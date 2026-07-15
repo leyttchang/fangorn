@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bwq4tvxnrffrt"]
+
+[ext_resource type="Script" uid="uid://fcffevjvcxgn" path="res://scripts/abilities/Burning_ground/burning_ground.gd" id="1_ku3dy"]
+[ext_resource type="PackedScene" uid="uid://bq82o86mbcy58" path="res://objet/ground_fire.tscn" id="1_r4dt6"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="2_to7cv"]
+
+[node name="burning_ground" type="Node3D" unique_id=1594176735 node_paths=PackedStringArray("scaling_component")]
+script = ExtResource("1_ku3dy")
+scaling_component = NodePath("SpellScalingComponent")
+
+[node name="ground_fire" parent="." unique_id=186284986 instance=ExtResource("1_r4dt6")]
+
+[node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("2_to7cv")]
+attack_component = NodePath("../ground_fire/AttackComponent")
+base_impact_radius = 5.0
+
+[editable path="ground_fire"]
+[editable path="ground_fire/AttackComponent"]

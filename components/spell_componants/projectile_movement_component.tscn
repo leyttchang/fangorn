@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c8vpbw6n27cqq"]
+
+[ext_resource type="Script" uid="uid://6y64edm0cuig" path="res://components/spell_componants/projectile_movement_component.gd" id="1_tlv7j"]
+
+[node name="ProjectileMovementComponent" type="Node3D" unique_id=810223984]
+script = ExtResource("1_tlv7j")

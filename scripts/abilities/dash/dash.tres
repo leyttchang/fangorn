@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://c48j238bwssjh"]
+
+[ext_resource type="PackedScene" uid="uid://c8l2qxcste64b" path="res://scripts/abilities/dash/dash.tscn" id="1_dl6yv"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_t1i8s"]
+[ext_resource type="Texture2D" uid="uid://f2nd41iqxs61" path="res://assets/icon/Mythril Age Icons/shield-bash.png" id="2_62800"]
+
+[resource]
+script = ExtResource("1_t1i8s")
+ability_name = "Dash"
+icon = ExtResource("2_62800")
+ability_scene = ExtResource("1_dl6yv")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

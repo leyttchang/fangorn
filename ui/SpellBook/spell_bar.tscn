@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://byhe67undjbyr"]
+
+[ext_resource type="PackedScene" uid="uid://cm1s4kb4n2s8d" path="res://ui/SpellBook/spell_b_slot.tscn" id="1_jgo48"]
+[ext_resource type="Script" uid="uid://b4gs88bp8ida8" path="res://ui/SpellBook/spell_bar.gd" id="1_p6csa"]
+
+[node name="Spell_bar" type="CanvasLayer" unique_id=243740632]
+script = ExtResource("1_p6csa")
+
+[node name="MainPanel" type="Control" parent="." unique_id=403461903]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="inventaire" type="ColorRect" parent="MainPanel" unique_id=1824694739]
+custom_minimum_size = Vector2(400, 50)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -62.940002
+offset_right = 200.0
+offset_bottom = -12.940002
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.148935, 0.148935, 0.148935, 1)
+
+[node name="inv_grid" type="GridContainer" parent="MainPanel/inventaire" unique_id=468804349]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 2
+columns = 6
+metadata/_edit_use_anchors_ = true
+
+[node name="Spell_B_Slot" parent="MainPanel/inventaire/inv_grid" unique_id=178112762 instance=ExtResource("1_jgo48")]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+script = null
+
+[node name="Spell_B_Slot2" parent="MainPanel/inventaire/inv_grid" unique_id=838106293 instance=ExtResource("1_jgo48")]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+script = null
+
+[node name="Spell_B_Slot3" parent="MainPanel/inventaire/inv_grid" unique_id=133791228 instance=ExtResource("1_jgo48")]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+script = null
+
+[node name="Spell_B_Slot4" parent="MainPanel/inventaire/inv_grid" unique_id=1085232698 instance=ExtResource("1_jgo48")]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+script = null
+
+[node name="Spell_B_Slot5" parent="MainPanel/inventaire/inv_grid" unique_id=1656305982 instance=ExtResource("1_jgo48")]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+script = null
+
+[node name="Spell_B_Slot6" parent="MainPanel/inventaire/inv_grid" unique_id=1730845879 instance=ExtResource("1_jgo48")]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+script = null

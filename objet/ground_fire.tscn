@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://bq82o86mbcy58"]
+
+[ext_resource type="PackedScene" uid="uid://vn0m85i8b4sj" path="res://particule/fire/ground_fire_particles.tscn" id="1_6o3xb"]
+[ext_resource type="Script" uid="uid://cyuqoxe4r1pmc" path="res://objet/ground_fire.gd" id="1_ao5di"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_l6b05"]
+[ext_resource type="Script" uid="uid://by5m82k7jhbrr" path="res://components/continuous_attack_component.gd" id="4_j0opw"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ao5di"]
+height = 0.5
+radius = 4.0
+
+[node name="ground_fire" type="Node3D" unique_id=186284986]
+script = ExtResource("1_ao5di")
+
+[node name="ground_fire_particles" parent="." unique_id=2102614159 instance=ExtResource("1_6o3xb")]
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_l6b05")]
+collision_layer = 20
+collision_mask = 10
+knockback_force = 0.0
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+shape = SubResource("CylinderShape3D_ao5di")
+
+[node name="ContinuousAttackComponant" type="Node3D" parent="." unique_id=516031327 node_paths=PackedStringArray("attack_component")]
+script = ExtResource("4_j0opw")
+attack_component = NodePath("../AttackComponent")
+tick_rate = 0.1
+
+[editable path="AttackComponent"]

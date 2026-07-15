@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://bhvj2ircd33r1"]
+
+[ext_resource type="Script" uid="uid://1tpgb805q8qc" path="res://ui/inventaire/inventory_ui.gd" id="1_oeit1"]
+[ext_resource type="PackedScene" uid="uid://b7hriebjyeir" path="res://ui/inventaire/inventory_slot.tscn" id="2_jiv3e"]
+[ext_resource type="PackedScene" uid="uid://b0wrst7mamwji" path="res://ui/inventaire/equipment_slot.tscn" id="3_sitvp"]
+
+[node name="InventoryUI" type="CanvasLayer" unique_id=1946714399]
+script = ExtResource("1_oeit1")
+slot_scene = ExtResource("2_jiv3e")
+
+[node name="MainPanel" type="Control" parent="." unique_id=2104048239]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="inventaire" type="ColorRect" parent="MainPanel" unique_id=327391410]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 375.0
+offset_top = 164.0
+offset_right = -277.0
+offset_bottom = -184.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.148935, 0.148935, 0.148935, 1)
+
+[node name="inv_grid" type="GridContainer" parent="MainPanel/inventaire" unique_id=1964638]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+columns = 5
+
+[node name="equipe" type="ColorRect" parent="MainPanel" unique_id=1349708289]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 116.0
+offset_top = 124.0
+offset_right = -831.0
+offset_bottom = -141.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.148935, 0.148935, 0.148935, 1)
+
+[node name="equipment_slot" parent="MainPanel/equipe" unique_id=178112762 instance=ExtResource("3_sitvp")]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 35.0
+offset_right = 127.0
+offset_bottom = 99.0

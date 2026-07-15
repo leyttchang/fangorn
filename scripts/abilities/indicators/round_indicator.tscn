@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bnemrb3vjo0la"]
+
+[ext_resource type="Texture2D" uid="uid://cfou000j4v2wv" path="res://icon.svg" id="1_465n0"]
+
+[node name="round_indicator" type="Decal" unique_id=1668346238]
+texture_albedo = ExtResource("1_465n0")

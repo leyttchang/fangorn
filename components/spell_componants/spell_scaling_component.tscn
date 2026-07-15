@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b28h68cl712if"]
+
+[ext_resource type="Script" uid="uid://dknwc1yamdkbp" path="res://components/spell_componants/spell_scaling_component.gd" id="1_wh6di"]
+
+[node name="SpellScalingComponent" type="Node3D" unique_id=1128614238]
+script = ExtResource("1_wh6di")

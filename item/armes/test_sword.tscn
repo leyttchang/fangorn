@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://8k77usk0x7g0"]
+
+[ext_resource type="Script" uid="uid://36q1gw7f0ytp" path="res://item/armes/weapon.gd" id="1_dtvns"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="1_vskvh"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_hlie2"]
+size = Vector3(0.1, 1, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m1j5a"]
+size = Vector3(0.11, 1.1, 0.11)
+
+[node name="TestSword" type="Node3D" unique_id=2020783524]
+script = ExtResource("1_dtvns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1842833283]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_hlie2")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_vskvh")]
+collision_layer = 4
+collision_mask = 8
+knockback_force = 5.0
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_m1j5a")
+disabled = true
+
+[editable path="AttackComponent"]

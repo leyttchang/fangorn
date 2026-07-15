@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponItem" format=3 uid="uid://cubsij5q17dky"]
+
+[ext_resource type="Texture2D" uid="uid://cuhjrv04p384e" path="res://assets/icon/fc155.png" id="1_oe5x5"]
+[ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="2_oe5x5"]
+[ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="3_oe5x5"]
+
+[resource]
+script = ExtResource("2_oe5x5")
+weapon_scene = ExtResource("3_oe5x5")
+item_name = "Test Sword"
+description = "test sword"
+icon = ExtResource("1_oe5x5")
+item_type = 0
+weapon_style = 1
+metadata/_custom_type_script = "uid://dgtcfko7wc1cp"

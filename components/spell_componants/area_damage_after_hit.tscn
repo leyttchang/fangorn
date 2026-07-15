@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bkf8u24x228xv"]
+
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="1_3o166"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_0x40h"]
+radius = 4.0
+
+[node name="explosion_after_hit" type="Node3D" unique_id=341895869]
+
+[node name="explosion" parent="." unique_id=63324796 instance=ExtResource("1_3o166")]
+damage = 10.0
+
+[node name="CollisionShape3D" parent="explosion" index="0" unique_id=710296738]
+shape = SubResource("SphereShape3D_0x40h")
+disabled = true
+
+[editable path="explosion"]

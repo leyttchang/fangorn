@@ -1,0 +1,179 @@
+[gd_scene format=3 uid="uid://dad6pbsu7b6s5"]
+
+[ext_resource type="Script" uid="uid://6e61gbw6gugj" path="res://character/player.gd" id="1_2orxn"]
+[ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="2_aypkh"]
+[ext_resource type="Script" uid="uid://4lgdql2xgv6l" path="res://character/main_droite.gd" id="2_dkowc"]
+[ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="2_j51ly"]
+[ext_resource type="Resource" uid="uid://cubsij5q17dky" path="res://item/armes/test_sword_stats.tres" id="3_a1kp2"]
+[ext_resource type="Resource" uid="uid://3ts10m6vmiwm" path="res://character/player_stats.tres" id="3_hhoun"]
+[ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_hhoun"]
+[ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="5_bdyh8"]
+[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
+[ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="9_b6pse"]
+[ext_resource type="Resource" uid="uid://cs618ik4co076" path="res://scripts/abilities/fireball/fireball.tres" id="10_hn1kw"]
+[ext_resource type="Resource" uid="uid://c48j238bwssjh" path="res://scripts/abilities/dash/dash.tres" id="10_i6sb3"]
+[ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
+[ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
+[ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
+[ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
+
+[sub_resource type="Animation" id="Animation_a1kp2"]
+resource_name = "1 handed sword"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.6, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.20943952, 0, 0), Vector3(-2.0943952, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.6, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.1, -0.7), Vector3(0.5, -1, -1), Vector3(0.5, -0.9, -1)]
+}
+
+[sub_resource type="Animation" id="Animation_xqqx8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.20943952, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_aw5rd"]
+_data = {
+&"1 handed sword": SubResource("Animation_a1kp2"),
+&"RESET": SubResource("Animation_xqqx8")
+}
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
+top_radius = 0.15
+bottom_radius = 0.05
+height = 0.4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qe16m"]
+
+[node name="player" type="CharacterBody3D" unique_id=967643559 node_paths=PackedStringArray("camera")]
+script = ExtResource("1_2orxn")
+camera = NodePath("Camera3D")
+arme_de_depart = ExtResource("2_j51ly")
+"epée" = ExtResource("3_a1kp2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1568168780]
+mesh = SubResource("CapsuleMesh_hlie2")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1922960757]
+shape = SubResource("CapsuleShape3D_hlie2")
+metadata/_edit_group_ = true
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1689323841]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
+metadata/_edit_group_ = true
+
+[node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
+transform = Transform3D(1, 0, 0, 0, 0.9781476, -0.2079117, 0, 0.2079117, 0.9781476, 0.5, -0.9, -1)
+script = ExtResource("2_dkowc")
+
+[node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=729055229]
+target_position = Vector3(0, 0, -50)
+
+[node name="CastPoint" type="Marker3D" parent="Camera3D" unique_id=288234638]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Camera3D" unique_id=1837715065]
+root_node = NodePath("../MainDroite")
+libraries/ = SubResource("AnimationLibrary_aw5rd")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1688824659]
+transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 0, 0.4775703, -0.48433536)
+mesh = SubResource("CylinderMesh_hlie2")
+metadata/_edit_group_ = true
+
+[node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712]
+unique_name_in_owner = true
+script = ExtResource("2_aypkh")
+starting_stats = ExtResource("3_hhoun")
+
+[node name="HealthComponent" type="Node3D" parent="." unique_id=1333908518 node_paths=PackedStringArray("stats_component")]
+script = ExtResource("4_hhoun")
+stats_component = NodePath("../StatsComponent")
+armor_curve = ExtResource("7_hn1kw")
+
+[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component") instance=ExtResource("5_bdyh8")]
+collision_layer = 2
+collision_mask = 0
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_qe16m")
+
+[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast")]
+script = ExtResource("8_pw6nv")
+slots = Dictionary[String, ExtResource("9_b6pse")]({
+"slot_1": ExtResource("10_hn1kw"),
+"slot_2": null,
+"slot_3": ExtResource("10_i6sb3"),
+"slot_4": null,
+"slot_5": null,
+"slot_6": null
+})
+raycast = NodePath("../Camera3D/RayCast3D")
+
+[node name="InventoryComponent" parent="." unique_id=1175652799 instance=ExtResource("13_ps75u")]
+
+[node name="EquipmentComponent" parent="." unique_id=952356501 node_paths=PackedStringArray("inventory_component", "stats_component") instance=ExtResource("14_3u2u7")]
+inventory_component = NodePath("../InventoryComponent")
+stats_component = NodePath("../StatsComponent")
+
+[node name="VisualEquipmentManager" parent="." unique_id=542156590 node_paths=PackedStringArray("equipment_component", "main_droite") instance=ExtResource("15_j51ly")]
+equipment_component = NodePath("../EquipmentComponent")
+main_droite = NodePath("../Camera3D/MainDroite")
+
+[node name="InventoryUI" parent="." unique_id=1946714399 node_paths=PackedStringArray("inventory_component", "equipment_component") instance=ExtResource("16_xqqx8")]
+inventory_component = NodePath("../InventoryComponent")
+equipment_component = NodePath("../EquipmentComponent")
+
+[node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component")]
+equipment_component = NodePath("../../../../EquipmentComponent")
+
+[editable path="HitboxComponent"]
+[editable path="InventoryUI"]

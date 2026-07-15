@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://coj4bs1y7mwte"]
+
+[ext_resource type="Script" uid="uid://dmkj7y2chruav" path="res://scripts/abilities/fireball/fireball_c.gd" id="1_i3gd7"]
+[ext_resource type="PackedScene" uid="uid://bq82o86mbcy58" path="res://objet/ground_fire.tscn" id="2_24oj3"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_vrer4"]
+[ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="4_0x40h"]
+[ext_resource type="PackedScene" uid="uid://c8vpbw6n27cqq" path="res://components/spell_componants/projectile_movement_component.tscn" id="4_24oj3"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="5_vrer4"]
+[ext_resource type="PackedScene" uid="uid://3nja3oqtkxia" path="res://components/spell_componants/impact_spawner_component.tscn" id="6_0x40h"]
+[ext_resource type="PackedScene" uid="uid://bkf8u24x228xv" path="res://components/spell_componants/area_damage_after_hit.tscn" id="8_x5wq2"]
+[ext_resource type="Script" uid="uid://754224kx8r1s" path="res://components/spell_componants/explosion-after_hit_after_hit.gd" id="9_o14cw"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_hlie2"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_56r4w"]
+radius = 0.6
+
+[node name="fireball" type="RigidBody3D" unique_id=247738793]
+collision_layer = 0
+script = ExtResource("1_i3gd7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1783134167]
+mesh = SubResource("SphereMesh_hlie2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2120570958]
+shape = SubResource("SphereShape3D_hlie2")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("3_vrer4")]
+collision_layer = 4
+collision_mask = 9
+damage = 100.0
+destroy_on_environment = true
+knockback_force = 10.0
+is_projectile = true
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+shape = SubResource("SphereShape3D_56r4w")
+
+[node name="fire_paricles" parent="." unique_id=1474207563 instance=ExtResource("4_0x40h")]
+
+[node name="ProjectileMovementComponent" parent="." unique_id=810223984 instance=ExtResource("4_24oj3")]
+
+[node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("5_vrer4")]
+attack_component = NodePath("../AttackComponent")
+
+[node name="ImpactSpawnerComponent" parent="." unique_id=19574901 node_paths=PackedStringArray("attack_component", "scaling_component") instance=ExtResource("6_0x40h")]
+impact_scene = ExtResource("2_24oj3")
+attack_component = NodePath("../AttackComponent")
+scaling_component = NodePath("../SpellScalingComponent")
+
+[node name="explosion_after_hit" parent="." unique_id=341895869 node_paths=PackedStringArray("attack_component", "scaling_component", "explosion") instance=ExtResource("8_x5wq2")]
+script = ExtResource("9_o14cw")
+attack_component = NodePath("../AttackComponent")
+scaling_component = NodePath("../SpellScalingComponent")
+explosion = NodePath("explosion")
+ratio_degat = 0.3
+
+[node name="explosion" parent="explosion_after_hit" index="0" unique_id=63324796]
+collision_layer = 4
+collision_mask = 8
+knockback_force = 9.0
+
+[editable path="AttackComponent"]
+[editable path="explosion_after_hit"]
+[editable path="explosion_after_hit/explosion"]

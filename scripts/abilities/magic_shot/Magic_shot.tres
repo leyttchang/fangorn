@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://bbtanhurht03s"]
+
+[ext_resource type="PackedScene" uid="uid://2gxlbnerkd5y" path="res://scripts/abilities/magic_shot/magic_shot.tscn" id="1_0oae6"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_quav2"]
+[ext_resource type="Texture2D" uid="uid://obdfslgne3jo" path="res://assets/icon/Mythril Age Icons/arrow-scope.png" id="2_52odb"]
+
+[resource]
+script = ExtResource("1_quav2")
+ability_name = "Magic Shot"
+icon = ExtResource("2_52odb")
+target_mode = 1
+ability_scene = ExtResource("1_0oae6")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

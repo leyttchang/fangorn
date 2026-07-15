@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://jvy84ml4qbnk"]
+
+[ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="1_67f0w"]
+[ext_resource type="Script" uid="uid://bxygnpjrinlrb" path="res://character/dummy.gd" id="1_uij62"]
+[ext_resource type="Resource" uid="uid://c6ffpu2048j4x" path="res://character/dummy_stats.tres" id="2_sjyxn"]
+[ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="3_hw4ky"]
+[ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="4_uij62"]
+[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="5_2vqka"]
+[ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="7_luoob"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hlie2"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_2vqka"]
+height = 2.1
+radius = 0.6
+
+[node name="Dummy" type="CharacterBody3D" unique_id=198686853]
+script = ExtResource("1_uij62")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2127880368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_hlie2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1007231989]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_hlie2")
+
+[node name="StatsComponent" type="Node3D" parent="." unique_id=820381273]
+script = ExtResource("1_67f0w")
+starting_stats = ExtResource("2_sjyxn")
+
+[node name="HealthComponent" type="Node3D" parent="." unique_id=1248471252 node_paths=PackedStringArray("stats_component")]
+script = ExtResource("3_hw4ky")
+stats_component = NodePath("../StatsComponent")
+armor_curve = ExtResource("5_2vqka")
+
+[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("4_uij62")]
+collision_layer = 8
+collision_mask = 0
+health_component = NodePath("../HealthComponent")
+knockback_component = NodePath("../knockback_componant")
+
+[node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_2vqka")
+
+[node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("7_luoob")]
+stats_component = NodePath("../StatsComponent")
+
+[editable path="HitboxComponent"]

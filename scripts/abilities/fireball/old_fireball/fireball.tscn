@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://grl3ct3lv7sy"]
+
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="1_56r4w"]
+[ext_resource type="Script" uid="uid://py8mijvvxgcv" path="res://scripts/abilities/fireball/old_fireball/fireball.gd" id="1_pdba5"]
+[ext_resource type="PackedScene" uid="uid://bq82o86mbcy58" path="res://objet/ground_fire.tscn" id="2_c3ldr"]
+[ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="3_mf1h6"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_hlie2"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_56r4w"]
+radius = 0.6
+
+[node name="fireball" type="RigidBody3D" unique_id=247738793]
+collision_layer = 0
+script = ExtResource("1_pdba5")
+ground_fire_duration = 5.0
+impact_scene = ExtResource("2_c3ldr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1783134167]
+mesh = SubResource("SphereMesh_hlie2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2120570958]
+shape = SubResource("SphereShape3D_hlie2")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_56r4w")]
+collision_layer = 4
+collision_mask = 9
+damage = 10.0
+destroy_on_environment = true
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+shape = SubResource("SphereShape3D_56r4w")
+
+[node name="fire_paricles" parent="." unique_id=1474207563 instance=ExtResource("3_mf1h6")]
+
+[editable path="AttackComponent"]

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cs8orhii0a0o7"]
+
+[ext_resource type="Script" uid="uid://jw3hk4tfnren" path="res://components/visual_equipment_manager.gd" id="1_gykkk"]
+
+[node name="VisualEquipmentManager" type="Node3D" unique_id=542156590]
+script = ExtResource("1_gykkk")

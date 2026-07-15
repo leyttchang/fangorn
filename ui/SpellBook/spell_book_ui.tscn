@@ -1,0 +1,148 @@
+[gd_scene format=3 uid="uid://cw1qnfxqpge0t"]
+
+[ext_resource type="Script" uid="uid://w3xxdepu757s" path="res://ui/SpellBook/spell_book_ui.gd" id="1_72jq0"]
+[ext_resource type="PackedScene" uid="uid://ch8b412k8kv3p" path="res://ui/SpellBook/spell_u_slot.tscn" id="2_5xpyw"]
+[ext_resource type="PackedScene" uid="uid://cej2xjh3uvh3y" path="res://ui/SpellBook/spell_e_slot.tscn" id="3_dl83h"]
+
+[node name="SpellBook_UI" type="CanvasLayer" unique_id=1946714399]
+script = ExtResource("1_72jq0")
+
+[node name="MainPanel" type="Control" parent="." unique_id=2104048239]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="inventaire" type="ColorRect" parent="MainPanel" unique_id=327391410]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 375.0
+offset_top = 164.0
+offset_right = -277.0
+offset_bottom = -184.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.148935, 0.148935, 0.148935, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="inv_grid" type="GridContainer" parent="MainPanel/inventaire" unique_id=1964638]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+columns = 5
+metadata/_edit_use_anchors_ = true
+
+[node name="Spell_U_Slot" parent="MainPanel/inventaire/inv_grid" unique_id=178112762 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot2" parent="MainPanel/inventaire/inv_grid" unique_id=999834282 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot3" parent="MainPanel/inventaire/inv_grid" unique_id=973596879 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot4" parent="MainPanel/inventaire/inv_grid" unique_id=1505222051 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot5" parent="MainPanel/inventaire/inv_grid" unique_id=1392790704 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot6" parent="MainPanel/inventaire/inv_grid" unique_id=6632815 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot7" parent="MainPanel/inventaire/inv_grid" unique_id=1099745106 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot8" parent="MainPanel/inventaire/inv_grid" unique_id=258986615 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot9" parent="MainPanel/inventaire/inv_grid" unique_id=1078117236 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot10" parent="MainPanel/inventaire/inv_grid" unique_id=1350555323 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot11" parent="MainPanel/inventaire/inv_grid" unique_id=595451629 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot12" parent="MainPanel/inventaire/inv_grid" unique_id=296249305 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot13" parent="MainPanel/inventaire/inv_grid" unique_id=2146737062 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot14" parent="MainPanel/inventaire/inv_grid" unique_id=1491145827 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot15" parent="MainPanel/inventaire/inv_grid" unique_id=1505843897 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot16" parent="MainPanel/inventaire/inv_grid" unique_id=1574910599 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot17" parent="MainPanel/inventaire/inv_grid" unique_id=1937547943 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot18" parent="MainPanel/inventaire/inv_grid" unique_id=81463527 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot19" parent="MainPanel/inventaire/inv_grid" unique_id=1027847361 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="Spell_U_Slot20" parent="MainPanel/inventaire/inv_grid" unique_id=1672116855 instance=ExtResource("2_5xpyw")]
+layout_mode = 2
+
+[node name="equipe" type="ColorRect" parent="MainPanel" unique_id=1349708289]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 116.0
+offset_top = 124.0
+offset_right = -831.0
+offset_bottom = -141.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.148935, 0.148935, 0.148935, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="inv_grid" type="GridContainer" parent="MainPanel/equipe" unique_id=498716029]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Spell_E_Slot" parent="MainPanel/equipe/inv_grid" unique_id=2106870090 instance=ExtResource("3_dl83h")]
+layout_mode = 2
+
+[node name="Spell_E_Slot2" parent="MainPanel/equipe/inv_grid" unique_id=976184506 instance=ExtResource("3_dl83h")]
+layout_mode = 2
+
+[node name="Spell_E_Slot3" parent="MainPanel/equipe/inv_grid" unique_id=468406677 instance=ExtResource("3_dl83h")]
+layout_mode = 2
+
+[node name="Spell_E_Slot4" parent="MainPanel/equipe/inv_grid" unique_id=605569513 instance=ExtResource("3_dl83h")]
+layout_mode = 2
+
+[node name="Spell_E_Slot5" parent="MainPanel/equipe/inv_grid" unique_id=46740029 instance=ExtResource("3_dl83h")]
+layout_mode = 2
+
+[node name="Spell_E_Slot6" parent="MainPanel/equipe/inv_grid" unique_id=1572728227 instance=ExtResource("3_dl83h")]
+layout_mode = 2

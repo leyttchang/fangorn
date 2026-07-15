@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://3nja3oqtkxia"]
+
+[ext_resource type="Script" uid="uid://drirdfv5wsbb0" path="res://impact_spawner_component.gd" id="1_fuqdm"]
+
+[node name="ImpactSpawnerComponent" type="Node3D" unique_id=19574901]
+script = ExtResource("1_fuqdm")

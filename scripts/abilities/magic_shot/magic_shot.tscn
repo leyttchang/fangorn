@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://2gxlbnerkd5y"]
+
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="1_1rj1f"]
+[ext_resource type="Script" uid="uid://dan4awd35g8on" path="res://scripts/abilities/magic_shot/magic_shot.gd" id="1_7deol"]
+[ext_resource type="PackedScene" uid="uid://c8vpbw6n27cqq" path="res://components/spell_componants/projectile_movement_component.tscn" id="2_0d483"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="3_7deol"]
+[ext_resource type="PackedScene" uid="uid://3nja3oqtkxia" path="res://components/spell_componants/impact_spawner_component.tscn" id="4_0d483"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yqkk6"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yqkk6"]
+particle_flag_align_y = true
+direction = Vector3(0, 0, -1)
+spread = 35.217
+initial_velocity_min = 1.0
+initial_velocity_max = 4.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.03
+scale_max = 0.099999994
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_3bpsp"]
+
+[node name="magic_shot" type="RigidBody3D" unique_id=2061275323]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+collision_layer = 0
+script = ExtResource("1_7deol")
+lifespan = 5.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=301352468]
+transform = Transform3D(0.2, 0, 0, 0, -8.742278e-09, -0.2, 0, 0.2, -8.742278e-09, 0, 0, 0.2)
+shape = SubResource("CapsuleShape3D_hlie2")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_1rj1f")]
+collision_layer = 4
+collision_mask = 9
+damage = 15.0
+destroy_on_environment = true
+knockback_force = 2.0
+is_projectile = true
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(0.3, 0, 0, 0, -1.3113417e-08, -0.3, 0, 0.3, -1.3113417e-08, 0, 0, 0.2)
+shape = SubResource("CapsuleShape3D_yqkk6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=233078867]
+transform = Transform3D(0.2, 0, 0, 0, -8.742278e-09, -0.2, 0, 0.2, -8.742278e-09, 0, 0, 0.2)
+mesh = SubResource("CapsuleMesh_hlie2")
+
+[node name="ProjectileMovementComponent" parent="." unique_id=810223984 instance=ExtResource("2_0d483")]
+projectile_speed = 50.0
+
+[node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("3_7deol")]
+attack_component = NodePath("../AttackComponent")
+
+[node name="ImpactSpawnerComponent" parent="." unique_id=19574901 node_paths=PackedStringArray("attack_component", "scaling_component") instance=ExtResource("4_0d483")]
+attack_component = NodePath("../AttackComponent")
+scaling_component = NodePath("../SpellScalingComponent")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1469635849]
+process_material = SubResource("ParticleProcessMaterial_yqkk6")
+draw_pass_1 = SubResource("CapsuleMesh_3bpsp")
+
+[editable path="AttackComponent"]
+[editable path="ProjectileMovementComponent"]
+[editable path="SpellScalingComponent"]

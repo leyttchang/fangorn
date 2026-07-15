@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://gu5hxjbjuwrq"]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ilgln"]
+[ext_resource type="PackedScene" uid="uid://bwq4tvxnrffrt" path="res://scripts/abilities/Burning_ground/burning_ground.tscn" id="1_x2yls"]
+[ext_resource type="PackedScene" uid="uid://bnemrb3vjo0la" path="res://scripts/abilities/indicators/round_indicator.tscn" id="2_8dwsn"]
+[ext_resource type="Texture2D" uid="uid://yx4esj5bq7eh" path="res://assets/icon/Mythril Age Icons/embrassed-energy.png" id="2_h8d7u"]
+
+[resource]
+script = ExtResource("1_ilgln")
+ability_name = "Burning Ground"
+icon = ExtResource("2_h8d7u")
+cooldown = 3.0
+target_mode = 3
+indicator_scene = ExtResource("2_8dwsn")
+ability_scene = ExtResource("1_x2yls")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"
