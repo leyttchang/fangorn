@@ -12,17 +12,19 @@
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
 [ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="9_b6pse"]
-[ext_resource type="Resource" uid="uid://cs618ik4co076" path="res://scripts/abilities/fireball/fireball.tres" id="10_hn1kw"]
+[ext_resource type="Resource" uid="uid://cs618ik4co076" path="res://scripts/abilities/fireball/Fireball.tres" id="10_hn1kw"]
 [ext_resource type="Resource" uid="uid://c48j238bwssjh" path="res://scripts/abilities/dash/dash.tres" id="10_i6sb3"]
 [ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
 [ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
-[ext_resource type="Resource" uid="uid://bbtanhurht03s" path="res://scripts/abilities/magic_shot/Magic_shot.tres" id="14_t461u"]
+[ext_resource type="Resource" uid="uid://qvuc7exik4g5" path="res://scripts/abilities/magic_shot/MagicShot.tres" id="14_t461u"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
 [ext_resource type="Resource" uid="uid://gu5hxjbjuwrq" path="res://scripts/abilities/Burning_ground/BurningGround.tres" id="16_gh4hd"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
 [ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="21_ynykn"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="21_yr573"]
+[ext_resource type="PackedScene" uid="uid://cm8vpgrn4bp77" path="res://ui/SpellBook/Casting_Bar.tscn" id="24_u2y57"]
+[ext_resource type="PackedScene" uid="uid://cg50ca34fajqd" path="res://ui/crosshair.tscn" id="25_tr32s"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
@@ -211,10 +213,11 @@ armor_curve = ExtResource("7_hn1kw")
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("21_yr573")]
 stats_component = NodePath("../StatsComponent")
 
-[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component") instance=ExtResource("5_bdyh8")]
+[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("5_bdyh8")]
 collision_layer = 2
 collision_mask = 0
 health_component = NodePath("../HealthComponent")
+knockback_component = NodePath("../knockback_componant")
 
 [node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
@@ -242,6 +245,8 @@ stats_component = NodePath("../StatsComponent")
 equipment_component = NodePath("../EquipmentComponent")
 main_droite = NodePath("../Camera3D/MainDroite")
 
+[node name="Crosshair" parent="." unique_id=894221743 instance=ExtResource("25_tr32s")]
+
 [node name="InventoryUI" parent="." unique_id=1946714399 node_paths=PackedStringArray("inventory_component", "equipment_component") instance=ExtResource("16_xqqx8")]
 inventory_component = NodePath("../InventoryComponent")
 equipment_component = NodePath("../EquipmentComponent")
@@ -256,6 +261,10 @@ skill_bar = NodePath("../SkillBarComponent")
 visible = false
 skill_bar = NodePath("../SkillBarComponent")
 unlocked_spells = Array[ExtResource("9_b6pse")]([ExtResource("16_gh4hd"), ExtResource("10_i6sb3"), ExtResource("10_hn1kw"), ExtResource("14_t461u")])
+
+[node name="CastingBar" parent="." unique_id=1878220428 node_paths=PackedStringArray("skill_bar") instance=ExtResource("24_u2y57")]
+visible = false
+skill_bar = NodePath("../SkillBarComponent")
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

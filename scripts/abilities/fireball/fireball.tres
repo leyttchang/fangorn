@@ -1,14 +1,15 @@
 [gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cs618ik4co076"]
 
-[ext_resource type="PackedScene" uid="uid://coj4bs1y7mwte" path="res://scripts/abilities/fireball/fireball_c.tscn" id="1_cpexj"]
-[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_hch2r"]
-[ext_resource type="Texture2D" uid="uid://c71msakx26sls" path="res://assets/icon/Mythril Age Icons/flaming-sheet.png" id="2_vss01"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_20ysy"]
+[ext_resource type="PackedScene" uid="uid://coj4bs1y7mwte" path="res://scripts/abilities/fireball/fireball_c.tscn" id="1_i6nhm"]
+[ext_resource type="Texture2D" uid="uid://c71msakx26sls" path="res://assets/icon/Mythril Age Icons/flaming-sheet.png" id="1_w6ik7"]
 
 [resource]
-script = ExtResource("1_hch2r")
-ability_name = "fireball"
-icon = ExtResource("2_vss01")
+script = ExtResource("1_20ysy")
+ability_name = "Fireball"
+icon = ExtResource("1_w6ik7")
 cooldown = 3.0
+cast_time = 2.0
 target_mode = 1
-ability_scene = ExtResource("1_cpexj")
+ability_scene = ExtResource("1_i6nhm")
 metadata/_custom_type_script = "uid://3lwhmf27kto3"

@@ -24,7 +24,7 @@ func _ready():
 	_stats["movement_speed"] = Stat.new(starting_stats.movement_speed)
 	_stats["knockback_power"] = Stat.new(starting_stats.knockback_power)
 	_stats["knockback_resistance"] = Stat.new(starting_stats.knockback_resistance)
-
+	_stats["casting_speed"] = Stat.new(starting_stats.casting_speed)
 # Fonction pour récupérer rapidement la valeur finale (ex: pour taper un ennemi)
 func get_stat_value(stat_name: String) -> float:
 	if _stats.has(stat_name):

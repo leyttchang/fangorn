@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cm8vpgrn4bp77"]
+
+[ext_resource type="Script" uid="uid://cq8sx0al25pmx" path="res://ui/SpellBook/casting_bar.gd" id="1_1qebg"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlie2"]
+size = Vector2(150, 25)
+
+[node name="CastingBar" type="CanvasLayer" unique_id=1878220428]
+script = ExtResource("1_1qebg")
+
+[node name="Control" type="Control" parent="." unique_id=1245251249]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Spell_casting_completion" type="TextureProgressBar" parent="Control" unique_id=943436953]
+custom_minimum_size = Vector2(150, 25)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -75.0
+offset_top = -148.47
+offset_right = 75.0
+offset_bottom = -108.47009
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+step = 0.01
+texture_progress = SubResource("PlaceholderTexture2D_hlie2")
+tint_progress = Color(1.3621961, 0, 1.5896477, 0.80784315)

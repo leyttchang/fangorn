@@ -12,6 +12,8 @@ signal equipment_changed(slot_name: String, item: ItemData)
 var equipped_items: Dictionary = {
 	"head": null,
 	"chest": null,
+	"legs": null,
+	"boots": null,
 	"main_hand": null,
 	"off_hand": null,
 	"ring_1": null,

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dpb1mwe1g2a53"]
+
+[ext_resource type="PackedScene" uid="uid://pgcyx0lli8mn" path="res://scripts/abilities/Ice Crash/ice_crash.tscn" id="1_4ipbx"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_e8vsc"]
+[ext_resource type="Texture2D" uid="uid://dkn4mke1c0n4o" path="res://assets/icon/Mythril Age Icons/pointy-sword.png" id="1_fkfg7"]
+
+[resource]
+script = ExtResource("1_e8vsc")
+ability_name = "Ice Crash"
+icon = ExtResource("1_fkfg7")
+category = 1
+cooldown = 3.0
+weapon_damage_multiplier = 1.5
+weapon_speed_multiplier = 0.8
+anim_name = "attack_heavy_slam"
+ability_scene = ExtResource("1_4ipbx")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

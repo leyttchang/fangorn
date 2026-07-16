@@ -1,16 +1,23 @@
 extends Marker3D
 
 @onready var player_stats: StatsComponent = owner.get_node("StatsComponent")
+@onready var equipment: EquipmentComponent = owner.get_node("EquipmentComponent")
+# --- NOUVEAU : On récupère la barre de sort pour bloquer l'attaque pendant la magie ---
+@onready var skill_bar: SkillBarComponent = owner.get_node("SkillBarComponent")
 
 # N'oublie pas de vérifier que ce chemin pointe bien vers ton nœud AnimationPlayer !
 @onready var anim_player: AnimationPlayer =  %attack_animation
-@onready var equipment: EquipmentComponent = owner.get_node("EquipmentComponent")
+
 var is_attacking = false
 var current_weapon: Node3D = null
 
 func _input(event):
-	# SÉCURITÉ : Si la souris est libre sur l'écran (inventaire ouvert), on bloque l'attaque
+	# SÉCURITÉ 1 : Si la souris est libre sur l'écran (inventaire ouvert), on bloque l'attaque
 	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+		return
+		
+	# SÉCURITÉ 2 : On bloque l'attaque si on est en train de viser ou de charger un sort
+	if skill_bar != null and skill_bar.current_state != SkillBarComponent.State.IDLE:
 		return
 		
 	if event.is_action_pressed("r_click") and not is_attacking:
@@ -47,7 +54,6 @@ func attack():
 		anim_name = "attack_" + style_string 
 		
 
-	
 	# 7. On joue l'animation correspondante
 	if anim_player.has_animation(anim_name):
 		

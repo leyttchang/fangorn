@@ -13,3 +13,4 @@ extends Resource
 @export var movement_speed: float = 5.0
 @export var knockback_resistance: float = 1
 @export var knockback_power: float = 1
+@export var casting_speed: float = 1
