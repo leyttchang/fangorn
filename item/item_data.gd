@@ -8,8 +8,8 @@ extends Resource
 @export var icon: Texture2D
 
 # --- CATÉGORISATION ---
-enum ItemType { WEAPON, ARMOR, CONSUMABLE, RING, MATERIAL }
-@export var item_type: ItemType = ItemType.MATERIAL
+enum ItemType { main_hand, chest, legs, feet, head }
+@export var item_type: ItemType = ItemType.main_hand
 
 # 2. Catégorisation du style de l'arme (pour l'AnimationPlayer)
 enum WeaponStyle { AXE, SWORD, DAGGER, MACE, SPEAR }

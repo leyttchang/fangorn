@@ -14,4 +14,4 @@ enum WeaponSlot { ONE_HAND, TWO_HAND }
 func _init() -> void:
 	# Par défaut, quand tu créeras une arme, elle se mettra automatiquement 
 	# dans la bonne catégorie pour l'inventaire !
-	item_type = ItemType.WEAPON
+	item_type = ItemType.main_hand

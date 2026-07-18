@@ -1,34 +1,56 @@
 class_name EquipmentSlot
 extends Panel
 
-# Le nom de l'emplacement qu'on veut surveiller (par défaut la main droite)
 @export var slot_name: String = "main_hand" 
-
-# On a besoin du lien vers l'EquipmentComponent du joueur
 @export var equipment_component: EquipmentComponent
+@export var inventory_component: InventoryComponent # <-- C'EST LUI LE COUPABLE SI ÇA DUPLIQUE
 
 @onready var icon_rect: TextureRect = $Icon
 
 func _ready() -> void:
 	if equipment_component != null:
-		# 1. On branche nos oreilles sur le composant d'équipement
 		equipment_component.equipment_changed.connect(_on_equipment_changed)
-		
-		# 2. On affiche l'arme de départ (si le joueur a déjà un objet au lancement du jeu)
-		var starting_item = equipment_component.equipped_items[slot_name]
+		var starting_item = equipment_component.equipped_items.get(slot_name)
 		_update_visual(starting_item)
 	else:
-		push_warning("EquipmentSlot : Il manque le EquipmentComponent sur la case " + slot_name)
+		push_warning("EquipmentSlot : Il manque le EquipmentComponent sur " + slot_name)
+		
+	# Nouvelle sécurité au lancement :
+	if inventory_component == null:
+		push_warning("⚠️ ATTENTION : inventory_component manquant sur le slot " + slot_name + " ! La suppression d'objet va bugger.")
 
-# Cette fonction est appelée automatiquement dès qu'une arme est équipée/déséquipée
 func _on_equipment_changed(changed_slot_name: String, item: ItemData) -> void:
-	# Si l'équipement qui a changé correspond à NOTRE case (ex: "main_hand")
 	if changed_slot_name == slot_name:
 		_update_visual(item)
 
-# Fonction pour changer l'image
 func _update_visual(item: ItemData) -> void:
 	if item == null:
-		icon_rect.texture = null # Case vide
+		icon_rect.texture = null
 	else:
-		icon_rect.texture = item.icon # On affiche l'icône de l'arme
+		icon_rect.texture = item.icon
+
+func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+	if typeof(data) == TYPE_DICTIONARY and data.has("type") and data["type"] == "inventory_item":
+		var item: ItemData = data["item"]
+		var item_type_string = ItemData.ItemType.keys()[item.item_type]
+		
+		if item_type_string == slot_name:
+			return true
+			
+	return false 
+
+func _drop_data(at_position: Vector2, data: Variant) -> void:
+	var item_to_equip: ItemData = data["item"]
+	var source_index: int = data["source_index"]
+	
+	# 1. ON RETIRE L'OBJET DE L'INVENTAIRE EN PREMIER (On libère la case)
+	inventory_component.remove_item_at_slot(source_index, 1)
+	
+	# 2. On équipe la nouvelle arme. 
+	# La magie opère ici : si le joueur tient déjà une épée, ton 'EquipmentComponent' 
+	# va la déséquiper et la ranger LUI-MÊME dans la case qu'on vient juste de vider !
+	var success = equipment_component.equip_item(item_to_equip, slot_name)
+	
+	if not success:
+		# Sécurité : Si l'équipement échoue, on remet l'objet dans l'inventaire
+		inventory_component.add_item(item_to_equip, 1)

@@ -1,38 +1,44 @@
 class_name InventorySlot
 extends Panel
 
-# Le signal qui va crier à l'UI : "On m'a fait un clic droit !"
-signal slot_right_clicked(slot_index: int)
-
-@onready var icon_rect: TextureRect = $Icon
-@onready var quantity_label: Label = $Quantity
-
-# La mémoire de la case
-var my_index: int = -1
+var slot_index: int = -1
 var current_item: ItemData = null
 
-# On a ajouté "index" dans les paramètres
-func update_slot(item: ItemData, quantity: int, index: int) -> void:
-	current_item = item
-	my_index = index
-	
-	if item == null:
-		icon_rect.texture = null
-		quantity_label.text = ""
-	else:
-		icon_rect.texture = item.icon
-		if item.is_stackable and quantity > 1:
-			quantity_label.text = str(quantity)
-		else:
-			quantity_label.text = ""
+@onready var icon_rect: TextureRect = $Icon # Assure-toi que ton icône s'appelle bien "Icon"
 
-func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			print("Clic GAUCHE sur la case ", my_index)
-			
-		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			# Si la case n'est pas vide, on envoie le signal avec notre numéro !
-			if current_item != null:
-				slot_right_clicked.emit(my_index)
+func update_slot(item: ItemData, quantity: int, index: int) -> void:
+	slot_index = index
+	current_item = item
+	if item != null:
+		icon_rect.texture = item.icon
+	else:
+		icon_rect.texture = null
+
+# ==========================================
+# DÉBUT DU GLISSER (DRAG)
+# ==========================================
+func _get_drag_data(at_position: Vector2) -> Variant:
+	# S'il n'y a pas d'objet dans cette case, on ne fait rien
+	if current_item == null:
+		return null 
+
+	# 1. Création du fantôme visuel (l'icône qui suit la souris)
+	var preview_texture = TextureRect.new()
+	preview_texture.texture = current_item.icon
+	preview_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview_texture.custom_minimum_size = size # Prend la même taille que la case
+	preview_texture.modulate.a = 0.5 # Rend l'image semi-transparente
+	
+	var preview_control = Control.new()
+	preview_control.add_child(preview_texture)
+	preview_texture.position = -0.5 * size # Centre l'image sur le curseur de la souris
+	
+	set_drag_preview(preview_control) # Dit à Godot d'afficher ce fantôme
+
+	# 2. On emballe les données de l'objet pour le voyage
+	var payload = {
+		"type": "inventory_item",
+		"item": current_item,
+		"source_index": slot_index
+	}
+	return payload

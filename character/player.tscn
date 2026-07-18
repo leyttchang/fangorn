@@ -179,6 +179,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_aw5rd"]
 resource_name = "attack_sword"
+length = 0.7
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -186,7 +187,7 @@ tracks/0/path = NodePath(".:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.6, 1),
+"times": PackedFloat32Array(0, 0.2, 0.43333334, 0.6666667),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.20943952, 0, 0), Vector3(-2.0943952, 0, 0), Vector3(0, 0, 0)]
@@ -198,7 +199,7 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.6, 1),
+"times": PackedFloat32Array(0, 0.2, 0.43333334, 0.6666667),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.1, -0.7), Vector3(0.5, -1, -1), Vector3(0.5, -0.9, -1)]
@@ -210,7 +211,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.16666667, 1),
+"times": PackedFloat32Array(0.16666667, 0.6666667),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -331,8 +332,25 @@ main_droite = NodePath("../Camera3D/MainDroite")
 inventory_component = NodePath("../InventoryComponent")
 equipment_component = NodePath("../EquipmentComponent")
 
-[node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component")]
+[node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
+inventory_component = NodePath("../../../../InventoryComponent")
+
+[node name="equipment_slot2" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="1" unique_id=206346114 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+equipment_component = NodePath("../../../../EquipmentComponent")
+inventory_component = NodePath("../../../../InventoryComponent")
+
+[node name="equipment_slot3" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="2" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+equipment_component = NodePath("../../../../EquipmentComponent")
+inventory_component = NodePath("../../../../InventoryComponent")
+
+[node name="equipment_slot4" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="3" unique_id=1693178314 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+equipment_component = NodePath("../../../../EquipmentComponent")
+inventory_component = NodePath("../../../../InventoryComponent")
+
+[node name="equipment_slot5" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="4" unique_id=2093880661 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+equipment_component = NodePath("../../../../EquipmentComponent")
+inventory_component = NodePath("../../../../InventoryComponent")
 
 [node name="Spell_bar" parent="." unique_id=243740632 node_paths=PackedStringArray("skill_bar") instance=ExtResource("21_ynykn")]
 skill_bar = NodePath("../SkillBarComponent")
