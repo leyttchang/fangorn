@@ -60,5 +60,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 func _on_died() -> void:
 	print("mort")
+	
+	# On attend 2 secondes pour te laisser le temps de comprendre que tu as perdu
+	await get_tree().create_timer(2.0).timeout
+	
+	# On ferme définitivement la fenêtre du jeu
+	get_tree().quit()
 func _on_damage_taken(amount: float) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")

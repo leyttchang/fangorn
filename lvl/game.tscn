@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="5_gglad"]
 [ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="5_vkv4l"]
 [ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="6_gglad"]
+[ext_resource type="PackedScene" uid="uid://ciorbt48rdjri" path="res://character/enemie/dumb/dumb_spawner.tscn" id="7_ayx17"]
 
 [node name="game" type="Node3D" unique_id=1242181288]
 
@@ -40,3 +41,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 22, 17)
 
 [node name="orc" parent="." unique_id=1721799317 instance=ExtResource("6_gglad")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.040007, 20.860651, -3.7841444)
+
+[node name="dumb_spawner" parent="." unique_id=1600295091 instance=ExtResource("7_ayx17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 24, -33)
+
+[node name="dumb_spawner2" parent="." unique_id=1874703764 instance=ExtResource("7_ayx17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 24, -33)
+
+[node name="dumb_spawner3" parent="." unique_id=1593388953 instance=ExtResource("7_ayx17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 171)
+
+[editable path="Map1T3d"]

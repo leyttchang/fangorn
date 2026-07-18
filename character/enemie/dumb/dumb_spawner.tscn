@@ -1,3 +1,8 @@
 [gd_scene format=3 uid="uid://ciorbt48rdjri"]
 
-[node name="Node3D" type="Node3D" unique_id=1600295091]
+[ext_resource type="Script" uid="uid://c5ljuheo2yij3" path="res://character/enemie/dumb/dumb_spawner.gd" id="1_qvvhg"]
+[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="2_ftbp8"]
+
+[node name="dumb_spawner" type="Node3D" unique_id=1600295091]
+script = ExtResource("1_qvvhg")
+Dumb = ExtResource("2_ftbp8")
