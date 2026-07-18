@@ -72,7 +72,7 @@ states/Walk2/position = Vector2(469, 88)
 transitions = ["Start", "Stand", SubResource("AnimationNodeStateMachineTransition_3kx3y"), "Stand", "Walk2", SubResource("AnimationNodeStateMachineTransition_rnfn3"), "Walk2", "Stand", SubResource("AnimationNodeStateMachineTransition_ensva"), "Walk2", "Punch", SubResource("AnimationNodeStateMachineTransition_qj2y1"), "Stand", "Punch", SubResource("AnimationNodeStateMachineTransition_67x00"), "Walk2", "Death", SubResource("AnimationNodeStateMachineTransition_6o7hd"), "Punch", "Death", SubResource("AnimationNodeStateMachineTransition_k0o0d"), "Stand", "Death", SubResource("AnimationNodeStateMachineTransition_nv5u7"), "Punch", "Stand", SubResource("AnimationNodeStateMachineTransition_is52v")]
 graph_offset = Vector2(0, -64.43514)
 
-[node name="dumb" type="CharacterBody3D" unique_id=888204308]
+[node name="dumb" type="CharacterBody3D" unique_id=888204308 groups=["Enemie"]]
 script = ExtResource("1_ngory")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1659181656]

@@ -26,6 +26,8 @@
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="21_yr573"]
 [ext_resource type="PackedScene" uid="uid://cm8vpgrn4bp77" path="res://ui/SpellBook/Casting_Bar.tscn" id="24_u2y57"]
 [ext_resource type="PackedScene" uid="uid://cg50ca34fajqd" path="res://ui/crosshair.tscn" id="25_tr32s"]
+[ext_resource type="PackedScene" uid="uid://bk1064mxurpec" path="res://ui/health_bar.tscn" id="27_2tvps"]
+[ext_resource type="PackedScene" uid="uid://dtn1sa360mw67" path="res://ui/score.tscn" id="28_nw0js"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
@@ -343,6 +345,12 @@ unlocked_spells = Array[ExtResource("9_b6pse")]([ExtResource("16_gh4hd"), ExtRes
 [node name="CastingBar" parent="." unique_id=1878220428 node_paths=PackedStringArray("skill_bar") instance=ExtResource("24_u2y57")]
 visible = false
 skill_bar = NodePath("../SkillBarComponent")
+
+[node name="health_bar" parent="." unique_id=427302170 node_paths=PackedStringArray("health_component") instance=ExtResource("27_2tvps")]
+health_component = NodePath("../HealthComponent")
+
+[node name="CanvasLayer" parent="." unique_id=1608159447 node_paths=PackedStringArray("player_health") instance=ExtResource("28_nw0js")]
+player_health = NodePath("../HealthComponent")
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://dw8bplvo56b74"]
+
+[ext_resource type="Script" uid="uid://2shshyrqpka4" path="res://character/enemie/dumb_archer/fire_arrow.gd" id="1_j4con"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="1_xvqqq"]
+[ext_resource type="PackedScene" uid="uid://c8vpbw6n27cqq" path="res://components/spell_componants/projectile_movement_component.tscn" id="3_1ifn1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yqkk6"]
+radius = 0.055
+height = 0.52905273
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
+top_radius = 0.0
+bottom_radius = 0.06
+height = 0.6
+
+[node name="fire_arrow" type="RigidBody3D" unique_id=842953379]
+script = ExtResource("1_j4con")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1593908456]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.24645996, 0)
+shape = SubResource("CapsuleShape3D_yqkk6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1247463607]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.25922436, 0)
+mesh = SubResource("CylinderMesh_hlie2")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_xvqqq")]
+collision_layer = 16
+collision_mask = 2
+damage = 20.0
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.24610108, 1.075742e-08)
+shape = SubResource("CapsuleShape3D_yqkk6")
+
+[node name="ProjectileMovementComponent" parent="." unique_id=810223984 instance=ExtResource("3_1ifn1")]
+
+[editable path="AttackComponent"]

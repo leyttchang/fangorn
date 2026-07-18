@@ -58,6 +58,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		# Bloquer la caméra pour ne pas pouvoir regarder trop en arrière et se tordre le cou
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+
+	# ==========================================================
+	# NOUVEAU : GESTION DU PLEIN ÉCRAN (F11)
+	# ==========================================================
+	if event is InputEventKey and event.keycode == KEY_F11 and event.pressed:
+		var current_mode = DisplayServer.window_get_mode()
+		
+		if current_mode == DisplayServer.WINDOW_MODE_FULLSCREEN or current_mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
 func _on_died() -> void:
 	print("mort")
 	
@@ -66,5 +78,6 @@ func _on_died() -> void:
 	
 	# On ferme définitivement la fenêtre du jeu
 	get_tree().quit()
+
 func _on_damage_taken(amount: float) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")

@@ -3,55 +3,79 @@ extends Node3D
 @export var Dumb : PackedScene
 
 # --- PARAMÈTRES DE DIFFICULTÉ ---
-@export var start_spawn_time: float = 4.0   # Temps de départ (ex: 1 monstre toutes les 4s)
-@export var minimum_spawn_time: float = 0.5 # Limite max de vitesse (ex: 2 monstres par seconde)
-@export var decrease_step: float = 0.1      # Combien de secondes on enlève à chaque apparition
+@export var start_spawn_time: float = 4.0   
+@export var minimum_spawn_time: float = 0.5 
+@export var decrease_step: float = 0.1      
+@export var max_scaling_duration: float = 30.0 
+
+# --- GESTION DE LA POPULATION ---
+@export var max_enemies_on_map: int = 60
+var can_spawn: bool = true
 
 var spawn_timer: Timer
+var check_timer: Timer
 var current_spawn_time: float
+var can_scale_difficulty: bool = true 
 
 func _ready() -> void:
-	# On initialise le temps de départ
 	current_spawn_time = start_spawn_time
 	
-	# Création du Chronomètre (Timer) 100% par le code
+	# 1. Le Chronomètre de Spawn
 	spawn_timer = Timer.new()
 	spawn_timer.wait_time = current_spawn_time
 	spawn_timer.autostart = true
-	# On connecte le signal de fin du timer à notre fonction d'apparition
 	spawn_timer.timeout.connect(_on_timeout) 
-	
-	# On ajoute le Timer comme enfant du Spawner pour qu'il existe dans le jeu
 	add_child(spawn_timer)
-
-
-func _on_timeout() -> void:
-	# 1. On fait apparaître un Orc
-	spawn_dumb()
 	
-	# 2. OPTIMISATION DE LA DIFFICULTÉ : On accélère la cadence !
-	if current_spawn_time > minimum_spawn_time:
+	# 2. Le Chronomètre de Vérification (Toutes les 3 secondes)
+	check_timer = Timer.new()
+	check_timer.wait_time = 3.0
+	check_timer.autostart = true
+	check_timer.timeout.connect(_check_enemy_count)
+	add_child(check_timer)
+
+	# 3. La sécurité des 30 secondes
+	get_tree().create_timer(max_scaling_duration).timeout.connect(_stop_scaling)
+
+
+func _stop_scaling() -> void:
+	can_scale_difficulty = false
+
+
+# ==========================================================
+# VÉRIFICATION DE LA LIMITE D'ENNEMIS
+# ==========================================================
+func _check_enemy_count() -> void:
+	var enemies_count = get_tree().get_nodes_in_group("Enemie").size()
+	
+	if enemies_count >= max_enemies_on_map:
+		can_spawn = false
+	else:
+		can_spawn = true
+
+
+# ==========================================================
+# APPARITION ET DIFFICULTÉ
+# ==========================================================
+func _on_timeout() -> void:
+	# La sécurité est ici : on ne spawn que si le flag l'autorise
+	if can_spawn:
+		spawn_dumb()
+	
+	# OPTIMISATION DE LA DIFFICULTÉ (Continue de tourner même si ça ne spawn pas)
+	if can_scale_difficulty and current_spawn_time > minimum_spawn_time:
 		current_spawn_time -= decrease_step
 		
-		# Sécurité : on s'assure de ne jamais descendre en dessous de la limite absolue
 		if current_spawn_time < minimum_spawn_time:
 			current_spawn_time = minimum_spawn_time
 			
-		# On met à jour le Timer avec la nouvelle vitesse plus rapide
 		spawn_timer.wait_time = current_spawn_time
 
 
 func spawn_dumb() -> void:
 	if Dumb == null:
-		print("Erreur : La scène Dumb n'est pas glissée dans l'inspecteur du Spawner !")
 		return
 		
-	# On crée une copie de la scène de l'Orc
 	var new_dumb = Dumb.instantiate()
-	
-	# IMPORTANT : On ajoute l'Orc à la racine du jeu, pas à l'intérieur du Spawner.
-	# Comme ça, si ton Spawner bouge ou est détruit, l'Orc reste indépendant dans le monde.
 	get_tree().current_scene.add_child(new_dumb)
-	
-	# On place le monstre exactement aux coordonnées du Spawner
 	new_dumb.global_position = global_position

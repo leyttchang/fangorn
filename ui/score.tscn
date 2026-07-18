@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dtn1sa360mw67"]
+
+[ext_resource type="Script" uid="uid://dscbb6vdfu5oy" path="res://ui/score.gd" id="1_7b0px"]
+
+[node name="CanvasLayer" type="CanvasLayer" unique_id=1608159447]
+script = ExtResource("1_7b0px")
+
+[node name="Label" type="Label" parent="." unique_id=1837202928]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -58.0
+offset_top = 40.0
+offset_right = -12.0
+offset_bottom = 66.0
+grow_horizontal = 0
+text = "999"

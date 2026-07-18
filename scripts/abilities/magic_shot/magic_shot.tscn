@@ -37,7 +37,7 @@ shape = SubResource("CapsuleShape3D_hlie2")
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_1rj1f")]
 collision_layer = 4
 collision_mask = 9
-damage = 15.0
+damage = 25.0
 destroy_on_environment = true
 knockback_force = 2.0
 is_projectile = true

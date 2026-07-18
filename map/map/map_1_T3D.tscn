@@ -107,75 +107,57 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 247.68005, 30.532349, 0)
 
 [node name="island_tree19" parent="island_tree" unique_id=862277325 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-2.8628907, 0, -9.581432, 0, 10.000001, 0, 9.581432, 0, -2.8628907, 5.9128346, 19.948854, -40.306564)
-visible = false
 
 [node name="island_tree20" parent="island_tree" unique_id=1437727312 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-8.513983, 0, 5.245199, 0, 10.000001, 0, -5.245199, 0, -8.513983, 29.346928, 19.948854, -39.63729)
-visible = false
 
 [node name="island_tree21" parent="island_tree" unique_id=1593426030 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(9.581432, 0, -2.8628907, 0, 10.000001, 0, 2.8628907, 0, 9.581432, 60.00944, 19.948854, -11.955719)
-visible = false
 
 [node name="island_tree22" parent="island_tree" unique_id=1314540284 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-2.3113809, 0, 9.72921, 0, 10.000001, 0, -9.72921, 0, -2.3113809, 82.80594, 19.948854, -38.110504)
-visible = false
 
 [node name="island_tree23" parent="island_tree" unique_id=1804657549 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-4.750727, 0, 8.799467, 0, 10, 0, -8.799467, 0, -4.750727, 106.6062, 19.948854, -37.43077)
-visible = false
 
 [node name="island_tree24" parent="island_tree" unique_id=170035020 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-9.995924, 0, 0.28548265, 0, 10, 0, -0.28548265, 0, -9.995924, -21.253529, 19.948854, -23.557617)
-visible = false
 
 [node name="island_tree25" parent="island_tree" unique_id=419824742 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-9.995924, 0, 0.28548265, 0, 10, 0, -0.28548265, 0, -9.995924, -34.73067, 19.948854, -41.467342)
-visible = false
 
 [node name="island_tree26" parent="island_tree" unique_id=1343284150 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-9.995924, 0, 0.28548265, 0, 10, 0, -0.28548265, 0, -9.995924, -53.4047, 19.948854, -42.00067)
-visible = false
 
 [node name="island_tree27" parent="island_tree" unique_id=1913772695 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(-8.583867, 0, -5.1300325, 0, 9.999999, 0, 5.1300325, 0, -8.583867, -61.46019, 19.948854, -42.230736)
-visible = false
 
 [node name="island_tree28" parent="island_tree" unique_id=894243913 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(8.799465, 0, 4.7507277, 0, 10, 0, -4.7507277, 0, 8.799465, 7.0472074, 19.948854, -80.02563)
-visible = false
 
 [node name="island_tree29" parent="island_tree" unique_id=2084398783 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(7.270055, 0, 6.8663197, 0, 10.000001, 0, -6.8663197, 0, 7.270055, 41.548786, 19.948854, -92.71818)
-visible = false
 
 [node name="island_tree30" parent="island_tree" unique_id=374345690 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(7.270053, 0, 6.866318, 0, 9.999999, 0, -6.866318, 0, 7.270053, 56.966854, 19.948854, -70.05123)
-visible = false
 
 [node name="island_tree31" parent="island_tree" unique_id=1338948075 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(7.270053, 0, 6.866318, 0, 9.999999, 0, -6.866318, 0, 7.270053, 84.29404, 19.948854, -90.21509)
-visible = false
 
 [node name="island_tree32" parent="island_tree" unique_id=644902531 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(7.270053, 0, 6.866318, 0, 9.999999, 0, -6.866318, 0, 7.270053, 95.59917, 19.948854, -71.08509)
-visible = false
 
 [node name="island_tree33" parent="island_tree" unique_id=1507001687 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(7.270053, 0, 6.866318, 0, 9.999999, 0, -6.866318, 0, 7.270053, -9.796065, 19.948854, -80.50667)
-visible = false
 
 [node name="island_tree34" parent="island_tree" unique_id=795512458 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(3.0676003, 0, -9.517868, 0, 10.000001, 0, 9.517868, 0, 3.0676003, -38.623608, 19.948854, -69.78923)
-visible = false
 
 [node name="island_tree35" parent="island_tree" unique_id=691787332 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(7.270053, 0, 6.866318, 0, 9.999999, 0, -6.866318, 0, 7.270053, -52.001984, 19.948854, -91.11562)
-visible = false
 
 [node name="island_tree36" parent="island_tree" unique_id=422909985 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(8.513983, 0, -5.2451982, 0, 10, 0, 5.2451982, 0, 8.513983, -69.72152, 19.948854, -67.25792)
-visible = false
 
 [node name="island_tree" parent="island_tree" unique_id=1748853633 instance=ExtResource("8_wcxlr")]
 transform = Transform3D(2.5881908, 0, 9.659258, 0, 10, 0, -9.659258, 0, 2.5881908, 20.558537, 19.948854, -16.058037)
@@ -360,5 +342,6 @@ navigation_mesh = SubResource("NavigationMesh_hlie2")
 data_directory = "res://terrain3d"
 material = SubResource("Terrain3DMaterial_f3olj")
 assets = SubResource("Terrain3DAssets_yc432")
+collision_mode = 3
 top_level = true
 metadata/_edit_lock_ = true

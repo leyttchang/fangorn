@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://bk1064mxurpec"]
+
+[ext_resource type="Script" uid="uid://2m21r57usn56" path="res://ui/health_bar.gd" id="1_rwxrv"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlie2"]
+
+[node name="health_bar" type="CanvasLayer" unique_id=427302170]
+script = ExtResource("1_rwxrv")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=1597248502]
+custom_minimum_size = Vector2(200, 30)
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -42.0
+offset_right = 210.0
+offset_bottom = -12.0
+grow_vertical = 0
+step = 0.1
+nine_patch_stretch = true
+texture_progress = SubResource("PlaceholderTexture2D_hlie2")
+tint_progress = Color(1.6197081, 0.030314302, 0.030314302, 1)

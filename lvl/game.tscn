@@ -5,8 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://ps4gscdkslsn" path="res://objet/pic.tscn" id="4_41cxx"]
 [ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="5_gglad"]
 [ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="5_vkv4l"]
-[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="6_gglad"]
 [ext_resource type="PackedScene" uid="uid://ciorbt48rdjri" path="res://character/enemie/dumb/dumb_spawner.tscn" id="7_ayx17"]
+[ext_resource type="PackedScene" uid="uid://dodpc1n4mp20v" path="res://ui/enemies_coutner.tscn" id="8_gf3dy"]
+[ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="9_1eb17"]
 
 [node name="game" type="Node3D" unique_id=1242181288]
 
@@ -39,9 +40,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 22, 17)
 
 [node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("5_gglad")]
 
-[node name="orc" parent="." unique_id=1721799317 instance=ExtResource("6_gglad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.040007, 20.860651, -3.7841444)
-
 [node name="dumb_spawner" parent="." unique_id=1600295091 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 24, -33)
 
@@ -50,5 +48,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 24, -33)
 
 [node name="dumb_spawner3" parent="." unique_id=1593388953 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 171)
+
+[node name="dumb_spawner4" parent="." unique_id=1599193968 instance=ExtResource("7_ayx17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 21.894852, -19.801086)
+Dumb = ExtResource("9_1eb17")
+
+[node name="dumb_spawner5" parent="." unique_id=522046548 instance=ExtResource("7_ayx17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 21.894852, -19.801086)
+Dumb = ExtResource("9_1eb17")
+
+[node name="dumb_spawner6" parent="." unique_id=1453430473 instance=ExtResource("7_ayx17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 21.894852, 2.1989136)
+Dumb = ExtResource("9_1eb17")
+
+[node name="enemies_coutner" parent="." unique_id=1160664613 instance=ExtResource("8_gf3dy")]
+
+[node name="dumb_archer" parent="." unique_id=74478897 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.467243, 26.251118, -10.0809555)
 
 [editable path="Map1T3d"]

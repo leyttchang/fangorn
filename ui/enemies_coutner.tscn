@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dodpc1n4mp20v"]
+
+[ext_resource type="Script" uid="uid://kh7r0xkthatv" path="res://ui/enemies_coutner.gd" id="1_wf765"]
+
+[node name="enemies_coutner" type="CanvasLayer" unique_id=1160664613]
+script = ExtResource("1_wf765")
+
+[node name="Label" type="Label" parent="." unique_id=1479216275]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 23.0
+grow_horizontal = 0
+text = "999
+"
