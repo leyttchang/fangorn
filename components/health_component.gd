@@ -16,6 +16,7 @@ signal damage_taken(amount: float)
 @export var max_expected_armor: float = 100.0
 
 var current_health: float
+var _known_max_health: float # NOUVEAU : On mémorise l'ancienne limite
 
 func _ready() -> void:
 	if stats_component == null:
@@ -25,8 +26,12 @@ func _ready() -> void:
 	if armor_curve == null:
 		push_warning("HealthComponent sur " + get_parent().name + " : Pas de armor_curve assignée ! L'armure ne fonctionnera pas.")
 		
-	# Au début du jeu, le personnage a toute sa vie
-	current_health = stats_component.get_stat_value("max_health")
+	# Au début du jeu, le personnage a toute sa vie et on mémorise son maximum
+	_known_max_health = stats_component.get_stat_value("max_health")
+	current_health = _known_max_health
+	
+	# On branche nos oreilles sur le StatsComponent !
+	stats_component.stat_changed.connect(_on_stat_changed)
 
 # Fonction appelée quand une arme ou un sort touche ce personnage
 func take_damage(raw_damage: float) -> void:
@@ -70,3 +75,25 @@ func take_damage(raw_damage: float) -> void:
 	# 6. On vérifie si le personnage est mort
 	if current_health == 0:
 		died.emit()
+
+# =========================================================
+# L'ÉCOUTE DES STATS EN TEMPS RÉEL (Armure, Buffs, etc.)
+# =========================================================
+func _on_stat_changed(stat_name: String, new_value: float) -> void:
+	if stat_name == "max_health":
+		# On calcule combien de vie max on vient de gagner (ou perdre)
+		var difference = new_value - _known_max_health
+		
+		# Si on gagne de la vie max (ex: on équipe l'armure de 10 000 PV)
+		if difference > 0:
+			current_health += difference # On soigne le joueur du montant gagné
+			
+		# Si on perd de la vie max (ex: on retire l'armure)
+		# On s'assure juste que la vie actuelle ne dépasse pas le nouveau plafond
+		current_health = min(current_health, new_value)
+		
+		# On met à jour notre mémoire pour la prochaine fois
+		_known_max_health = new_value
+		
+		# On met à jour l'interface !
+		health_changed.emit(current_health, new_value)

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://ckgp1u2lvmgr4"]
+
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="1_ti2yg"]
+[ext_resource type="Texture2D" uid="uid://rircxw0hu63f" path="res://assets/icon/32x32/fb1099.png" id="1_v18r8"]
+
+[resource]
+script = ExtResource("1_ti2yg")
+stat_bonuses = {
+"area_of_effect": 1.4,
+"armor": 40.0,
+"attack_speed": 2.0,
+"casting_speed": 2.0,
+"cd_red": 1.0,
+"knockback_power": 3.0,
+"knockback_resistance": 10.0,
+"magic_damage": 2.0,
+"max_health": 100.0,
+"movement_speed": 2.0,
+"physical_damage": 2.0
+}
+id = "armor_cheat"
+item_name = "heavy_armor"
+icon = ExtResource("1_v18r8")
+item_type = 1
+metadata/_custom_type_script = "uid://b6114jo5bnldt"

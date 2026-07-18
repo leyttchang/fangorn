@@ -6,7 +6,7 @@ extends Node
 
 # Le dictionnaire qui va contenir nos objets Stat
 var _stats: Dictionary = {}
-
+signal stat_changed(stat_name: String, new_value: float)
 func _ready():
 	# 1. Sécurité : On vérifie qu'on a bien assigné un fichier de stats
 	if starting_stats == null:
@@ -42,13 +42,13 @@ func get_stat(stat_name: String) -> Stat:
 # --- NOUVELLES FONCTIONS : LE PONT DES MODIFICATEURS ---
 func add_modifier(stat_name: String, mod_type: int, value: float, source_id: String) -> void:
 	var stat = get_stat(stat_name)
-	
 	if stat != null:
 		if stat.has_method("add_modifier"):
-			# LA CORRECTION EST ICI : 
-			# On respecte l'ordre exact de ton _init() : id, valeur, type
 			var new_modifier = StatModifier.new(source_id, value, mod_type)
 			stat.add_modifier(new_modifier)
+			
+			# NOUVEAU : On prévient le reste du jeu de la nouvelle valeur !
+			stat_changed.emit(stat_name, stat.get_value())
 		else:
 			push_warning("Attention, la classe Stat n'a pas de fonction add_modifier()")
 
@@ -56,4 +56,10 @@ func remove_modifier_by_source(source_id: String) -> void:
 	for stat_name in _stats:
 		var stat = _stats[stat_name]
 		if stat.has_method("remove_modifier"):
+			# On garde l'ancienne valeur en mémoire pour voir si ça a vraiment changé
+			var old_value = stat.get_value()
 			stat.remove_modifier(source_id)
+			
+			# NOUVEAU : Si la stat a changé après le retrait, on prévient le jeu
+			if stat.get_value() != old_value:
+				stat_changed.emit(stat_name, stat.get_value())

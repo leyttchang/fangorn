@@ -1,5 +1,5 @@
 class_name WeaponItem
-extends ItemData # NOUVEAU : On hérite de ItemData au lieu de Resource !
+extends EquipmentItem
 
 # On ajoute une information pour savoir comment on s'en équipe
 enum WeaponSlot { ONE_HAND, TWO_HAND }

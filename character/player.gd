@@ -1,11 +1,19 @@
 extends CharacterBody3D
 
 @export var camera: Camera3D
-@export var arme_de_depart: WeaponItem
-@export var epée: WeaponItem
+
+# --- SYSTÈME D'ÉQUIPEMENT ET D'INVENTAIRE DE DÉPART ---
+# L'arme qui sera directement dans la main au lancement (Optionnel)
+@export var starting_equipped_weapon: WeaponItem 
+
+# La liste dans laquelle tu peux glisser autant d'objets que tu veux depuis l'inspecteur
+@export var starting_inventory_items: Array[ItemData] = []
+# ------------------------------------------------------
+
 # On récupère notre composant intelligent grâce à son nom unique (%)
 @onready var stats_component: StatsComponent = %StatsComponent
 @onready var health_component: HealthComponent = $HealthComponent
+
 const JUMP_VELOCITY = 4.5
 const mouse_sensitivity = 0.002
 
@@ -13,12 +21,18 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	health_component.died.connect(_on_died)
 	health_component.damage_taken.connect(_on_damage_taken)
-	# TEST TEMPORAIRE POUR L'ÉQUIPEMENT
-	var equip_comp = $EquipmentComponent # Adapte le chemin si besoin
-	if equip_comp != null and arme_de_depart != null:
-		equip_comp.equip_item(arme_de_depart, "main_hand")
-	$InventoryComponent.add_item(arme_de_depart, 1)
-	$InventoryComponent.add_item(epée, 1)
+	
+	# 1. On équipe l'arme de départ si on en a mis une
+	var equip_comp = $EquipmentComponent 
+	if equip_comp != null and starting_equipped_weapon != null:
+		equip_comp.equip_item(starting_equipped_weapon, "main_hand")
+		
+	# 2. On remplit le sac à dos avec tous les objets mis dans la liste
+	var inv_comp = $InventoryComponent
+	if inv_comp != null:
+		for item in starting_inventory_items:
+			if item != null: # Sécurité au cas où tu laisses une case vide dans l'éditeur
+				inv_comp.add_item(item, 1)
 	
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
@@ -28,7 +42,7 @@ func _physics_process(delta: float) -> void:
 	# Handle jump.
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-	# --- C'EST ICI QUE TOUT CHANGE ---
+
 	# On demande au composant la vitesse exacte du joueur à CETTE frame
 	# Si un monstre te ralentit avec un sort, cette valeur baissera toute seule !
 	var current_speed = stats_component.get_stat_value("movement_speed")
@@ -60,7 +74,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 	# ==========================================================
-	# NOUVEAU : GESTION DU PLEIN ÉCRAN (F11)
+	# GESTION DU PLEIN ÉCRAN (F11)
 	# ==========================================================
 	if event is InputEventKey and event.keycode == KEY_F11 and event.pressed:
 		var current_mode = DisplayServer.window_get_mode()

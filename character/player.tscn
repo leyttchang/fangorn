@@ -4,8 +4,10 @@
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="2_aypkh"]
 [ext_resource type="Script" uid="uid://4lgdql2xgv6l" path="res://character/main_droite.gd" id="2_dkowc"]
 [ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="2_j51ly"]
+[ext_resource type="Script" uid="uid://51rh523r8oxe" path="res://item/item_data.gd" id="3_45wte"]
 [ext_resource type="Resource" uid="uid://cubsij5q17dky" path="res://item/armes/test_sword_stats.tres" id="3_a1kp2"]
 [ext_resource type="Resource" uid="uid://3ts10m6vmiwm" path="res://character/player_stats.tres" id="3_hhoun"]
+[ext_resource type="Resource" uid="uid://ckgp1u2lvmgr4" path="res://item/armures/chest_armor.tres" id="4_8vi7a"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_hhoun"]
 [ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="5_aw5rd"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="5_bdyh8"]
@@ -242,8 +244,8 @@ height = 0.4
 collision_layer = 2
 script = ExtResource("1_2orxn")
 camera = NodePath("Camera3D")
-arme_de_depart = ExtResource("2_j51ly")
-"epée" = ExtResource("3_a1kp2")
+starting_equipped_weapon = ExtResource("3_a1kp2")
+starting_inventory_items = Array[ExtResource("3_45wte")]([ExtResource("2_j51ly"), ExtResource("4_8vi7a")])
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1568168780]
 mesh = SubResource("CapsuleMesh_hlie2")

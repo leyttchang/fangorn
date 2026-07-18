@@ -71,15 +71,23 @@ func _apply_item_stats(item: ItemData) -> void:
 	if stats_component == null:
 		return
 		
-	if item is WeaponItem:
-		print("Une arme a été équipée : ", item.item_name)
-		# Le test de +20% a été supprimé ici !
-		# Plus tard, on lira les vraies stats du fichier .tres de l'arme
+	if item is EquipmentItem:
+		print("Application des stats pour : ", item.item_name)
 		
+		for stat_name in item.stat_bonuses.keys():
+			var bonus_value = item.stat_bonuses[stat_name]
+			
+			if bonus_value != 0.0: # (J'ai mis != 0.0 au cas où tu as des objets maudits qui donnent -10 !)
+				
+				# LA CORRECTION EST LÀ : on rajoute le "0" en deuxième argument
+				# (0 correspond très certainement au mod_type "FLAT" / Addition classique de ton StatModifier)
+				stats_component.add_modifier(stat_name, 0, bonus_value, item.id)
+
 func _remove_item_stats(item: ItemData) -> void:
 	if stats_component == null:
 		return
 		
-	if item is WeaponItem:
-		print("L'arme a été retirée : ", item.item_name)
+	if item is EquipmentItem:
+		print("Retrait des stats pour : ", item.item_name)
+		# On retire tous les bonus qui ont pour source l'ID de cette arme
 		stats_component.remove_modifier_by_source(item.id)
