@@ -1,57 +1,42 @@
 [gd_scene format=3 uid="uid://y502le1sqeb3"]
 
 [ext_resource type="PackedScene" uid="uid://dad6pbsu7b6s5" path="res://character/player.tscn" id="1_c3mjc"]
-[ext_resource type="PackedScene" uid="uid://cog2gj283wl35" path="res://map/map_test.tscn" id="2_7mfpx"]
 [ext_resource type="PackedScene" uid="uid://jvy84ml4qbnk" path="res://character/dummy.tscn" id="3_7mfpx"]
 [ext_resource type="PackedScene" uid="uid://ps4gscdkslsn" path="res://objet/pic.tscn" id="4_41cxx"]
+[ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="5_gglad"]
 [ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="5_vkv4l"]
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_41cxx"]
-sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-
-[sub_resource type="Sky" id="Sky_vkv4l"]
-sky_material = SubResource("ProceduralSkyMaterial_41cxx")
-
-[sub_resource type="Environment" id="Environment_gglad"]
-background_mode = 2
-sky = SubResource("Sky_vkv4l")
-glow_enabled = true
+[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="6_gglad"]
 
 [node name="game" type="Node3D" unique_id=1242181288]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=629659406]
-environment = SubResource("Environment_gglad")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1529853201]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-shadow_enabled = true
-
 [node name="player" parent="." unique_id=967643559 instance=ExtResource("1_c3mjc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
-[node name="map_test" parent="." unique_id=1129381349 instance=ExtResource("2_7mfpx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21, 0)
 
 [node name="Dummy" parent="." unique_id=922894006 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 20, -3)
 
 [node name="pic" parent="." unique_id=1249540837 instance=ExtResource("4_41cxx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 20, -3)
 
 [node name="Ground_fire_paricles" parent="." unique_id=1474207563 instance=ExtResource("5_vkv4l")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 21, -2)
 
 [node name="Dummy2" parent="." unique_id=1314685021 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 22, 17)
 
 [node name="Dummy3" parent="." unique_id=296377237 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22, 17)
 
 [node name="Dummy4" parent="." unique_id=338464274 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 22, 17)
 
 [node name="Dummy5" parent="." unique_id=346924833 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 22, 17)
 
 [node name="Dummy6" parent="." unique_id=861490982 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 22, 17)
+
+[node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("5_gglad")]
+
+[node name="orc" parent="." unique_id=1721799317 instance=ExtResource("6_gglad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.040007, 20.860651, -3.7841444)

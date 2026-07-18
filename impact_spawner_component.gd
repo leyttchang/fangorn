@@ -27,7 +27,7 @@ func _on_attack_landed(_target: Node) -> void:
 		
 		get_tree().root.add_child(impact_instance)
 		impact_instance.global_position = get_parent().global_position
-		impact_instance.global_position.y = 0 
+		
 		
 	# On détruit le sort entier
 	get_parent().hide()

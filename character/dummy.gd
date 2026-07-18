@@ -1,35 +1,38 @@
 extends CharacterBody3D
 
-# On charge la scène du texte en mémoire (vérifie bien le chemin d'accès !)
 var damage_text_scene = preload("res://ui/damage_text.tscn")
 
 @onready var health_component: HealthComponent = $HealthComponent
 
+# On récupère la force de gravité définie dans les paramètres du projet Godot
+var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+
 func _ready() -> void:
-	# On connecte le nouveau signal
 	health_component.damage_taken.connect(_on_damage_taken)
 	health_component.died.connect(_on_died)
 	
 func _physics_process(delta: float) -> void:
-	# 1. Le moteur lit la vélocité (modifiée par ton KnockbackComponent) et déplace le corps
+	# 1. On applique la gravité si l'entité n'est pas sur le sol
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+	# 2. Le moteur lit la vélocité et déplace le corps
 	move_and_slide()
 	
-	# 2. Le freinage : on réduit la vélocité petit à petit, sinon le Dummy 
-	# va glisser à l'infini dans le décor comme sur une patinoire
-	velocity = velocity.lerp(Vector3.ZERO, 5.0 * delta)
-# Quand le mannequin reçoit des dégâts
+	# 3. Le freinage (Friction)
+	# On freine UNIQUEMENT les axes X et Z pour ne pas annuler la chute (axe Y)
+	velocity.x = move_toward(velocity.x, 0, 5.0 * delta)
+	velocity.z = move_toward(velocity.z, 0, 5.0 * delta)
+	
+	# (Alternative avec lerp si tu préfères un freinage plus "glissant") :
+	# velocity.x = lerp(velocity.x, 0.0, 5.0 * delta)
+	# velocity.z = lerp(velocity.z, 0.0, 5.0 * delta)
+
+
 func _on_damage_taken(amount: float) -> void:
-	# 1. On fabrique un nouveau texte
 	var text_instance = damage_text_scene.instantiate()
-	
-	# 2. On l'ajoute dans le monde (au niveau du mannequin)
 	add_child(text_instance)
-	
-	# 3. On le place un peu au-dessus du mannequin pour ne pas qu'il pop dans ses pieds
-	# (Si ton cylindre fait 2m de haut, mets y = 1.0 ou 1.5)
 	text_instance.position.y = 1.0 
-	
-	# 4. On lance l'animation !
 	text_instance.animate(amount)
 
 func _on_died() -> void:

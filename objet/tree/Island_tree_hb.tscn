@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://dmt1gbe4mnsjl"]
+
+[ext_resource type="PackedScene" uid="uid://hj7fjxkdvlfi" path="res://assets/3D_models/tree/low_poly/Models/Tree Type6 04.dae" id="1_3vv4f"]
+[ext_resource type="Texture2D" uid="uid://u6elekb2jt0k" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet Tree Cold.png" id="2_noja3"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hlie2"]
+height = 1.307373
+radius = 0.28027344
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2efig"]
+albedo_texture = ExtResource("2_noja3")
+
+[node name="island_tree" type="Node3D" unique_id=862277325]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=147524176]
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1585596136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5975342, 0)
+shape = SubResource("CylinderShape3D_hlie2")
+
+[node name="Tree Type6 04" parent="." unique_id=1410396237 instance=ExtResource("1_3vv4f")]
+
+[node name="Tree_Type6_04_mesh" parent="Tree Type6 04" index="0" unique_id=658652696]
+surface_material_override/0 = SubResource("StandardMaterial3D_2efig")
+
+[editable path="Tree Type6 04"]

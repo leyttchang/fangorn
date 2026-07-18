@@ -1,0 +1,156 @@
+[gd_scene format=3 uid="uid://5wrdcmpkd7se"]
+
+[ext_resource type="Script" uid="uid://c7m43l7f012hv" path="res://character/enemie/dumb/dumb.gd" id="1_ngory"]
+[ext_resource type="PackedScene" uid="uid://b44pafafj13ku" path="res://assets/3D_models/body/orc_degeu/Orc.glb" id="1_vx1eg"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_is52v"]
+[ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="3_lsk58"]
+[ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="4_is52v"]
+[ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="5_y7n3t"]
+[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="6_vkw15"]
+[ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="7_it7g2"]
+[ext_resource type="Resource" uid="uid://c6ffpu2048j4x" path="res://character/dummy_stats.tres" id="9_is52v"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
+radius = 0.37402344
+height = 2.1777344
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_y7n3t"]
+height = 0.87939453
+radius = 0.16894531
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yqkk6"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_is52v"]
+animation = &"Death"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_y7n3t"]
+animation = &"Punch"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_vkw15"]
+animation = &"Stand"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_it7g2"]
+animation = &"Walk2"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_3kx3y"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_rnfn3"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ensva"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qj2y1"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_67x00"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6o7hd"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_k0o0d"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nv5u7"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_is52v"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_hlie2"]
+states/Death/node = SubResource("AnimationNodeAnimation_is52v")
+states/Death/position = Vector2(499, -18)
+states/Punch/node = SubResource("AnimationNodeAnimation_y7n3t")
+states/Punch/position = Vector2(583, 238)
+states/Stand/node = SubResource("AnimationNodeAnimation_vkw15")
+states/Stand/position = Vector2(314, 100)
+states/Walk2/node = SubResource("AnimationNodeAnimation_it7g2")
+states/Walk2/position = Vector2(469, 88)
+transitions = ["Start", "Stand", SubResource("AnimationNodeStateMachineTransition_3kx3y"), "Stand", "Walk2", SubResource("AnimationNodeStateMachineTransition_rnfn3"), "Walk2", "Stand", SubResource("AnimationNodeStateMachineTransition_ensva"), "Walk2", "Punch", SubResource("AnimationNodeStateMachineTransition_qj2y1"), "Stand", "Punch", SubResource("AnimationNodeStateMachineTransition_67x00"), "Walk2", "Death", SubResource("AnimationNodeStateMachineTransition_6o7hd"), "Punch", "Death", SubResource("AnimationNodeStateMachineTransition_k0o0d"), "Stand", "Death", SubResource("AnimationNodeStateMachineTransition_nv5u7"), "Punch", "Stand", SubResource("AnimationNodeStateMachineTransition_is52v")]
+graph_offset = Vector2(0, -64.43514)
+
+[node name="dumb" type="CharacterBody3D" unique_id=888204308]
+script = ExtResource("1_ngory")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1659181656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.007764, 0)
+shape = SubResource("CapsuleShape3D_hlie2")
+
+[node name="Orc" parent="." unique_id=1043574353 instance=ExtResource("1_vx1eg")]
+
+[node name="Skeleton3D" parent="Orc/Armature" parent_id_path=PackedInt32Array(1043574353, 1809313473) index="0" unique_id=1744226460]
+bones/0/position = Vector3(0.00072134647, 0.011377128, -0.79426455)
+bones/0/rotation = Quaternion(-0.70862734, -0.007032904, -0.0070526255, 0.70551264)
+bones/1/rotation = Quaternion(0.08701798, 0.0015338486, 0.0041548014, 0.9961969)
+bones/2/rotation = Quaternion(0.17470023, 0.0016741455, 0.008705527, 0.98458177)
+bones/3/rotation = Quaternion(0.109687574, 0.001293464, 0.008603238, 0.9939281)
+bones/4/rotation = Quaternion(0.083534986, -0.008053368, 0.00044003618, 0.9964723)
+bones/5/rotation = Quaternion(-0.18870556, 0.023675308, -0.017435726, 0.98159343)
+bones/7/rotation = Quaternion(-0.6626498, -0.481286, 0.34067997, -0.46173173)
+bones/8/rotation = Quaternion(0.26162934, -0.22558552, 0.2108764, 0.91443557)
+bones/9/rotation = Quaternion(0.2170332, 0.08609702, 0.40223774, 0.885262)
+bones/10/rotation = Quaternion(0.03913022, -0.4132095, 0.21828917, 0.88321954)
+bones/11/rotation = Quaternion(0.6371002, -0.49839926, 0.36726442, 0.4591498)
+bones/12/rotation = Quaternion(0.33335623, 0.20912851, -0.14444318, 0.90789604)
+bones/13/rotation = Quaternion(0.21555883, 0.074837856, -0.5190671, 0.823713)
+bones/14/rotation = Quaternion(0.08886042, 0.13399081, -0.01768358, 0.9868321)
+bones/15/rotation = Quaternion(0.0973868, 0.26438427, 0.9314181, -0.23038445)
+bones/16/rotation = Quaternion(-0.45982203, 0.02333869, -0.10836135, 0.8810658)
+bones/17/rotation = Quaternion(0.66373265, 0.039577354, -0.13003802, 0.7355153)
+bones/18/rotation = Quaternion(0.23698528, -0.020846197, -0.10486945, 0.9656117)
+bones/20/rotation = Quaternion(-0.16982847, 0.26669696, 0.9332192, 0.17068404)
+bones/21/rotation = Quaternion(-0.460545, -0.0656869, 0.014768931, 0.8850794)
+bones/22/rotation = Quaternion(0.6613764, 0.016135698, 0.14893469, 0.7349418)
+bones/23/rotation = Quaternion(0.28727496, 0.08806025, 0.099558, 0.94858146)
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Orc/Armature/Skeleton3D" index="10" unique_id=903327115]
+transform = Transform3D(0.1280249, 0.43736666, 0.8901236, 0.81698054, 0.4623248, -0.34467062, -0.56227356, 0.77134037, -0.29813093, -0.47606623, 0.36528152, -0.9035759)
+bone_name = "mixamorig_RightHand"
+bone_idx = 14
+
+[node name="AttackComponent" parent="Orc/Armature/Skeleton3D/BoneAttachment3D" unique_id=63324796 instance=ExtResource("3_is52v")]
+collision_layer = 16
+collision_mask = 2
+damage = 20.0
+
+[node name="CollisionShape3D" parent="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(1, 8.940697e-08, 0, -2.9802322e-08, 1, 0, 2.9802322e-08, 0, 1, 1.1920929e-07, 0.036377013, 8.940697e-08)
+shape = SubResource("CylinderShape3D_y7n3t")
+disabled = true
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=636485674]
+
+[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("3_lsk58")]
+collision_layer = 8
+collision_mask = 0
+health_component = NodePath("../HealthComponent")
+knockback_component = NodePath("../knockback_componant")
+
+[node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1151068, 0)
+shape = SubResource("CapsuleShape3D_yqkk6")
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=286116125]
+active = false
+root_node = NodePath("../Orc")
+tree_root = SubResource("AnimationNodeStateMachine_hlie2")
+anim_player = NodePath("../Orc/AnimationPlayer")
+
+[node name="StatsComponent" type="Node3D" parent="." unique_id=245828782]
+script = ExtResource("7_it7g2")
+starting_stats = ExtResource("9_is52v")
+
+[node name="HealthComponent" type="Node3D" parent="." unique_id=1864401734 node_paths=PackedStringArray("stats_component")]
+script = ExtResource("5_y7n3t")
+stats_component = NodePath("../StatsComponent")
+armor_curve = ExtResource("6_vkw15")
+
+[node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("4_is52v")]
+stats_component = NodePath("../StatsComponent")
+
+[editable path="Orc"]
+[editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]
+[editable path="HitboxComponent"]

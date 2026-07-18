@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cog2gj283wl35"]
 
-[ext_resource type="Texture2D" uid="uid://b2xd2fn2mjw3b" path="res://assets/texture/Tiles074_1K-JPG_Color.jpg" id="1_jvcve"]
+[ext_resource type="Texture2D" uid="uid://b2xd2fn2mjw3b" path="res://assets/texture/PH/Tiles074_1K-JPG_Color.jpg" id="1_jvcve"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_hlie2"]
 

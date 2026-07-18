@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
 [ext_resource type="Resource" uid="uid://gu5hxjbjuwrq" path="res://scripts/abilities/Burning_ground/BurningGround.tres" id="16_gh4hd"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
+[ext_resource type="Resource" uid="uid://dpb1mwe1g2a53" path="res://scripts/abilities/Ice Crash/IceCrash.tres" id="18_fn6jh"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
 [ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="21_ynykn"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="21_yr573"]
@@ -101,6 +102,79 @@ tracks/2/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="Animation_fn6jh"]
+resource_name = "attack_heavy_slam"
+length = 0.6333333
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.43333334, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.20943952, -0.567232, -0.4712389), Vector3(-2.2654374, 0.4956735, -0.33859387)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.43333334, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.1, -0.7), Vector3(-0.03, -0.6, -1.04)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.5, 0.6333333),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_2tvps"]
+resource_name = "attack_heavy_slam_recovery"
+length = 0.26999999999999996
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.26),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-0.03, -0.6, -1.04), Vector3(0.5, -0.9, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.26),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-2.2654374, 0.4956735, -0.33859387), Vector3(0, 0, 0)]
+}
+
 [sub_resource type="Animation" id="Animation_aw5rd"]
 resource_name = "attack_sword"
 tracks/0/type = "value"
@@ -149,6 +223,8 @@ tracks/2/keys = {
 _data = {
 &"RESET": SubResource("Animation_xqqx8"),
 &"attack_axe": SubResource("Animation_a1kp2"),
+&"attack_heavy_slam": SubResource("Animation_fn6jh"),
+&"attack_heavy_slam_recovery": SubResource("Animation_2tvps"),
 &"attack_sword": SubResource("Animation_aw5rd")
 }
 
@@ -160,6 +236,7 @@ height = 0.4
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qe16m"]
 
 [node name="player" type="CharacterBody3D" unique_id=967643559 node_paths=PackedStringArray("camera")]
+collision_layer = 2
 script = ExtResource("1_2orxn")
 camera = NodePath("Camera3D")
 arme_de_depart = ExtResource("2_j51ly")
@@ -200,7 +277,7 @@ transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.3
 mesh = SubResource("CylinderMesh_hlie2")
 metadata/_edit_group_ = true
 
-[node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712]
+[node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712 groups=["Player"]]
 unique_name_in_owner = true
 script = ExtResource("2_aypkh")
 starting_stats = ExtResource("3_hhoun")
@@ -223,17 +300,18 @@ knockback_component = NodePath("../knockback_componant")
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_qe16m")
 
-[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast")]
+[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast", "anim_player")]
 script = ExtResource("8_pw6nv")
 slots = Dictionary[String, ExtResource("9_b6pse")]({
 "slot_1": ExtResource("10_hn1kw"),
 "slot_2": ExtResource("14_t461u"),
 "slot_3": ExtResource("10_i6sb3"),
 "slot_4": ExtResource("16_gh4hd"),
-"slot_5": null,
+"slot_5": ExtResource("18_fn6jh"),
 "slot_6": null
 })
 raycast = NodePath("../Camera3D/RayCast3D")
+anim_player = NodePath("../Camera3D/attack_animation")
 
 [node name="InventoryComponent" parent="." unique_id=1175652799 instance=ExtResource("13_ps75u")]
 
