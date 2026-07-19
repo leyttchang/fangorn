@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponItem" format=3 uid="uid://biqusejrat6c6"]
+
+[ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="1_0f405"]
+[ext_resource type="Texture2D" uid="uid://chui0cma3g01" path="res://assets/icon/32x32/fb401.png" id="1_6gp2h"]
+[ext_resource type="PackedScene" uid="uid://bscyin7n03udp" path="res://item/armes/test_spear.tscn" id="2_tnt7o"]
+
+[resource]
+script = ExtResource("1_0f405")
+base_damage = 50.0
+base_attack_speed = 0.8
+weapon_scene = ExtResource("2_tnt7o")
+icon = ExtResource("1_6gp2h")
+weapon_style = 4
+metadata/_custom_type_script = "uid://dgtcfko7wc1cp"

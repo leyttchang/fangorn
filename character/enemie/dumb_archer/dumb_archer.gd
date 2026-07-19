@@ -1,13 +1,17 @@
 extends CharacterBody3D
 
-var damage_text_scene = preload("res://ui/damage_text.tscn")
 @export var arrow_scene: PackedScene
 
-# --- COMPOSANTS ---
+# --- DONNÉES DE COMPORTEMENT (Le Profil) ---
+# C'est ici que tu vas glisser ton fichier archer_behavior.tres !
+@export var behavior: EnemyBehaviorData
+
+# --- COMPOSANTS EXTERNES (Les Muscles et le Guide) ---
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var stats_component: StatsComponent = $StatsComponent
 @onready var knockback_componant = $knockback_componant
-@onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
+@onready var movement_comp: EnemyMovementComponent = $EnemyMovementComponent
+@onready var navigation_comp: EnemyNavigationComponent = $EnemyNavigationComponent
 
 # --- ANIMATION TREE ---
 @onready var anim_tree: AnimationTree = $AnimationTree
@@ -18,23 +22,17 @@ enum State { IDLE, CHASE, ATTACK, RETREAT, DEAD }
 var current_state: State = State.IDLE
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
-var attack_range: float = 15.0 
-var flee_threshold: float = 7.0 
 var target: Node3D = null
 
 # --- SÉCURITÉ ---
 var _attack_anim_started: bool = false
 
-# --- OPTIMISATION NAVIGATION ---
-var frames_since_path_update: int = 0
-var next_path_update_frame: int = 0
-
 func _ready() -> void:
+	if behavior == null:
+		push_error("Archer (" + name + ") : Fichier EnemyBehaviorData manquant dans l'inspecteur !")
+		
 	anim_tree.active = true
-	health_component.damage_taken.connect(_on_damage_taken)
 	health_component.died.connect(_on_died)
-	
-	next_path_update_frame = randi_range(20, 40)
 	
 	call_deferred("actor_setup")
 
@@ -73,37 +71,36 @@ func change_state(new_state: State) -> void:
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
-		
-	if current_state == State.DEAD:
-		_apply_friction(delta)
-		move_and_slide()
-		return
 
 	var current_anim = anim_playback.get_current_node()
 
-	# --- SYNCHRONISATION ARBRE -> CODE ---
+	# Synchronisation de l'animation d'attaque
 	if current_state == State.ATTACK:
-		
 		if current_anim == "anim_standing_draw_arrow" or current_anim == "anim_aim_recoil":
 			_attack_anim_started = true
-			
 		elif _attack_anim_started and (current_anim == "anim_stand" or current_anim == "anim_walk"):
-			if target != null and global_position.distance_to(target.global_position) < flee_threshold:
+			if target != null and global_position.distance_to(target.global_position) < behavior.flee_threshold:
 				change_state(State.RETREAT)
 			else:
 				change_state(State.IDLE)
 
 	var current_speed = stats_component.get_stat_value("movement_speed")
+	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
 	match current_state:
+		State.DEAD:
+			vitesse_horizontale = movement_comp.apply_friction(vitesse_horizontale, behavior, delta)
 		State.IDLE:
-			_process_idle_state(delta)
+			vitesse_horizontale = _process_idle_state(vitesse_horizontale, delta)
 		State.CHASE:
-			_process_chase_state(delta, current_speed)
+			vitesse_horizontale = _process_chase_state(vitesse_horizontale, delta, current_speed)
 		State.RETREAT:
-			_process_retreat_state(delta, current_speed) 
+			vitesse_horizontale = _process_retreat_state(vitesse_horizontale, delta, current_speed) 
 		State.ATTACK:
-			_process_attack_state(delta)
+			vitesse_horizontale = _process_attack_state(vitesse_horizontale, delta)
+
+	velocity.x = vitesse_horizontale.x
+	velocity.z = vitesse_horizontale.y
 
 	move_and_slide()
 
@@ -122,91 +119,66 @@ func fire_arrow() -> void:
 
 
 # ==========================================================
-# LOGIQUE DES COMPORTEMENTS
+# LOGIQUE DES COMPORTEMENTS (Le Cerveau)
 # ==========================================================
-func _process_idle_state(delta: float) -> void:
-	_apply_friction(delta)
-	
+func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 	if target != null:
 		var distance = global_position.distance_to(target.global_position)
-		if distance < flee_threshold: 
+		if distance < behavior.flee_threshold: 
 			change_state(State.RETREAT)
-		elif distance <= attack_range:
+		elif distance <= behavior.attack_range:
 			change_state(State.ATTACK)
 		else:
 			change_state(State.CHASE)
+			
+	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 
-func _process_chase_state(delta: float, speed: float) -> void:
+func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) -> Vector2:
 	if target == null:
 		change_state(State.IDLE)
-		return
+		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 		
 	var distance_to_target = global_position.distance_to(target.global_position)
-	
-	if distance_to_target <= attack_range:
+	if distance_to_target <= behavior.attack_range:
 		change_state(State.ATTACK)
-		return
+		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 		
-	frames_since_path_update += 1
+	var direction = navigation_comp.get_direction_to_target(target.global_position)
+	movement_comp.rotate_towards_direction(direction, behavior, delta)
 	
-	if frames_since_path_update >= next_path_update_frame:
-		nav_agent.target_position = target.global_position
-		frames_since_path_update = 0
-		next_path_update_frame = randi_range(20, 40)
-		
-	var next_path_pos: Vector3 = nav_agent.get_next_path_position()
-	var direction: Vector3 = (next_path_pos - global_position).normalized()
-	
-	velocity.x = move_toward(velocity.x, direction.x * speed, speed * 10.0 * delta)
-	velocity.z = move_toward(velocity.z, direction.z * speed, speed * 10.0 * delta)
-	
-	var horizontal_velocity = Vector2(velocity.x, velocity.z)
-	if horizontal_velocity.length() > 0.1:
-		var target_rotation_y = atan2(velocity.x, velocity.z)
-		rotation.y = lerp_angle(rotation.y, target_rotation_y, 10.0 * delta)
+	return movement_comp.accelerate_to_direction(vitesse_horiz, direction, speed, behavior, delta)
 
-func _process_retreat_state(delta: float, speed: float) -> void:
+func _process_retreat_state(vitesse_horiz: Vector2, delta: float, speed: float) -> Vector2:
 	if target == null:
 		change_state(State.IDLE)
-		return
+		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 		
 	var distance_to_target = global_position.distance_to(target.global_position)
-	
-	if distance_to_target >= attack_range:
+	if distance_to_target >= behavior.attack_range:
 		change_state(State.IDLE)
-		return
+		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 		
-	var direction = (global_position - target.global_position).normalized()
+	# Mouvement de fuite (direction opposée)
+	var move_direction = (global_position - target.global_position).normalized()
+	var new_vitesse = movement_comp.accelerate_to_direction(vitesse_horiz, move_direction, speed, behavior, delta)
 	
-	velocity.x = move_toward(velocity.x, direction.x * speed, speed * 10.0 * delta)
-	velocity.z = move_toward(velocity.z, direction.z * speed, speed * 10.0 * delta)
-	
+	# Rotation vers le joueur (L'Archer regarde la cible pendant qu'il recule !)
 	var look_direction = (target.global_position - global_position).normalized()
-	var target_rotation_y = atan2(look_direction.x, look_direction.z)
-	rotation.y = lerp_angle(rotation.y, target_rotation_y, 15.0 * delta)
-
-func _process_attack_state(delta: float) -> void:
-	_apply_friction(delta) 
+	movement_comp.rotate_towards_direction(look_direction, behavior, delta)
 	
+	return new_vitesse
+
+func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 	if target != null:
-		var direction = (target.global_position - global_position).normalized()
-		var target_rotation_y = atan2(direction.x, direction.z)
-		rotation.y = lerp_angle(rotation.y, target_rotation_y, 15.0 * delta)
+		var look_direction = (target.global_position - global_position).normalized()
+		movement_comp.rotate_towards_direction(look_direction, behavior, delta, 1.5)
+		
+	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 
 
 # ==========================================================
 # UTILITAIRES ET ÉVÉNEMENTS
 # ==========================================================
-func _apply_friction(delta: float) -> void:
-	velocity.x = move_toward(velocity.x, 0, 5.0 * delta)
-	velocity.z = move_toward(velocity.z, 0, 5.0 * delta)
-
-func _on_damage_taken(amount: float) -> void:
-	var text_instance = damage_text_scene.instantiate()
-	add_child(text_instance)
-	text_instance.position.y = 1.0 
-	text_instance.animate(amount)
-
 func _on_died() -> void:
 	get_tree().call_group("ScoreManager", "add_kill_point")
 	change_state(State.DEAD)

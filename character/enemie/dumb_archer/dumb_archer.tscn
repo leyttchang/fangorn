@@ -5,7 +5,8 @@
 [ext_resource type="Animation" uid="uid://bpy0ryv6d38hq" path="res://character/enemie/dumb_archer/aim_overdraw.res" id="2_grf25"]
 [ext_resource type="PackedScene" uid="uid://dw8bplvo56b74" path="res://character/enemie/dumb_archer/fire_arrow.tscn" id="2_ww05i"]
 [ext_resource type="Animation" uid="uid://dfv1catwvsfj4" path="res://character/enemie/dumb_archer/aim_recoil.res" id="3_a7mki"]
-[ext_resource type="Animation" uid="uid://dijpd17e43ila" path="res://character/enemie/dumb_archer/stand.res" id="4_lsrrd"]
+[ext_resource type="Resource" uid="uid://bd3teeku7vdx" path="res://character/enemie/dumb_archer/dumb_archer_behavior_data.tres" id="3_ryuhb"]
+[ext_resource type="Animation" uid="uid://dqsjev0aeyf6d" path="res://character/enemie/dumb_archer/stand.res" id="4_lsrrd"]
 [ext_resource type="Animation" uid="uid://dm7l1b2mnb4a7" path="res://character/enemie/dumb_archer/death.res" id="4_sfyia"]
 [ext_resource type="Animation" uid="uid://c8cwfnqcltb01" path="res://character/enemie/dumb_archer/walk.res" id="7_joaff"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="7_kar8j"]
@@ -15,6 +16,10 @@
 [ext_resource type="Resource" uid="uid://dm4fbtmwvwdt4" path="res://character/enemie/dumb_archer/dumb_archer_stats.tres" id="11_0d6u8"]
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="11_advbo"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="12_3m0uy"]
+[ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="16_ieug1"]
+[ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="17_ryuhb"]
+[ext_resource type="PackedScene" uid="uid://bnq7s2tgri30i" path="res://components/EnemyMovementComponent.tscn" id="18_xf43a"]
+[ext_resource type="PackedScene" uid="uid://mnnj3o8ilins" path="res://components/enemy_navigation_component.tscn" id="19_84fxw"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 
@@ -88,6 +93,7 @@ transitions = ["Start", "anim_stand", SubResource("AnimationNodeStateMachineTran
 [node name="dumb_archer" type="CharacterBody3D" unique_id=1437418324]
 script = ExtResource("1_0d6u8")
 arrow_scene = ExtResource("2_ww05i")
+behavior = ExtResource("3_ryuhb")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=401500342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.98367834, 0)
@@ -168,6 +174,15 @@ armor_curve = ExtResource("11_advbo")
 
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("12_3m0uy")]
 stats_component = NodePath("../StatsComponent")
+
+[node name="CombatFeedbackComponent" parent="." unique_id=2086975508 node_paths=PackedStringArray("health_component") instance=ExtResource("16_ieug1")]
+damage_text_scene = ExtResource("17_ryuhb")
+health_component = NodePath("../HealthComponent")
+
+[node name="EnemyMovementComponent" parent="." unique_id=280066399 instance=ExtResource("18_xf43a")]
+
+[node name="EnemyNavigationComponent" parent="." unique_id=1659678892 node_paths=PackedStringArray("nav_agent") instance=ExtResource("19_84fxw")]
+nav_agent = NodePath("../NavigationAgent3D")
 
 [editable path="Orc_obj"]
 [editable path="HitboxComponent"]

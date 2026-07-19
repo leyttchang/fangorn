@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bscyin7n03udp"]
+
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="1_nb0aq"]
+[ext_resource type="Script" uid="uid://36q1gw7f0ytp" path="res://item/armes/weapon.gd" id="1_sp570"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
+top_radius = 0.01
+bottom_radius = 0.1
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sp570"]
+radius = 0.1
+
+[node name="test_spear" type="Node3D" unique_id=335765208]
+script = ExtResource("1_sp570")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1900265553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_hlie2")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_nb0aq")]
+collision_layer = 4
+collision_mask = 8
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0670582, 0)
+shape = SubResource("CylinderShape3D_sp570")
+
+[editable path="AttackComponent"]

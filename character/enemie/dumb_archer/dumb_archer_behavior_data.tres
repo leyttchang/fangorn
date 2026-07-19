@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnemyBehaviorData" format=3 uid="uid://bd3teeku7vdx"]
+
+[ext_resource type="Script" uid="uid://0gemtrlg1hbh" path="res://character/enemie/EnemyBehaviorData.gd" id="1_dqjhu"]
+
+[resource]
+script = ExtResource("1_dqjhu")
+attack_range = 15.0
+flee_threshold = 7.0
+acceleration = 30.0
+metadata/_custom_type_script = "uid://0gemtrlg1hbh"

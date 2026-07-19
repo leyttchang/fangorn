@@ -3,14 +3,16 @@ extends CharacterBody3D
 @export var camera: Camera3D
 
 # --- SYSTÈME D'ÉQUIPEMENT ET D'INVENTAIRE DE DÉPART ---
-# L'arme qui sera directement dans la main au lancement (Optionnel)
 @export var starting_equipped_weapon: WeaponItem 
-
-# La liste dans laquelle tu peux glisser autant d'objets que tu veux depuis l'inspecteur
 @export var starting_inventory_items: Array[ItemData] = []
 # ------------------------------------------------------
 
-# On récupère notre composant intelligent grâce à son nom unique (%)
+# --- NOUVEAU : GESTION DE LA PHYSIQUE (Accélération / Friction) ---
+@export var acceleration: float = 40.0
+@export var friction: float = 35.0
+@export var air_friction: float = 10.0 # Moins de friction en l'air pour garder l'élan du saut
+# ------------------------------------------------------
+
 @onready var stats_component: StatsComponent = %StatsComponent
 @onready var health_component: HealthComponent = $HealthComponent
 
@@ -22,63 +24,68 @@ func _ready() -> void:
 	health_component.died.connect(_on_died)
 	health_component.damage_taken.connect(_on_damage_taken)
 	
-	# 1. On équipe l'arme de départ si on en a mis une
 	var equip_comp = $EquipmentComponent 
 	if equip_comp != null and starting_equipped_weapon != null:
 		equip_comp.equip_item(starting_equipped_weapon, "main_hand")
 		
-	# 2. On remplit le sac à dos avec tous les objets mis dans la liste
 	var inv_comp = $InventoryComponent
 	if inv_comp != null:
 		for item in starting_inventory_items:
-			if item != null: # Sécurité au cas où tu laisses une case vide dans l'éditeur
+			if item != null:
 				inv_comp.add_item(item, 1)
 	
 func _physics_process(delta: float) -> void:
-	# Add the gravity.
+	# 1. Gestion de la gravité
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
-	# Handle jump.
+	# 2. Gestion du saut
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	# On demande au composant la vitesse exacte du joueur à CETTE frame
-	# Si un monstre te ralentit avec un sort, cette valeur baissera toute seule !
 	var current_speed = stats_component.get_stat_value("movement_speed")
 
-	# Get the input direction and handle the movement/deceleration.
+	# ==========================================================
+	# 3. NOUVELLE GESTION DU MOUVEMENT (Inspirée de tes anciens scripts)
+	# ==========================================================
+	
+	# On isole la vitesse horizontale dans un Vector2 (pour ne pas casser la gravité)
+	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
+
+	# On récupère les inputs du joueur
 	var input_dir := Input.get_vector("left", "right", "forward", "backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
-	if direction:
-		# On utilise 'current_speed' au lieu de la constante
-		velocity.x = direction.x * current_speed
-		velocity.z = direction.z * current_speed
+	# On convertit la direction 3D en direction 2D
+	var direction_2d = Vector2(direction.x, direction.z)
+	
+	if direction_2d != Vector2.ZERO:
+		# S'il y a un input, on calcule la vitesse à atteindre
+		var vitesse_cible_2d = direction_2d * current_speed
+		
+		# On ACCÉLÈRE vers cette vitesse cible. 
+		# Si la vitesse actuelle est à 50 (Knockback), elle va descendre doucement vers la vitesse cible au lieu de "clignoter".
+		vitesse_horizontale = vitesse_horizontale.move_toward(vitesse_cible_2d, acceleration * delta)
 	else:
-		velocity.x = move_toward(velocity.x, 0, current_speed)
-		velocity.z = move_toward(velocity.z, 0, current_speed)
+		# Si on lâche les touches, on applique la friction
+		var friction_actuelle = friction if is_on_floor() else air_friction
+		vitesse_horizontale = vitesse_horizontale.move_toward(Vector2.ZERO, friction_actuelle * delta)
 
+	# On réapplique la vélocité horizontale calculée à la vraie vélocité 3D du CharacterBody
+	velocity.x = vitesse_horizontale.x
+	velocity.z = vitesse_horizontale.y
+
+	# 4. On bouge !
 	move_and_slide()
 	
 func _unhandled_input(event: InputEvent) -> void:
-	# Détecte les mouvements de la souris
 	if event is InputEventMouseMotion:
-		# Tourner le personnage entier de gauche à droite (sur l'axe Y)
 		rotate_y(-event.relative.x * mouse_sensitivity)
-		
-		# Tourner uniquement la caméra de haut en bas (sur l'axe X)
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
-		
-		# Bloquer la caméra pour ne pas pouvoir regarder trop en arrière et se tordre le cou
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
-	# ==========================================================
-	# GESTION DU PLEIN ÉCRAN (F11)
-	# ==========================================================
 	if event is InputEventKey and event.keycode == KEY_F11 and event.pressed:
 		var current_mode = DisplayServer.window_get_mode()
-		
 		if current_mode == DisplayServer.WINDOW_MODE_FULLSCREEN or current_mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		else:
@@ -86,11 +93,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_died() -> void:
 	print("mort")
-	
-	# On attend 2 secondes pour te laisser le temps de comprendre que tu as perdu
 	await get_tree().create_timer(2.0).timeout
-	
-	# On ferme définitivement la fenêtre du jeu
 	get_tree().quit()
 
 func _on_damage_taken(amount: float) -> void:

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bdv5anb4oalnr"]
+
+[ext_resource type="Script" uid="uid://d2bgwlhvkg88y" path="res://components/combat_feedback_component.gd" id="1_fo86p"]
+
+[node name="CombatFeedbackComponent" type="Node3D" unique_id=2086975508]
+script = ExtResource("1_fo86p")

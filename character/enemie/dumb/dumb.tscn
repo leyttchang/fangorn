@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c7m43l7f012hv" path="res://character/enemie/dumb/dumb.gd" id="1_ngory"]
 [ext_resource type="PackedScene" uid="uid://b44pafafj13ku" path="res://assets/3D_models/body/orc_degeu/Orc.glb" id="1_vx1eg"]
+[ext_resource type="Resource" uid="uid://chn30d83iiq3w" path="res://character/enemie/dumb/dumb_behavior_data.tres" id="2_3atj7"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_is52v"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="3_lsk58"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="4_is52v"]
@@ -9,6 +10,10 @@
 [ext_resource type="Resource" uid="uid://cr7en7aw23w0e" path="res://character/enemie/dumb/dumb_stats.tres" id="6_mb0d1"]
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="6_vkw15"]
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="7_it7g2"]
+[ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="10_452es"]
+[ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="11_3atj7"]
+[ext_resource type="PackedScene" uid="uid://bnq7s2tgri30i" path="res://components/EnemyMovementComponent.tscn" id="12_xfsm0"]
+[ext_resource type="PackedScene" uid="uid://mnnj3o8ilins" path="res://components/enemy_navigation_component.tscn" id="13_pta2e"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 radius = 0.37402344
@@ -74,6 +79,7 @@ graph_offset = Vector2(0, -64.43514)
 
 [node name="dumb" type="CharacterBody3D" unique_id=888204308 groups=["Enemie"]]
 script = ExtResource("1_ngory")
+behavior = ExtResource("2_3atj7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1659181656]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.007764, 0)
@@ -115,6 +121,7 @@ bone_idx = 14
 collision_layer = 16
 collision_mask = 2
 damage = 20.0
+knockback_force = 30.0
 
 [node name="CollisionShape3D" parent="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 8.940697e-08, 0, -2.9802322e-08, 1, 0, 2.9802322e-08, 0, 1, 1.1920929e-07, 0.036377013, 8.940697e-08)
@@ -150,6 +157,15 @@ armor_curve = ExtResource("6_vkw15")
 
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("4_is52v")]
 stats_component = NodePath("../StatsComponent")
+
+[node name="CombatFeedbackComponent" parent="." unique_id=2086975508 node_paths=PackedStringArray("health_component") instance=ExtResource("10_452es")]
+damage_text_scene = ExtResource("11_3atj7")
+health_component = NodePath("../HealthComponent")
+
+[node name="EnemyMovementComponent" parent="." unique_id=280066399 instance=ExtResource("12_xfsm0")]
+
+[node name="EnemyNavigationComponent" parent="." unique_id=1659678892 node_paths=PackedStringArray("nav_agent") instance=ExtResource("13_pta2e")]
+nav_agent = NodePath("../NavigationAgent3D")
 
 [editable path="Orc"]
 [editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]

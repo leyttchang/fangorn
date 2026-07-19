@@ -9,9 +9,10 @@
 [ext_resource type="Resource" uid="uid://3ts10m6vmiwm" path="res://character/player_stats.tres" id="3_hhoun"]
 [ext_resource type="Resource" uid="uid://ckgp1u2lvmgr4" path="res://item/armures/chest_armor.tres" id="4_8vi7a"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_hhoun"]
-[ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="5_aw5rd"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="5_bdyh8"]
+[ext_resource type="Resource" uid="uid://biqusejrat6c6" path="res://item/armes/spear_test.tres" id="6_8vi7a"]
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
+[ext_resource type="PackedScene" uid="uid://bscyin7n03udp" path="res://item/armes/test_spear.tscn" id="8_8vi7a"]
 [ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="9_b6pse"]
 [ext_resource type="Resource" uid="uid://cs618ik4co076" path="res://scripts/abilities/fireball/Fireball.tres" id="10_hn1kw"]
@@ -36,30 +37,30 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 
 [sub_resource type="Animation" id="Animation_xqqx8"]
-length = 0.001
+length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath(".:rotation")
+tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.20943952, 0, 0)]
+"values": [Vector3(0.85764027, -0.9, -0.6392616)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:position")
+tracks/1/path = NodePath(".:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.5, -0.9, -1)]
+"values": [Vector3(0.106190525, -0.46215287, 1.0671991)]
 }
 
 [sub_resource type="Animation" id="Animation_a1kp2"]
@@ -179,9 +180,8 @@ tracks/1/keys = {
 "values": [Vector3(-2.2654374, 0.4956735, -0.33859387), Vector3(0, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_aw5rd"]
-resource_name = "attack_sword"
-length = 0.7
+[sub_resource type="Animation" id="Animation_8vi7a"]
+resource_name = "attack_spear"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -189,7 +189,51 @@ tracks/0/path = NodePath(".:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.43333334, 0.6666667),
+"times": PackedFloat32Array(0, 0.29333332, 0.5, 0.7733333, 1),
+"transitions": PackedFloat32Array(1, 5, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.106190465, -0.071651146, 1.0671991), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395715, 0, 0), Vector3(0.106190465, -0.071651146, 1.0671991)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.28333333, 0.5, 0.7733333, 1),
+"transitions": PackedFloat32Array(1, 5, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.85764027, -0.9, -0.6392616), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.37647116, -0.6165854, -1.1098979), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.85764027, -0.9, -0.6392616)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.3, 0.6333333),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_aw5rd"]
+resource_name = "attack_sword"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.43333334, 0.96666664),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.20943952, 0, 0), Vector3(-2.0943952, 0, 0), Vector3(0, 0, 0)]
@@ -201,7 +245,7 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.43333334, 0.6666667),
+"times": PackedFloat32Array(0, 0.2, 0.43333334, 0.96666664),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.1, -0.7), Vector3(0.5, -1, -1), Vector3(0.5, -0.9, -1)]
@@ -213,7 +257,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.16666667, 0.6666667),
+"times": PackedFloat32Array(0.16666667, 0.96666664),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -230,6 +274,7 @@ _data = {
 &"attack_axe": SubResource("Animation_a1kp2"),
 &"attack_heavy_slam": SubResource("Animation_fn6jh"),
 &"attack_heavy_slam_recovery": SubResource("Animation_2tvps"),
+&"attack_spear": SubResource("Animation_8vi7a"),
 &"attack_sword": SubResource("Animation_aw5rd")
 }
 
@@ -245,7 +290,7 @@ collision_layer = 2
 script = ExtResource("1_2orxn")
 camera = NodePath("Camera3D")
 starting_equipped_weapon = ExtResource("3_a1kp2")
-starting_inventory_items = Array[ExtResource("3_45wte")]([ExtResource("2_j51ly"), ExtResource("4_8vi7a")])
+starting_inventory_items = Array[ExtResource("3_45wte")]([ExtResource("2_j51ly"), ExtResource("4_8vi7a"), ExtResource("6_8vi7a")])
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1568168780]
 mesh = SubResource("CapsuleMesh_hlie2")
@@ -261,10 +306,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(1, 0, 0, 0, 0.9781476, -0.2079117, 0, 0.2079117, 0.9781476, 0.5, -0.9, -1)
+transform = Transform3D(0.3905622, -0.80677646, -0.44336444, 0.87091833, 0.47986072, -0.10599104, 0.29826435, -0.3447382, 0.8900524, 0.85764027, -0.9, -0.6392616)
 script = ExtResource("2_dkowc")
 
-[node name="TestSword" parent="Camera3D/MainDroite" unique_id=2020783524 instance=ExtResource("5_aw5rd")]
+[node name="test_spear" parent="Camera3D/MainDroite" unique_id=335765208 instance=ExtResource("8_8vi7a")]
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=729055229]
 target_position = Vector3(0, 0, -50)
