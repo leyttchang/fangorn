@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bl3bnebvggso3"]
+
+[ext_resource type="Script" path="res://objet/chest/chest_spawner.gd" id="1_script"]
+
+[node name="chest_spawner" type="Node3D" unique_id=78453180]
+script = ExtResource("1_script")

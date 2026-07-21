@@ -12,6 +12,8 @@
 [ext_resource type="PackedScene" uid="uid://c7s8m1k2n3p4q" path="res://character/enemie/smart_spawner/smart_spawner.tscn" id="10_6i2mx"]
 [ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="11_2ho30"]
 [ext_resource type="PackedScene" uid="uid://b1v2w3d4s5p6q" path="res://ui/wave_display.tscn" id="12_2ho30"]
+[ext_resource type="PackedScene" uid="uid://bl3bnebvggso3" path="res://objet/chest/chest_spawner.tscn" id="12_mhhd5"]
+[ext_resource type="PackedScene" uid="uid://c8s7m2k3n4p5w" path="res://ui/fps_counter.tscn" id="13_fps"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_6i2mx"]
 density = 0.27
@@ -63,6 +65,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 22, 17)
 
 [node name="fog" parent="." unique_id=604921953 instance=ExtResource("9_q4u25")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.577293, 21, -43.831547)
+visible = false
 size = Vector3(202.2, 0.75, 232)
 material = SubResource("FogMaterial_6i2mx")
 
@@ -80,49 +83,52 @@ shadow_blur = 2.474
 
 [node name="enemies_coutner" parent="." unique_id=1160664613 instance=ExtResource("8_gf3dy")]
 
-[node name="dumb_archer" parent="." unique_id=74478897 instance=ExtResource("9_1eb17")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.467243, 26.251118, -10.0809555)
-
 [node name="spawner" type="Node3D" parent="." unique_id=1444932937]
 
 [node name="dumb_spawner" parent="spawner" unique_id=1600295091 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 24, -33)
 is_disabled = true
-start_spawn_time = 1000.0
 
 [node name="dumb_spawner2" parent="spawner" unique_id=1874703764 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 24, -33)
 is_disabled = true
-start_spawn_time = 1000.0
 
 [node name="dumb_spawner3" parent="spawner" unique_id=1593388953 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 171)
 is_disabled = true
-start_spawn_time = 1000.0
 
 [node name="dumb_spawner4" parent="spawner" unique_id=1599193968 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 21.894852, -19.801086)
 Dumb = ExtResource("9_1eb17")
 is_disabled = true
-start_spawn_time = 1000.0
 
 [node name="dumb_spawner5" parent="spawner" unique_id=522046548 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 21.894852, -19.801086)
 Dumb = ExtResource("9_1eb17")
 is_disabled = true
-start_spawn_time = 1000.0
 
 [node name="dumb_spawner6" parent="spawner" unique_id=1453430473 instance=ExtResource("7_ayx17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 21.894852, 2.1989136)
 Dumb = ExtResource("9_1eb17")
 is_disabled = true
-start_spawn_time = 1000.0
 
 [node name="SmartSpawner" parent="spawner" unique_id=1089854815 instance=ExtResource("10_6i2mx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.60695, -20.34161)
 monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17")])
+initial_wave_count = 1
+delay_between_waves = 10.0
+time_between_spawns = 0.2
 spawn_radius = 70.0
 
+[node name="chest_spawner" parent="spawner" unique_id=78453180 instance=ExtResource("12_mhhd5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 20, -9)
+
+[node name="chest_spawner2" parent="spawner" unique_id=1292706102 instance=ExtResource("12_mhhd5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 20, -9)
+spawn_chance = 40.0
+
 [node name="wave_display" parent="." unique_id=114584502 instance=ExtResource("12_2ho30")]
+
+[node name="fps_counter" parent="." unique_id=987654321 instance=ExtResource("13_fps")]
 
 [editable path="Map1T3d"]

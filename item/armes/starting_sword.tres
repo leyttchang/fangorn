@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponItem" format=3 uid="uid://dhcijrbw4kphg"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_by18r"]
+[ext_resource type="Texture2D" uid="uid://bt3g23p5g3hxh" path="res://assets/icon/32x32/fb1785.png" id="2_ecp8x"]
+[ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="2_vp61g"]
+[ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="4_m8gly"]
+
+[resource]
+script = ExtResource("2_vp61g")
+damage_range = Vector2(12, 12)
+attack_speed_range = Vector2(1, 1)
+weapon_scene = ExtResource("4_m8gly")
+id = "starting_sword"
+item_name = "Starting Sword"
+description = "une epée"
+icon = ExtResource("2_ecp8x")
+weapon_style = 1
+metadata/_custom_type_script = "uid://dgtcfko7wc1cp"

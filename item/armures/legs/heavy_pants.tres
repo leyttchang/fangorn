@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://nw75w0jr2b2b"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_uhku5"]
+[ext_resource type="Resource" path="res://item/affixes/affix_health.tres" id="2_fbgf4"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_iaqh1"]
+[ext_resource type="Resource" uid="uid://dag3t06rnv3nc" path="res://item/affixes/affix_armor.tres" id="3_0rsbu"]
+[ext_resource type="Texture2D" uid="uid://dh6d26bu3u7s4" path="res://assets/icon/32x32/fb1953.png" id="4_0rsbu"]
+
+[resource]
+script = ExtResource("2_iaqh1")
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(5, 10),
+"attack_speed": Vector2(0, 0),
+"casting_speed": Vector2(0, 0),
+"cd_red": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(10, 15),
+"movement_speed": Vector2(0, 0),
+"physical_damage": Vector2(0, 0)
+}
+excluded_affixes = Array[ExtResource("1_uhku5")]([ExtResource("2_fbgf4"), ExtResource("3_0rsbu")])
+id = "heavy_pants"
+item_name = " Heavy Pants"
+icon = ExtResource("4_0rsbu")
+item_type = 2
+metadata/_custom_type_script = "uid://b6114jo5bnldt"

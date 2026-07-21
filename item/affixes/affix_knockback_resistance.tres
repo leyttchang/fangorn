@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="AffixData" format=3 uid="uid://bxkju5qr4jqev"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_affix"]
+
+[resource]
+script = ExtResource("1_affix")
+affix_name = "du roc"
+stat_name = "knockback_resistance"

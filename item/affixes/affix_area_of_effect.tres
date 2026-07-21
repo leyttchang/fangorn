@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AffixData" format=3 uid="uid://b4uui2ekif0bj"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_affix"]
+
+[resource]
+script = ExtResource("1_affix")
+affix_name = "de l'amplificateur"
+stat_name = "area_of_effect"
+min_roll = 0.05
+max_roll = 0.7

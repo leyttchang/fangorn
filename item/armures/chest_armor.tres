@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://ckgp1u2lvmgr4"]
 
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_mkyl1"]
 [ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="1_ti2yg"]
 [ext_resource type="Texture2D" uid="uid://rircxw0hu63f" path="res://assets/icon/32x32/fb1099.png" id="1_v18r8"]
 
@@ -19,7 +20,8 @@ stat_bonuses = {
 "physical_damage": 2.0
 }
 id = "armor_cheat"
-item_name = "heavy_armor"
+item_name = "armor cheat"
+description = "une armure cheat"
 icon = ExtResource("1_v18r8")
 item_type = 1
 metadata/_custom_type_script = "uid://b6114jo5bnldt"

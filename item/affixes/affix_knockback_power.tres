@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AffixData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://item/affix_data.gd" id="1_affix"]
+
+[resource]
+script = ExtResource("1_affix")
+affix_name = "du bélier"
+stat_name = "knockback_power"
+min_roll = 1.0
+max_roll = 5.0

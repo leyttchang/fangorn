@@ -1,16 +1,14 @@
 [gd_scene format=3 uid="uid://dad6pbsu7b6s5"]
 
 [ext_resource type="Script" uid="uid://6e61gbw6gugj" path="res://character/player.gd" id="1_2orxn"]
+[ext_resource type="Resource" uid="uid://dhcijrbw4kphg" path="res://item/armes/starting_sword.tres" id="2_2tvps"]
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="2_aypkh"]
 [ext_resource type="Script" uid="uid://4lgdql2xgv6l" path="res://character/main_droite.gd" id="2_dkowc"]
 [ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="2_j51ly"]
 [ext_resource type="Script" uid="uid://51rh523r8oxe" path="res://item/item_data.gd" id="3_45wte"]
-[ext_resource type="Resource" uid="uid://cubsij5q17dky" path="res://item/armes/test_sword_stats.tres" id="3_a1kp2"]
 [ext_resource type="Resource" uid="uid://3ts10m6vmiwm" path="res://character/player_stats.tres" id="3_hhoun"]
-[ext_resource type="Resource" uid="uid://ckgp1u2lvmgr4" path="res://item/armures/chest_armor.tres" id="4_8vi7a"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_hhoun"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="5_bdyh8"]
-[ext_resource type="Resource" uid="uid://biqusejrat6c6" path="res://item/armes/spear_test.tres" id="6_8vi7a"]
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
 [ext_resource type="PackedScene" uid="uid://bscyin7n03udp" path="res://item/armes/test_spear.tscn" id="8_8vi7a"]
 [ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
@@ -349,7 +347,6 @@ tracks/3/keys = {
 
 [sub_resource type="Animation" id="Animation_3m6fa"]
 resource_name = "attack_spear_2"
-length = 1.2333333
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -469,7 +466,7 @@ tracks/3/keys = {
 
 [sub_resource type="Animation" id="Animation_aayji"]
 resource_name = "idle_axe"
-length = 0.1
+length = 3.5000000000000004
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -478,10 +475,10 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1.1666666, 2.5666666),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.5, -0.9, -1)]
+"values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.8091459, -1), Vector3(0.5, -1.0362347, -1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -490,15 +487,15 @@ tracks/1/path = NodePath(".:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1.1666666, 2.575),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0, 0, 0)]
+"values": [Vector3(0, 0, 0), Vector3(0.017177094, 0, 0), Vector3(0.12670197, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_e72n5"]
 resource_name = "idle_spear"
-length = 0.1
+length = 3.5000000000000004
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -507,10 +504,10 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1.23, 2.37),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.85764027, -0.9, -0.6392616)]
+"values": [Vector3(0.85764027, -0.9, -0.6392616), Vector3(0.85764027, -0.83812433, -0.6392616), Vector3(0.85764027, -1.0065842, -0.6392616)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -519,15 +516,15 @@ tracks/1/path = NodePath(".:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1.23, 2.37),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.106190465, -0.071651146, 1.0671991)]
+"values": [Vector3(0.106190465, -0.071651146, 1.0671991), Vector3(0.10951775, -0.06644179, 1.1155835), Vector3(0.10211951, -0.0772904, 1.012764)]
 }
 
 [sub_resource type="Animation" id="Animation_sexlj"]
 resource_name = "idle_sword"
-length = 0.1
+length = 3.5000000000000004
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -536,10 +533,10 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1.1666666, 2.5666666),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.5, -0.9, -1)]
+"values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.8091459, -1), Vector3(0.5, -1.0362347, -1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -548,10 +545,10 @@ tracks/1/path = NodePath(".:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1.1666666, 2.575),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0, 0, 0)]
+"values": [Vector3(0, 0, 0), Vector3(0.017177094, 0, 0), Vector3(0.12670197, 0, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_aw5rd"]
@@ -657,11 +654,12 @@ states/idle_spear/position = Vector2(231, 86)
 states/idle_sword/node = SubResource("AnimationNodeAnimation_6e1i3")
 states/idle_sword/position = Vector2(231, 189)
 transitions = ["attack_axe_1", "attack_axe_2", SubResource("AnimationNodeStateMachineTransition_bpixc"), "idle_axe", "attack_axe_1", SubResource("AnimationNodeStateMachineTransition_8amhy"), "Start", "idle_axe", SubResource("AnimationNodeStateMachineTransition_6e1i3"), "attack_axe_2", "idle_axe", SubResource("AnimationNodeStateMachineTransition_rtbr7"), "attack_axe_1", "idle_axe", SubResource("AnimationNodeStateMachineTransition_f3w6d"), "idle_spear", "attack_spear_1", SubResource("AnimationNodeStateMachineTransition_2qmbm"), "attack_spear_1", "attack_spear_2", SubResource("AnimationNodeStateMachineTransition_8weaa"), "attack_spear_2", "idle_spear", SubResource("AnimationNodeStateMachineTransition_o88sh"), "attack_spear_1", "idle_spear", SubResource("AnimationNodeStateMachineTransition_3k6pu"), "attack_heavy_slam", "attack_heavy_slam_recovery", SubResource("AnimationNodeStateMachineTransition_7e1ce"), "idle_sword", "attack_sword_1", SubResource("AnimationNodeStateMachineTransition_6vepr"), "idle_sword", "attack_heavy_slam", SubResource("AnimationNodeStateMachineTransition_ek25o"), "attack_sword_1", "idle_sword", SubResource("AnimationNodeStateMachineTransition_nnepy")]
-graph_offset = Vector2(-178.22887, 71.30229)
+graph_offset = Vector2(-134.22887, 123.30229)
 
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_speed"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_combo"]
+graph_offset = Vector2(-281.61694, -18.580177)
 nodes/output/position = Vector2(340, 140)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_yqkk6")
 nodes/StateMachine/position = Vector2(-100, 140)
@@ -680,8 +678,9 @@ height = 0.4
 collision_layer = 2
 script = ExtResource("1_2orxn")
 camera = NodePath("Camera3D")
-starting_equipped_weapon = ExtResource("3_a1kp2")
-starting_inventory_items = Array[ExtResource("3_45wte")]([ExtResource("2_j51ly"), ExtResource("4_8vi7a"), ExtResource("6_8vi7a")])
+starting_equipped_weapon = ExtResource("2_2tvps")
+starting_inventory_items = Array[ExtResource("3_45wte")]([ExtResource("2_j51ly")])
+friction = 50.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1568168780]
 mesh = SubResource("CapsuleMesh_hlie2")
@@ -697,7 +696,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999795, -0.0061650006, 0.0014514609, 0, 0.22916973, 0.9733861, -0.0063335593, -0.97336644, 0.22916515, 0.5, -0.9, -1)
+transform = Transform3D(0.9999791, -0.0061649974, 0.0014514605, 0, 0.2291696, 0.9733859, -0.006333557, -0.97336596, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 
 [node name="test_spear" parent="Camera3D/MainDroite" unique_id=335765208 instance=ExtResource("8_8vi7a")]
@@ -714,6 +713,7 @@ root_node = NodePath("../MainDroite")
 libraries/ = SubResource("AnimationLibrary_aw5rd")
 
 [node name="AnimationTree" type="AnimationTree" parent="Camera3D" unique_id=2091119579]
+active = false
 root_node = NodePath("../MainDroite")
 tree_root = SubResource("AnimationNodeBlendTree_combo")
 anim_player = NodePath("../attack_animation")
@@ -773,27 +773,34 @@ main_droite = NodePath("../Camera3D/MainDroite")
 
 [node name="Crosshair" parent="." unique_id=894221743 instance=ExtResource("25_tr32s")]
 
-[node name="InventoryUI" parent="." unique_id=1946714399 node_paths=PackedStringArray("inventory_component", "equipment_component") instance=ExtResource("16_xqqx8")]
+[node name="InventoryUI" parent="." unique_id=1946714399 node_paths=PackedStringArray("inventory_component", "equipment_component", "stats_component") instance=ExtResource("16_xqqx8")]
 inventory_component = NodePath("../InventoryComponent")
 equipment_component = NodePath("../EquipmentComponent")
+stats_component = NodePath("../StatsComponent")
 
-[node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipe" parent="InventoryUI/MainPanel" parent_id_path=PackedInt32Array(1946714399, 2104048239) index="2" unique_id=1349708289]
+offset_left = 43.0
+offset_top = 90.0
+offset_right = -819.0
+offset_bottom = -41.0
+
+[node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot2" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="1" unique_id=206346114 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot2" parent="InventoryUI/MainPanel/equipe" index="1" unique_id=206346114 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot3" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="2" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot3" parent="InventoryUI/MainPanel/equipe" index="2" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot4" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="3" unique_id=1693178314 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot4" parent="InventoryUI/MainPanel/equipe" index="3" unique_id=1693178314 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot5" parent="InventoryUI/MainPanel/equipe" parent_id_path=PackedInt32Array(1946714399, 1349708289) index="4" unique_id=2093880661 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot5" parent="InventoryUI/MainPanel/equipe" index="4" unique_id=2093880661 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 

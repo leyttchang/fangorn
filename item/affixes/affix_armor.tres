@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AffixData" format=3 uid="uid://dag3t06rnv3nc"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_affix"]
+
+[resource]
+script = ExtResource("1_affix")
+affix_name = "de robustesse"
+stat_name = "armor"
+min_roll = 5.0
+max_roll = 15.0

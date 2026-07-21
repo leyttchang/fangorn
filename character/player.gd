@@ -31,13 +31,15 @@ func _ready() -> void:
 	
 	var equip_comp = $EquipmentComponent 
 	if equip_comp != null and starting_equipped_weapon != null:
-		equip_comp.equip_item(starting_equipped_weapon, "main_hand")
+		# On équipe l'arme telle qu'elle est définie dans l'inspecteur
+		equip_comp.equip_item(starting_equipped_weapon.duplicate(true), "main_hand")
 		
 	var inv_comp = $InventoryComponent
 	if inv_comp != null:
 		for item in starting_inventory_items:
 			if item != null:
-				inv_comp.add_item(item, 1)
+				inv_comp.add_item(item.duplicate(true), 1)
+	# ========================================
 	
 func _physics_process(delta: float) -> void:
 	# 1. Gestion de la gravité

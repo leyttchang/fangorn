@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://cu0sioi6yccht"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_1nh1g"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_5bbsx"]
+[ext_resource type="Resource" uid="uid://dag3t06rnv3nc" path="res://item/affixes/affix_armor.tres" id="2_ae2ym"]
+[ext_resource type="Resource" uid="uid://c0q7crg6hwbrc" path="res://item/affixes/affix_physical_damage.tres" id="3_gieb7"]
+[ext_resource type="Texture2D" uid="uid://cqrf2i3hkjhmg" path="res://assets/icon/32x32/fb24.png" id="4_gieb7"]
+
+[resource]
+script = ExtResource("2_5bbsx")
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(3, 7),
+"attack_speed": Vector2(0, 0),
+"casting_speed": Vector2(0, 0),
+"cd_red": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(0, 0),
+"movement_speed": Vector2(0, 0),
+"physical_damage": Vector2(0.05, 0.1)
+}
+excluded_affixes = Array[ExtResource("1_1nh1g")]([ExtResource("2_ae2ym"), ExtResource("3_gieb7")])
+icon = ExtResource("4_gieb7")
+item_type = 4
+metadata/_custom_type_script = "uid://b6114jo5bnldt"

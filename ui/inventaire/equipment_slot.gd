@@ -23,11 +23,26 @@ func _on_equipment_changed(changed_slot_name: String, item: ItemData) -> void:
 	if changed_slot_name == slot_name:
 		_update_visual(item)
 
+var current_item: ItemData = null
+
 func _update_visual(item: ItemData) -> void:
+	current_item = item
 	if item == null:
 		icon_rect.texture = null
+		tooltip_text = "" # Désactive le tooltip
 	else:
 		icon_rect.texture = item.icon
+		tooltip_text = " " # Active le tooltip
+
+# ==========================================
+# TOOLTIP PERSONNALISÉ
+# ==========================================
+func _make_custom_tooltip(_for_text: String) -> Object:
+	if current_item == null: return null
+	var tooltip_scene = preload("res://ui/inventaire/item_tooltip.tscn")
+	var tooltip = tooltip_scene.instantiate()
+	tooltip.set_item(current_item)
+	return tooltip
 
 func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	if typeof(data) == TYPE_DICTIONARY and data.has("type") and data["type"] == "inventory_item":

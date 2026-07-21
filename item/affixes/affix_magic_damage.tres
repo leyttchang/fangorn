@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AffixData" format=3 uid="uid://4wx1ak4h7su6"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_affix"]
+
+[resource]
+script = ExtResource("1_affix")
+affix_name = "de l'érudit"
+stat_name = "magic_damage"
+min_roll = 0.05
+max_roll = 0.2

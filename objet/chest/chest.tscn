@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://uwqnpr24nibv"]
+
+[ext_resource type="PackedScene" uid="uid://cjlkis05t14ni" path="res://objet/chest/low poly chest 1/Low_Poly_Chest GLTF/Simple_Chest GLTF.glb" id="1_rxqf2"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_i55t8"]
+[ext_resource type="Script" uid="uid://ciplisiqqqryj" path="res://objet/chest/chest.gd" id="2_script"]
+[ext_resource type="Resource" uid="uid://ds78iyt2aodhc" path="res://item/armures/chest/heavy_armor.tres" id="3_8rmxv"]
+[ext_resource type="Resource" uid="uid://jgm32ewrjlh2" path="res://item/armures/feet/heavy_boots.tres" id="4_n3aon"]
+[ext_resource type="Resource" uid="uid://cu0sioi6yccht" path="res://item/armures/head/heavy_helmet.tres" id="5_f85ld"]
+[ext_resource type="Resource" uid="uid://nw75w0jr2b2b" path="res://item/armures/legs/heavy_pants.tres" id="6_6pnsy"]
+[ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="7_dre1o"]
+[ext_resource type="Resource" uid="uid://cubsij5q17dky" path="res://item/armes/test_sword_stats.tres" id="8_tnj3d"]
+[ext_resource type="Resource" uid="uid://biqusejrat6c6" path="res://item/armes/spear_test.tres" id="9_wr6mb"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
+size = Vector3(1.2149, 0.9249, 0.7678)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_interact"]
+size = Vector3(3, 2, 3)
+
+[node name="Chest" type="Area3D" unique_id=1680074549]
+collision_layer = 32
+collision_mask = 2
+script = ExtResource("2_script")
+possible_bases = Array[ExtResource("2_i55t8")]([ExtResource("3_8rmxv"), ExtResource("4_n3aon"), ExtResource("5_f85ld"), ExtResource("6_6pnsy"), ExtResource("7_dre1o"), ExtResource("8_tnj3d"), ExtResource("9_wr6mb")])
+
+[node name="Simple_Chest GLTF" parent="." unique_id=1602409972 instance=ExtResource("1_rxqf2")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=951093060]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=705017761]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+shape = SubResource("BoxShape3D_solid")
+
+[node name="InteractShape" type="CollisionShape3D" parent="." unique_id=2023996628]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_interact")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=86689604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+billboard = 1
+text = "Press E to open"
+font_size = 48

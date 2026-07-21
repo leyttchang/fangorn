@@ -7,6 +7,11 @@ extends Resource
 @export_multiline var description: String = "Description de l'objet."
 @export var icon: Texture2D
 
+# --- ARPG SYSTÈME ---
+enum Rarity { COMMON, MAGIC, RARE, LEGENDARY }
+@export var rarity: Rarity = Rarity.COMMON
+@export var ilvl: int = 1
+
 # --- CATÉGORISATION ---
 enum ItemType { main_hand, chest, legs, feet, head }
 @export var item_type: ItemType = ItemType.main_hand
@@ -18,3 +23,4 @@ enum WeaponStyle { AXE, SWORD, DAGGER, MACE, SPEAR }
 # --- INVENTAIRE ---
 @export var is_stackable: bool = false
 @export var max_stack: int = 99
+@export var is_new_item: bool = true # Vrai par défaut pour les loots

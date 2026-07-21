@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://c8s7m2k3n4p5w"]
+
+[ext_resource type="Script" path="res://ui/fps_counter.gd" id="1_fps"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fps"]
+font_size = 18
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[node name="fps_counter" type="CanvasLayer"]
+script = ExtResource("1_fps")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 72.0
+offset_bottom = 39.0
+text = "FPS: 60"
+label_settings = SubResource("LabelSettings_fps")

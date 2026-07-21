@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="WeaponItem" format=3 uid="uid://db2pyarlsbrbb"]
 
 [ext_resource type="Texture2D" uid="uid://bhgw0w3m2d6bs" path="res://assets/icon/fc126.png" id="1_imlsj"]
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_w65v3"]
 [ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="2_imlsj"]
 [ext_resource type="PackedScene" uid="uid://bkcrhf14uynjl" path="res://item/armes/test_axe.tscn" id="3_imlsj"]
 
@@ -8,6 +9,8 @@
 script = ExtResource("2_imlsj")
 base_damage = 50.0
 base_attack_speed = 0.7
+damage_range = Vector2(50, 60)
+attack_speed_range = Vector2(0.7, 0.8)
 weapon_scene = ExtResource("3_imlsj")
 id = "axe_test"
 item_name = "axe"
