@@ -21,7 +21,8 @@ signal cast_finished()
 }
 
 @export var raycast: RayCast3D 
-@export var anim_player: AnimationPlayer 
+@export var anim_player: AnimationPlayer
+@export var anim_tree: AnimationTree # <-- L'ajout est ici
 
 var cooldown_timers: Dictionary = {}
 var active_ability: AbilityData = null 
@@ -105,6 +106,7 @@ func _handle_inputs() -> void:
 				var final_required_time = base_cast_time / final_speed_multiplier
 				
 				if final_required_time <= 0.0:
+					if anim_tree != null: anim_tree.active = false # <-- ON COUPE L'ARBRE
 					if anim_player != null and ability.anim_name != "":
 						anim_player.play(ability.anim_name) 
 					_try_cast_ability(ability)
@@ -124,16 +126,18 @@ func _handle_inputs() -> void:
 					# =========================================================
 					if anim_player != null and ability.anim_name != "":
 						if anim_player.has_animation(ability.anim_name):
+							if anim_tree != null: anim_tree.active = false # <-- ON COUPE L'ARBRE
+							
 							var anim_length = anim_player.get_animation(ability.anim_name).length
 							var play_speed = anim_length / required_cast_time
 							
 							# 1. On joue la frappe à la bonne vitesse
 							anim_player.play(ability.anim_name, -1, play_speed)
 							
-							# 2. On vérifie si l'animation de retour existe (ex: "attack_heavy_slam_recovery")
+							# 2. On vérifie si l'animation de retour existe
 							var recovery_anim = ability.anim_name + "_recovery"
 							if anim_player.has_animation(recovery_anim):
-								# 3. On la met en file d'attente pour qu'elle s'enchaîne toute seule !
+								# 3. On la met en file d'attente
 								anim_player.queue(recovery_anim)
 					# =========================================================
 					
@@ -219,7 +223,6 @@ func _validate_and_fire() -> void:
 	# FALSE = On ne coupe pas l'AnimationPlayer, pour laisser jouer l'animation de Recovery en paix !
 	_reset_casting(false) 
 
-# --- NOUVEAU : Le paramètre 'is_canceled' permet de choisir si on coupe l'animation ou non ---
 func _reset_casting(is_canceled: bool = false) -> void:
 	current_state = State.IDLE
 	casting_ability = null
@@ -232,11 +235,12 @@ func _reset_casting(is_canceled: bool = false) -> void:
 		indicator_instance = null
 		
 	# Si le joueur a annulé (clic droit), on gèle son mouvement
-	if is_canceled and anim_player != null:
-		anim_player.stop() 
+	if is_canceled:
+		if anim_player != null: anim_player.stop() 
+		if anim_tree != null: anim_tree.active = true
 
 # ==========================================
-# (Les fonctions ci-dessous n'ont pas changé !)
+# (Les fonctions qui ont sauté au copier-coller !)
 # ==========================================
 
 func _try_cast_ability(ability: AbilityData) -> void:
@@ -282,6 +286,7 @@ func _handle_targeting() -> void:
 				"impact_point": raycast.get_collision_point()
 			}
 			if anim_player != null and active_ability.anim_name != "":
+				if anim_tree != null: anim_tree.active = false # <-- ON COUPE L'ARBRE AU CLIC
 				anim_player.play(active_ability.anim_name)
 				
 			_execute_ability(active_ability, target_data)

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dkht0vu3wt3ic"]
+
+[sub_resource type="FogMaterial" id="FogMaterial_hlie2"]
+albedo = Color(0.37111807, 0.4431049, 0.3064715, 1)
+
+[node name="Node3D" type="FogVolume" unique_id=604921953]
+size = Vector3(25.05, 2, 25)
+material = SubResource("FogMaterial_hlie2")

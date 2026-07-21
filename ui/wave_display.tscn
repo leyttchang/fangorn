@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://b1v2w3d4s5p6q"]
+
+[ext_resource type="Script" path="res://ui/wave_display.gd" id="1_wavedisplay"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wave"]
+font_size = 48
+outline_size = 10
+outline_color = Color(0, 0, 0, 0.8)
+shadow_size = 8
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_offset = Vector2(2, 2)
+
+[node name="wave_display" type="CanvasLayer"]
+script = ExtResource("1_wavedisplay")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 80.0
+offset_bottom = 160.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="CenterContainer"]
+layout_mode = 2
+text = "VAGUE 1"
+label_settings = SubResource("LabelSettings_wave")
+horizontal_alignment = 1
+vertical_alignment = 1

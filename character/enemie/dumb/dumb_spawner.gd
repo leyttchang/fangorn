@@ -1,6 +1,7 @@
 extends Node3D
 
 @export var Dumb : PackedScene
+@export var is_disabled: bool = false # Cochez pour désactiver complètement ce spawner !
 
 # --- PARAMÈTRES DE DIFFICULTÉ ---
 @export var start_spawn_time: float = 4.0   
@@ -18,6 +19,9 @@ var current_spawn_time: float
 var can_scale_difficulty: bool = true 
 
 func _ready() -> void:
+	if is_disabled:
+		return
+		
 	current_spawn_time = start_spawn_time
 	
 	# 1. Le Chronomètre de Spawn
@@ -73,7 +77,7 @@ func _on_timeout() -> void:
 
 
 func spawn_dumb() -> void:
-	if Dumb == null:
+	if is_disabled or Dumb == null:
 		return
 		
 	var new_dumb = Dumb.instantiate()

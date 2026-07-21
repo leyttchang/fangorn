@@ -37,7 +37,7 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 
 [sub_resource type="Animation" id="Animation_xqqx8"]
-length = 0.1
+length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -48,7 +48,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.85764027, -0.9, -0.6392616)]
+"values": [Vector3(0.5, -0.9, -1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -60,11 +60,11 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.106190525, -0.46215287, 1.0671991)]
+"values": [Vector3(-1.3395716, 0.0063336045, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_a1kp2"]
-resource_name = "attack_axe"
+resource_name = "attack_axe_1"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -72,7 +72,7 @@ tracks/0/path = NodePath(".:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.43333334, 0.6, 1),
+"times": PackedFloat32Array(0, 0.36666673, 0.6333334, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.20943952, -0.567232, -0.4712389), Vector3(-1.2479104, 0.97912973, -0.09773844), Vector3(0, 0, 0)]
@@ -84,7 +84,7 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.43333334, 0.6, 1),
+"times": PackedFloat32Array(0, 0.36666673, 0.6333334, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.1, -0.7), Vector3(-1, -1, -1), Vector3(0.5, -0.9, -1)]
@@ -96,7 +96,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.5, 1),
+"times": PackedFloat32Array(0.40000004, 0.6666667),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -104,6 +104,84 @@ tracks/2/keys = {
 }, {
 "args": [],
 "method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.6666667, 0.96666664),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_fqwjq"]
+resource_name = "attack_axe_2"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1, 0.50731856, 0.57747436, 0.73333335, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 2.7320802, 1),
+"update": 0,
+"values": [Vector3(-1.07532, 0.8437127, -0.084220886), Vector3(-0.7465105, 1.3784574, -0.21807085), Vector3(-0.4508599, 1.2392839, 0.22331308), Vector3(-1.0065247, 1.4834416, -2.3146667), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.1, 0.50731856, 0.57747436, 0.73333335, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 2.7320802, 1),
+"update": 0,
+"values": [Vector3(-0.7925447, -0.98616964, -1), Vector3(-0.7925447, -0.7634588, -0.71905524), Vector3(-0.7925447, -0.7634588, -0.71905524), Vector3(0.6764816, -1.0191555, -0.71905524), Vector3(0.5, -0.9, -1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.56666666, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.8, 0.93333334),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
 }]
 }
 
@@ -151,6 +229,20 @@ tracks/2/keys = {
 "method": &"disable_current_hitbox"
 }]
 }
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.6),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"end_combat_state"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_2tvps"]
 resource_name = "attack_heavy_slam_recovery"
@@ -179,9 +271,23 @@ tracks/1/keys = {
 "update": 0,
 "values": [Vector3(-2.2654374, 0.4956735, -0.33859387), Vector3(0, 0, 0)]
 }
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"end_combat_state"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_8vi7a"]
-resource_name = "attack_spear"
+resource_name = "attack_spear_1"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -189,10 +295,10 @@ tracks/0/path = NodePath(".:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.29333332, 0.5, 0.7733333, 1),
-"transitions": PackedFloat32Array(1, 5, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.29333332, 0.5, 0.63583094, 0.7733333, 1),
+"transitions": PackedFloat32Array(1, 5, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector3(0.106190465, -0.071651146, 1.0671991), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395715, 0, 0), Vector3(0.106190465, -0.071651146, 1.0671991)]
+"values": [Vector3(0.106190465, -0.071651146, 1.0671991), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395716, 0.12567429, 0), Vector3(-1.3395715, 0, 0), Vector3(0.106190465, -0.071651146, 1.0671991)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -201,10 +307,10 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.28333333, 0.5, 0.7733333, 1),
-"transitions": PackedFloat32Array(1, 5, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.28333333, 0.5, 0.63583094, 0.7733333, 1),
+"transitions": PackedFloat32Array(1, 5, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector3(0.85764027, -0.9, -0.6392616), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.37647116, -0.6165854, -1.1098979), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.85764027, -0.9, -0.6392616)]
+"values": [Vector3(0.85764027, -0.9, -0.6392616), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.37647116, -0.6165854, -1.1098979), Vector3(0.5793849, -0.6165854, -0.33337438), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.85764027, -0.9, -0.6392616)]
 }
 tracks/2/type = "method"
 tracks/2/imported = false
@@ -223,9 +329,88 @@ tracks/2/keys = {
 "method": &"disable_current_hitbox"
 }]
 }
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.6333333, 0.96666664),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_3m6fa"]
+resource_name = "attack_spear_2"
+length = 1.2333333
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.29333332, 0.5001515, 0.7733333, 1),
+"transitions": PackedFloat32Array(1, 5, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-1.3395716, 0.12567429, 0), Vector3(-1.3395716, 0.24982092, 0), Vector3(-1.3395716, 0.0063336045, 0), Vector3(-1.3395715, 0, 0), Vector3(0.106190465, -0.071651146, 1.0671991)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.28333333, 0.5001515, 0.7733333, 1),
+"transitions": PackedFloat32Array(1, 5, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5793849, -0.6165854, -0.33337438), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.05077049, -0.49869978, -1.6577411), Vector3(0.78479564, -0.6165854, 0.45270443), Vector3(0.85764027, -0.9, -0.6392616)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.3, 0.6333333),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.6333333, 0.96666664),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_aw5rd"]
-resource_name = "attack_sword"
+resource_name = "attack_sword_1"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -257,7 +442,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.16666667, 0.96666664),
+"times": PackedFloat32Array(0.16666667, 0.6333333),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -267,16 +452,222 @@ tracks/2/keys = {
 "method": &"disable_current_hitbox"
 }]
 }
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.93333334),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_aayji"]
+resource_name = "idle_axe"
+length = 0.1
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_e72n5"]
+resource_name = "idle_spear"
+length = 0.1
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.85764027, -0.9, -0.6392616)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.106190465, -0.071651146, 1.0671991)]
+}
+
+[sub_resource type="Animation" id="Animation_sexlj"]
+resource_name = "idle_sword"
+length = 0.1
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_aw5rd"]
 _data = {
 &"RESET": SubResource("Animation_xqqx8"),
-&"attack_axe": SubResource("Animation_a1kp2"),
+&"attack_axe_1": SubResource("Animation_a1kp2"),
+&"attack_axe_2": SubResource("Animation_fqwjq"),
 &"attack_heavy_slam": SubResource("Animation_fn6jh"),
 &"attack_heavy_slam_recovery": SubResource("Animation_2tvps"),
-&"attack_spear": SubResource("Animation_8vi7a"),
-&"attack_sword": SubResource("Animation_aw5rd")
+&"attack_spear_1": SubResource("Animation_8vi7a"),
+&"attack_spear_2": SubResource("Animation_3m6fa"),
+&"attack_sword_1": SubResource("Animation_aw5rd"),
+&"idle_axe": SubResource("Animation_aayji"),
+&"idle_spear": SubResource("Animation_e72n5"),
+&"idle_sword": SubResource("Animation_sexlj")
 }
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8vi7a"]
+animation = &"attack_axe_1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_fqwjq"]
+animation = &"attack_axe_2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_bpixc"]
+animation = &"attack_heavy_slam"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8amhy"]
+animation = &"attack_heavy_slam_recovery"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_aayji"]
+animation = &"attack_spear_1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sexlj"]
+animation = &"attack_spear_2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3m6fa"]
+animation = &"attack_sword_1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_e72n5"]
+animation = &"idle_axe"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_svssn"]
+animation = &"idle_spear"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_6e1i3"]
+animation = &"idle_sword"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_bpixc"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8amhy"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6e1i3"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_rtbr7"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_f3w6d"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2qmbm"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8weaa"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_o88sh"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_3k6pu"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_7e1ce"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6vepr"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ek25o"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nnepy"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_yqkk6"]
+states/End/position = Vector2(1257, 65)
+states/Start/position = Vector2(-29, 86)
+states/attack_axe_1/node = SubResource("AnimationNodeAnimation_8vi7a")
+states/attack_axe_1/position = Vector2(389, -71)
+states/attack_axe_2/node = SubResource("AnimationNodeAnimation_fqwjq")
+states/attack_axe_2/position = Vector2(555, -35)
+states/attack_heavy_slam/node = SubResource("AnimationNodeAnimation_bpixc")
+states/attack_heavy_slam/position = Vector2(255.77115, 340)
+states/attack_heavy_slam_recovery/node = SubResource("AnimationNodeAnimation_8amhy")
+states/attack_heavy_slam_recovery/position = Vector2(515.7711, 340)
+states/attack_spear_1/node = SubResource("AnimationNodeAnimation_aayji")
+states/attack_spear_1/position = Vector2(476, 44)
+states/attack_spear_2/node = SubResource("AnimationNodeAnimation_sexlj")
+states/attack_spear_2/position = Vector2(645, 86)
+states/attack_sword_1/node = SubResource("AnimationNodeAnimation_3m6fa")
+states/attack_sword_1/position = Vector2(476, 145)
+states/idle_axe/node = SubResource("AnimationNodeAnimation_e72n5")
+states/idle_axe/position = Vector2(225, -35)
+states/idle_spear/node = SubResource("AnimationNodeAnimation_svssn")
+states/idle_spear/position = Vector2(231, 86)
+states/idle_sword/node = SubResource("AnimationNodeAnimation_6e1i3")
+states/idle_sword/position = Vector2(231, 189)
+transitions = ["attack_axe_1", "attack_axe_2", SubResource("AnimationNodeStateMachineTransition_bpixc"), "idle_axe", "attack_axe_1", SubResource("AnimationNodeStateMachineTransition_8amhy"), "Start", "idle_axe", SubResource("AnimationNodeStateMachineTransition_6e1i3"), "attack_axe_2", "idle_axe", SubResource("AnimationNodeStateMachineTransition_rtbr7"), "attack_axe_1", "idle_axe", SubResource("AnimationNodeStateMachineTransition_f3w6d"), "idle_spear", "attack_spear_1", SubResource("AnimationNodeStateMachineTransition_2qmbm"), "attack_spear_1", "attack_spear_2", SubResource("AnimationNodeStateMachineTransition_8weaa"), "attack_spear_2", "idle_spear", SubResource("AnimationNodeStateMachineTransition_o88sh"), "attack_spear_1", "idle_spear", SubResource("AnimationNodeStateMachineTransition_3k6pu"), "attack_heavy_slam", "attack_heavy_slam_recovery", SubResource("AnimationNodeStateMachineTransition_7e1ce"), "idle_sword", "attack_sword_1", SubResource("AnimationNodeStateMachineTransition_6vepr"), "idle_sword", "attack_heavy_slam", SubResource("AnimationNodeStateMachineTransition_ek25o"), "attack_sword_1", "idle_sword", SubResource("AnimationNodeStateMachineTransition_nnepy")]
+graph_offset = Vector2(-178.22887, 71.30229)
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_speed"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_combo"]
+nodes/output/position = Vector2(340, 140)
+nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_yqkk6")
+nodes/StateMachine/position = Vector2(-100, 140)
+nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_speed")
+nodes/TimeScale/position = Vector2(140, 140)
+node_connections = [&"output", 0, &"TimeScale", &"TimeScale", 0, &"StateMachine"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
 top_radius = 0.15
@@ -306,7 +697,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.3905622, -0.80677646, -0.44336444, 0.87091833, 0.47986072, -0.10599104, 0.29826435, -0.3447382, 0.8900524, 0.85764027, -0.9, -0.6392616)
+transform = Transform3D(0.9999795, -0.0061650006, 0.0014514609, 0, 0.22916973, 0.9733861, -0.0063335593, -0.97336644, 0.22916515, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 
 [node name="test_spear" parent="Camera3D/MainDroite" unique_id=335765208 instance=ExtResource("8_8vi7a")]
@@ -321,6 +712,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 unique_name_in_owner = true
 root_node = NodePath("../MainDroite")
 libraries/ = SubResource("AnimationLibrary_aw5rd")
+
+[node name="AnimationTree" type="AnimationTree" parent="Camera3D" unique_id=2091119579]
+root_node = NodePath("../MainDroite")
+tree_root = SubResource("AnimationNodeBlendTree_combo")
+anim_player = NodePath("../attack_animation")
+parameters/TimeScale/scale = 1.0
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1688824659]
 transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 0, 0.4775703, -0.48433536)
@@ -350,7 +747,7 @@ knockback_component = NodePath("../knockback_componant")
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_qe16m")
 
-[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast", "anim_player")]
+[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast", "anim_player", "anim_tree")]
 script = ExtResource("8_pw6nv")
 slots = Dictionary[String, ExtResource("9_b6pse")]({
 "slot_1": ExtResource("10_hn1kw"),
@@ -362,6 +759,7 @@ slots = Dictionary[String, ExtResource("9_b6pse")]({
 })
 raycast = NodePath("../Camera3D/RayCast3D")
 anim_player = NodePath("../Camera3D/attack_animation")
+anim_tree = NodePath("../Camera3D/AnimationTree")
 
 [node name="InventoryComponent" parent="." unique_id=1175652799 instance=ExtResource("13_ps75u")]
 

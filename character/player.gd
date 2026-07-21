@@ -16,6 +16,11 @@ extends CharacterBody3D
 @onready var stats_component: StatsComponent = %StatsComponent
 @onready var health_component: HealthComponent = $HealthComponent
 
+@export var custom_footstep_sound: AudioStream # Optionnel : Glisser un fichier .wav / .ogg
+@export var step_interval: float = 2.8 # Distance en mètres entre deux bruits de pas
+
+var _footstep_distance: float = 0.0
+
 const JUMP_VELOCITY = 4.5
 const mouse_sensitivity = 0.002
 
@@ -77,6 +82,15 @@ func _physics_process(delta: float) -> void:
 
 	# 4. On bouge !
 	move_and_slide()
+	
+	# 5. Bruits de pas (Footsteps)
+	if is_on_floor() and vitesse_horizontale.length() > 0.5:
+		_footstep_distance += vitesse_horizontale.length() * delta
+		if _footstep_distance >= step_interval:
+			_footstep_distance = 0.0
+			SoundManager.play_footstep_sound(self, global_position, custom_footstep_sound)
+	else:
+		_footstep_distance = 0.0
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:

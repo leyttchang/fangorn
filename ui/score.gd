@@ -34,10 +34,13 @@ func _process(delta: float) -> void:
 # NOUVEAU : Fonction appelée par les monstres au moment de leur mort
 # ==========================================================
 func add_kill_point() -> void:
+	add_score_points(1)
+
+func add_score_points(amount: int) -> void:
 	if is_player_dead:
 		return
 		
-	current_score += 1
+	current_score += amount
 	_update_score_display()
 
 # Petite fonction utilitaire pour éviter de répéter du code

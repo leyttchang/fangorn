@@ -10,10 +10,11 @@ func _ready() -> void:
 	else:
 		push_warning(name + " n'a pas de WeaponItem (.tres) assigné !")
 
-func update_damage_from_stats(player_stats: Node) -> void:
+func update_damage_from_stats(player_stats: Node, combo_step: int = 1) -> void:
 	if weapon_stats != null and player_stats != null:
 		var phys_multiplier = player_stats.get_stat_value("physical_damage")
-		attack_component.damage = weapon_stats.base_damage * phys_multiplier
+		var combo_multiplier = 1.0 + (combo_step - 1) * 0.10
+		attack_component.damage = weapon_stats.base_damage * phys_multiplier * combo_multiplier
 
 # --- NOUVELLE FONCTION ---
 # Calcule la vitesse d'attaque totale (Arme * Joueur)
