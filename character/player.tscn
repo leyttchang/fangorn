@@ -19,6 +19,7 @@
 [ext_resource type="AudioStream" uid="uid://o1f2jww0msgk" path="res://assets/sound_effects/Combat and Gore/swipe.wav" id="11_tmwgi"]
 [ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="12_pn6xv"]
 [ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
+[ext_resource type="PackedScene" uid="uid://cly4pui7duo3p" path="res://particule/screen_vfx/damage_screen_effect.tscn" id="13_r5ovt"]
 [ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
@@ -996,6 +997,10 @@ root_node = NodePath("../MainDroite")
 tree_root = SubResource("AnimationNodeBlendTree_combo")
 anim_player = NodePath("../attack_animation")
 parameters/TimeScale/scale = 1.0
+
+[node name="damage_screen_effect" parent="Camera3D" unique_id=1847647721 node_paths=PackedStringArray("health_component") instance=ExtResource("13_r5ovt")]
+transform = Transform3D(1.3503089, 0, 0, 0, 0.86472625, 0, 0, 0, 1, 0, 0, -0.50868833)
+health_component = NodePath("../../HealthComponent")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1688824659]
 transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 0, 0.4775703, -0.48433536)

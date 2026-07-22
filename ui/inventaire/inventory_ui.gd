@@ -96,13 +96,21 @@ func close_inventory() -> void:
 	if loot_panel:
 		loot_panel.visible = false
 	if current_chest_inventory != null:
-		current_chest_inventory.inventory_changed.disconnect(_update_loot_ui)
+		if current_chest_inventory.inventory_changed.is_connected(_update_loot_ui):
+			current_chest_inventory.inventory_changed.disconnect(_update_loot_ui)
 		current_chest_inventory = null
 	inventory_closed.emit()
 
 func open_with_chest(chest_inv: InventoryComponent) -> void:
+	# Si on ouvrait déjà un autre coffre juste avant (ou en même temps à cause d'une superposition)
+	if current_chest_inventory != null and current_chest_inventory != chest_inv:
+		if current_chest_inventory.inventory_changed.is_connected(_update_loot_ui):
+			current_chest_inventory.inventory_changed.disconnect(_update_loot_ui)
+			
 	current_chest_inventory = chest_inv
-	current_chest_inventory.inventory_changed.connect(_update_loot_ui)
+	
+	if not current_chest_inventory.inventory_changed.is_connected(_update_loot_ui):
+		current_chest_inventory.inventory_changed.connect(_update_loot_ui)
 	if loot_panel:
 		loot_panel.visible = true
 	_update_loot_ui()
