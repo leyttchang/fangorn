@@ -12,11 +12,11 @@ stat_bonuses = {
 "attack_speed": 2.0,
 "casting_speed": 2.0,
 "cd_red": 1.0,
-"knockback_power": 3.0,
+"knockback_power": 0.15,
 "knockback_resistance": 10.0,
 "magic_damage": 2.0,
 "max_health": 100.0,
-"movement_speed": 2.0,
+"movement_speed": 0.10,
 "physical_damage": 2.0
 }
 id = "armor_cheat"

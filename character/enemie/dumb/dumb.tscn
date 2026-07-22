@@ -14,6 +14,32 @@
 [ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="11_3atj7"]
 [ext_resource type="PackedScene" uid="uid://bnq7s2tgri30i" path="res://components/EnemyMovementComponent.tscn" id="12_xfsm0"]
 [ext_resource type="PackedScene" uid="uid://mnnj3o8ilins" path="res://components/enemy_navigation_component.tscn" id="13_pta2e"]
+[ext_resource type="PackedScene" uid="uid://wefscg5hf58q" path="res://components/foot_step_component.tscn" id="15_qbcfw"]
+[ext_resource type="AudioStream" uid="uid://d4jwhrrkgb4ny" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-001.ogg" id="16_8e0gv"]
+[ext_resource type="AudioStream" uid="uid://cw04xi6t0uk2w" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-002.ogg" id="17_np3ky"]
+[ext_resource type="AudioStream" uid="uid://dhi3ne5ow4hki" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-003.ogg" id="18_41maq"]
+[ext_resource type="AudioStream" uid="uid://d2hetsn2xc84m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-004.ogg" id="19_holf7"]
+[ext_resource type="AudioStream" uid="uid://7he0i6bcgtf" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-005.ogg" id="20_g26vk"]
+[ext_resource type="AudioStream" uid="uid://cpm0u8qk8hp5x" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-006.ogg" id="21_vhgsy"]
+[ext_resource type="AudioStream" uid="uid://bf3wi3aisq6nj" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-007.ogg" id="22_0x4wk"]
+[ext_resource type="AudioStream" uid="uid://c5m3k2snt1c8l" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-008.ogg" id="23_l8mwe"]
+[ext_resource type="AudioStream" uid="uid://c6n07ms36rkq" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-009.ogg" id="24_7xqpj"]
+[ext_resource type="AudioStream" uid="uid://dgl2sncrmdkla" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-010.ogg" id="25_qv5fp"]
+[ext_resource type="AudioStream" uid="uid://woyyyxi4fo5l" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-011.ogg" id="26_h5jy3"]
+[ext_resource type="AudioStream" uid="uid://c7s5akercg3wh" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-012.ogg" id="27_exy68"]
+[ext_resource type="AudioStream" uid="uid://g7u6flvjc8lc" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-013.ogg" id="28_31b3k"]
+[ext_resource type="AudioStream" uid="uid://jshdnniut88m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-014.ogg" id="29_ouj6p"]
+[ext_resource type="AudioStream" uid="uid://tfugyctgh7pl" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-015.ogg" id="30_du8it"]
+[ext_resource type="AudioStream" uid="uid://xq8iyb7d2ku" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-016.ogg" id="31_6l5le"]
+[ext_resource type="AudioStream" uid="uid://de5yma1byjkm" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-017.ogg" id="32_0hexi"]
+[ext_resource type="AudioStream" uid="uid://elaef3wckdwi" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-018.ogg" id="33_pcyoi"]
+[ext_resource type="AudioStream" uid="uid://crpa74k6e5lw7" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-019.ogg" id="34_yca6r"]
+[ext_resource type="AudioStream" uid="uid://cuqwgpeqeqonr" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-020.ogg" id="35_o86o7"]
+[ext_resource type="AudioStream" uid="uid://nhhox4s8eah1" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-021.ogg" id="36_681dj"]
+[ext_resource type="PackedScene" uid="uid://8phfagxw0ymc" path="res://components/hurt_sound_component.tscn" id="37_holf7"]
+[ext_resource type="AudioStream" uid="uid://ciu3mffcanmdx" path="res://assets/sound_effects/Human/belch_1.wav" id="38_g26vk"]
+[ext_resource type="AudioStream" uid="uid://lij60mhnigeg" path="res://assets/sound_effects/Human/belch_2.wav" id="39_vhgsy"]
+[ext_resource type="AudioStream" uid="uid://d28g7j4vbcf31" path="res://assets/sound_effects/Human/belch_3.wav" id="40_0x4wk"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 radius = 0.37402344
@@ -166,6 +192,17 @@ health_component = NodePath("../HealthComponent")
 
 [node name="EnemyNavigationComponent" parent="." unique_id=1659678892 node_paths=PackedStringArray("nav_agent") instance=ExtResource("13_pta2e")]
 nav_agent = NodePath("../NavigationAgent3D")
+
+[node name="FootStep_component" parent="." unique_id=1544068964 node_paths=PackedStringArray("character_body") instance=ExtResource("15_qbcfw")]
+character_body = NodePath("..")
+footstep_sounds = Array[AudioStream]([ExtResource("16_8e0gv"), ExtResource("17_np3ky"), ExtResource("18_41maq"), ExtResource("19_holf7"), ExtResource("20_g26vk"), ExtResource("21_vhgsy"), ExtResource("22_0x4wk"), ExtResource("23_l8mwe"), ExtResource("24_7xqpj"), ExtResource("25_qv5fp"), ExtResource("26_h5jy3"), ExtResource("27_exy68"), ExtResource("28_31b3k"), ExtResource("29_ouj6p"), ExtResource("30_du8it"), ExtResource("31_6l5le"), ExtResource("32_0hexi"), ExtResource("33_pcyoi"), ExtResource("34_yca6r"), ExtResource("35_o86o7"), ExtResource("36_681dj")])
+volume_db = -14.0
+max_distance = 50.0
+
+[node name="hurt_sound" parent="." unique_id=1503784435 node_paths=PackedStringArray("health_component") instance=ExtResource("37_holf7")]
+health_component = NodePath("../HealthComponent")
+hurt_sounds = Array[AudioStream]([ExtResource("38_g26vk"), ExtResource("39_vhgsy"), ExtResource("40_0x4wk")])
+volume_db = -40.5
 
 [editable path="Orc"]
 [editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]

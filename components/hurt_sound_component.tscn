@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://8phfagxw0ymc"]
+
+[ext_resource type="Script" uid="uid://c1p3ekmgglkdo" path="res://components/hurt_sound_component.gd" id="1_hurtsound"]
+
+[node name="hurt_sound" type="Node3D" unique_id=1503784435]
+script = ExtResource("1_hurtsound")

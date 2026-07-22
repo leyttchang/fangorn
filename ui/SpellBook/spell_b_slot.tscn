@@ -34,6 +34,14 @@ nine_patch_stretch = true
 texture_progress = SubResource("PlaceholderTexture2D_hlie2")
 tint_progress = Color(0.07, 0.07, 0.07, 0.7411765)
 
+[node name="Hotkey" type="Label" parent="." unique_id=987654321]
+layout_mode = 1
+offset_left = 4.0
+offset_top = 2.0
+offset_right = 28.0
+offset_bottom = 25.0
+text = "1"
+
 [node name="cd" type="Label" parent="." unique_id=562709654]
 layout_mode = 1
 anchors_preset = 3

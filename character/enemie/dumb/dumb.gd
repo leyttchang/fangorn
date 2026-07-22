@@ -9,6 +9,7 @@ extends CharacterBody3D
 
 # --- DONNÉES DE COMPORTEMENT (Le Profil) ---
 # C'est ici que tu vas glisser ton fichier orc_behavior.tres !
+@export var base_movement_speed: float = 4.5
 @export var behavior: EnemyBehaviorData
 
 # --- ANIMATION TREE ---
@@ -77,7 +78,7 @@ func _physics_process(delta: float) -> void:
 		elif _attack_anim_started and (current_anim == "Stand" or current_anim == "Walk2"):
 			change_state(State.IDLE)
 
-	var current_speed = stats_component.get_stat_value("movement_speed")
+	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
 	# On passe la vitesse horizontale à nos comportements

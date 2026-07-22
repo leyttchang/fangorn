@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c5k807u123abc"]
+
+[ext_resource type="Script" path="res://components/interaction_component.gd" id="1_interact"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_interact"]
+size = Vector3(3, 2, 3)
+
+[node name="InteractionComponent" type="Area3D" unique_id=987654321]
+collision_layer = 32
+collision_mask = 2
+script = ExtResource("1_interact")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=987654322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_interact")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=987654323]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+billboard = 1
+text = "Appuyez sur E pour interagir"
+font_size = 48

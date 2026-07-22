@@ -1,6 +1,13 @@
 [gd_scene format=3 uid="uid://bdv5anb4oalnr"]
 
 [ext_resource type="Script" uid="uid://d2bgwlhvkg88y" path="res://components/combat_feedback_component.gd" id="1_fo86p"]
+[ext_resource type="AudioStream" uid="uid://7txedy8d7rmv" path="res://assets/sound_effects/Combat and Gore/kick.wav" id="2_bt2gb"]
+[ext_resource type="AudioStream" uid="uid://dukrttwx656g" path="res://assets/sound_effects/Combat and Gore/punch.wav" id="3_xoxpa"]
+[ext_resource type="AudioStream" uid="uid://c6hn0htwo8o76" path="res://assets/sound_effects/Combat and Gore/punch_2.wav" id="4_t5v0x"]
+[ext_resource type="AudioStream" uid="uid://cge538aljq20f" path="res://assets/sound_effects/Combat and Gore/punch_3.wav" id="5_t425x"]
+[ext_resource type="AudioStream" uid="uid://bxgwfi15q2o12" path="res://assets/sound_effects/Combat and Gore/slap.wav" id="6_geivx"]
 
 [node name="CombatFeedbackComponent" type="Node3D" unique_id=2086975508]
 script = ExtResource("1_fo86p")
+hit_sounds = Array[AudioStream]([ExtResource("2_bt2gb"), ExtResource("3_xoxpa"), ExtResource("4_t5v0x"), ExtResource("5_t425x"), ExtResource("6_geivx")])
+volume_db = -35.0

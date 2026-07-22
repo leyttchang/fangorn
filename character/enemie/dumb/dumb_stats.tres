@@ -5,5 +5,4 @@
 [resource]
 script = ExtResource("1_2yhjv")
 max_health = 200.0
-movement_speed = 4.5
 metadata/_custom_type_script = "uid://dpiksbl0a1f5"

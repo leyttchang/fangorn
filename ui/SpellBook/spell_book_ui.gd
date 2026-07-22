@@ -29,6 +29,18 @@ func _setup_inventory_slots() -> void:
 		else:
 			u_slots[i].set_ability(null)
 
+# Débloque un nouveau sort s'il n'est pas déjà possédé
+func unlock_spell(ability: AbilityData) -> bool:
+	if ability == null:
+		return false
+	for s in unlocked_spells:
+		if s != null and (s == ability or s.ability_name == ability.ability_name):
+			return false
+			
+	unlocked_spells.append(ability)
+	_setup_inventory_slots()
+	return true
+
 # Prépare les 6 cases de gauche (assignation des noms et du lien vers le joueur)
 func _setup_equipment_slots() -> void:
 	var e_slots = e_grid.get_children()
@@ -47,13 +59,14 @@ func _refresh_equipment_visuals() -> void:
 # On écoute les touches pressées par le joueur
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_spellbook"):
-		# Inverse la visibilité (si c'est caché ça s'affiche, si c'est affiché ça se cache)
-		visible = !visible
-		
-		# Bonus : Libérer ou capturer la souris pour ton jeu 3D !
-		if visible:
-			# Le grimoire est ouvert : on libère la souris pour pouvoir cliquer
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			# Le grimoire est fermé : on recache la souris pour tourner la caméra
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		_set_spellbook_visible(!visible)
+	elif visible:
+		if (event is InputEventKey and event.physical_keycode == KEY_TAB and event.pressed) or event.is_action_pressed("toggle_inventory"):
+			_set_spellbook_visible(false)
+
+func _set_spellbook_visible(is_vis: bool) -> void:
+	visible = is_vis
+	if visible:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

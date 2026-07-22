@@ -4,6 +4,7 @@ extends CharacterBody3D
 
 # --- DONNÉES DE COMPORTEMENT (Le Profil) ---
 # C'est ici que tu vas glisser ton fichier archer_behavior.tres !
+@export var base_movement_speed: float = 3.5
 @export var behavior: EnemyBehaviorData
 
 # --- COMPOSANTS EXTERNES (Les Muscles et le Guide) ---
@@ -84,7 +85,7 @@ func _physics_process(delta: float) -> void:
 			else:
 				change_state(State.IDLE)
 
-	var current_speed = stats_component.get_stat_value("movement_speed")
+	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
 	match current_state:

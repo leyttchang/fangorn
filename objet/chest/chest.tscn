@@ -10,16 +10,12 @@
 [ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="7_dre1o"]
 [ext_resource type="Resource" uid="uid://cubsij5q17dky" path="res://item/armes/test_sword_stats.tres" id="8_tnj3d"]
 [ext_resource type="Resource" uid="uid://biqusejrat6c6" path="res://item/armes/spear_test.tres" id="9_wr6mb"]
+[ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="10_interact"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
 size = Vector3(1.2149, 0.9249, 0.7678)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_interact"]
-size = Vector3(3, 2, 3)
-
-[node name="Chest" type="Area3D" unique_id=1680074549]
-collision_layer = 32
-collision_mask = 2
+[node name="Chest" type="Node3D" unique_id=1680074549]
 script = ExtResource("2_script")
 possible_bases = Array[ExtResource("2_i55t8")]([ExtResource("3_8rmxv"), ExtResource("4_n3aon"), ExtResource("5_f85ld"), ExtResource("6_6pnsy"), ExtResource("7_dre1o"), ExtResource("8_tnj3d"), ExtResource("9_wr6mb")])
 
@@ -31,12 +27,7 @@ possible_bases = Array[ExtResource("2_i55t8")]([ExtResource("3_8rmxv"), ExtResou
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
 shape = SubResource("BoxShape3D_solid")
 
-[node name="InteractShape" type="CollisionShape3D" parent="." unique_id=2023996628]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-shape = SubResource("BoxShape3D_interact")
+[node name="InteractionComponent" parent="." unique_id=123456789 instance=ExtResource("10_interact")]
+prompt_text = "Press E to open chest"
 
-[node name="Label3D" type="Label3D" parent="." unique_id=86689604]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-billboard = 1
-text = "Press E to open"
-font_size = 48
+[editable path="InteractionComponent"]

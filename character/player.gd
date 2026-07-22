@@ -7,7 +7,7 @@ extends CharacterBody3D
 @export var starting_inventory_items: Array[ItemData] = []
 # ------------------------------------------------------
 
-# --- NOUVEAU : GESTION DE LA PHYSIQUE (Accélération / Friction) ---
+@export var base_movement_speed: float = 6.0
 @export var acceleration: float = 40.0
 @export var friction: float = 35.0
 @export var air_friction: float = 10.0 # Moins de friction en l'air pour garder l'élan du saut
@@ -50,7 +50,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	var current_speed = stats_component.get_stat_value("movement_speed")
+	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
 
 	# ==========================================================
 	# 3. NOUVELLE GESTION DU MOUVEMENT (Inspirée de tes anciens scripts)

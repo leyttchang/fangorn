@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://cekr3wmhu571c"]
+
+[ext_resource type="PackedScene" uid="uid://cjlkis05t14ni" path="res://objet/chest/low poly chest 1/Low_Poly_Chest GLTF/Simple_Chest GLTF.glb" id="1_rxqf2"]
+[ext_resource type="PackedScene" uid="uid://c1ebdtvibf4p4" path="res://objet/chest/particule_chest.tscn" id="2_isn6a"]
+[ext_resource type="Script" uid="uid://boupjl212x11c" path="res://objet/chest/skill_chest.gd" id="2_skillchest"]
+[ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="3_interact"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
+size = Vector3(1.2149, 0.9249, 0.7678)
+
+[node name="SkillChest" type="Node3D" unique_id=1680074550]
+script = ExtResource("2_skillchest")
+
+[node name="Simple_Chest GLTF" parent="." unique_id=1602409973 instance=ExtResource("1_rxqf2")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=951093061]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=705017762]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+shape = SubResource("BoxShape3D_solid")
+
+[node name="InteractionComponent" parent="." unique_id=123456790 instance=ExtResource("3_interact")]
+prompt_text = "Press E to open Skill Chest"
+
+[node name="chest_particule" parent="." unique_id=288196329 instance=ExtResource("2_isn6a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

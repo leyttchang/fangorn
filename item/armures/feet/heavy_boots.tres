@@ -18,7 +18,7 @@ base_stat_ranges = {
 "knockback_resistance": Vector2(0, 0),
 "magic_damage": Vector2(0, 0),
 "max_health": Vector2(0, 0),
-"movement_speed": Vector2(2, 8),
+"movement_speed": Vector2(0.05, 0.15),
 "physical_damage": Vector2(0, 0)
 }
 excluded_affixes = Array[ExtResource("1_kaimu")]([ExtResource("2_y507j"), ExtResource("3_gwmr8"), null])

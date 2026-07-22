@@ -10,7 +10,7 @@ extends Resource
 @export var attack_speed: float = 1
 @export var cd_red: float = 1 # Réduction de cooldown
 @export var area_of_effect: float = 1
-@export var movement_speed: float = 5.0
+@export var movement_speed: float = 1.0
 @export var knockback_resistance: float = 1
 @export var knockback_power: float = 1
 @export var casting_speed: float = 1

@@ -15,6 +15,7 @@ func _ready() -> void:
 		
 	# Initialisation de l'affichage au lancement
 	update_all_slots()
+
 func _process(_delta: float) -> void:
 	if skill_bar == null:
 		return
@@ -47,8 +48,6 @@ func _process(_delta: float) -> void:
 					# 2. On met à jour le texte
 					if cd_label != null:
 						cd_label.visible = true
-						# "ceili" permet d'arrondir à l'entier supérieur (ex: 2.1 affiche 3)
-						# pour un affichage propre comme dans les RPG
 						cd_label.text = "%.1f" % timer.time_left
 				else:
 					overlay.visible = false
@@ -59,12 +58,23 @@ func _process(_delta: float) -> void:
 		else:
 			overlay.visible = false
 			if cd_label != null: cd_label.visible = false
+
 func update_all_slots() -> void:
 	var slot_nodes = grid.get_children()
 	
 	for i in range(slot_nodes.size()):
 		var slot_key: String = "slot_" + str(i + 1)
 		var slot_node: Node = slot_nodes[i]
+		
+		# Mise à jour du Label de touche (Hotkey)
+		var hotkey_label: Label = slot_node.get_node_or_null("Hotkey")
+		if hotkey_label == null:
+			hotkey_label = slot_node.get_node_or_null("hotkey")
+			
+		if hotkey_label != null:
+			var key_text = _get_action_key_text(slot_key, i + 1)
+			hotkey_label.text = key_text
+			hotkey_label.visible = true
 		
 		if not skill_bar.slots.has(slot_key):
 			continue
@@ -87,3 +97,18 @@ func _update_single_slot(slot_node: Node, ability: AbilityData) -> void:
 	else:
 		icon_rect.texture = null
 		icon_rect.visible = false
+
+func _get_action_key_text(action_name: String, fallback_number: int) -> String:
+	if InputMap.has_action(action_name):
+		var events = InputMap.action_get_events(action_name)
+		for event in events:
+			if event is InputEventKey:
+				var text = event.as_text_physical_keycode()
+				if text == "":
+					text = OS.get_keycode_string(event.keycode)
+				text = text.replace("Physical", "").replace("Key", "").strip_edges()
+				if text != "":
+					return text
+			elif event is InputEventMouseButton:
+				return "M" + str(event.button_index)
+	return str(fallback_number)

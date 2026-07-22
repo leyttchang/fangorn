@@ -6,3 +6,5 @@
 script = ExtResource("1_affix")
 affix_name = "du vent"
 stat_name = "movement_speed"
+min_roll = 0.05
+max_roll = 0.15

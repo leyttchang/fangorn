@@ -9,19 +9,19 @@
 [ext_resource type="Resource" uid="uid://3ts10m6vmiwm" path="res://character/player_stats.tres" id="3_hhoun"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_hhoun"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="5_bdyh8"]
+[ext_resource type="AudioStream" uid="uid://6f0x848aplbp" path="res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Swipe - 1.wav" id="6_r5ovt"]
+[ext_resource type="AudioStream" uid="uid://o72085f1gr8u" path="res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Swipe - 2.wav" id="7_4vy5w"]
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
 [ext_resource type="PackedScene" uid="uid://bscyin7n03udp" path="res://item/armes/test_spear.tscn" id="8_8vi7a"]
+[ext_resource type="AudioStream" uid="uid://etu2ylsuirfg" path="res://assets/sound_effects/UI/wav (HD)/Swoosh_3.wav" id="8_dadkq"]
 [ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
-[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="9_b6pse"]
-[ext_resource type="Resource" uid="uid://cs618ik4co076" path="res://scripts/abilities/fireball/Fireball.tres" id="10_hn1kw"]
-[ext_resource type="Resource" uid="uid://c48j238bwssjh" path="res://scripts/abilities/dash/dash.tres" id="10_i6sb3"]
+[ext_resource type="AudioStream" uid="uid://bywd2jahco1bk" path="res://assets/sound_effects/UI/wav (HD)/woosh.wav" id="9_aynll"]
+[ext_resource type="AudioStream" uid="uid://bd4t6opupnkni" path="res://assets/sound_effects/UI/wav (HD)/woosh_5.wav" id="10_ubgyp"]
+[ext_resource type="AudioStream" uid="uid://o1f2jww0msgk" path="res://assets/sound_effects/Combat and Gore/swipe.wav" id="11_tmwgi"]
 [ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
 [ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
-[ext_resource type="Resource" uid="uid://qvuc7exik4g5" path="res://scripts/abilities/magic_shot/MagicShot.tres" id="14_t461u"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
-[ext_resource type="Resource" uid="uid://gu5hxjbjuwrq" path="res://scripts/abilities/Burning_ground/BurningGround.tres" id="16_gh4hd"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
-[ext_resource type="Resource" uid="uid://dpb1mwe1g2a53" path="res://scripts/abilities/Ice Crash/IceCrash.tres" id="18_fn6jh"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
 [ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="21_ynykn"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="21_yr573"]
@@ -29,6 +29,29 @@
 [ext_resource type="PackedScene" uid="uid://cg50ca34fajqd" path="res://ui/crosshair.tscn" id="25_tr32s"]
 [ext_resource type="PackedScene" uid="uid://bk1064mxurpec" path="res://ui/health_bar.tscn" id="27_2tvps"]
 [ext_resource type="PackedScene" uid="uid://dtn1sa360mw67" path="res://ui/score.tscn" id="28_nw0js"]
+[ext_resource type="PackedScene" uid="uid://wefscg5hf58q" path="res://components/foot_step_component.tscn" id="30_73sc4"]
+[ext_resource type="AudioStream" uid="uid://d4jwhrrkgb4ny" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-001.ogg" id="31_pn6xv"]
+[ext_resource type="AudioStream" uid="uid://cw04xi6t0uk2w" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-002.ogg" id="32_r5ovt"]
+[ext_resource type="AudioStream" uid="uid://dhi3ne5ow4hki" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-003.ogg" id="33_4vy5w"]
+[ext_resource type="AudioStream" uid="uid://d2hetsn2xc84m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-004.ogg" id="34_vp26o"]
+[ext_resource type="AudioStream" uid="uid://7he0i6bcgtf" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-005.ogg" id="35_ooc2e"]
+[ext_resource type="AudioStream" uid="uid://cpm0u8qk8hp5x" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-006.ogg" id="36_dadkq"]
+[ext_resource type="AudioStream" uid="uid://bf3wi3aisq6nj" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-007.ogg" id="37_aynll"]
+[ext_resource type="AudioStream" uid="uid://c5m3k2snt1c8l" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-008.ogg" id="38_ubgyp"]
+[ext_resource type="AudioStream" uid="uid://c6n07ms36rkq" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-009.ogg" id="39_tmwgi"]
+[ext_resource type="AudioStream" uid="uid://dgl2sncrmdkla" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-010.ogg" id="40_ay40t"]
+[ext_resource type="AudioStream" uid="uid://woyyyxi4fo5l" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-011.ogg" id="41_ce8hk"]
+[ext_resource type="AudioStream" uid="uid://c7s5akercg3wh" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-012.ogg" id="42_2o2rg"]
+[ext_resource type="AudioStream" uid="uid://g7u6flvjc8lc" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-013.ogg" id="43_l2u66"]
+[ext_resource type="AudioStream" uid="uid://jshdnniut88m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-014.ogg" id="44_jekax"]
+[ext_resource type="AudioStream" uid="uid://tfugyctgh7pl" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-015.ogg" id="45_uy1o2"]
+[ext_resource type="AudioStream" uid="uid://xq8iyb7d2ku" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-016.ogg" id="46_g1p3m"]
+[ext_resource type="AudioStream" uid="uid://de5yma1byjkm" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-017.ogg" id="47_tvgtm"]
+[ext_resource type="AudioStream" uid="uid://elaef3wckdwi" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-018.ogg" id="48_btepb"]
+[ext_resource type="AudioStream" uid="uid://crpa74k6e5lw7" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-019.ogg" id="49_yxg05"]
+[ext_resource type="AudioStream" uid="uid://cuqwgpeqeqonr" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-020.ogg" id="50_ealkq"]
+[ext_resource type="AudioStream" uid="uid://nhhox4s8eah1" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-021.ogg" id="51_2dh56"]
+[ext_resource type="PackedScene" uid="uid://8phfagxw0ymc" path="res://components/hurt_sound_component.tscn" id="58_aynll"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
@@ -121,6 +144,20 @@ tracks/3/keys = {
 "method": &"end_combat_state"
 }]
 }
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play_attack_sound"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_fqwjq"]
 resource_name = "attack_axe_2"
@@ -172,9 +209,12 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.8, 0.93333334),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.6333333, 0.8, 0.93333334),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
 "args": [],
 "method": &"check_combo"
 }, {
@@ -334,9 +374,12 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.6333333, 0.96666664),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.4, 0.6333333, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
 "args": [],
 "method": &"check_combo"
 }, {
@@ -395,9 +438,12 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.6333333, 0.96666664),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.43333334, 0.6333333, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
 "args": [],
 "method": &"check_combo"
 }, {
@@ -456,9 +502,12 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.93333334),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0.26666668, 0.93333334),
+"transitions": PackedFloat32Array(1, 1),
 "values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
 "args": [],
 "method": &"end_combat_state"
 }]
@@ -659,7 +708,6 @@ graph_offset = Vector2(-134.22887, 123.30229)
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_speed"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_combo"]
-graph_offset = Vector2(-281.61694, -18.580177)
 nodes/output/position = Vector2(340, 140)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_yqkk6")
 nodes/StateMachine/position = Vector2(-100, 140)
@@ -696,8 +744,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999791, -0.0061649974, 0.0014514605, 0, 0.2291696, 0.9733859, -0.006333557, -0.97336596, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.99997896, -0.006164997, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333556, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
+attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
+attack_sound_volume_db = -40.0
 
 [node name="test_spear" parent="Camera3D/MainDroite" unique_id=335765208 instance=ExtResource("8_8vi7a")]
 
@@ -749,14 +799,6 @@ shape = SubResource("CapsuleShape3D_qe16m")
 
 [node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast", "anim_player", "anim_tree")]
 script = ExtResource("8_pw6nv")
-slots = Dictionary[String, ExtResource("9_b6pse")]({
-"slot_1": ExtResource("10_hn1kw"),
-"slot_2": ExtResource("14_t461u"),
-"slot_3": ExtResource("10_i6sb3"),
-"slot_4": ExtResource("16_gh4hd"),
-"slot_5": ExtResource("18_fn6jh"),
-"slot_6": null
-})
 raycast = NodePath("../Camera3D/RayCast3D")
 anim_player = NodePath("../Camera3D/attack_animation")
 anim_tree = NodePath("../Camera3D/AnimationTree")
@@ -810,7 +852,6 @@ skill_bar = NodePath("../SkillBarComponent")
 [node name="SpellBook_UI" parent="." unique_id=1635640243 node_paths=PackedStringArray("skill_bar") instance=ExtResource("21_007hi")]
 visible = false
 skill_bar = NodePath("../SkillBarComponent")
-unlocked_spells = Array[ExtResource("9_b6pse")]([ExtResource("16_gh4hd"), ExtResource("10_i6sb3"), ExtResource("10_hn1kw"), ExtResource("14_t461u")])
 
 [node name="CastingBar" parent="." unique_id=1878220428 node_paths=PackedStringArray("skill_bar") instance=ExtResource("24_u2y57")]
 visible = false
@@ -821,6 +862,14 @@ health_component = NodePath("../HealthComponent")
 
 [node name="CanvasLayer" parent="." unique_id=1608159447 node_paths=PackedStringArray("player_health") instance=ExtResource("28_nw0js")]
 player_health = NodePath("../HealthComponent")
+
+[node name="FootStep_component" parent="." unique_id=1544068964 node_paths=PackedStringArray("character_body") instance=ExtResource("30_73sc4")]
+character_body = NodePath("..")
+footstep_sounds = Array[AudioStream]([ExtResource("31_pn6xv"), ExtResource("32_r5ovt"), ExtResource("33_4vy5w"), ExtResource("34_vp26o"), ExtResource("35_ooc2e"), ExtResource("36_dadkq"), ExtResource("37_aynll"), ExtResource("38_ubgyp"), ExtResource("39_tmwgi"), ExtResource("40_ay40t"), ExtResource("41_ce8hk"), ExtResource("42_2o2rg"), ExtResource("43_l2u66"), ExtResource("44_jekax"), ExtResource("45_uy1o2"), ExtResource("46_g1p3m"), ExtResource("47_tvgtm"), ExtResource("48_btepb"), ExtResource("49_yxg05"), ExtResource("50_ealkq"), ExtResource("51_2dh56")])
+volume_db = -20.0
+
+[node name="hurt_sound" parent="." unique_id=1503784435 node_paths=PackedStringArray("health_component") instance=ExtResource("58_aynll")]
+health_component = NodePath("../HealthComponent")
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

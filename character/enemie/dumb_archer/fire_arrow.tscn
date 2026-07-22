@@ -26,8 +26,10 @@ mesh = SubResource("CylinderMesh_hlie2")
 
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_xvqqq")]
 collision_layer = 16
-collision_mask = 2
+collision_mask = 138
 damage = 20.0
+destroy_on_environment = true
+is_projectile = true
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.24610108, 1.075742e-08)

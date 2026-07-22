@@ -10,15 +10,23 @@ static func _init_sounds() -> void:
 	if footstep_stream == null:
 		footstep_stream = _generate_footstep_sound()
 
-static func play_hit_sound(node: Node, pos: Vector3, custom_stream: AudioStream = null, volume_db: float = 0.0) -> void:
+static func play_hit_sound(node: Node, pos: Vector3, custom_stream: AudioStream = null, volume_db: float = 0.0, pitch_min: float = 0.88, pitch_max: float = 1.12, max_distance: float = 40.0) -> void:
 	if not is_instance_valid(node) or not node.is_inside_tree(): return
 	_init_sounds()
+	
+	var final_stream = custom_stream if custom_stream != null else hit_stream
+	if final_stream is AudioStreamWAV:
+		final_stream.loop_mode = AudioStreamWAV.LOOP_DISABLED
+	elif final_stream is AudioStreamOggVorbis:
+		final_stream.loop = false
+
 	var player = AudioStreamPlayer3D.new()
-	player.stream = custom_stream if custom_stream != null else hit_stream
+	player.stream = final_stream
 	player.volume_db = volume_db
-	player.pitch_scale = randf_range(0.88, 1.12)
-	player.max_distance = 40.0
+	player.pitch_scale = randf_range(pitch_min, pitch_max)
+	player.max_distance = max_distance
 	player.unit_size = 5.0
+	player.panning_strength = 1.0
 	
 	var scene = node.get_tree().current_scene
 	if scene != null:
@@ -27,15 +35,24 @@ static func play_hit_sound(node: Node, pos: Vector3, custom_stream: AudioStream 
 		player.play()
 		player.finished.connect(func(): if is_instance_valid(player): player.queue_free())
 
-static func play_footstep_sound(node: Node, pos: Vector3, custom_stream: AudioStream = null, volume_db: float = -16.0) -> void:
+static func play_footstep_sound(node: Node, pos: Vector3, custom_stream: AudioStream = null, volume_db: float = -16.0, pitch_min: float = 0.85, pitch_max: float = 1.15, max_distance: float = 15.0) -> void:
 	if not is_instance_valid(node) or not node.is_inside_tree(): return
 	_init_sounds()
+	
+	var final_stream = custom_stream if custom_stream != null else footstep_stream
+	if final_stream is AudioStreamWAV:
+		final_stream.loop_mode = AudioStreamWAV.LOOP_DISABLED
+	elif final_stream is AudioStreamOggVorbis:
+		final_stream.loop = false
+
 	var player = AudioStreamPlayer3D.new()
-	player.stream = custom_stream if custom_stream != null else footstep_stream
+	player.stream = final_stream
 	player.volume_db = volume_db
-	player.pitch_scale = randf_range(0.85, 1.15)
-	player.max_distance = 15.0
-	player.unit_size = 2.0
+	player.pitch_scale = randf_range(pitch_min, pitch_max)
+	player.max_distance = max_distance
+	player.unit_size = 3.0
+	player.panning_strength = 1.0
+	player.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 	
 	var scene = node.get_tree().current_scene
 	if scene != null:

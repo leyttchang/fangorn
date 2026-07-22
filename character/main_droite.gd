@@ -8,10 +8,25 @@ extends Marker3D
 @onready var anim_playback: AnimationNodeStateMachinePlayback = anim_tree.get("parameters/StateMachine/playback")
 @onready var anim_player: AnimationPlayer = %attack_animation 
 
+## Liste des sons de frappe d'arme (un son sera tiré au hasard par play_sound())
+@export var attack_sounds: Array[AudioStream] = []
+@export_range(-80.0, 24.0, 0.5) var attack_sound_volume_db: float = 0.0
+
 var current_weapon: Node3D = null
 var is_attacking: bool = false
 var wants_to_combo: bool = false
 var combo_step: int = 1
+
+## Méthode appelée depuis les pistes d'animation de l'AnimationPlayer
+func play_sound() -> void:
+	if attack_sounds.is_empty():
+		return
+	var sound_to_play = attack_sounds.pick_random()
+	if sound_to_play != null:
+		SoundManager.play_hit_sound(self, global_position, sound_to_play, attack_sound_volume_db)
+
+func play_attack_sound() -> void:
+	play_sound()
 
 func _ready():
 	call_deferred("update_idle_stance")
