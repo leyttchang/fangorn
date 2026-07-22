@@ -106,9 +106,7 @@ func _handle_inputs() -> void:
 				var final_required_time = base_cast_time / final_speed_multiplier
 				
 				if final_required_time <= 0.0:
-					if anim_tree != null: anim_tree.active = false # <-- ON COUPE L'ARBRE
-					if anim_player != null and ability.anim_name != "":
-						anim_player.play(ability.anim_name) 
+					_play_ability_anim_safe(ability, 1.0)
 					_try_cast_ability(ability)
 				else:
 					if ability.category == AbilityData.AbilityCategory.WEAPON_ATTACK:
@@ -121,24 +119,15 @@ func _handle_inputs() -> void:
 					current_cast_time = 0.0
 					required_cast_time = final_required_time
 					
-					# =========================================================
-					# LA MAGIE DE LA FILE D'ATTENTE (QUEUE) EST ICI
-					# =========================================================
 					if anim_player != null and ability.anim_name != "":
 						if anim_player.has_animation(ability.anim_name):
-							if anim_tree != null: anim_tree.active = false # <-- ON COUPE L'ARBRE
-							
 							var anim_length = anim_player.get_animation(ability.anim_name).length
 							var play_speed = anim_length / required_cast_time
 							
-							# 1. On joue la frappe à la bonne vitesse
-							anim_player.play(ability.anim_name, -1, play_speed)
-							
-							# 2. On vérifie si l'animation de retour existe
-							var recovery_anim = ability.anim_name + "_recovery"
-							if anim_player.has_animation(recovery_anim):
-								# 3. On la met en file d'attente
-								anim_player.queue(recovery_anim)
+							if _play_ability_anim_safe(ability, play_speed):
+								var recovery_anim = ability.anim_name + "_recovery"
+								if anim_player.has_animation(recovery_anim):
+									anim_player.queue(recovery_anim)
 					# =========================================================
 					
 					if ability.target_mode in [AbilityData.TargetMode.GROUND_TARGET, AbilityData.TargetMode.SUMMON]:
@@ -234,10 +223,35 @@ func _reset_casting(is_canceled: bool = false) -> void:
 		indicator_instance.queue_free()
 		indicator_instance = null
 		
-	# Si le joueur a annulé (clic droit), on gèle son mouvement
+	# Si le joueur a annulé (clic droit ou autre), on répare l'état des animations
 	if is_canceled:
-		if anim_player != null: anim_player.stop() 
+		if anim_player != null:
+			# Au lieu de "stop()" (qui fige la hitbox active), on joue RESET pour tout ranger proprement !
+			if anim_player.has_animation("RESET"):
+				anim_player.play("RESET")
+			else:
+				anim_player.stop()
 		if anim_tree != null: anim_tree.active = true
+
+# ==========================================
+# FONCTION DE SÉCURITÉ POUR LES ANIMATIONS
+# ==========================================
+func _play_ability_anim_safe(ability: AbilityData, speed: float = 1.0) -> bool:
+	if anim_player == null or ability.anim_name == "" or not anim_player.has_animation(ability.anim_name):
+		return false
+		
+	# Si une attaque est déjà en cours, on ne la coupe PAS pour jouer l'animation d'un sort !
+	# L'attaque va continuer de se jouer normalement.
+	if anim_player.is_playing() and anim_player.current_animation.begins_with("attack"):
+		if not ability.anim_name.begins_with("attack"):
+			print("Attaque en cours ! On ne joue pas l'animation du sort pour laisser l'attaque se terminer.")
+			return false
+			
+	if anim_tree != null: 
+		anim_tree.active = false
+	
+	anim_player.play(ability.anim_name, -1, speed)
+	return true
 
 # ==========================================
 # (Les fonctions qui ont sauté au copier-coller !)
@@ -285,9 +299,8 @@ func _handle_targeting() -> void:
 			var target_data = {
 				"impact_point": raycast.get_collision_point()
 			}
-			if anim_player != null and active_ability.anim_name != "":
-				if anim_tree != null: anim_tree.active = false # <-- ON COUPE L'ARBRE AU CLIC
-				anim_player.play(active_ability.anim_name)
+			if active_ability != null:
+				_play_ability_anim_safe(active_ability, 1.0)
 				
 			_execute_ability(active_ability, target_data)
 		else:

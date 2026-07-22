@@ -7,8 +7,10 @@ extends CanvasLayer
 
 @onready var u_grid = $MainPanel/inventaire/inv_grid
 @onready var e_grid = $MainPanel/equipe/inv_grid
+@onready var unlock_btn: Button = find_child("UnlockAllButton", true, false)
 
 func _ready() -> void:
+	visible = false
 	if skill_bar == null:
 		push_error("SpellBookUI : SkillBarComponent manquant.")
 		return
@@ -19,6 +21,28 @@ func _ready() -> void:
 	# On écoute les changements pour rafraîchir l'affichage instantanément
 	skill_bar.spells_updated.connect(_refresh_equipment_visuals)
 	_refresh_equipment_visuals()
+
+	if unlock_btn != null:
+		if not unlock_btn.pressed.is_connected(unlock_all_spells):
+			unlock_btn.pressed.connect(unlock_all_spells)
+
+func unlock_all_spells() -> void:
+	print("Bouton cliqué : Déblocage de tous les sorts...")
+	var spell_paths = [
+		"res://scripts/abilities/fireball/Fireball.tres",
+		"res://scripts/abilities/dash/dash.tres",
+		"res://scripts/abilities/magic_shot/MagicShot.tres",
+		"res://scripts/abilities/Burning_ground/BurningGround.tres",
+		"res://scripts/abilities/Ice Crash/IceCrash.tres",
+		"res://scripts/abilities/light_pilar/light_pillar.tres"
+	]
+	for path in spell_paths:
+		if ResourceLoader.exists(path):
+			var spell_res = load(path) as AbilityData
+			if spell_res != null:
+				unlock_spell(spell_res)
+	_setup_inventory_slots()
+	print("Tous les sorts du jeu ont été débloqués !")
 
 # Remplit la grande liste de droite avec les sorts débloqués
 func _setup_inventory_slots() -> void:
@@ -56,6 +80,7 @@ func _refresh_equipment_visuals() -> void:
 		var slot_key = "slot_" + str(i + 1)
 		if skill_bar.slots.has(slot_key):
 			e_slots[i].set_ability(skill_bar.slots[slot_key])
+
 # On écoute les touches pressées par le joueur
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_spellbook"):

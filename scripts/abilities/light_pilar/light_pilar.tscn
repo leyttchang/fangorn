@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://cvloxeiewl8vl"]
+
+[ext_resource type="PackedScene" uid="uid://c1ebdtvibf4p4" path="res://objet/chest/particule_chest.tscn" id="1_osr64"]
+[ext_resource type="Shader" uid="uid://b3uo1snrwyfgh" path="res://objet/chest/glow_shader.tres" id="2_ynyim"]
+[ext_resource type="Texture2D" uid="uid://vtltbnpfsplq" path="res://assets/LeLu's Noise Pack/T_Aura7.png" id="3_31khw"]
+[ext_resource type="Script" path="res://scripts/abilities/light_pilar/light_pilar.gd" id="4_script"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wtftm"]
+render_priority = 0
+shader = ExtResource("2_ynyim")
+shader_parameter/Main_color = Color(2.7067378, 2.7067378, 1.9737649, 1)
+shader_parameter/BlinkingSpeed = 4.0
+shader_parameter/Transparancy_texture = ExtResource("3_31khw")
+shader_parameter/fading_param = 1.0
+
+[sub_resource type="Curve" id="Curve_wiybp"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.3321943, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_dria3"]
+curve = SubResource("Curve_wiybp")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_heeqv"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.0
+emission_ring_radius = 0.3
+emission_ring_inner_radius = 0.2
+emission_ring_cone_angle = 90.0
+angle_min = -179.99998
+angle_max = 180.00002
+direction = Vector3(0, 1, 0)
+spread = 5.0
+initial_velocity_min = 1.0
+initial_velocity_max = 2.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.049999997
+scale_max = 0.099999994
+scale_curve = SubResource("CurveTexture_dria3")
+color = Color(2.2011487, 1.8130012, 0.40969932, 1)
+
+[sub_resource type="Animation" id="Animation_osr64"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:light_energy")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_ynyim"]
+resource_name = "glow"
+length = 4.7
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:light_energy")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.03, 1.52, 2.02, 3.0333333, 3.76),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [1.0, 5.459, 5.459, 8.082, 0.738, 4.524]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_31khw"]
+_data = {
+&"RESET": SubResource("Animation_osr64"),
+&"glow": SubResource("Animation_ynyim")
+}
+
+[node name="Light_pilar" type="Node3D" unique_id=172657370 script=ExtResource("4_script")]
+
+[node name="chest_particule" parent="." unique_id=288196329 instance=ExtResource("1_osr64")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1827312, 0)
+
+[node name="aura_glow_effect" parent="chest_particule" index="0" unique_id=1637198412]
+material_override = SubResource("ShaderMaterial_wtftm")
+
+[node name="particles" parent="chest_particule/aura_glow_effect" index="0" unique_id=212527297]
+amount = 20
+process_material = SubResource("ParticleProcessMaterial_heeqv")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1805580673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6870255, 0)
+light_color = Color(2.707, 2.707, 1.974, 1)
+omni_range = 40.0
+omni_attenuation = 2.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="OmniLight3D" unique_id=1025740147]
+libraries/ = SubResource("AnimationLibrary_31khw")
+
+[editable path="chest_particule"]

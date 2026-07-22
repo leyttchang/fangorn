@@ -18,7 +18,8 @@ func _auto_load_default_spells() -> void:
 		"res://scripts/abilities/dash/dash.tres",
 		"res://scripts/abilities/magic_shot/MagicShot.tres",
 		"res://scripts/abilities/Burning_ground/BurningGround.tres",
-		"res://scripts/abilities/Ice Crash/IceCrash.tres"
+		"res://scripts/abilities/Ice Crash/IceCrash.tres",
+		"res://scripts/abilities/light_pilar/light_pillar.tres"
 	]
 	for path in spell_paths:
 		if ResourceLoader.exists(path):

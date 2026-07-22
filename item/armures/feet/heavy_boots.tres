@@ -23,6 +23,7 @@ base_stat_ranges = {
 }
 excluded_affixes = Array[ExtResource("1_kaimu")]([ExtResource("2_y507j"), ExtResource("3_gwmr8"), null])
 id = "heavy_boots_id"
+item_name = "Heavy boots"
 icon = ExtResource("1_1etp3")
 item_type = 3
 metadata/_custom_type_script = "uid://b6114jo5bnldt"

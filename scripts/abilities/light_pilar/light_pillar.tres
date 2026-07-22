@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dipiprkv1btfv"]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ldasm"]
+[ext_resource type="PackedScene" uid="uid://cvloxeiewl8vl" path="res://scripts/abilities/light_pilar/light_pilar.tscn" id="1_ow66a"]
+[ext_resource type="Texture2D" uid="uid://ducwbrc0m2g3t" path="res://assets/icon/32x32/fb986.png" id="2_ygo4i"]
+[ext_resource type="PackedScene" uid="uid://bnemrb3vjo0la" path="res://scripts/abilities/indicators/round_indicator.tscn" id="3_78hy7"]
+
+[resource]
+script = ExtResource("1_ldasm")
+ability_name = "Light Pillar"
+icon = ExtResource("2_ygo4i")
+cooldown = 30.0
+cast_time = 2.0
+target_mode = 3
+indicator_scene = ExtResource("3_78hy7")
+ability_scene = ExtResource("1_ow66a")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

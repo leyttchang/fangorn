@@ -8,9 +8,10 @@ extends CharacterBody3D
 @onready var navigation_comp: EnemyNavigationComponent = $EnemyNavigationComponent
 
 # --- DONNÉES DE COMPORTEMENT (Le Profil) ---
-# C'est ici que tu vas glisser ton fichier orc_behavior.tres !
 @export var base_movement_speed: float = 4.5
 @export var behavior: EnemyBehaviorData
+
+@onready var attack_shape: CollisionShape3D = get_node_or_null("Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent/CollisionShape3D")
 
 # --- ANIMATION TREE ---
 @onready var anim_tree: AnimationTree = $AnimationTree
@@ -31,8 +32,25 @@ func _ready() -> void:
 		push_error("Orc (" + name + ") : Fichier EnemyBehaviorData manquant dans l'inspecteur !")
 		
 	anim_tree.active = true
-	# Note : Le texte de dégâts a disparu d'ici ! C'est le CombatFeedbackComponent qui écoute maintenant.
 	health_component.died.connect(_on_died)
+	
+	# =====================================================================
+	# CORRECTION MAGIQUE : On détruit la piste vicieuse dans l'animation RESET
+	# =====================================================================
+	var anim_player: AnimationPlayer = get_node_or_null("Orc/AnimationPlayer")
+	if anim_player and anim_player.has_animation("RESET"):
+		var reset_anim = anim_player.get_animation("RESET")
+		# On cherche si le RESET a enregistré la hitbox par erreur
+		for i in range(reset_anim.get_track_count() - 1, -1, -1):
+			var path_str = str(reset_anim.track_get_path(i))
+			if "disabled" in path_str or "CollisionShape3D" in path_str:
+				reset_anim.remove_track(i)
+				print("[DUMB FIX] Piste 'disabled' supprimée de l'animation RESET !")
+	# =====================================================================
+	
+	# On s'assure qu'elle est bien désactivée au lancement
+	if attack_shape != null:
+		attack_shape.disabled = true
 	
 	call_deferred("actor_setup")
 
@@ -77,6 +95,10 @@ func _physics_process(delta: float) -> void:
 			_attack_anim_started = true
 		elif _attack_anim_started and (current_anim == "Stand" or current_anim == "Walk2"):
 			change_state(State.IDLE)
+			
+	if attack_shape != null:
+		if current_state != State.ATTACK and not attack_shape.disabled:
+			attack_shape.disabled = true
 
 	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)

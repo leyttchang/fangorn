@@ -21,17 +21,21 @@ density = 0.27
 albedo = Color(0.37111807, 0.4431049, 0.3064715, 1)
 
 [sub_resource type="Environment" id="Environment_gf3dy"]
+ambient_light_color = Color(0.7117184, 0.63087815, 0.23003373, 1)
 ambient_light_energy = 1.21
-tonemap_mode = 3
+tonemap_mode = 2
 ssao_enabled = true
 ssao_radius = 1.69
 ssil_enabled = true
+ssil_intensity = 0.76
 glow_enabled = true
 glow_intensity = 0.86
 glow_bloom = 0.15
 glow_blend_mode = 2
 volumetric_fog_enabled = true
-volumetric_fog_albedo = Color(0.24313726, 0.29803923, 0.26666668, 1)
+volumetric_fog_albedo = Color(0.2901966, 0.28847882, 0.20427796, 1)
+volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
+volumetric_fog_emission_energy = 5.0
 volumetric_fog_anisotropy = 0.75
 volumetric_fog_length = 152.09
 
@@ -44,25 +48,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 20, -3)
 
 [node name="pic" parent="." unique_id=1249540837 instance=ExtResource("4_41cxx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 20, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 20, -9)
+
+[node name="pic2" parent="." unique_id=781300725 instance=ExtResource("4_41cxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 20, -8)
+
+[node name="pic3" parent="." unique_id=159022719 instance=ExtResource("4_41cxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 20, -7)
+
+[node name="pic4" parent="." unique_id=16913749 instance=ExtResource("4_41cxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 20, -7)
+
+[node name="pic5" parent="." unique_id=1332899478 instance=ExtResource("4_41cxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 20, -8)
+
+[node name="pic6" parent="." unique_id=1458915582 instance=ExtResource("4_41cxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 20, -9)
 
 [node name="Ground_fire_paricles" parent="." unique_id=1474207563 instance=ExtResource("5_vkv4l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 21, -2)
-
-[node name="Dummy2" parent="." unique_id=1314685021 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 22, 17)
-
-[node name="Dummy3" parent="." unique_id=296377237 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22, 17)
-
-[node name="Dummy4" parent="." unique_id=338464274 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 22, 17)
-
-[node name="Dummy5" parent="." unique_id=346924833 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 22, 17)
-
-[node name="Dummy6" parent="." unique_id=861490982 instance=ExtResource("3_7mfpx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 22, 17)
 
 [node name="fog" parent="." unique_id=604921953 instance=ExtResource("9_q4u25")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.577293, 21, -43.831547)
@@ -74,13 +78,6 @@ material = SubResource("FogMaterial_6i2mx")
 
 [node name="WorldEnvironment" parent="Map1T3d" index="0" unique_id=834492024]
 environment = SubResource("Environment_gf3dy")
-
-[node name="DirectionalLight3D" parent="Map1T3d" index="1" unique_id=210805582]
-transform = Transform3D(1, 0, 0, 0, 0.39068252, 0.9205255, 0, -0.9205255, 0.39068252, -15.584869, 227.54758, 187.73827)
-light_color = Color(0.7823647, 0.77829343, 0.5902444, 1)
-light_volumetric_fog_energy = 2.432
-shadow_enabled = true
-shadow_blur = 2.474
 
 [node name="enemies_coutner" parent="." unique_id=1160664613 instance=ExtResource("8_gf3dy")]
 
@@ -131,12 +128,10 @@ spawn_chance = 40.0
 [node name="chest_spawner3" parent="spawner" unique_id=1790494388 instance=ExtResource("12_mhhd5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 20, -9)
 chest_scene = ExtResource("15_apj7j")
+spawn_chance = 33.0
 
 [node name="wave_display" parent="." unique_id=114584502 instance=ExtResource("12_2ho30")]
 
 [node name="fps_counter" parent="." unique_id=987654321 instance=ExtResource("13_fps")]
-
-[node name="dumb_archer" parent="." unique_id=1437418324 instance=ExtResource("9_1eb17")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 22, 0)
 
 [editable path="Map1T3d"]

@@ -22,6 +22,7 @@ base_stat_ranges = {
 "physical_damage": Vector2(0.05, 0.1)
 }
 excluded_affixes = Array[ExtResource("1_1nh1g")]([ExtResource("2_ae2ym"), ExtResource("3_gieb7")])
+item_name = "Heavy Helmet"
 icon = ExtResource("4_gieb7")
 item_type = 4
 metadata/_custom_type_script = "uid://b6114jo5bnldt"

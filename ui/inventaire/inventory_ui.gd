@@ -25,6 +25,27 @@ func _ready() -> void:
 		_build_stats_ui()
 	else:
 		push_warning("InventoryUI : Pas de StatsComponent ou de StatsContainer trouvé.")
+		
+	# --- NOUVEAU : Bouton de triche pour tuer les monstres ---
+	var kill_btn = Button.new()
+	kill_btn.text = "KILL ALL"
+	kill_btn.custom_minimum_size = Vector2(0, 40)
+	kill_btn.add_theme_color_override("font_color", Color.RED)
+	kill_btn.pressed.connect(_on_kill_all_pressed)
+	if stats_container != null:
+		stats_container.add_child(kill_btn)
+	else:
+		add_child(kill_btn)
+
+func _on_kill_all_pressed() -> void:
+	var enemies = get_tree().get_nodes_in_group("Enemie")
+	var kill_count = 0
+	for e in enemies:
+		var health = e.get_node_or_null("HealthComponent")
+		if health != null and health.has_method("take_damage"):
+			health.take_damage(999999)
+			kill_count += 1
+	print("Bouton magique utilisé : ", kill_count, " monstres tués !")
 
 func _build_stats_ui() -> void:
 	# On supprime les vieux labels si existants

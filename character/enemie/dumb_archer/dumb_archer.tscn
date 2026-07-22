@@ -116,7 +116,7 @@ states/anim_walk/node = SubResource("AnimationNodeAnimation_hgai7")
 states/anim_walk/position = Vector2(328, 280)
 transitions = ["Start", "anim_stand", SubResource("AnimationNodeStateMachineTransition_0d6u8"), "anim_walk", "anim_death", SubResource("AnimationNodeStateMachineTransition_ww05i"), "anim_stand", "anim_standing_draw_arrow", SubResource("AnimationNodeStateMachineTransition_advbo"), "anim_standing_draw_arrow", "anim_aim_recoil", SubResource("AnimationNodeStateMachineTransition_3m0uy"), "anim_aim_recoil", "anim_stand", SubResource("AnimationNodeStateMachineTransition_ryuhb"), "anim_stand", "anim_death", SubResource("AnimationNodeStateMachineTransition_84fxw"), "anim_walk", "anim_stand", SubResource("AnimationNodeStateMachineTransition_hgai7"), "anim_stand", "anim_walk", SubResource("AnimationNodeStateMachineTransition_dakcv")]
 
-[node name="dumb_archer" type="CharacterBody3D" unique_id=1437418324]
+[node name="dumb_archer" type="CharacterBody3D" unique_id=1437418324 groups=["Enemie"]]
 script = ExtResource("1_0d6u8")
 arrow_scene = ExtResource("2_ww05i")
 behavior = ExtResource("3_ryuhb")

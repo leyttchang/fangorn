@@ -3,6 +3,7 @@ extends Node
 
 static var hit_stream: AudioStreamWAV = null
 static var footstep_stream: AudioStreamWAV = null
+static var _last_hit_sound_time: int = 0
 
 static func _init_sounds() -> void:
 	if hit_stream == null:
@@ -12,6 +13,12 @@ static func _init_sounds() -> void:
 
 static func play_hit_sound(node: Node, pos: Vector3, custom_stream: AudioStream = null, volume_db: float = 0.0, pitch_min: float = 0.88, pitch_max: float = 1.12, max_distance: float = 40.0) -> void:
 	if not is_instance_valid(node) or not node.is_inside_tree(): return
+	
+	var current_time = Time.get_ticks_msec()
+	if current_time - _last_hit_sound_time < 30:
+		return
+	_last_hit_sound_time = current_time
+	
 	_init_sounds()
 	
 	var final_stream = custom_stream if custom_stream != null else hit_stream
