@@ -4,7 +4,8 @@ extends Area3D
 @export var damage: float = 1
 # NOUVEAU : Une case à cocher dans l'inspecteur, à activer UNIQUEMENT pour tes projectiles
 @export var destroy_on_environment: bool = false 
-@export var knockback_force: float = 15.0 # NOUVEAU : La force de poussée de cette attaque
+@export var knockback_force: float = 15.0 # La force de poussée de cette attaque
+@export_range(0.0, 90.0) var knockback_angle: float = 0.0 # L'angle d'élévation de la cible (0 = plat, 90 = vertical)
 @export var is_projectile: bool = false
 signal attack_landed(target)
 

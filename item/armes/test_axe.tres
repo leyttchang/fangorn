@@ -9,6 +9,7 @@
 script = ExtResource("2_imlsj")
 base_damage = 50.0
 base_attack_speed = 0.7
+hit_slow = 0.5
 damage_range = Vector2(50, 60)
 attack_speed_range = Vector2(0.7, 0.8)
 weapon_scene = ExtResource("3_imlsj")

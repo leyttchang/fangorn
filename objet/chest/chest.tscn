@@ -11,6 +11,7 @@
 [ext_resource type="Resource" uid="uid://cubsij5q17dky" path="res://item/armes/test_sword_stats.tres" id="8_tnj3d"]
 [ext_resource type="Resource" uid="uid://biqusejrat6c6" path="res://item/armes/spear_test.tres" id="9_wr6mb"]
 [ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="10_interact"]
+[ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="11_inv_comp"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
 size = Vector3(1.2149, 0.9249, 0.7678)
@@ -29,5 +30,8 @@ shape = SubResource("BoxShape3D_solid")
 
 [node name="InteractionComponent" parent="." unique_id=123456789 instance=ExtResource("10_interact")]
 prompt_text = "Press E to open chest"
+
+[node name="InventoryComponent" parent="." unique_id=53472195 instance=ExtResource("11_inv_comp")]
+max_slots = 4
 
 [editable path="InteractionComponent"]

@@ -4,6 +4,9 @@ extends Panel
 var slot_index: int = -1
 var current_item: ItemData = null
 
+var target_inventory: InventoryComponent = null
+var is_loot_container: bool = false
+
 @onready var icon_rect: TextureRect = $Icon # Assure-toi que ton icône s'appelle bien "Icon"
 @onready var highlight_rect: ReferenceRect = $NewItemHighlight if has_node("NewItemHighlight") else null
 
@@ -101,9 +104,67 @@ func _get_drag_data(at_position: Vector2) -> Variant:
 	var payload = {
 		"type": "inventory_item",
 		"item": current_item,
-		"source_index": slot_index
+		"source_index": slot_index,
+		"source_inventory": target_inventory,
+		"quantity": target_inventory.slots[slot_index]["quantity"] if target_inventory != null else 1
 	}
 	return payload
+	
+# ==========================================
+# FIN DU GLISSER (DROP)
+# ==========================================
+func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+	# Si ce slot appartient à un coffre, on ne veut pas pouvoir déposer nos propres objets dedans
+	if is_loot_container:
+		return false
+		
+	if typeof(data) == TYPE_DICTIONARY and data.has("type") and data["type"] == "inventory_item":
+		# Optionnel: on pourrait empêcher de drop sur la même case
+		return true
+	return false
+	
+func _drop_data(at_position: Vector2, data: Variant) -> void:
+	var dropped_item: ItemData = data["item"]
+	var source_inventory: InventoryComponent = data.get("source_inventory")
+	var source_index: int = data["source_index"]
+	var dropped_quantity: int = data.get("quantity", 1)
+	
+	if target_inventory == null:
+		push_error("InventorySlot : target_inventory n'est pas défini !")
+		return
+		
+	# Cas 1 : Ça vient du même inventaire (le joueur réorganise ses cases)
+	if source_inventory == target_inventory:
+		# Pour l'instant on fait un swap simple si la case contient déjà qqch
+		var item_in_this_slot = current_item
+		var qty_in_this_slot = target_inventory.slots[slot_index]["quantity"] if target_inventory else 1
+		
+		# On retire de la source
+		source_inventory.remove_item_at_slot(source_index, dropped_quantity)
+		
+		if item_in_this_slot != null:
+			# Il y avait un objet, on le met dans l'ancienne case (swap)
+			target_inventory.remove_item_at_slot(slot_index, qty_in_this_slot)
+			target_inventory.set_item_at_slot(slot_index, dropped_item, dropped_quantity)
+			target_inventory.set_item_at_slot(source_index, item_in_this_slot, qty_in_this_slot)
+		else:
+			# Pas d'objet, on déplace juste
+			target_inventory.set_item_at_slot(slot_index, dropped_item, dropped_quantity)
+			
+	# Cas 2 : Ça vient d'un autre inventaire (Le joueur loote le coffre)
+	elif source_inventory != null:
+		var item_in_this_slot = current_item
+		
+		if item_in_this_slot != null:
+			# On ne peut pas swap vers le coffre (sens unique), donc on annule si la case est prise.
+			# Alternativement, on pourrait chercher la première case vide.
+			print("Case occupée, glissez sur une case vide de l'inventaire.")
+			return
+			
+		# 1. On retire l'objet du coffre
+		source_inventory.remove_item_at_slot(source_index, dropped_quantity)
+		# 2. On l'ajoute précisément dans cette case du joueur
+		target_inventory.set_item_at_slot(slot_index, dropped_item, dropped_quantity)
 
 # ==========================================
 # CLIC DROIT : MENU CONTEXTUEL (JETER)
@@ -129,15 +190,6 @@ func _show_context_menu() -> void:
 
 func _on_context_menu_id_pressed(id: int, popup: PopupMenu) -> void:
 	if id == 0: # Si on a cliqué sur "Throw (Delete)"
-		# On remonte l'arbre pour trouver l'InventoryUI et son composant
-		var current_node = get_parent()
-		var inv_comp = null
-		while current_node != null:
-			if current_node is InventoryUI: # "InventoryUI" est le nom de la classe
-				inv_comp = current_node.inventory_component
-				break
-			current_node = current_node.get_parent()
-			
-		if inv_comp != null:
+		if target_inventory != null:
 			# On supprime 999 quantités pour être sûr de vider toute la pile
-			inv_comp.remove_item_at_slot(slot_index, 999)
+			target_inventory.remove_item_at_slot(slot_index, 999)

@@ -9,6 +9,7 @@ enum WeaponSlot { ONE_HAND, TWO_HAND }
 @export_category("Dégâts et Vitesse - Résultat Final")
 @export var base_damage: float = 15.0
 @export var base_attack_speed: float = 1.0 
+@export_range(0.0, 1.0) var hit_slow: float = 1.0
 
 @export_category("Génération ARPG - Blueprint")
 @export var damage_range: Vector2 = Vector2(10, 15)

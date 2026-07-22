@@ -189,7 +189,7 @@ root_node = NodePath("../Orc_obj")
 tree_root = SubResource("AnimationNodeStateMachine_sfyia")
 anim_player = NodePath("../Orc_obj/AnimationPlayer")
 
-[node name="StatsComponent" type="Node3D" parent="." unique_id=577930347 groups=["Enemie"]]
+[node name="StatsComponent" type="Node3D" parent="." unique_id=577930347]
 script = ExtResource("8_pjks3")
 starting_stats = ExtResource("11_0d6u8")
 

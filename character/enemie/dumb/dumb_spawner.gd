@@ -19,9 +19,6 @@ var current_spawn_time: float
 var can_scale_difficulty: bool = true 
 
 func _ready() -> void:
-	if is_disabled:
-		return
-		
 	current_spawn_time = start_spawn_time
 	
 	# 1. Le Chronomètre de Spawn

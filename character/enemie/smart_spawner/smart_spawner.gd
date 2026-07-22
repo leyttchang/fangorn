@@ -25,11 +25,25 @@ var active_enemies: Array[Node3D] = []
 var is_spawning_wave: bool = false
 var enemies_left_to_spawn: int = 0
 
+var is_paused: bool = false
+var _waiting_to_spawn: bool = false
+var _waiting_for_next_wave: bool = false
+
 func _ready() -> void:
 	add_to_group("SmartSpawner")
 	if auto_start:
 		if is_inside_tree():
 			get_tree().create_timer(1.0).timeout.connect(start_next_wave)
+
+func toggle_pause() -> void:
+	is_paused = not is_paused
+	if not is_paused:
+		if _waiting_to_spawn:
+			_waiting_to_spawn = false
+			_spawn_next_enemy_in_wave()
+		elif _waiting_for_next_wave:
+			_waiting_for_next_wave = false
+			start_next_wave()
 
 func start_next_wave() -> void:
 	if not is_inside_tree(): return
@@ -51,6 +65,10 @@ func start_next_wave() -> void:
 
 func _spawn_next_enemy_in_wave() -> void:
 	if not is_inside_tree(): return
+	
+	if is_paused:
+		_waiting_to_spawn = true
+		return
 	
 	if enemies_left_to_spawn <= 0:
 		is_spawning_wave = false
@@ -118,4 +136,10 @@ func _check_wave_completion() -> void:
 		# Pause avant la vague suivante
 		var tree = get_tree()
 		if tree != null:
-			tree.create_timer(delay_between_waves).timeout.connect(start_next_wave)
+			tree.create_timer(delay_between_waves).timeout.connect(_on_delay_between_waves_finished)
+
+func _on_delay_between_waves_finished() -> void:
+	if is_paused:
+		_waiting_for_next_wave = true
+	else:
+		start_next_wave()

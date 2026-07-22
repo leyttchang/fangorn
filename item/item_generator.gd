@@ -13,12 +13,16 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 	
 	var ilvl_multiplier = 1.0 + (ilvl * 0.1) # Option A: +10% de puissance par niveau
 	
+	var percent_stats = ["attack_speed", "cd_red", "area_of_effect", "movement_speed", "casting_speed"]
+	
 	# 2. Roll des stats intrinsèques de base (Equipment)
 	for stat_name in new_item.base_stat_ranges.keys():
 		var range_vec: Vector2 = new_item.base_stat_ranges[stat_name]
 		if range_vec.y > 0 or range_vec.x > 0: # S'il y a une range définie (au lieu de 0,0)
 			var roll = randf_range(range_vec.x, range_vec.y) * ilvl_multiplier
-			var snapped_roll = snapped(roll, 0.1)
+			var is_percent = percent_stats.has(stat_name)
+			var snapped_roll = snapped(roll, 0.1) if is_percent else round(roll)
+			
 			new_item.stat_bonuses[stat_name] = snapped_roll
 			new_item.innate_stats[stat_name] = snapped_roll
 			
@@ -27,7 +31,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 		var weapon = new_item as WeaponItem
 		if weapon.damage_range.y > 0 or weapon.damage_range.x > 0:
 			var dmg_roll = randf_range(weapon.damage_range.x, weapon.damage_range.y) * ilvl_multiplier
-			weapon.base_damage = snapped(dmg_roll, 0.1)
+			weapon.base_damage = round(dmg_roll)
 		if weapon.attack_speed_range.y > 0 or weapon.attack_speed_range.x > 0:
 			# L'attack speed scale généralement beaucoup moins dans les ARPG
 			var as_mult = 1.0 + (ilvl * 0.02) 
@@ -79,7 +83,8 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 				roll_t = randf() # Si la courbe n'existe pas, on fait du hasard pur
 				
 			var affix_roll = lerp(chosen_affix.min_roll, chosen_affix.max_roll, roll_t) * ilvl_multiplier * equipment_budget
-			var snapped_affix = snapped(affix_roll, 0.1)
+			var is_percent = percent_stats.has(stat_name)
+			var snapped_affix = snapped(affix_roll, 0.1) if is_percent else round(affix_roll)
 			
 			# Ajouter le bonus aux stats (additionne par dessus la stat de base)
 			if new_item.stat_bonuses.has(stat_name):

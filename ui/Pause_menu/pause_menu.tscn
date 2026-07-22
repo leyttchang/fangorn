@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://b2i01iy66mw4o"]
+
+[ext_resource type="Script" uid="uid://cp7n6y1770o7d" path="res://ui/Pause_menu/pause_menu.gd" id="1_script"]
+
+[node name="Pause_menu" type="CanvasLayer" unique_id=533859901]
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="." unique_id=1240144176]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -176.5
+offset_top = -245.25
+offset_right = 176.5
+offset_bottom = 245.25
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1491055499]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer" unique_id=1494707235]
+layout_mode = 2
+text = "Fangorn
+"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Panel/VBoxContainer" unique_id=911070678]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Resume
+"
+
+[node name="Button2" type="Button" parent="Panel/VBoxContainer" unique_id=584564550]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Option"
+
+[node name="Button3" type="Button" parent="Panel/VBoxContainer" unique_id=1782004856]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Pause/unpause spawn"
+
+[node name="Button5" type="Button" parent="Panel/VBoxContainer" unique_id=178789073]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Enable debugSpawner"
+
+[node name="Button4" type="Button" parent="Panel/VBoxContainer" unique_id=2072541465]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Quit"

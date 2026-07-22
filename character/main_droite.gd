@@ -32,7 +32,14 @@ func play_attack_sound() -> void:
 	play_sound()
 
 func _ready():
+	if equipment != null:
+		equipment.equipment_changed.connect(_on_equipment_changed)
 	call_deferred("update_idle_stance")
+
+func _on_equipment_changed(slot_name: String, _item: ItemData) -> void:
+	if slot_name == "main_hand":
+		if not is_attacking:
+			update_idle_stance()
 
 func _input(event):
 	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE: return
@@ -78,11 +85,13 @@ func reset_attack_state():
 			anim_tree.active = true
 
 func update_idle_stance():
-	var equipped_item = equipment.equipped_items["main_hand"] as WeaponItem
-	if equipped_item == null: return
+	var equipped_item = equipment.equipped_items.get("main_hand") as WeaponItem
+	if equipped_item == null: 
+		# Optionnel: on pourrait revenir à un idle sans arme si on n'a plus d'arme
+		return
 	var style_string = WeaponItem.WeaponStyle.keys()[equipped_item.weapon_style].to_lower()
 	var idle_anim = "idle_" + style_string
-	anim_playback.start(idle_anim)
+	anim_playback.travel(idle_anim)
 
 # --- NOUVEAU : Calcul des stats de vitesse pour les attaques de base ---
 func get_current_attack_speed() -> float:

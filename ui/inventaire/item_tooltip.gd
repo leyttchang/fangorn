@@ -42,6 +42,14 @@ func _ready() -> void:
 		stats_text += "[color=white]Dégâts : " + str(weapon.base_damage) + "[/color]\n"
 		stats_text += "[color=white]Vitesse d'attaque : " + str(weapon.base_attack_speed) + "[/color]\n"
 		
+	var percent_stats = ["attack_speed", "cd_red", "area_of_effect", "movement_speed", "casting_speed"]
+	var get_formatted_val = func(k, v):
+		if k in percent_stats:
+			var pct = round(v * 100.0)
+			return ("+" if pct > 0 else "") + str(pct) + "%"
+		else:
+			return ("+" if v > 0 else "") + str(round(v))
+			
 	if _item is EquipmentItem:
 		var equip = _item as EquipmentItem
 		# Sécurité : Si l'objet n'a pas été généré par le générateur (objet statique placé à la main)
@@ -49,22 +57,19 @@ func _ready() -> void:
 			for key in equip.stat_bonuses:
 				var val = equip.stat_bonuses[key]
 				if val != 0.0:
-					var sign_str = "+" if val > 0 else ""
-					stats_text += "[color=white]" + key.capitalize().replace("_", " ") + " : " + sign_str + str(val) + "[/color]\n"
+					stats_text += "[color=white]" + key.capitalize().replace("_", " ") + " : " + get_formatted_val.call(key, val) + "[/color]\n"
 		else:
 			# 1. Affichage des stats de base en Blanc
 			for key in equip.innate_stats:
 				var val = equip.innate_stats[key]
 				if val != 0.0:
-					var sign_str = "+" if val > 0 else ""
-					stats_text += "[color=white]" + key.capitalize().replace("_", " ") + " : " + sign_str + str(val) + "[/color]\n"
+					stats_text += "[color=white]" + key.capitalize().replace("_", " ") + " : " + get_formatted_val.call(key, val) + "[/color]\n"
 			
 			# 2. Affichage des stats d'affixes en Bleu
 			for key in equip.affix_stats:
 				var val = equip.affix_stats[key]
 				if val != 0.0:
-					var sign_str = "+" if val > 0 else ""
-					stats_text += "[color=lightskyblue]" + key.capitalize().replace("_", " ") + " : " + sign_str + str(val) + "[/color]\n"
+					stats_text += "[color=lightskyblue]" + key.capitalize().replace("_", " ") + " : " + get_formatted_val.call(key, val) + "[/color]\n"
 				
 	if stats_text == "":
 		stats_label.visible = false

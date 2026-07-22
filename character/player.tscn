@@ -12,12 +12,12 @@
 [ext_resource type="AudioStream" uid="uid://6f0x848aplbp" path="res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Swipe - 1.wav" id="6_r5ovt"]
 [ext_resource type="AudioStream" uid="uid://o72085f1gr8u" path="res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Swipe - 2.wav" id="7_4vy5w"]
 [ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
-[ext_resource type="PackedScene" uid="uid://bscyin7n03udp" path="res://item/armes/test_spear.tscn" id="8_8vi7a"]
 [ext_resource type="AudioStream" uid="uid://etu2ylsuirfg" path="res://assets/sound_effects/UI/wav (HD)/Swoosh_3.wav" id="8_dadkq"]
 [ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
 [ext_resource type="AudioStream" uid="uid://bywd2jahco1bk" path="res://assets/sound_effects/UI/wav (HD)/woosh.wav" id="9_aynll"]
 [ext_resource type="AudioStream" uid="uid://bd4t6opupnkni" path="res://assets/sound_effects/UI/wav (HD)/woosh_5.wav" id="10_ubgyp"]
 [ext_resource type="AudioStream" uid="uid://o1f2jww0msgk" path="res://assets/sound_effects/Combat and Gore/swipe.wav" id="11_tmwgi"]
+[ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="12_pn6xv"]
 [ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
 [ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
@@ -452,7 +452,7 @@ tracks/3/keys = {
 }]
 }
 
-[sub_resource type="Animation" id="Animation_aw5rd"]
+[sub_resource type="Animation" id="Animation_r5ovt"]
 resource_name = "attack_sword_1"
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -485,7 +485,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.16666667, 0.6333333),
+"times": PackedFloat32Array(0.16666667, 0.43333334),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -502,11 +502,206 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.26666668, 0.93333334),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.26666668, 0.43333334, 0.93333334),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
 "args": [],
 "method": &"play_attack_sound"
+}, {
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_aw5rd"]
+resource_name = "attack_sword_2"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4666129, 0.64, 0.6683364, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-2.0943952, 0, 0), Vector3(-1.4798168, -2.3626425, 2.489008), Vector3(-1.5010211, 1.0683976, -0.8950764), Vector3(-1.3708165, 0.97572047, -0.8174338), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4666129, 0.64, 0.6683364, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5, -1, -1), Vector3(0.2830804, -0.13348663, -0.007423699), Vector3(0.39143595, -0.5567479, -1.6137054), Vector3(0.40085325, -0.586523, -1.5604701), Vector3(0.5, -0.9, -1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.4666667, 0.6666667),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.46666667, 0.6666667, 0.93333334),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_pn6xv"]
+resource_name = "attack_sword_3"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.19968587, 0.26666668, 0.325, 0.425, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-1.3708165, 0.97572047, -0.8174338), Vector3(-1.4020649, 1.0993668, 1.1466928), Vector3(-1.3499177, -1.0621289, 1.1040435), Vector3(-1.2865958, -1.5380254, 1.052255), Vector3(-1.1897506, -2.3952358, 0.9730491), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.19968587, 0.26666668, 0.3211851, 0.425, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.40085325, -0.586523, -1.5604701), Vector3(-0.46966672, -0.3488856, -0.75041205), Vector3(-0.43360162, -0.36938334, -1.8337233), Vector3(0.1674782, -0.33274108, -1.2487769), Vector3(0.7864792, -0.37544006, -0.5210643), Vector3(0.5, -0.9, -1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.19999999, 0.43333334),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.20000002, 0.43333334, 0.93333334),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
+"args": [],
+"method": &"check_combo"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_4vy5w"]
+resource_name = "attack_sword_4"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08761727, 0.1283695, 0.19968587, 0.27303988, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-1.1897506, -2.3952358, 0.9730491), Vector3(-0.8591731, 1.9936869, -3.1355395), Vector3(-0.62479067, 2.072805, -2.9723263), Vector3(-0.30297348, 0.49028617, 0.44101033), Vector3(-0.09547848, 1.2299159, 1.0022271), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.08761727, 0.1283695, 0.19968587, 0.27303988, 0.96666664),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.7864792, -0.37544006, -0.5210643), Vector3(0.7605131, -0.94830954, -0.56447434), Vector3(0.7484359, -0.94606996, -1.4754262), Vector3(-0.053435564, -0.17481464, -1.5051873), Vector3(-0.77392143, 0.2656666, -0.89812833), Vector3(0.5, -0.9, -1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.13333334, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.13333337, 0.3, 0.93333334),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"play_attack_sound"
+}, {
+"args": [],
+"method": &"check_combo"
 }, {
 "args": [],
 "method": &"end_combat_state"
@@ -609,7 +804,10 @@ _data = {
 &"attack_heavy_slam_recovery": SubResource("Animation_2tvps"),
 &"attack_spear_1": SubResource("Animation_8vi7a"),
 &"attack_spear_2": SubResource("Animation_3m6fa"),
-&"attack_sword_1": SubResource("Animation_aw5rd"),
+&"attack_sword_1": SubResource("Animation_r5ovt"),
+&"attack_sword_2": SubResource("Animation_aw5rd"),
+&"attack_sword_3": SubResource("Animation_pn6xv"),
+&"attack_sword_4": SubResource("Animation_4vy5w"),
 &"idle_axe": SubResource("Animation_aayji"),
 &"idle_spear": SubResource("Animation_e72n5"),
 &"idle_sword": SubResource("Animation_sexlj")
@@ -635,6 +833,15 @@ animation = &"attack_spear_2"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3m6fa"]
 animation = &"attack_sword_1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pn6xv"]
+animation = &"attack_sword_2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_r5ovt"]
+animation = &"attack_sword_3"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_4vy5w"]
+animation = &"attack_sword_4"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_e72n5"]
 animation = &"idle_axe"
@@ -679,6 +886,21 @@ advance_mode = 2
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nnepy"]
 switch_mode = 2
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_r5ovt"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4vy5w"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_vp26o"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ooc2e"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_dadkq"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_aynll"]
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_yqkk6"]
 states/End/position = Vector2(1257, 65)
 states/Start/position = Vector2(-29, 86)
@@ -696,14 +918,20 @@ states/attack_spear_2/node = SubResource("AnimationNodeAnimation_sexlj")
 states/attack_spear_2/position = Vector2(645, 86)
 states/attack_sword_1/node = SubResource("AnimationNodeAnimation_3m6fa")
 states/attack_sword_1/position = Vector2(476, 145)
+states/attack_sword_2/node = SubResource("AnimationNodeAnimation_pn6xv")
+states/attack_sword_2/position = Vector2(676.7711, 189)
+states/attack_sword_3/node = SubResource("AnimationNodeAnimation_r5ovt")
+states/attack_sword_3/position = Vector2(826.7711, 268)
+states/attack_sword_4/node = SubResource("AnimationNodeAnimation_4vy5w")
+states/attack_sword_4/position = Vector2(622.7711, 290.3023)
 states/idle_axe/node = SubResource("AnimationNodeAnimation_e72n5")
 states/idle_axe/position = Vector2(225, -35)
 states/idle_spear/node = SubResource("AnimationNodeAnimation_svssn")
 states/idle_spear/position = Vector2(231, 86)
 states/idle_sword/node = SubResource("AnimationNodeAnimation_6e1i3")
 states/idle_sword/position = Vector2(231, 189)
-transitions = ["attack_axe_1", "attack_axe_2", SubResource("AnimationNodeStateMachineTransition_bpixc"), "idle_axe", "attack_axe_1", SubResource("AnimationNodeStateMachineTransition_8amhy"), "Start", "idle_axe", SubResource("AnimationNodeStateMachineTransition_6e1i3"), "attack_axe_2", "idle_axe", SubResource("AnimationNodeStateMachineTransition_rtbr7"), "attack_axe_1", "idle_axe", SubResource("AnimationNodeStateMachineTransition_f3w6d"), "idle_spear", "attack_spear_1", SubResource("AnimationNodeStateMachineTransition_2qmbm"), "attack_spear_1", "attack_spear_2", SubResource("AnimationNodeStateMachineTransition_8weaa"), "attack_spear_2", "idle_spear", SubResource("AnimationNodeStateMachineTransition_o88sh"), "attack_spear_1", "idle_spear", SubResource("AnimationNodeStateMachineTransition_3k6pu"), "attack_heavy_slam", "attack_heavy_slam_recovery", SubResource("AnimationNodeStateMachineTransition_7e1ce"), "idle_sword", "attack_sword_1", SubResource("AnimationNodeStateMachineTransition_6vepr"), "idle_sword", "attack_heavy_slam", SubResource("AnimationNodeStateMachineTransition_ek25o"), "attack_sword_1", "idle_sword", SubResource("AnimationNodeStateMachineTransition_nnepy")]
-graph_offset = Vector2(-134.22887, 123.30229)
+transitions = ["attack_axe_1", "attack_axe_2", SubResource("AnimationNodeStateMachineTransition_bpixc"), "idle_axe", "attack_axe_1", SubResource("AnimationNodeStateMachineTransition_8amhy"), "Start", "idle_axe", SubResource("AnimationNodeStateMachineTransition_6e1i3"), "attack_axe_2", "idle_axe", SubResource("AnimationNodeStateMachineTransition_rtbr7"), "attack_axe_1", "idle_axe", SubResource("AnimationNodeStateMachineTransition_f3w6d"), "idle_spear", "attack_spear_1", SubResource("AnimationNodeStateMachineTransition_2qmbm"), "attack_spear_1", "attack_spear_2", SubResource("AnimationNodeStateMachineTransition_8weaa"), "attack_spear_2", "idle_spear", SubResource("AnimationNodeStateMachineTransition_o88sh"), "attack_spear_1", "idle_spear", SubResource("AnimationNodeStateMachineTransition_3k6pu"), "attack_heavy_slam", "attack_heavy_slam_recovery", SubResource("AnimationNodeStateMachineTransition_7e1ce"), "idle_sword", "attack_sword_1", SubResource("AnimationNodeStateMachineTransition_6vepr"), "idle_sword", "attack_heavy_slam", SubResource("AnimationNodeStateMachineTransition_ek25o"), "attack_sword_1", "idle_sword", SubResource("AnimationNodeStateMachineTransition_nnepy"), "attack_sword_1", "attack_sword_2", SubResource("AnimationNodeStateMachineTransition_r5ovt"), "attack_sword_2", "idle_sword", SubResource("AnimationNodeStateMachineTransition_4vy5w"), "attack_sword_2", "attack_sword_3", SubResource("AnimationNodeStateMachineTransition_vp26o"), "attack_sword_3", "idle_sword", SubResource("AnimationNodeStateMachineTransition_ooc2e"), "attack_sword_4", "idle_sword", SubResource("AnimationNodeStateMachineTransition_dadkq"), "attack_sword_3", "attack_sword_4", SubResource("AnimationNodeStateMachineTransition_aynll")]
+graph_offset = Vector2(143.77113, 49.30229)
 
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_speed"]
 
@@ -744,12 +972,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.99997896, -0.006164997, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333556, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.9999789, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335556, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
 
-[node name="test_spear" parent="Camera3D/MainDroite" unique_id=335765208 instance=ExtResource("8_8vi7a")]
+[node name="TestSword" parent="Camera3D/MainDroite" unique_id=2020783524 instance=ExtResource("12_pn6xv")]
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=729055229]
 target_position = Vector3(0, 0, -50)

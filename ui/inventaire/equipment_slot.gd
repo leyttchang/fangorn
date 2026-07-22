@@ -57,15 +57,22 @@ func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 func _drop_data(at_position: Vector2, data: Variant) -> void:
 	var item_to_equip: ItemData = data["item"]
 	var source_index: int = data["source_index"]
+	var source_inventory: InventoryComponent = data.get("source_inventory")
+	var quantity: int = data.get("quantity", 1)
 	
+	if source_inventory == null:
+		# Fallback au cas où
+		source_inventory = inventory_component
+		
 	# 1. ON RETIRE L'OBJET DE L'INVENTAIRE EN PREMIER (On libère la case)
-	inventory_component.remove_item_at_slot(source_index, 1)
+	source_inventory.remove_item_at_slot(source_index, quantity)
 	
 	# 2. On équipe la nouvelle arme. 
 	# La magie opère ici : si le joueur tient déjà une épée, ton 'EquipmentComponent' 
-	# va la déséquiper et la ranger LUI-MÊME dans la case qu'on vient juste de vider !
+	# va la déséquiper et la ranger LUI-MÊME dans la case qu'on vient juste de vider 
+	# (il la mettra dans l'inventaire du joueur grâce au code de EquipmentComponent).
 	var success = equipment_component.equip_item(item_to_equip, slot_name)
 	
 	if not success:
-		# Sécurité : Si l'équipement échoue, on remet l'objet dans l'inventaire
-		inventory_component.add_item(item_to_equip, 1)
+		# Sécurité : Si l'équipement échoue, on remet l'objet là d'où il vient !
+		source_inventory.set_item_at_slot(source_index, item_to_equip, quantity)

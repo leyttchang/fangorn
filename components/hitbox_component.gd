@@ -19,11 +19,23 @@ func receive_hit(attack: AttackComponent) -> void:
 		var push_dir: Vector3
 		
 		if attack.is_projectile:
-			# MAGIE : Si c'est un sort, on utilise sa direction de vol (son axe Z inversé)
+			# MAGIE : Si c'est un sort, on utilise sa direction de vol horizontale
 			push_dir = -attack.global_transform.basis.z
 		else:
 			# Si c'est une épée, on garde l'ancien calcul basé sur les positions
 			push_dir = global_position - attack.global_position
+			
+		# 1. On l'aplatit pour avoir une direction horizontale pure
+		push_dir.y = 0
+		if push_dir.length_squared() > 0.001:
+			push_dir = push_dir.normalized()
+		else:
+			push_dir = Vector3.FORWARD
+			
+		# 2. On applique le fameux angle d'élévation
+		var angle_rad = deg_to_rad(attack.knockback_angle)
+		push_dir = push_dir * cos(angle_rad)
+		push_dir.y = sin(angle_rad)
 			
 		# On envoie directement la direction calculée au composant de recul
 		knockback_component.apply_knockback(push_dir, attack.knockback_force)

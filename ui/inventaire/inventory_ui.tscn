@@ -60,10 +60,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 375.0
-offset_top = 164.0
-offset_right = -277.0
-offset_bottom = -184.0
+offset_left = 365.0
+offset_top = 284.0
+offset_right = -287.0
+offset_bottom = -64.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.148935, 0.148935, 0.148935, 1)
@@ -131,3 +131,38 @@ offset_top = 381.0
 offset_right = 183.0
 offset_bottom = 445.0
 slot_name = "feet"
+
+[node name="LootPanel" type="ColorRect" parent="MainPanel" unique_id=456123789]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 372.0
+offset_top = 10.0
+offset_right = -280.0
+offset_bottom = 130.0
+grow_horizontal = 2
+color = Color(0.148935, 0.148935, 0.148935, 1)
+
+[node name="Title" type="Label" parent="MainPanel/LootPanel" unique_id=789456123]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Coffre"
+horizontal_alignment = 1
+
+[node name="LootGrid" type="GridContainer" parent="MainPanel/LootPanel" unique_id=159753468]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 5

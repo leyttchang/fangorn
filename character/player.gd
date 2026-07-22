@@ -9,12 +9,14 @@ extends CharacterBody3D
 
 @export var base_movement_speed: float = 6.0
 @export var acceleration: float = 40.0
+@export var air_acceleration: float = 10.0 # Accélération réduite en l'air (inertie)
 @export var friction: float = 35.0
-@export var air_friction: float = 10.0 # Moins de friction en l'air pour garder l'élan du saut
+@export var air_friction: float = 5.0 # Moins de friction en l'air pour garder l'élan du saut
 # ------------------------------------------------------
 
 @onready var stats_component: StatsComponent = %StatsComponent
 @onready var health_component: HealthComponent = $HealthComponent
+@onready var main_droite = $Camera3D/MainDroite
 
 @export var custom_footstep_sound: AudioStream # Optionnel : Glisser un fichier .wav / .ogg
 @export var step_interval: float = 2.8 # Distance en mètres entre deux bruits de pas
@@ -52,6 +54,13 @@ func _physics_process(delta: float) -> void:
 
 	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
 
+	if main_droite != null and main_droite.is_attacking:
+		var equip_comp = $EquipmentComponent
+		if equip_comp != null:
+			var weapon = equip_comp.equipped_items.get("main_hand") as WeaponItem
+			if weapon != null:
+				current_speed *= weapon.hit_slow
+
 	# ==========================================================
 	# 3. NOUVELLE GESTION DU MOUVEMENT (Inspirée de tes anciens scripts)
 	# ==========================================================
@@ -70,9 +79,11 @@ func _physics_process(delta: float) -> void:
 		# S'il y a un input, on calcule la vitesse à atteindre
 		var vitesse_cible_2d = direction_2d * current_speed
 		
+		# On choisit l'accélération selon si on est au sol ou en l'air
+		var accel_actuelle = acceleration if is_on_floor() else air_acceleration
+		
 		# On ACCÉLÈRE vers cette vitesse cible. 
-		# Si la vitesse actuelle est à 50 (Knockback), elle va descendre doucement vers la vitesse cible au lieu de "clignoter".
-		vitesse_horizontale = vitesse_horizontale.move_toward(vitesse_cible_2d, acceleration * delta)
+		vitesse_horizontale = vitesse_horizontale.move_toward(vitesse_cible_2d, accel_actuelle * delta)
 	else:
 		# Si on lâche les touches, on applique la friction
 		var friction_actuelle = friction if is_on_floor() else air_friction

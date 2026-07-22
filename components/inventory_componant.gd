@@ -78,3 +78,18 @@ func remove_item_at_slot(slot_index: int, amount: int = 1) -> void:
 			slot["quantity"] = 0
 			
 		inventory_changed.emit()
+
+# --- FORCER UN OBJET DANS UNE CASE (Utile pour le drag & drop) ---
+func set_item_at_slot(slot_index: int, item: ItemData, quantity: int) -> void:
+	if slot_index < 0 or slot_index >= max_slots:
+		return
+	slots[slot_index]["item"] = item
+	slots[slot_index]["quantity"] = quantity
+	inventory_changed.emit()
+
+# --- VÉRIFIER SI L'INVENTAIRE EST VIDE ---
+func is_empty() -> bool:
+	for slot in slots:
+		if slot["item"] != null:
+			return false
+	return true

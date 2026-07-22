@@ -166,6 +166,7 @@ func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 # ÉVÉNEMENTS
 # ==========================================================
 func _on_died() -> void:
+	remove_from_group("Enemie")
 	get_tree().call_group("ScoreManager", "add_kill_point")
 	change_state(State.DEAD)
 	if has_node("HitboxComponent/CollisionShape3D"):

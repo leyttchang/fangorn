@@ -10,9 +10,9 @@ func _ready() -> void:
 	target_body = get_parent()
 
 func apply_knockback(push_direction: Vector3, raw_knockback_force: float) -> void:
-	# On s'assure que le recul reste bien plat sur le sol
-	push_direction.y = 0 
-	push_direction = push_direction.normalized()
+	# On accepte la direction envoyée par l'attaque (qui gère l'angle)
+	if push_direction.length_squared() > 0.001:
+		push_direction = push_direction.normalized()
 	
 	var resistance: float = 0.0
 	if stats_component != null:

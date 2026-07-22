@@ -10,6 +10,11 @@ extends CanvasLayer
 @onready var stats_container: VBoxContainer = %StatsContainer # <-- NOUVEAU
 
 var stat_labels: Dictionary = {}
+@onready var loot_panel: ColorRect = %LootPanel
+@onready var loot_grid: GridContainer = %LootGrid
+var current_chest_inventory: InventoryComponent = null
+
+signal inventory_closed
 
 func _ready() -> void:
 	visible = false
@@ -66,15 +71,42 @@ func _on_stat_changed(stat_name: String, new_value: float) -> void:
 
 func _format_stat(stat_name: String, value: float) -> String:
 	var clean_name = stat_name.capitalize().replace("_", " ")
-	return clean_name + ": " + str(snapped(value, 0.1))
+	var percent_stats = ["attack_speed", "cd_red", "area_of_effect", "movement_speed", "casting_speed"]
+	
+	if stat_name in percent_stats:
+		var pct = round(value * 100.0)
+		return clean_name + " : " + str(pct) + "%"
+	else:
+		return clean_name + " : " + str(round(value))
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_inventory"):
-		visible = not visible
 		if visible:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			close_inventory()
 		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			open_inventory()
+
+func open_inventory() -> void:
+	visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+func close_inventory() -> void:
+	visible = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if loot_panel:
+		loot_panel.visible = false
+	if current_chest_inventory != null:
+		current_chest_inventory.inventory_changed.disconnect(_update_loot_ui)
+		current_chest_inventory = null
+	inventory_closed.emit()
+
+func open_with_chest(chest_inv: InventoryComponent) -> void:
+	current_chest_inventory = chest_inv
+	current_chest_inventory.inventory_changed.connect(_update_loot_ui)
+	if loot_panel:
+		loot_panel.visible = true
+	_update_loot_ui()
+	open_inventory()
 
 func update_ui() -> void:
 	for child in inv_grid.get_children():
@@ -83,8 +115,26 @@ func update_ui() -> void:
 	var index = 0
 	for slot_data in inventory_component.slots:
 		var slot_instance = slot_scene.instantiate() as InventorySlot
+		slot_instance.target_inventory = inventory_component
+		slot_instance.is_loot_container = false
 		inv_grid.add_child(slot_instance)
 		
 		# Le drag and drop est géré tout seul dans InventorySlot et EquipmentSlot !
+		slot_instance.update_slot(slot_data["item"], slot_data["quantity"], index)
+		index += 1
+
+func _update_loot_ui() -> void:
+	if current_chest_inventory == null or loot_grid == null: return
+	
+	for child in loot_grid.get_children():
+		child.queue_free()
+		
+	var index = 0
+	for slot_data in current_chest_inventory.slots:
+		var slot_instance = slot_scene.instantiate() as InventorySlot
+		slot_instance.target_inventory = current_chest_inventory
+		slot_instance.is_loot_container = true
+		loot_grid.add_child(slot_instance)
+		
 		slot_instance.update_slot(slot_data["item"], slot_data["quantity"], index)
 		index += 1
