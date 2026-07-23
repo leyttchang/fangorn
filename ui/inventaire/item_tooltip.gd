@@ -42,7 +42,7 @@ func _ready() -> void:
 		stats_text += "[color=white]Dégâts : " + str(weapon.base_damage) + "[/color]\n"
 		stats_text += "[color=white]Vitesse d'attaque : " + str(weapon.base_attack_speed) + "[/color]\n"
 		
-	var percent_stats = ["attack_speed", "cd_red", "area_of_effect", "movement_speed", "casting_speed"]
+	var percent_stats = GameData.PERCENT_STATS
 	var get_formatted_val = func(k, v):
 		if k in percent_stats:
 			var pct = round(v * 100.0)

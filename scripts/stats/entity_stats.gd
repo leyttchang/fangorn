@@ -4,6 +4,8 @@ extends Resource
 
 
 @export var max_health: float = 100.0
+@export var max_mana: float = 100.0
+@export var mana_regen: float = 5.0
 @export var armor: float = 10.0
 @export var physical_damage: float = 1
 @export var magic_damage: float = 1
@@ -14,3 +16,4 @@ extends Resource
 @export var knockback_resistance: float = 1
 @export var knockback_power: float = 1
 @export var casting_speed: float = 1
+@export var xp_reward: float = 10.0

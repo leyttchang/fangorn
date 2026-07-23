@@ -75,6 +75,15 @@ func _handle_inputs() -> void:
 					print(ability.ability_name, " est en cooldown !")
 					continue
 
+				# Vérification du mana
+				var mana_comp = get_parent().get_node_or_null("ManaComponent")
+				if mana_comp == null:
+					mana_comp = get_parent().get_node_or_null("mana_component")
+					
+				if mana_comp != null and not mana_comp.has_enough_mana(ability.mana_cost):
+					print(ability.ability_name, " : Pas assez de mana !")
+					continue
+
 				var base_cast_time = ability.cast_time if "cast_time" in ability else 0.0
 				var final_speed_multiplier = 1.0
 				
@@ -322,6 +331,14 @@ func _cleanup_targeting() -> void:
 func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 	print("Lancement réussi de : ", ability.ability_name)
 	_start_cooldown(ability)
+
+	# Consommation du mana
+	var mana_comp = get_parent().get_node_or_null("ManaComponent")
+	if mana_comp == null:
+		mana_comp = get_parent().get_node_or_null("mana_component")
+		
+	if mana_comp != null:
+		mana_comp.use_mana(ability.mana_cost)
 
 	if ability.ability_scene != null:
 		var spell_instance = ability.ability_scene.instantiate()

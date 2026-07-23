@@ -13,7 +13,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 	
 	var ilvl_multiplier = 1.0 + (ilvl * 0.1) # Option A: +10% de puissance par niveau
 	
-	var percent_stats = ["attack_speed", "cd_red", "area_of_effect", "movement_speed", "casting_speed"]
+	var percent_stats = GameData.PERCENT_STATS
 	
 	# 2. Roll des stats intrinsèques de base (Equipment)
 	for stat_name in new_item.base_stat_ranges.keys():
@@ -21,7 +21,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 		if range_vec.y > 0 or range_vec.x > 0: # S'il y a une range définie (au lieu de 0,0)
 			var roll = randf_range(range_vec.x, range_vec.y) * ilvl_multiplier
 			var is_percent = percent_stats.has(stat_name)
-			var snapped_roll = snapped(roll, 0.1) if is_percent else round(roll)
+			var snapped_roll = snapped(roll, 0.01) if is_percent else round(roll)
 			
 			new_item.stat_bonuses[stat_name] = snapped_roll
 			new_item.innate_stats[stat_name] = snapped_roll
@@ -84,7 +84,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 				
 			var affix_roll = lerp(chosen_affix.min_roll, chosen_affix.max_roll, roll_t) * ilvl_multiplier * equipment_budget
 			var is_percent = percent_stats.has(stat_name)
-			var snapped_affix = snapped(affix_roll, 0.1) if is_percent else round(affix_roll)
+			var snapped_affix = snapped(affix_roll, 0.01) if is_percent else round(affix_roll)
 			
 			# Ajouter le bonus aux stats (additionne par dessus la stat de base)
 			if new_item.stat_bonuses.has(stat_name):

@@ -31,16 +31,7 @@ func _ready() -> void:
 		possible_bases.append(preload("res://item/armures/feet/heavy_boots.tres"))
 	
 	if all_possible_affixes.is_empty():
-		all_possible_affixes.append(preload("res://item/affixes/affix_health.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_armor.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_attack_speed.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_movement_speed.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_physical_damage.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_magic_damage.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_cd_red.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_area_of_effect.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_knockback_resistance.tres"))
-		all_possible_affixes.append(preload("res://item/affixes/affix_casting_speed.tres"))
+		all_possible_affixes = GameData.get_all_affixes()
 
 ## Méthode appelée par l'InteractionComponent quand le joueur appuie sur E
 func use(player: CharacterBody3D) -> void:

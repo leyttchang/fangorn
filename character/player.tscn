@@ -52,6 +52,10 @@
 [ext_resource type="AudioStream" uid="uid://crpa74k6e5lw7" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-019.ogg" id="49_yxg05"]
 [ext_resource type="AudioStream" uid="uid://cuqwgpeqeqonr" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-020.ogg" id="50_ealkq"]
 [ext_resource type="AudioStream" uid="uid://nhhox4s8eah1" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-021.ogg" id="51_2dh56"]
+[ext_resource type="PackedScene" uid="uid://bowtifq1hsnmv" path="res://components/lvl_component.tscn" id="54_vp26o"]
+[ext_resource type="PackedScene" uid="uid://beurqx4t0mjwa" path="res://ui/xp_bar_ui.tscn" id="55_ooc2e"]
+[ext_resource type="PackedScene" uid="uid://c2u4m28i4uc43" path="res://components/mana_component.tscn" id="56_dadkq"]
+[ext_resource type="PackedScene" uid="uid://manabar00000" path="res://ui/mana_bar.tscn" id="57_aynll"]
 [ext_resource type="PackedScene" uid="uid://8phfagxw0ymc" path="res://components/hurt_sound_component.tscn" id="58_aynll"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
@@ -951,7 +955,7 @@ height = 0.4
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qe16m"]
 
-[node name="player" type="CharacterBody3D" unique_id=967643559 node_paths=PackedStringArray("camera")]
+[node name="player" type="CharacterBody3D" unique_id=967643559 node_paths=PackedStringArray("camera") groups=["Player"]]
 collision_layer = 2
 script = ExtResource("1_2orxn")
 camera = NodePath("Camera3D")
@@ -973,7 +977,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999789, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335556, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.9999787, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335546, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1007,7 +1011,7 @@ transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.3
 mesh = SubResource("CylinderMesh_hlie2")
 metadata/_edit_group_ = true
 
-[node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712 groups=["Player"]]
+[node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712]
 unique_name_in_owner = true
 script = ExtResource("2_aypkh")
 starting_stats = ExtResource("3_hhoun")
@@ -1103,6 +1107,16 @@ volume_db = -20.0
 
 [node name="hurt_sound" parent="." unique_id=1503784435 node_paths=PackedStringArray("health_component") instance=ExtResource("58_aynll")]
 health_component = NodePath("../HealthComponent")
+
+[node name="lvl_component" parent="." unique_id=314554620 instance=ExtResource("54_vp26o")]
+
+[node name="XP_bar_ui" parent="." unique_id=1877716003 instance=ExtResource("55_ooc2e")]
+
+[node name="mana_component" parent="." unique_id=1179339449 node_paths=PackedStringArray("stats_component") instance=ExtResource("56_dadkq")]
+stats_component = NodePath("../StatsComponent")
+
+[node name="mana_bar" parent="." unique_id=1134976734 node_paths=PackedStringArray("mana_component") instance=ExtResource("57_aynll")]
+mana_component = NodePath("../mana_component")
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c2u4m28i4uc43"]
+
+[ext_resource type="Script" uid="uid://djxm0n5bpsub6" path="res://components/mana_component.gd" id="1_atfuu"]
+
+[node name="mana_component" type="Node3D" unique_id=1179339449]
+script = ExtResource("1_atfuu")

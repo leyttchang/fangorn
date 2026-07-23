@@ -61,6 +61,11 @@ custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Enable debugSpawner"
 
+[node name="Button6" type="Button" parent="Panel/VBoxContainer" unique_id=1059883478]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Create 10 items"
+
 [node name="Button4" type="Button" parent="Panel/VBoxContainer" unique_id=2072541465]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2

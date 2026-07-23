@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bowtifq1hsnmv"]
+
+[ext_resource type="Script" path="res://components/lvl_component.gd" id="1_script"]
+
+[node name="lvl_component" type="Node3D" unique_id=314554620]
+script = ExtResource("1_script")

@@ -4,6 +4,7 @@ extends CanvasLayer
 @export var inventory_component: InventoryComponent 
 @export var equipment_component: EquipmentComponent 
 @export var stats_component: StatsComponent # <-- NOUVEAU
+@export var level_component: LevelComponent # <-- NOUVEAU
 @export var slot_scene: PackedScene 
 
 @onready var inv_grid: GridContainer = %inv_grid
@@ -25,6 +26,12 @@ func _ready() -> void:
 		push_error("InventoryUI : Il manque le InventoryComponent !")
 		
 	# Initialisation du panneau de stats
+	if level_component == null and owner != null:
+		level_component = owner.get_node_or_null("lvl_component") as LevelComponent
+		
+	if level_component != null:
+		level_component.level_up.connect(_on_level_up)
+		
 	if stats_component != null and stats_container != null:
 		stats_component.stat_changed.connect(_on_stat_changed)
 		_build_stats_ui()
@@ -58,6 +65,14 @@ func _build_stats_ui() -> void:
 		if child is Label:
 			child.queue_free()
 			
+	# Ajout du Niveau en haut de la liste
+	if level_component != null:
+		var lvl_label = Label.new()
+		lvl_label.text = "Level : " + str(level_component.current_level)
+		lvl_label.add_theme_color_override("font_color", Color.GOLD) # En doré pour que ça ressorte !
+		stats_container.add_child(lvl_label)
+		stat_labels["current_level"] = lvl_label
+			
 	# On crée un label pour chaque stat
 	for stat_name in stats_component._stats.keys():
 		var label = Label.new()
@@ -69,9 +84,13 @@ func _on_stat_changed(stat_name: String, new_value: float) -> void:
 	if stat_labels.has(stat_name):
 		stat_labels[stat_name].text = _format_stat(stat_name, new_value)
 
+func _on_level_up(new_level: int) -> void:
+	if stat_labels.has("current_level"):
+		stat_labels["current_level"].text = "Level : " + str(new_level)
+
 func _format_stat(stat_name: String, value: float) -> String:
 	var clean_name = stat_name.capitalize().replace("_", " ")
-	var percent_stats = ["attack_speed", "cd_red", "area_of_effect", "movement_speed", "casting_speed"]
+	var percent_stats = GameData.PERCENT_STATS
 	
 	if stat_name in percent_stats:
 		var pct = round(value * 100.0)

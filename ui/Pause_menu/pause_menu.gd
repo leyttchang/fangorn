@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var spawn_btn: Button = $Panel/VBoxContainer/Button3
 @onready var quit_btn: Button = $Panel/VBoxContainer/Button4
 @onready var debug_btn: Button = $Panel/VBoxContainer/Button5
+@onready var create_items_btn: Button = $Panel/VBoxContainer/Button6
 
 func _ready() -> void:
 	# Très important : le menu de pause doit pouvoir tourner même quand le jeu est en pause
@@ -17,6 +18,7 @@ func _ready() -> void:
 	spawn_btn.pressed.connect(_on_spawn_pressed)
 	quit_btn.pressed.connect(_on_quit_pressed)
 	debug_btn.pressed.connect(_on_debug_pressed)
+	create_items_btn.pressed.connect(_on_create_items_pressed)
 	
 	visible = false
 
@@ -74,3 +76,48 @@ func _on_debug_pressed() -> void:
 		debug_btn.text = "Enable debugSpawner"
 	else:
 		debug_btn.text = "Disable debugSpawner"
+
+func _on_create_items_pressed() -> void:
+	# Trouver l'inventaire du joueur
+	var inv_component: InventoryComponent = null
+	if get_tree().current_scene:
+		inv_component = get_tree().current_scene.find_child("InventoryComponent", true, false)
+		
+	if inv_component == null:
+		print("Impossible de trouver l'inventaire du joueur !")
+		return
+		
+	var possible_bases: Array[EquipmentItem] = [
+		preload("res://item/armes/test_sword_stats.tres"),
+		preload("res://item/armes/test_axe.tres"),
+		preload("res://item/armes/spear_test.tres"),
+		preload("res://item/armures/chest/heavy_armor.tres"),
+		preload("res://item/armures/feet/heavy_boots.tres")
+	]
+	
+	var all_possible_affixes: Array[AffixData] = GameData.get_all_affixes()
+	
+	for i in range(10):
+		var ilvl = randi_range(1, 15) # ilvl au pif entre 1 et 15
+		var rarity = _get_random_rarity()
+		var base_item = possible_bases.pick_random()
+		var new_item = ItemGenerator.generate_equipment(base_item, ilvl, rarity, all_possible_affixes)
+		inv_component.add_item(new_item, 1)
+		
+	print("10 items ont été créés et ajoutés à l'inventaire !")
+
+func _get_random_rarity() -> ItemData.Rarity:
+	var weight_common = 25
+	var weight_magic = 35
+	var weight_rare = 30
+	var weight_legendary = 10
+	
+	var total_weight = weight_common + weight_magic + weight_rare + weight_legendary
+	var roll = randi_range(1, total_weight)
+	
+	if roll <= weight_common: return ItemData.Rarity.COMMON
+	roll -= weight_common
+	if roll <= weight_magic: return ItemData.Rarity.MAGIC
+	roll -= weight_magic
+	if roll <= weight_rare: return ItemData.Rarity.RARE
+	return ItemData.Rarity.LEGENDARY

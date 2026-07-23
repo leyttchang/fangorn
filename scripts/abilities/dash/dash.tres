@@ -8,5 +8,6 @@
 script = ExtResource("1_t1i8s")
 ability_name = "Dash"
 icon = ExtResource("2_62800")
+mana_cost = 15.0
 ability_scene = ExtResource("1_dl6yv")
 metadata/_custom_type_script = "uid://3lwhmf27kto3"

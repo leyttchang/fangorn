@@ -15,6 +15,8 @@ func _ready():
 		
 	# 2. On initialise le dictionnaire avec des objets Stat.new()
 	_stats["max_health"] = Stat.new(starting_stats.max_health)
+	_stats["max_mana"] = Stat.new(starting_stats.max_mana)
+	_stats["mana_regen"] = Stat.new(starting_stats.mana_regen)
 	_stats["armor"] = Stat.new(starting_stats.armor)
 	_stats["physical_damage"] = Stat.new(starting_stats.physical_damage)
 	_stats["magic_damage"] = Stat.new(starting_stats.magic_damage)
@@ -25,6 +27,7 @@ func _ready():
 	_stats["knockback_power"] = Stat.new(starting_stats.knockback_power)
 	_stats["knockback_resistance"] = Stat.new(starting_stats.knockback_resistance)
 	_stats["casting_speed"] = Stat.new(starting_stats.casting_speed)
+	_stats["xp_reward"] = Stat.new(starting_stats.xp_reward)
 # Fonction pour récupérer rapidement la valeur finale (ex: pour taper un ennemi)
 func get_stat_value(stat_name: String) -> float:
 	if _stats.has(stat_name):

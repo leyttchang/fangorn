@@ -10,6 +10,7 @@ ability_name = "Ice Crash"
 icon = ExtResource("1_fkfg7")
 category = 1
 cooldown = 5.0
+mana_cost = 30.0
 weapon_damage_multiplier = 1.5
 weapon_speed_multiplier = 0.8
 anim_name = "attack_heavy_slam"

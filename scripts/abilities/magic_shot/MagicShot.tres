@@ -8,6 +8,7 @@
 script = ExtResource("1_ty360")
 ability_name = "Magic shot"
 icon = ExtResource("2_hk3mx")
+mana_cost = 10.0
 cast_time = 0.5
 target_mode = 1
 ability_scene = ExtResource("1_fullj")

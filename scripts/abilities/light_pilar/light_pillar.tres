@@ -10,6 +10,7 @@ script = ExtResource("1_ldasm")
 ability_name = "Light Pillar"
 icon = ExtResource("2_ygo4i")
 cooldown = 30.0
+mana_cost = 10.0
 cast_time = 2.0
 target_mode = 3
 indicator_scene = ExtResource("3_78hy7")

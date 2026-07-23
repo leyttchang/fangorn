@@ -4,4 +4,5 @@
 
 [resource]
 script = ExtResource("1_expp7")
+mana_regen = 1.0
 metadata/_custom_type_script = "uid://dpiksbl0a1f5"
