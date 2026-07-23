@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="9_1eb17"]
 [ext_resource type="PackedScene" uid="uid://dkht0vu3wt3ic" path="res://map/fog_ground.tscn" id="9_q4u25"]
 [ext_resource type="PackedScene" uid="uid://c7s8m1k2n3p4q" path="res://character/enemie/smart_spawner/smart_spawner.tscn" id="10_6i2mx"]
+[ext_resource type="Texture2D" uid="uid://bufynasqx5irc" path="res://assets/skybox/NightSkyHDRI008_4K_HDR.exr" id="10_bqr07"]
 [ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="11_2ho30"]
 [ext_resource type="PackedScene" uid="uid://b1v2w3d4s5p6q" path="res://ui/wave_display.tscn" id="12_2ho30"]
 [ext_resource type="PackedScene" uid="uid://bl3bnebvggso3" path="res://objet/chest/chest_spawner.tscn" id="12_mhhd5"]
@@ -24,7 +25,16 @@
 density = 0.27
 albedo = Color(0.37111807, 0.4431049, 0.3064715, 1)
 
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_yqkk6"]
+panorama = ExtResource("10_bqr07")
+energy_multiplier = 2.0
+
+[sub_resource type="Sky" id="Sky_hlie2"]
+sky_material = SubResource("PanoramaSkyMaterial_yqkk6")
+
 [sub_resource type="Environment" id="Environment_gf3dy"]
+background_mode = 2
+sky = SubResource("Sky_hlie2")
 ambient_light_color = Color(0.7117184, 0.63087815, 0.23003373, 1)
 ambient_light_energy = 1.21
 tonemap_mode = 2
@@ -42,6 +52,7 @@ volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
 volumetric_fog_emission_energy = 5.0
 volumetric_fog_anisotropy = 0.75
 volumetric_fog_length = 152.09
+volumetric_fog_sky_affect = 0.95
 
 [node name="game" type="Node3D" unique_id=1242181288]
 
@@ -84,6 +95,10 @@ material = SubResource("FogMaterial_6i2mx")
 
 [node name="WorldEnvironment" parent="Map1T3d" index="0" unique_id=834492024]
 environment = SubResource("Environment_gf3dy")
+
+[node name="DirectionalLight3D" parent="Map1T3d" index="1" unique_id=210805582]
+light_color = Color(0.76, 0.82, 1, 1)
+light_energy = 1.0
 
 [node name="enemies_coutner" parent="." unique_id=1160664613 instance=ExtResource("8_gf3dy")]
 
