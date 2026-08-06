@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dnv6k8v44l8xw"]
+
+[ext_resource type="Script" uid="uid://b8o8cfjvrulht" path="res://passive_skill_tree/generator_test.gd" id="1_k7a3p"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
+noise_type = 4
+seed = 6
+frequency = 0.0254
+offset = Vector3(256.55, 203.6, 0)
+fractal_octaves = 1
+domain_warp_type = 2
+
+[node name="Control" type="Control" unique_id=727017771]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k7a3p")
+num_nodes = 100
+tree_radius = 300.0
+min_node_distance = 20.0
+cross_link_percent = 50.0
+show_noise_background = false
+noise_map = SubResource("FastNoiseLite_ug1u1")
+noise_influence = 0.585
+noise_contrast = 3.673
