@@ -31,3 +31,20 @@ static func get_all_affixes() -> Array[AffixData]:
 			preload("res://item/affixes/affix_mana_regen.tres")
 		]
 	return _all_affixes
+
+static var _all_bases: Array[EquipmentItem] = []
+
+static func get_all_bases() -> Array[EquipmentItem]:
+	if _all_bases.is_empty():
+		_all_bases = [
+			preload("res://item/armes/test_sword_stats.tres"),
+			preload("res://item/armes/test_axe.tres"),
+			preload("res://item/armes/spear_test.tres"),
+			preload("res://item/armes/starting_sword.tres"),
+			#preload("res://item/armures/chest_armor.tres"),
+			preload("res://item/armures/chest/heavy_armor.tres"),
+			preload("res://item/armures/feet/heavy_boots.tres"),
+			preload("res://item/armures/head/heavy_helmet.tres"),
+			preload("res://item/armures/legs/heavy_pants.tres")
+		]
+	return _all_bases

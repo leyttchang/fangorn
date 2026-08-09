@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="SkillNodeData" format=3 uid="uid://bs1va2l5gob5u"]
+
+[ext_resource type="Texture2D" uid="uid://cv758thexr5h" path="res://assets/icon/32x32/fb288.png" id="1_jcm7g"]
+[ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="1_pwrf1"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_jcm7g"]
+
+[sub_resource type="Resource" id="Resource_5vf3x"]
+script = ExtResource("2_jcm7g")
+value = 15.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_78dpv"]
+script = ExtResource("2_jcm7g")
+stat_name = "armor"
+value = 5.0
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_pwrf1")
+node_id = "Constitution_du_Barbare"
+node_name = "Constitution du Barbare"
+description = "Augmente vos points de vie maximums et votre armure.
+"
+icon = ExtResource("1_jcm7g")
+node_type = 1
+zone = 1
+max_occurrences = 3
+spawn_weight_tier_1 = 30.0
+spawn_weight_tier_2 = 60.0
+spawn_weight_tier_3 = 10.0
+stats_bonuses = Array[ExtResource("2_jcm7g")]([SubResource("Resource_5vf3x"), SubResource("Resource_78dpv")])

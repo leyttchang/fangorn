@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cx2n538qv3yuo"]
+
+[ext_resource type="Texture2D" uid="uid://cwfga4nq1neqy" path="res://assets/icon/32x32/fb129.png" id="1_l2j27"]
+[ext_resource type="Script" uid="uid://lbkoke8wiimq" path="res://passive_skill_tree/skill_node_ui.gd" id="1_xxx"]
+
+[node name="SkillNodeUI" type="TextureButton" unique_id=392873834]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(20, 20)
+texture_normal = ExtResource("1_l2j27")
+script = ExtResource("1_xxx")

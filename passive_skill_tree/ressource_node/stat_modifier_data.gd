@@ -7,7 +7,7 @@ enum ModType { FLAT, PERCENT }
 @export var value: float = 0.0
 @export var mod_type: ModType = ModType.FLAT
 
-func _init(_stat_name: String = "", _value: float = 0.0, _mod_type: ModType = ModType.FLAT):
+func _init(_stat_name: String = "max_health", _value: float = 0.0, _mod_type: ModType = ModType.FLAT):
 	stat_name = _stat_name
 	value = _value
 	mod_type = _mod_type

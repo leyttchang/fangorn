@@ -87,13 +87,7 @@ func _on_create_items_pressed() -> void:
 		print("Impossible de trouver l'inventaire du joueur !")
 		return
 		
-	var possible_bases: Array[EquipmentItem] = [
-		preload("res://item/armes/test_sword_stats.tres"),
-		preload("res://item/armes/test_axe.tres"),
-		preload("res://item/armes/spear_test.tres"),
-		preload("res://item/armures/chest/heavy_armor.tres"),
-		preload("res://item/armures/feet/heavy_boots.tres")
-	]
+	var possible_bases: Array[EquipmentItem] = GameData.get_all_bases()
 	
 	var all_possible_affixes: Array[AffixData] = GameData.get_all_affixes()
 	

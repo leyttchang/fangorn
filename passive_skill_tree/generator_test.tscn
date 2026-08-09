@@ -1,6 +1,15 @@
 [gd_scene format=3 uid="uid://dnv6k8v44l8xw"]
 
 [ext_resource type="Script" uid="uid://b8o8cfjvrulht" path="res://passive_skill_tree/generator_test.gd" id="1_k7a3p"]
+[ext_resource type="PackedScene" uid="uid://cx2n538qv3yuo" path="res://passive_skill_tree/SkillNodeUI.tscn" id="2_mr2k3"]
+[ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="3_0upt1"]
+[ext_resource type="Resource" uid="uid://yvsptfjjhutr" path="res://passive_skill_tree/ressource_node/atk.tres" id="4_rbje3"]
+[ext_resource type="Resource" uid="uid://bs1va2l5gob5u" path="res://passive_skill_tree/ressource_node/Constitution_du_Barbare.tres" id="5_cvyny"]
+[ext_resource type="Resource" uid="uid://c2bev3u32gbba" path="res://passive_skill_tree/ressource_node/l'agilite_du_chasseur.tres" id="6_7m4xt"]
+[ext_resource type="Resource" uid="uid://dmh3o0jxv00c3" path="res://passive_skill_tree/ressource_node/magie.tres" id="7_6w6nr"]
+[ext_resource type="Resource" uid="uid://b1r6dumwuvobi" path="res://passive_skill_tree/ressource_node/sagesse_du_magicien.tres" id="8_frk3w"]
+[ext_resource type="Resource" uid="uid://b1p2a5356t72x" path="res://passive_skill_tree/ressource_node/vie.tres" id="9_gxykh"]
+[ext_resource type="Resource" uid="uid://dv8fbhwx1nk3h" path="res://passive_skill_tree/ressource_node/speed.tres" id="10_0upt1"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
@@ -15,13 +24,18 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_k7a3p")
 num_nodes = 100
-tree_radius = 300.0
-min_node_distance = 20.0
+tree_radius = 450.0
+min_node_distance = 30.0
 cross_link_percent = 50.0
+tree_seed = null
+node_ui_scene = ExtResource("2_mr2k3")
+skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_rbje3"), ExtResource("5_cvyny"), ExtResource("6_7m4xt"), ExtResource("7_6w6nr"), ExtResource("8_frk3w"), ExtResource("9_gxykh"), ExtResource("10_0upt1")])
 show_noise_background = false
 noise_map = SubResource("FastNoiseLite_ug1u1")
 noise_influence = 0.585

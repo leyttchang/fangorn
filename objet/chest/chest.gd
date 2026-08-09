@@ -24,11 +24,7 @@ var has_generated_loot: bool = false
 func _ready() -> void:
 	# === AUTO-CHARGEMENT PRATIQUE ===
 	if possible_bases.is_empty():
-		possible_bases.append(preload("res://item/armes/test_sword_stats.tres"))
-		possible_bases.append(preload("res://item/armes/test_axe.tres"))
-		possible_bases.append(preload("res://item/armes/spear_test.tres"))
-		possible_bases.append(preload("res://item/armures/chest/heavy_armor.tres"))
-		possible_bases.append(preload("res://item/armures/feet/heavy_boots.tres"))
+		possible_bases = GameData.get_all_bases().duplicate()
 	
 	if all_possible_affixes.is_empty():
 		all_possible_affixes = GameData.get_all_affixes()

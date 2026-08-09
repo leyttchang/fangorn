@@ -1,6 +1,8 @@
 @tool
 extends Control
 
+signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
+
 @export var generate_now: bool = false :
 	set(val):
 		generate_now = false
@@ -11,6 +13,11 @@ extends Control
 @export var tree_radius: float = 400.0
 @export var min_node_distance: float = 40.0
 @export_range(0.0, 100.0) var cross_link_percent: float = 10.0 # Pourcentage de connexions supplémentaires
+
+@export_category("UI & Données")
+@export var tree_seed: int = 12345 # Graine de génération pour avoir le même arbre
+@export var node_ui_scene: PackedScene
+@export var skill_deck: Array[SkillNodeData] = []
 
 @export_category("Noise")
 @export var show_noise_background: bool = true :
@@ -25,10 +32,99 @@ var points: PackedVector2Array = []
 var edges: Array[Vector2i] = [] # stocke les indices des points connectés (u, v)
 var noise_texture: ImageTexture = null
 
+# --- Nouvelles variables pour l'interaction ---
+var ui_nodes: Array[SkillNodeUI] = []
+var adjacency_list: Dictionary = {}
+var node_skills: Dictionary = {} # Associe un index de noeud à sa compétence
+
+var is_dragging: bool = false
+var last_mouse_pos: Vector2
+var zoom_min: float = 0.6
+var zoom_max: float = 2.5
+var zoom_speed: float = 0.1
+
+func _gui_input(event: InputEvent) -> void:
+	if not visible:
+		return
+		
+	# On utilise le CanvasLayer parent comme "Caméra" (c'est la meilleure méthode pour l'UI)
+	var canvas = get_parent()
+	if not canvas is CanvasLayer:
+		return
+		
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_dragging = true
+			else:
+				is_dragging = false
+				
+		# Zoom in/out
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			var new_zoom = clamp(canvas.scale.x + zoom_speed, zoom_min, zoom_max)
+			var mouse_pos = get_viewport().get_mouse_position()
+			canvas.offset = mouse_pos - (mouse_pos - canvas.offset) * (new_zoom / canvas.scale.x)
+			canvas.scale = Vector2(new_zoom, new_zoom)
+			
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			var new_zoom = clamp(canvas.scale.x - zoom_speed, zoom_min, zoom_max)
+			var mouse_pos = get_viewport().get_mouse_position()
+			canvas.offset = mouse_pos - (mouse_pos - canvas.offset) * (new_zoom / canvas.scale.x)
+			canvas.scale = Vector2(new_zoom, new_zoom)
+			
+	elif event is InputEventMouseMotion and is_dragging:
+		# Sécurité : si on bouge la souris mais qu'on ne maintient plus le clic physique, on arrête le drag (anti-accrochage)
+		if (event.button_mask & MOUSE_BUTTON_MASK_LEFT) == 0:
+			is_dragging = false
+			return
+			
+		# Panning (Déplacement)
+		# UTILISER event.relative !! Sinon ça crée une boucle infinie car l'UI bouge sous la souris !
+		var new_offset = canvas.offset + event.relative
+		
+		# Mathématiques pures : on calcule exactement les bords pour que le Control (-1000 à viewport+1000)
+		# couvre toujours l'écran [0, viewport], peu importe le zoom !
+		var margin = 1000.0
+		var viewport_size = get_viewport_rect().size
+		
+		var max_x = margin * canvas.scale.x
+		var min_x = viewport_size.x * (1.0 - canvas.scale.x) - margin * canvas.scale.x
+		
+		var max_y = margin * canvas.scale.y
+		var min_y = viewport_size.y * (1.0 - canvas.scale.y) - margin * canvas.scale.y
+		
+		# Sécurité anti-glitch si l'écran est géant (ultra-wide)
+		if min_x > max_x:
+			var mid = (min_x + max_x) / 2.0
+			min_x = mid
+			max_x = mid
+		if min_y > max_y:
+			var mid = (min_y + max_y) / 2.0
+			min_y = mid
+			max_y = mid
+			
+		new_offset.x = clamp(new_offset.x, min_x, max_x)
+		new_offset.y = clamp(new_offset.y, min_y, max_y)
+		
+		canvas.offset = new_offset
+
 func _ready():
-	pass
+	# Agrandir le panneau BEAUCOUP plus que la limite de caméra (3000 pixels) 
+	# pour créer une zone morte géante qui captera TOUJOURS la souris.
+	offset_left = -3000
+	offset_top = -3000
+	offset_right = 3000
+	offset_bottom = 3000
+
+	# Si on n'est pas dans l'éditeur (donc on lance le jeu), on génère l'arbre automatiquement
+	if not Engine.is_editor_hint():
+		generate_tree()
 
 func generate_tree():
+	seed(tree_seed)
+	if noise_map:
+		noise_map.seed = tree_seed
+		
 	points.clear()
 	edges.clear()
 	
@@ -146,9 +242,9 @@ func generate_tree():
 		edges.append(Vector2i(remaining_edges[i].u, remaining_edges[i].v))
 		
 	# --- ETAPE 4.5 : Sécurité de connectivité par région ---
-	_ensure_region_connectivity(Color.CORNFLOWER_BLUE)
-	_ensure_region_connectivity(Color.PALE_GREEN)
-	_ensure_region_connectivity(Color.INDIAN_RED)
+	_ensure_region_connectivity(SkillNodeData.Zone.MAGE)
+	_ensure_region_connectivity(SkillNodeData.Zone.DUELIST)
+	_ensure_region_connectivity(SkillNodeData.Zone.BARBARIAN)
 		
 	# --- ETAPE 5 : Génération de l'image de fond du bruit ---
 	if noise_map != null:
@@ -156,7 +252,10 @@ func generate_tree():
 	else:
 		noise_texture = null
 		
-	# Demande à Godot de redessiner l'UI
+	# --- ETAPE 6 : Construction de l'interface interactive ---
+	_build_interactive_tree()
+		
+	# Demande à Godot de redessiner l'UI (le fond)
 	queue_redraw()
 
 func _generate_noise_texture():
@@ -194,10 +293,10 @@ func _add_edge_if_unique(edge_list: Array, u: int, v: int) -> void:
 	var length = points[u].distance_to(points[v])
 	edge_list.append({"u": min_idx, "v": max_idx, "length": length})
 	
-func _ensure_region_connectivity(target_color: Color) -> void:
+func _ensure_region_connectivity(target_zone: int) -> void:
 	var region_nodes = []
 	for i in range(1, points.size()): # Skip le centre
-		if _get_region_color(points[i]) == target_color:
+		if _get_zone(points[i]) == target_zone:
 			region_nodes.append(i)
 			
 	if region_nodes.size() <= 1:
@@ -267,7 +366,11 @@ func _draw():
 	if points.size() == 0:
 		return
 		
-	var center_offset = size / 2.0
+	# Dessiner le fond (qui montre les limites du Control) en gris clair transparent
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.8, 0.8, 0.8, 0.1))
+		
+	# On centre par rapport à l'écran, peu importe la taille ou la position décalée du Control
+	var center_offset = get_viewport_rect().size / 2.0 - position
 	
 	# Dessiner la texture de bruit en arrière-plan
 	if show_noise_background and noise_texture != null:
@@ -287,35 +390,187 @@ func _draw():
 	draw_line(center_offset, center_offset + dir2, Color(1, 1, 1, 0.3), 1.0, true)
 	draw_line(center_offset, center_offset + dir3, Color(1, 1, 1, 0.3), 1.0, true)
 	
-	# Dessiner les lignes
-	for edge in edges:
-		var p1 = points[edge.x] + center_offset
-		var p2 = points[edge.y] + center_offset
-		draw_line(p1, p2, Color(0.4, 0.4, 0.5, 0.8), 2.0, true)
-		
-	# Dessiner les noeuds
-	for i in range(points.size()):
-		var p = points[i]
-		var draw_p = p + center_offset
-		if i == 0:
-			draw_circle(draw_p, 10.0, Color.GOLD) # Centre
-		else:
-			draw_circle(draw_p, 6.0, _get_region_color(p))
+	# Cercles concentriques (Tiers)
+	# Utiliser 0.5 et 0.8 équilibre beaucoup mieux les aires de chaque zone (environ 25% / 39% / 36% des points)
+	draw_arc(center_offset, tree_radius * 0.5, 0.0, TAU, 64, Color(1, 1, 1, 0.2), 1.5, true)
+	draw_arc(center_offset, tree_radius * 0.8, 0.0, TAU, 64, Color(1, 1, 1, 0.2), 1.5, true)
+	draw_arc(center_offset, tree_radius, 0.0, TAU, 64, Color(1, 1, 1, 0.1), 1.0, true)
 
-func _get_region_color(pos: Vector2) -> Color:
-	var angle = pos.angle() # De -PI à PI
+# ==========================================
+# INTERFACE ET DRAFTING (L'ARBRE INTERACTIF)
+# ==========================================
+
+func _build_interactive_tree():
+	# Nettoyer les anciens noeuds UI et Lignes
+	for child in get_children():
+		child.queue_free()
+		
+	ui_nodes.clear()
+	adjacency_list.clear()
+	node_skills.clear()
 	
-	# angle1 = -PI/2 (-1.57)
-	# angle2 = PI/6 (0.52)
-	# angle3 = 5*PI/6 (2.61)
+	# Construire le graphe d'adjacence pour propager les déblocages
+	for i in range(points.size()):
+		adjacency_list[i] = []
+		
+	for edge in edges:
+		if not adjacency_list[edge.x].has(edge.y):
+			adjacency_list[edge.x].append(edge.y)
+		if not adjacency_list[edge.y].has(edge.x):
+			adjacency_list[edge.y].append(edge.x)
+			
+	if node_ui_scene == null:
+		push_warning("Veuillez assigner la scène SkillNodeUI dans l'inspecteur !")
+		return
+		
+	# On centre par rapport à l'écran
+	var center_offset = get_viewport_rect().size / 2.0 - position
 	
-	# En haut à droite (Bleu) : entre -PI/2 et PI/6
+	# 1. Créer les lignes visuelles (Line2D)
+	for edge in edges:
+		var line = Line2D.new()
+		line.add_point(points[edge.x] + center_offset)
+		line.add_point(points[edge.y] + center_offset)
+		line.width = 4.0
+		line.default_color = Color(0.4, 0.4, 0.5, 0.5)
+		add_child(line)
+		
+	# 2. Cloner le deck pour le modifier pendant la génération
+	var available_deck = []
+	for skill in skill_deck:
+		if skill != null:
+			# On duplique la ressource en mémoire pour pouvoir modifier max_occurrences
+			# sans altérer le fichier original sauvegardé sur le disque
+			var skill_copy = skill.duplicate()
+			available_deck.append(skill_copy)
+	
+	# 3. Placer les boutons
+	for i in range(points.size()):
+		var pt = points[i]
+		var tier = _get_tier(pt)
+		var zone = _get_zone(pt)
+		var connections = _get_connections_count(i)
+		var is_leaf = (connections == 1)
+		var is_hub = (connections >= 3)
+		var is_root = (i == 1 or i == 2 or i == 3)
+		
+		# Spécial: le noeud 0 est le point de départ
+		var chosen_skill = null
+		if i != 0:
+			chosen_skill = _draft_skill(tier, zone, available_deck, is_leaf, is_hub, is_root)
+			
+		var ui = node_ui_scene.instantiate() as SkillNodeUI
+		add_child(ui)
+		ui.position = pt + center_offset - (ui.size / 2.0)
+		ui.setup(chosen_skill, i)
+		ui.node_clicked.connect(_on_ui_node_clicked.bind(i))
+		
+		ui_nodes.append(ui)
+		node_skills[i] = chosen_skill
+		
+		# Si on a pioché une compétence, on réduit son compteur
+		if chosen_skill != null:
+			chosen_skill.max_occurrences -= 1
+			if chosen_skill.max_occurrences <= 0:
+				available_deck.erase(chosen_skill)
+
+	# 4. Initialisation des états (Seul le centre est UNLOCKED, ses voisins sont AVAILABLE)
+	# On fait ça en mode "call_deferred" pour être sûr que tout est bien ajouté à l'arbre
+	call_deferred("_init_tree_states")
+
+func _init_tree_states():
+	if ui_nodes.size() > 0:
+		# Le noeud central (0) est débloqué
+		ui_nodes[0].set_state(SkillNodeUI.NodeState.UNLOCKED)
+		# Ses voisins deviennent disponibles
+		for neighbor in adjacency_list[0]:
+			ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
+
+func _on_ui_node_clicked(ui: SkillNodeUI, node_index: int):
+	# On dit au Component (s'il écoute) que ce noeud veut être débloqué
+	if ui.current_state == SkillNodeUI.NodeState.AVAILABLE:
+		tree_node_clicked.emit(node_index, node_skills.get(node_index, null))
+
+func unlock_node(node_index: int):
+	if node_index >= 0 and node_index < ui_nodes.size():
+		ui_nodes[node_index].set_state(SkillNodeUI.NodeState.UNLOCKED)
+		
+		# Rendre les voisins disponibles (s'ils sont encore verrouillés)
+		for neighbor in adjacency_list[node_index]:
+			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.LOCKED:
+				ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
+
+func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool, is_root: bool) -> SkillNodeData:
+	var best_candidates = []
+	var total_weight = 0.0
+	
+	var desired_type = SkillNodeData.NodeType.MINOR
+	if is_root:
+		desired_type = SkillNodeData.NodeType.MINOR
+	elif is_leaf:
+		desired_type = SkillNodeData.NodeType.KEYSTONE
+	elif is_hub:
+		desired_type = SkillNodeData.NodeType.NOTABLE
+	
+	for skill in deck:
+		# Vérifier la zone
+		if skill.zone != SkillNodeData.Zone.ANY and skill.zone != zone:
+			continue
+			
+		var weight = 0.0
+		if tier == 1: weight = skill.spawn_weight_tier_1
+		elif tier == 2: weight = skill.spawn_weight_tier_2
+		elif tier == 3: weight = skill.spawn_weight_tier_3
+		
+		if weight <= 0.0:
+			continue
+			
+		# Règle stricte : les 3 premiers points DOIVENT être mineurs
+		if is_root and skill.node_type != SkillNodeData.NodeType.MINOR:
+			continue
+			
+		var type_multiplier = 1.0
+		if skill.node_type == desired_type:
+			type_multiplier = 3.0 # On favorise le type idéal pour cet emplacement, mais sans excès
+			
+		weight *= type_multiplier
+		
+		if weight > 0:
+			best_candidates.append({"skill": skill, "weight": weight})
+			total_weight += weight
+			
+	if best_candidates.is_empty():
+		return null
+		
+	# Roulette
+	var roll = randf() * total_weight
+	var current = 0.0
+	for candidate in best_candidates:
+		current += candidate.weight
+		if roll <= current:
+			return candidate.skill
+			
+	return best_candidates.back().skill
+
+func _get_zone(pos: Vector2) -> int:
+	var angle = pos.angle() 
 	if angle >= -PI/2.0 and angle < PI/6.0:
-		return Color.CORNFLOWER_BLUE
-		
-	# En bas (Vert) : entre PI/6 et 5*PI/6
+		return SkillNodeData.Zone.MAGE
 	if angle >= PI/6.0 and angle < 5.0*PI/6.0:
-		return Color.PALE_GREEN
-		
-	# En haut à gauche (Rouge) : le reste
-	return Color.INDIAN_RED
+		return SkillNodeData.Zone.DUELIST
+	return SkillNodeData.Zone.BARBARIAN
+
+func _get_tier(pos: Vector2) -> int:
+	var dist = pos.length()
+	if dist <= tree_radius * 0.5:
+		return 1
+	elif dist <= tree_radius * 0.8:
+		return 2
+	return 3
+
+func _get_connections_count(idx: int) -> int:
+	var count = 0
+	for e in edges:
+		if e.x == idx or e.y == idx:
+			count += 1
+	return count
