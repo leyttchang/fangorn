@@ -16,7 +16,7 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
-seed = 6
+seed = 12345
 frequency = 0.0254
 offset = Vector3(256.55, 203.6, 0)
 fractal_octaves = 1
