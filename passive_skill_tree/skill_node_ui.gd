@@ -26,9 +26,9 @@ func setup(_data: SkillNodeData, _index: int):
 	node_index = _index
 	
 	if data:
-		# Mettre à jour l'icône si elle existe, sinon utiliser un style par défaut
-		if data.icon != null:
-			texture_normal = data.icon
+		# On ne met plus texture_normal pour pouvoir dessiner l'icône manuellement par-dessus le fond
+		# if data.icon != null:
+		# 	texture_normal = data.icon
 		
 		# Créer un Tooltip basique (bulle d'info au survol)
 		var tooltip = data.node_name + "\n"
@@ -43,8 +43,9 @@ func setup(_data: SkillNodeData, _index: int):
 		tooltip_text = tooltip
 		
 		# Ajuster la taille en fonction du type
-		ignore_texture_size = true
-		stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		# On n'utilise plus les propriétés de texture du TextureButton car on dessine manuellement
+		# ignore_texture_size = true
+		# stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 		
 		if data.node_type == SkillNodeData.NodeType.KEYSTONE:
 			custom_minimum_size = Vector2(64, 64)
@@ -100,6 +101,20 @@ func _draw():
 		border_color = Color(1.0, 0.8, 0.2, 1.0) # Doré
 		
 	draw_arc(center, radius, 0, TAU, 32, border_color, 2.0, true)
+	
+	# 3. Dessiner l'icône PAR-DESSUS le fond !
+	if data != null and data.icon != null:
+		# On dessine l'icône légèrement plus petite que le cercle pour voir la bordure
+		# On garde les proportions de l'image
+		var tex_size = data.icon.get_size()
+		var target_size = size * 0.7 # L'icône prend 70% de la taille du bouton
+		
+		# On calcule le ratio pour ne pas déformer l'image (Keep Aspect Centered)
+		var scale_factor = min(target_size.x / tex_size.x, target_size.y / tex_size.y)
+		var final_size = tex_size * scale_factor
+		var icon_pos = center - (final_size / 2.0)
+		
+		draw_texture_rect(data.icon, Rect2(icon_pos, final_size), false)
 
 func _pressed():
 	if current_state == NodeState.AVAILABLE:

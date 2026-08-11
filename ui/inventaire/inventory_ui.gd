@@ -98,20 +98,12 @@ func _format_stat(stat_name: String, value: float) -> String:
 	else:
 		return clean_name + " : " + str(round(value))
 
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("toggle_inventory"):
-		if visible:
-			close_inventory()
-		else:
-			open_inventory()
 
 func open_inventory() -> void:
 	visible = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 func close_inventory() -> void:
 	visible = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if loot_panel:
 		loot_panel.visible = false
 	if current_chest_inventory != null:

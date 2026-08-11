@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillNodeData" format=3 uid="uid://cvu5uc6k1n3g7"]
+
+[ext_resource type="Texture2D" uid="uid://cp3ygw6fthuh8" path="res://assets/icon/32x32/fb864.png" id="1_d8u8j"]
+[ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="2_l12y0"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="3_vplpt"]
+
+[resource]
+script = ExtResource("2_l12y0")
+node_id = "rage"
+node_name = "Rage"
+description = "augmente votre vitesse d'attaque et votre knockback power de 1% par % de pv manquant"
+icon = ExtResource("1_d8u8j")
+node_type = 2
+zone = 1
+spawn_weight_tier_1 = 0.0
+spawn_weight_tier_3 = 100.0
+gameplay_effect_id = "Rage"
+metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

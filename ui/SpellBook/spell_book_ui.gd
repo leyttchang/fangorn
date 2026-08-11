@@ -81,17 +81,8 @@ func _refresh_equipment_visuals() -> void:
 		if skill_bar.slots.has(slot_key):
 			e_slots[i].set_ability(skill_bar.slots[slot_key])
 
-# On écoute les touches pressées par le joueur
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("toggle_spellbook"):
-		_set_spellbook_visible(!visible)
-	elif visible:
-		if (event is InputEventKey and event.physical_keycode == KEY_TAB and event.pressed) or event.is_action_pressed("toggle_inventory"):
-			_set_spellbook_visible(false)
-
-func _set_spellbook_visible(is_vis: bool) -> void:
-	visible = is_vis
-	if visible:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	else:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+func open_spellbook() -> void:
+	visible = true
+	
+func close_spellbook() -> void:
+	visible = false

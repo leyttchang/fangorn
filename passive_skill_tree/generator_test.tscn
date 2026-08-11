@@ -10,6 +10,9 @@
 [ext_resource type="Resource" uid="uid://b1r6dumwuvobi" path="res://passive_skill_tree/ressource_node/sagesse_du_magicien.tres" id="8_frk3w"]
 [ext_resource type="Resource" uid="uid://b1p2a5356t72x" path="res://passive_skill_tree/ressource_node/vie.tres" id="9_gxykh"]
 [ext_resource type="Resource" uid="uid://dv8fbhwx1nk3h" path="res://passive_skill_tree/ressource_node/speed.tres" id="10_0upt1"]
+[ext_resource type="Resource" uid="uid://bny10w4obugxl" path="res://passive_skill_tree/ressource_node/Keystone/doulbe_jump_ks.tres" id="11_rbje3"]
+[ext_resource type="Resource" uid="uid://cvu5uc6k1n3g7" path="res://passive_skill_tree/ressource_node/Keystone/Rage_ks.tres" id="12_cvyny"]
+[ext_resource type="Resource" uid="uid://do0pwa8ruxrh4" path="res://passive_skill_tree/ressource_node/Keystone/mana_storm_ks.tres" id="13_7m4xt"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
@@ -24,8 +27,10 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 1.0
-offset_right = 1.0
+offset_left = -3000.0
+offset_top = -3000.0
+offset_right = 3000.0
+offset_bottom = 3000.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_k7a3p")
@@ -33,9 +38,8 @@ num_nodes = 100
 tree_radius = 450.0
 min_node_distance = 30.0
 cross_link_percent = 50.0
-tree_seed = null
 node_ui_scene = ExtResource("2_mr2k3")
-skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_rbje3"), ExtResource("5_cvyny"), ExtResource("6_7m4xt"), ExtResource("7_6w6nr"), ExtResource("8_frk3w"), ExtResource("9_gxykh"), ExtResource("10_0upt1")])
+skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_rbje3"), ExtResource("5_cvyny"), ExtResource("6_7m4xt"), ExtResource("7_6w6nr"), ExtResource("8_frk3w"), ExtResource("9_gxykh"), ExtResource("10_0upt1"), ExtResource("11_rbje3"), ExtResource("12_cvyny"), ExtResource("13_7m4xt")])
 show_noise_background = false
 noise_map = SubResource("FastNoiseLite_ug1u1")
 noise_influence = 0.585

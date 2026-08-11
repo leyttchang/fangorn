@@ -61,6 +61,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21, 0)
 starting_inventory_items = Array[ExtResource("2_2nma1")]([ExtResource("3_2g21l"), ExtResource("4_bqr07")])
 air_acceleration = 8.0
 
+[node name="KeystoneModifiers" type="Node3D" parent="player" unique_id=1845182723]
+
 [node name="Dummy" parent="." unique_id=922894006 instance=ExtResource("3_7mfpx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 20, -3)
 

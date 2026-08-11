@@ -3,6 +3,10 @@ extends Node
 
 @export var attack_component: AttackComponent
 @export var base_impact_radius: float = 4.0
+
+# NOUVEAU : Si le sort est passif (déclenché sans AbilityData), on choisit son type ici
+@export_enum("Magic", "Physical") var passive_scaling_type: String = "Magic"
+
 var final_impact_radius: float = 4.0 
 
 func on_execute(caster: Node3D, target_data: Dictionary) -> void:
@@ -20,32 +24,44 @@ func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 		# ====================================================
 		# 1. CALCUL DES DÉGÂTS SELON LA CATÉGORIE DU SORT
 		# ====================================================
+		
+		# On détermine si le sort doit être considéré comme physique ou magique
+		var is_physical: bool = false
+		
 		if ability_data != null:
-			if ability_data.category == AbilityData.AbilityCategory.WEAPON_ATTACK:
-				# --- CAS A : ATTAQUE PHYSIQUE ---
-				var weapon_damage = 0.0
+			is_physical = (ability_data.category == AbilityData.AbilityCategory.WEAPON_ATTACK)
+		else:
+			is_physical = (passive_scaling_type == "Physical")
+			
+		if is_physical:
+			# --- CAS A : ATTAQUE PHYSIQUE ---
+			var weapon_damage = 0.0
+			
+			if equipment != null and equipment.equipped_items.has("main_hand"):
+				var weapon = equipment.equipped_items["main_hand"]
+				if weapon != null and "base_damage" in weapon: 
+					weapon_damage = weapon.base_damage
+			
+			var phys_stat = 0.0
+			if caster_stats != null:
+				phys_stat = caster_stats.get_stat_value("physical_damage") 
 				
-				if equipment != null and equipment.equipped_items.has("main_hand"):
-					var weapon = equipment.equipped_items["main_hand"]
-					# CORRECTION : On cherche "base_damage" sur ton arme
-					if weapon != null and "base_damage" in weapon: 
-						weapon_damage = weapon.base_damage
+			# Si ability_data est null (sort passif physique), on considère que le multiplicateur d'arme est de 1.0 (100%)
+			var mult = 1.0
+			if ability_data != null:
+				mult = ability_data.weapon_damage_multiplier
 				
-				var phys_stat = 0.0
-				if caster_stats != null:
-					phys_stat = caster_stats.get_stat_value("physical_damage") 
-					
-				final_damage = (weapon_damage * ability_data.weapon_damage_multiplier) * phys_stat
+			final_damage = (weapon_damage * mult) * phys_stat
+			
+		else:
+			# --- CAS B : SORT MAGIQUE ---
+			var magic_stat = 1.0
+			if caster_stats != null:
+				magic_stat = caster_stats.get_stat_value("magic_damage")
+				if magic_stat == 0.0: 
+					magic_stat = 1.0 
 				
-			else:
-				# --- CAS B : SORT MAGIQUE ---
-				var magic_stat = 1.0
-				if caster_stats != null:
-					magic_stat = caster_stats.get_stat_value("magic_damage")
-					if magic_stat == 0.0: 
-						magic_stat = 1.0 
-					
-				final_damage = base_spell_damage * magic_stat
+			final_damage = base_spell_damage * magic_stat
 		
 		# On applique les dégâts finaux à la Hitbox
 		attack_component.damage = final_damage

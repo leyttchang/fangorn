@@ -26,10 +26,28 @@ func _on_attack_landed(_target: Node) -> void:
 			impact_instance.setup(radius, duration_on_ground) 
 		
 		get_tree().root.add_child(impact_instance)
-		impact_instance.global_position = get_parent().global_position
+		impact_instance.global_position = _get_ground_position(get_parent().global_position)
 		
 		
 	# On détruit le sort entier
 	get_parent().hide()
 	await get_tree().create_timer(0.05).timeout
 	get_parent().queue_free()
+
+func _get_ground_position(current_pos: Vector3) -> Vector3:
+	var parent3d = get_parent() as Node3D
+	if not parent3d: return current_pos
+	
+	var space_state = parent3d.get_world_3d().direct_space_state
+	var start_pos = current_pos + Vector3(0, 1.0, 0)
+	var end_pos = start_pos + Vector3(0, -100.0, 0)
+	
+	var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
+	# On peut spécifier le masque de collision ici si on veut ignorer les monstres (ex: layer environnement)
+	# query.collision_mask = 1 
+	
+	var result = space_state.intersect_ray(query)
+	if result:
+		return result.position
+	
+	return current_pos

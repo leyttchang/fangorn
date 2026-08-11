@@ -73,7 +73,24 @@ func open_chest() -> void:
 	if inv_ui != null:
 		if not inv_ui.inventory_closed.is_connected(_on_inventory_closed):
 			inv_ui.inventory_closed.connect(_on_inventory_closed)
-		inv_ui.open_with_chest(chest_inventory)
+		
+		# On passe par le UI_Manager s'il existe pour bien capturer la souris
+		var ui_manager = player_in_range.get_node_or_null("UI_Manager")
+		if ui_manager == null:
+			ui_manager = player_in_range.get_node_or_null("UI_manager")
+			
+		if ui_manager == null:
+			# Recherche plus large au cas où
+			ui_manager = player_in_range.find_child("*UI_manager*", true, false)
+			if ui_manager == null:
+				ui_manager = player_in_range.find_child("*UI_Manager*", true, false)
+			
+		if ui_manager != null and ui_manager.has_method("open_inventory_with_chest"):
+			print("Coffre: UI_Manager trouvé ! Ouverture via UI_Manager.")
+			ui_manager.open_inventory_with_chest(chest_inventory)
+		else:
+			print("Coffre: UI_Manager INTROUVABLE, ouverture normale (la souris ne sera pas libre).")
+			inv_ui.open_with_chest(chest_inventory)
 	else:
 		print("Erreur: Impossible de trouver l'InventoryUI du joueur !")
 

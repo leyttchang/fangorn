@@ -60,6 +60,7 @@
 [ext_resource type="PackedScene" uid="uid://cmcf3finvkk0k" path="res://components/Skilltree_comp.tscn" id="58_tmwgi"]
 [ext_resource type="Script" uid="uid://c8qhr0hxtdymv" path="res://components/skill_tree_component.gd" id="59_ay40t"]
 [ext_resource type="PackedScene" uid="uid://dnv6k8v44l8xw" path="res://passive_skill_tree/generator_test.tscn" id="60_ce8hk"]
+[ext_resource type="Script" uid="uid://v0dr1ndsmbrc" path="res://ui/ui_manager.gd" id="61_ay40t"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
@@ -958,6 +959,13 @@ height = 0.4
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qe16m"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_ay40t"]
+font_color = Color(1, 0.9386667, 0.07999998, 1)
+outline_size = 5
+outline_color = Color(0.37, 0.007399993, 0.007399993, 1)
+shadow_size = 4
+shadow_offset = Vector2(4, 1)
+
 [node name="player" type="CharacterBody3D" unique_id=967643559 node_paths=PackedStringArray("camera") groups=["Player"]]
 collision_layer = 2
 script = ExtResource("1_2orxn")
@@ -980,7 +988,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.99997854, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.006333553, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.99997836, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335523, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1122,20 +1130,37 @@ stats_component = NodePath("../StatsComponent")
 [node name="mana_bar" parent="." unique_id=1134976734 node_paths=PackedStringArray("mana_component") instance=ExtResource("57_aynll")]
 mana_component = NodePath("../mana_component")
 
-[node name="Skill_tree_comp" parent="." unique_id=1911323837 node_paths=PackedStringArray("stats_component", "level_component", "skill_tree_ui") instance=ExtResource("58_tmwgi")]
+[node name="Skill_tree_comp" parent="." unique_id=1911323837 node_paths=PackedStringArray("stats_component", "level_component", "skill_tree_ui", "points_label") instance=ExtResource("58_tmwgi")]
 script = ExtResource("59_ay40t")
 stats_component = NodePath("../StatsComponent")
 level_component = NodePath("../lvl_component")
 skill_tree_ui = NodePath("../CanvasLayer2/Skill_tree_ui")
+points_label = NodePath("CanvasLayer/pts_comp")
+available_skill_points = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Skill_tree_comp" unique_id=395354015]
+layer = 9
+
+[node name="pts_comp" type="Label" parent="Skill_tree_comp/CanvasLayer" unique_id=2137999023]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+label_settings = SubResource("LabelSettings_ay40t")
+horizontal_alignment = 1
 
 [node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=1160677733]
 
 [node name="Skill_tree_ui" parent="CanvasLayer2" unique_id=727017771 instance=ExtResource("60_ce8hk")]
-offset_left = -1000.0
-offset_top = -1000.0
-offset_right = 1000.0
-offset_bottom = 1000.0
-tree_seed = 12345
+
+[node name="UI_manager" type="Node3D" parent="." unique_id=2119675746 node_paths=PackedStringArray("inventory_ui", "spellbook_ui", "skill_tree_comp")]
+script = ExtResource("61_ay40t")
+inventory_ui = NodePath("../InventoryUI")
+spellbook_ui = NodePath("../SpellBook_UI")
+skill_tree_comp = NodePath("../Skill_tree_comp")
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

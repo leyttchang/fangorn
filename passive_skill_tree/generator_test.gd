@@ -36,6 +36,7 @@ var noise_texture: ImageTexture = null
 var ui_nodes: Array[SkillNodeUI] = []
 var adjacency_list: Dictionary = {}
 var node_skills: Dictionary = {} # Associe un index de noeud à sa compétence
+var edge_lines: Dictionary = {} # NOUVEAU: Pour garder une référence aux Line2D
 
 var is_dragging: bool = false
 var last_mouse_pos: Vector2
@@ -427,13 +428,19 @@ func _build_interactive_tree():
 	var center_offset = get_viewport_rect().size / 2.0 - position
 	
 	# 1. Créer les lignes visuelles (Line2D)
+	edge_lines.clear()
 	for edge in edges:
 		var line = Line2D.new()
 		line.add_point(points[edge.x] + center_offset)
 		line.add_point(points[edge.y] + center_offset)
 		line.width = 4.0
-		line.default_color = Color(0.4, 0.4, 0.5, 0.5)
+		line.default_color = Color(0.4, 0.4, 0.5, 0.5) # Gris par défaut
 		add_child(line)
+		
+		# On crée une clé unique "min_max" pour retrouver la ligne plus tard
+		var min_idx = min(edge.x, edge.y)
+		var max_idx = max(edge.x, edge.y)
+		edge_lines[str(min_idx) + "_" + str(max_idx)] = line
 		
 	# 2. Cloner le deck pour le modifier pendant la génération
 	var available_deck = []
@@ -485,6 +492,16 @@ func _init_tree_states():
 		# Ses voisins deviennent disponibles
 		for neighbor in adjacency_list[0]:
 			ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
+			
+		# Mise à jour des lignes pour les noeuds initiaux (et futurs chargements de sauvegarde)
+		for i in range(ui_nodes.size()):
+			if ui_nodes[i].current_state == SkillNodeUI.NodeState.UNLOCKED:
+				for neighbor in adjacency_list[i]:
+					if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.UNLOCKED:
+						var edge_key = str(min(i, neighbor)) + "_" + str(max(i, neighbor))
+						if edge_lines.has(edge_key):
+							edge_lines[edge_key].default_color = Color(1.0, 1.0, 1.0, 1.0)
+							edge_lines[edge_key].width = 6.0
 
 func _on_ui_node_clicked(ui: SkillNodeUI, node_index: int):
 	# On dit au Component (s'il écoute) que ce noeud veut être débloqué
@@ -499,6 +516,13 @@ func unlock_node(node_index: int):
 		for neighbor in adjacency_list[node_index]:
 			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.LOCKED:
 				ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
+				
+			# Mettre à jour la ligne si le voisin est AUSSI débloqué
+			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.UNLOCKED:
+				var edge_key = str(min(node_index, neighbor)) + "_" + str(max(node_index, neighbor))
+				if edge_lines.has(edge_key):
+					edge_lines[edge_key].default_color = Color(1.0, 1.0, 1.0, 1.0)
+					edge_lines[edge_key].width = 6.0
 
 func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool, is_root: bool) -> SkillNodeData:
 	var best_candidates = []
