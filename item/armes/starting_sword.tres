@@ -7,7 +7,9 @@
 
 [resource]
 script = ExtResource("2_vp61g")
-damage_range = Vector2(12, 12)
+base_damage = 17.0
+base_attack_speed = 1.5
+damage_range = Vector2(15, 15)
 attack_speed_range = Vector2(1, 1)
 weapon_scene = ExtResource("4_m8gly")
 id = "starting_sword"

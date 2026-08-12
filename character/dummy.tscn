@@ -17,6 +17,8 @@ height = 2.1
 radius = 0.6
 
 [node name="Dummy" type="CharacterBody3D" unique_id=198686853]
+collision_layer = 8
+collision_mask = 7
 script = ExtResource("1_uij62")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2127880368]

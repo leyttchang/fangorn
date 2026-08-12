@@ -43,15 +43,17 @@ func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 					weapon_damage = weapon.base_damage
 			
 			var phys_stat = 0.0
+			var flat_phys_stat = 0.0
 			if caster_stats != null:
 				phys_stat = caster_stats.get_stat_value("physical_damage") 
+				flat_phys_stat = caster_stats.get_stat_value("flat_physical_damage")
 				
 			# Si ability_data est null (sort passif physique), on considère que le multiplicateur d'arme est de 1.0 (100%)
 			var mult = 1.0
 			if ability_data != null:
 				mult = ability_data.weapon_damage_multiplier
 				
-			final_damage = (weapon_damage * mult) * phys_stat
+			final_damage = ((weapon_damage + flat_phys_stat) * mult) * phys_stat
 			
 		else:
 			# --- CAS B : SORT MAGIQUE ---

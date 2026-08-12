@@ -22,7 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://b2i01iy66mw4o" path="res://ui/Pause_menu/pause_menu.tscn" id="19_2g21l"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_6i2mx"]
-density = 0.27
+density = 0.4
 albedo = Color(0.37111807, 0.4431049, 0.3064715, 1)
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_yqkk6"]
@@ -46,7 +46,9 @@ glow_enabled = true
 glow_intensity = 0.86
 glow_bloom = 0.15
 glow_blend_mode = 2
+fog_light_color = Color(0.52402234, 0.5345653, 0.6961012, 1)
 volumetric_fog_enabled = true
+volumetric_fog_density = 0.1626
 volumetric_fog_albedo = Color(0.2901966, 0.28847882, 0.20427796, 1)
 volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
 volumetric_fog_emission_energy = 5.0
@@ -155,7 +157,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 20, -9)
 chest_scene = ExtResource("15_apj7j")
 spawn_chance = 33.0
 
-[node name="wave_display" parent="." unique_id=114584502 instance=ExtResource("12_2ho30")]
+[node name="wave_display" parent="." unique_id=114584502 node_paths=PackedStringArray("smart_spawner") instance=ExtResource("12_2ho30")]
+smart_spawner = NodePath("../spawner/SmartSpawner")
 
 [node name="fps_counter" parent="." unique_id=987654321 instance=ExtResource("13_fps")]
 
@@ -166,3 +169,7 @@ mob_spawner = NodePath("../spawner/SmartSpawner")
 debug_spawners = [NodePath("../spawner/dumb_spawner6"), NodePath("../spawner/dumb_spawner5"), NodePath("../spawner/dumb_spawner4"), NodePath("../spawner/dumb_spawner3"), NodePath("../spawner/dumb_spawner2"), NodePath("../spawner/dumb_spawner")]
 
 [editable path="Map1T3d"]
+[editable path="Map1T3d/island_tree/island_tree19"]
+[editable path="Map1T3d/island_tree/island_tree19/Tree Type6 04"]
+[editable path="Map1T3d/dead_tree/tree5"]
+[editable path="Map1T3d/dead_tree/tree5/Tree Type0 02"]

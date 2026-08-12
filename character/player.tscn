@@ -170,6 +170,7 @@ tracks/4/keys = {
 
 [sub_resource type="Animation" id="Animation_fqwjq"]
 resource_name = "attack_axe_2"
+length = 1.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -177,8 +178,8 @@ tracks/0/path = NodePath(".:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0.1, 0.50731856, 0.57747436, 0.73333335, 0.96666664),
-"transitions": PackedFloat32Array(1, 1, 1, 2.7320802, 1),
+"times": PackedFloat32Array(0.1, 0.50731856, 0.57747436, 0.73333335, 1.1666666),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(-1.07532, 0.8437127, -0.084220886), Vector3(-0.7465105, 1.3784574, -0.21807085), Vector3(-0.4508599, 1.2392839, 0.22331308), Vector3(-1.0065247, 1.4834416, -2.3146667), Vector3(0, 0, 0)]
 }
@@ -189,8 +190,8 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.1, 0.50731856, 0.57747436, 0.73333335, 0.96666664),
-"transitions": PackedFloat32Array(1, 1, 1, 2.7320802, 1),
+"times": PackedFloat32Array(0.1, 0.50731856, 0.57747436, 0.73333335, 1.1666666),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(-0.7925447, -0.98616964, -1), Vector3(-0.7925447, -0.7634588, -0.71905524), Vector3(-0.7925447, -0.7634588, -0.71905524), Vector3(0.6764816, -1.0191555, -0.71905524), Vector3(0.5, -0.9, -1)]
 }
@@ -218,7 +219,7 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.6333333, 0.8, 0.93333334),
+"times": PackedFloat32Array(0.6333333, 0.8, 1.1333333),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
 "args": [],
@@ -988,7 +989,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.99997836, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335523, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.9999781, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.006333551, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1155,6 +1156,8 @@ horizontal_alignment = 1
 [node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=1160677733]
 
 [node name="Skill_tree_ui" parent="CanvasLayer2" unique_id=727017771 instance=ExtResource("60_ce8hk")]
+zoom_min = 0.3
+zoom_max = 4.0
 
 [node name="UI_manager" type="Node3D" parent="." unique_id=2119675746 node_paths=PackedStringArray("inventory_ui", "spellbook_ui", "skill_tree_comp")]
 script = ExtResource("61_ay40t")

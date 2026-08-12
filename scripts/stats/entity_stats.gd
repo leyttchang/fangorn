@@ -7,6 +7,7 @@ extends Resource
 @export var max_mana: float = 100.0
 @export var mana_regen: float = 5.0
 @export var armor: float = 10.0
+@export var flat_physical_damage: float = 0.0
 @export var physical_damage: float = 1
 @export var magic_damage: float = 1
 @export var attack_speed: float = 1

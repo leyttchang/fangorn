@@ -16,9 +16,12 @@ enum Zone { ANY, BARBARIAN, MAGE, DUELIST }
 @export var max_occurrences: int = 1 # Nombre de fois max que ce nœud peut apparaître dans l'arbre
 
 @export_category("Probabilités d'apparition (Poids)")
-@export_range(0.0, 100.0) var spawn_weight_tier_1: float = 100.0 # Chance relative d'apparaître au Centre
-@export_range(0.0, 100.0) var spawn_weight_tier_2: float = 0.0   # Chance relative d'apparaître au Milieu
-@export_range(0.0, 100.0) var spawn_weight_tier_3: float = 0.0   # Chance relative d'apparaître à l'Extérieur
+@export_range(0.0, 1000.0) var base_spawn_weight: float = 100.0 # Poids global du nœud (Rareté)
+
+@export_group("Multiplicateurs par Tier")
+@export_range(0.0, 1.0) var tier_1_multiplier: float = 1.0 # 1.0 = 100% du poids, 0.0 = interdit
+@export_range(0.0, 1.0) var tier_2_multiplier: float = 0.0
+@export_range(0.0, 1.0) var tier_3_multiplier: float = 0.0
 
 @export_category("Effets")
 @export var stats_bonuses: Array[StatModifierData] = []

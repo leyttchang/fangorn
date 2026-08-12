@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="SkillNodeData" format=3 uid="uid://ct05yip6bw7n8"]
+
+[ext_resource type="Texture2D" uid="uid://b4latmjd7622k" path="res://assets/icon/32x32/fb789.png" id="1_lwq55"]
+[ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="1_sob2i"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_lwq55"]
+
+[sub_resource type="Resource" id="Resource_8d1ff"]
+script = ExtResource("2_lwq55")
+stat_name = "mana_regen"
+value = 1.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_sob2i"]
+script = ExtResource("2_lwq55")
+stat_name = "mana_regen"
+value = 10.0
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_sob2i")
+node_id = "serenite"
+node_name = "sérénité"
+icon = ExtResource("1_lwq55")
+node_type = 1
+zone = 2
+max_occurrences = 3
+tier_1_multiplier = 0.8
+tier_2_multiplier = 0.15
+tier_3_multiplier = 0.05
+stats_bonuses = Array[ExtResource("2_lwq55")]([SubResource("Resource_8d1ff"), SubResource("Resource_sob2i")])
+metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

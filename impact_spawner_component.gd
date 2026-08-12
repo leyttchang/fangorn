@@ -44,7 +44,7 @@ func _get_ground_position(current_pos: Vector3) -> Vector3:
 	
 	var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
 	# On peut spécifier le masque de collision ici si on veut ignorer les monstres (ex: layer environnement)
-	# query.collision_mask = 1 
+	query.collision_mask = 1 
 	
 	var result = space_state.intersect_ray(query)
 	if result:

@@ -40,9 +40,10 @@ var edge_lines: Dictionary = {} # NOUVEAU: Pour garder une référence aux Line2
 
 var is_dragging: bool = false
 var last_mouse_pos: Vector2
-var zoom_min: float = 0.6
-var zoom_max: float = 2.5
-var zoom_speed: float = 0.1
+@export_category("Navigation & Zoom")
+@export var zoom_min: float = 0.6
+@export var zoom_max: float = 2.5
+@export var zoom_speed: float = 0.1
 
 func _gui_input(event: InputEvent) -> void:
 	if not visible:
@@ -122,9 +123,15 @@ func _ready():
 		generate_tree()
 
 func generate_tree():
-	seed(tree_seed)
+	var current_seed = tree_seed
+	if current_seed == 0:
+		randomize()
+		current_seed = randi()
+		print("Génération avec une seed aléatoire : ", current_seed)
+		
+	seed(current_seed)
 	if noise_map:
-		noise_map.seed = tree_seed
+		noise_map.seed = current_seed
 		
 	points.clear()
 	edges.clear()
@@ -541,10 +548,10 @@ func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool
 		if skill.zone != SkillNodeData.Zone.ANY and skill.zone != zone:
 			continue
 			
-		var weight = 0.0
-		if tier == 1: weight = skill.spawn_weight_tier_1
-		elif tier == 2: weight = skill.spawn_weight_tier_2
-		elif tier == 3: weight = skill.spawn_weight_tier_3
+		var weight = skill.base_spawn_weight
+		if tier == 1: weight *= skill.tier_1_multiplier
+		elif tier == 2: weight *= skill.tier_2_multiplier
+		elif tier == 3: weight *= skill.tier_3_multiplier
 		
 		if weight <= 0.0:
 			continue

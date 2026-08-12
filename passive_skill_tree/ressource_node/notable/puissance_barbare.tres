@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SkillNodeData" format=3 uid="uid://c4eqp5oy2ecjo"]
+
+[ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="1_dg8p6"]
+[ext_resource type="Texture2D" uid="uid://c1jwrvyr6iaat" path="res://assets/icon/32x32/fb1080.png" id="1_eryv1"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_eryv1"]
+
+[sub_resource type="Resource" id="Resource_1c0pv"]
+script = ExtResource("2_eryv1")
+stat_name = "physical_damage"
+value = 30.0
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_bb3rr"]
+script = ExtResource("2_eryv1")
+stat_name = "attack_speed"
+value = -10.0
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_dg8p6")
+node_id = "Puissance_barbare"
+node_name = "Puissance barbare"
+description = "trop classe"
+icon = ExtResource("1_eryv1")
+node_type = 1
+zone = 1
+max_occurrences = 3
+tier_1_multiplier = 0.2
+tier_2_multiplier = 0.6
+tier_3_multiplier = 0.2
+stats_bonuses = Array[ExtResource("2_eryv1")]([SubResource("Resource_1c0pv"), SubResource("Resource_bb3rr")])
+metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

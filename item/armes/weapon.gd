@@ -16,8 +16,9 @@ func _ready() -> void:
 func update_damage_from_stats(player_stats: Node, combo_step: int = 1) -> void:
 	if weapon_stats != null and player_stats != null:
 		var phys_multiplier = player_stats.get_stat_value("physical_damage")
+		var flat_bonus = player_stats.get_stat_value("flat_physical_damage")
 		var combo_multiplier = 1.0 + (combo_step - 1) * 0.10
-		attack_component.damage = weapon_stats.base_damage * phys_multiplier * combo_multiplier
+		attack_component.damage = (weapon_stats.base_damage + flat_bonus) * phys_multiplier * combo_multiplier
 		
 		# --- APPLICATION DU KNOCKBACK POWER ---
 		var kb_mult = player_stats.get_stat_value("knockback_power")

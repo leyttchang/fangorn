@@ -18,6 +18,7 @@ func _ready():
 	_stats["max_mana"] = Stat.new(starting_stats.max_mana)
 	_stats["mana_regen"] = Stat.new(starting_stats.mana_regen)
 	_stats["armor"] = Stat.new(starting_stats.armor)
+	_stats["flat_physical_damage"] = Stat.new(starting_stats.flat_physical_damage)
 	_stats["physical_damage"] = Stat.new(starting_stats.physical_damage)
 	_stats["magic_damage"] = Stat.new(starting_stats.magic_damage)
 	_stats["attack_speed"] = Stat.new(starting_stats.attack_speed)

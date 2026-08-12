@@ -127,10 +127,13 @@ toggle_passive_tree={
 
 [layer_names]
 
+3d_physics/layer_1="sol"
+3d_physics/layer_2="player"
 3d_physics/layer_3="armes_joueur"
 3d_physics/layer_4="HitboxEnemie"
 3d_physics/layer_5="attaque enemie"
 3d_physics/layer_6="interactable"
+3d_physics/layer_8="tree"
 
 [physics]
 

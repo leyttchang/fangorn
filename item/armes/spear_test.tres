@@ -7,8 +7,8 @@
 
 [resource]
 script = ExtResource("1_0f405")
-base_damage = 50.0
-base_attack_speed = 0.8
+base_damage = 45.0
+base_attack_speed = 0.7
 hit_slow = 0.6
 damage_range = Vector2(45, 53)
 attack_speed_range = Vector2(0.7, 0.85)
