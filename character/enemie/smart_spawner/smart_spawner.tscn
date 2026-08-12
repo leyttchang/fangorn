@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://c7s8m1k2n3p4q"]
 
-[ext_resource type="Script" path="res://character/enemie/smart_spawner/smart_spawner.gd" id="1_spawner"]
+[ext_resource type="Script" uid="uid://daxant7rwaywu" path="res://character/enemie/smart_spawner/smart_spawner.gd" id="1_spawner"]
 
-[node name="SmartSpawner" type="Node3D"]
+[node name="SmartSpawner" type="Node3D" unique_id=908754430]
 script = ExtResource("1_spawner")
 
-[node name="Marker3D" type="Marker3D" parent="."]
+[node name="Marker3D" type="Marker3D" parent="." unique_id=1422679992]
+
+[node name="start_beacon" type="Marker3D" parent="." unique_id=1226872864]

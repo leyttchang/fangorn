@@ -19,6 +19,11 @@ signal enemy_spawned(enemy: Node3D)
 @export var wave_reward_score: int = 5
 @export var auto_start: bool = true
 
+@export_group("Système de Beacon")
+@export var waves_before_beacon: int = 3
+@export var beacon_scene: PackedScene
+@export var beacon_spawn_point: Marker3D
+
 # --- ÉTAT INTERNE ---
 var current_wave: int = 0
 var active_enemies: Array[Node3D] = []
@@ -28,6 +33,7 @@ var enemies_left_to_spawn: int = 0
 var is_paused: bool = false
 var _waiting_to_spawn: bool = false
 var _waiting_for_next_wave: bool = false
+var _waiting_for_beacon: bool = false
 
 func _ready() -> void:
 	add_to_group("SmartSpawner")
@@ -139,7 +145,29 @@ func _check_wave_completion() -> void:
 			tree.create_timer(delay_between_waves).timeout.connect(_on_delay_between_waves_finished)
 
 func _on_delay_between_waves_finished() -> void:
-	if is_paused:
+	if current_wave > 0 and waves_before_beacon > 0 and current_wave % waves_before_beacon == 0:
+		_spawn_beacon()
+	elif is_paused:
 		_waiting_for_next_wave = true
 	else:
+		start_next_wave()
+
+func _spawn_beacon() -> void:
+	_waiting_for_beacon = true
+	print("--- APPARITION DU BEACON (En attente d'interaction) ---")
+	
+	if beacon_scene != null and beacon_spawn_point != null:
+		var beacon = beacon_scene.instantiate() as Node3D
+		get_tree().current_scene.add_child(beacon)
+		beacon.global_position = beacon_spawn_point.global_position
+		
+		# Connecter un signal si le beacon a un signal "interacted" (optionnel, selon ce que tu feras)
+		if beacon.has_signal("interacted"):
+			beacon.interacted.connect(trigger_beacon)
+	else:
+		push_warning("SmartSpawner : Pas de beacon_scene ou de beacon_spawn_point configuré !")
+
+func trigger_beacon() -> void:
+	if _waiting_for_beacon:
+		_waiting_for_beacon = false
 		start_next_wave()
