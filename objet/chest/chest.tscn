@@ -19,6 +19,9 @@ size = Vector3(1.2149, 0.9249, 0.7678)
 [node name="Chest" type="Node3D" unique_id=1680074549]
 script = ExtResource("2_script")
 possible_bases = Array[ExtResource("2_i55t8")]([ExtResource("3_8rmxv"), ExtResource("4_n3aon"), ExtResource("5_f85ld"), ExtResource("6_6pnsy"), ExtResource("7_dre1o"), ExtResource("8_tnj3d"), ExtResource("9_wr6mb")])
+chance_2nd_item = 40.0
+chance_3rd_item = 15.0
+chance_4th_item = 0.0
 
 [node name="Simple_Chest GLTF" parent="." unique_id=1602409972 instance=ExtResource("1_rxqf2")]
 

@@ -13,6 +13,7 @@ extends CanvasLayer
 var stat_labels: Dictionary = {}
 @onready var loot_panel: ColorRect = %LootPanel
 @onready var loot_grid: GridContainer = %LootGrid
+@onready var loot_all_btn: Button = %LootPanel.get_node_or_null("HBoxContainer/loot_all")
 var current_chest_inventory: InventoryComponent = null
 
 signal inventory_closed
@@ -24,6 +25,9 @@ func _ready() -> void:
 		update_ui()
 	else:
 		push_error("InventoryUI : Il manque le InventoryComponent !")
+		
+	if loot_all_btn != null:
+		loot_all_btn.pressed.connect(_on_loot_all_pressed)
 		
 	# Initialisation du panneau de stats
 	if level_component == null and owner != null:
@@ -126,6 +130,25 @@ func open_with_chest(chest_inv: InventoryComponent) -> void:
 		loot_panel.visible = true
 	_update_loot_ui()
 	open_inventory()
+
+func _on_loot_all_pressed() -> void:
+	if current_chest_inventory == null or inventory_component == null: return
+	
+	# On boucle à l'envers ou on gère simplement les slots
+	for i in range(current_chest_inventory.slots.size()):
+		var slot = current_chest_inventory.slots[i]
+		if slot["item"] != null:
+			var item = slot["item"]
+			var quantity = slot["quantity"]
+			
+			# Tente d'ajouter au joueur
+			var remaining = inventory_component.add_item(item, quantity)
+			var taken = quantity - remaining
+			
+			if taken > 0:
+				# Enlève la quantité prise du coffre
+				current_chest_inventory.remove_item_at_slot(i, taken)
+
 
 func update_ui() -> void:
 	for child in inv_grid.get_children():
