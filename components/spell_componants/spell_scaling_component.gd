@@ -4,10 +4,22 @@ extends Node
 @export var attack_component: AttackComponent
 @export var base_impact_radius: float = 4.0
 
-# NOUVEAU : Si le sort est passif (déclenché sans AbilityData), on choisit son type ici
-@export_enum("Magic", "Physical") var passive_scaling_type: String = "Magic"
+@export_group("Weapon Scaling")
+## Si coché, ajoute les dégâts de l'arme + le flat_physical_damage aux dégâts de base du sort.
+@export var use_weapon_damage: bool = false
+## Utilisé si le sort est passif ou n'a pas d'ability_data (1.0 = 100% des dégâts d'arme)
+@export var base_weapon_multiplier: float = 1.0
+
+@export_group("Damage Scaling Multipliers")
+@export var scales_with_physical: bool = false
+@export var scales_with_magic: bool = false
+@export var scales_with_aoe_damage: bool = false
+@export var scales_with_fire: bool = false
+@export var scales_with_ice: bool = false
+@export var scales_with_lightning: bool = false
 
 var final_impact_radius: float = 4.0 
+var final_aoe_multiplier: float = 1.0
 
 func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 	
@@ -22,62 +34,78 @@ func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 		var final_damage = base_spell_damage
 		
 		# ====================================================
-		# 1. CALCUL DES DÉGÂTS SELON LA CATÉGORIE DU SORT
+		# 1. AJOUT DES DÉGÂTS D'ARME (Si coché)
 		# ====================================================
-		
-		# On détermine si le sort doit être considéré comme physique ou magique
-		var is_physical: bool = false
-		
-		if ability_data != null:
-			is_physical = (ability_data.category == AbilityData.AbilityCategory.WEAPON_ATTACK)
-		else:
-			is_physical = (passive_scaling_type == "Physical")
-			
-		if is_physical:
-			# --- CAS A : ATTAQUE PHYSIQUE ---
+		if use_weapon_damage:
 			var weapon_damage = 0.0
-			
 			if equipment != null and equipment.equipped_items.has("main_hand"):
 				var weapon = equipment.equipped_items["main_hand"]
 				if weapon != null and "base_damage" in weapon: 
 					weapon_damage = weapon.base_damage
 			
-			var phys_stat = 0.0
 			var flat_phys_stat = 0.0
 			if caster_stats != null:
-				phys_stat = caster_stats.get_stat_value("physical_damage") 
 				flat_phys_stat = caster_stats.get_stat_value("flat_physical_damage")
 				
-			# Si ability_data est null (sort passif physique), on considère que le multiplicateur d'arme est de 1.0 (100%)
-			var mult = 1.0
+			var mult = base_weapon_multiplier
 			if ability_data != null:
 				mult = ability_data.weapon_damage_multiplier
 				
-			final_damage = ((weapon_damage + flat_phys_stat) * mult) * phys_stat
+			# On additionne les dégâts de l'arme modifiés aux dégâts de base du sort
+			final_damage += (weapon_damage + flat_phys_stat) * mult
 			
-		else:
-			# --- CAS B : SORT MAGIQUE ---
-			var magic_stat = 1.0
-			if caster_stats != null:
-				magic_stat = caster_stats.get_stat_value("magic_damage")
-				if magic_stat == 0.0: 
-					magic_stat = 1.0 
+		# ====================================================
+		# 2. CALCUL ADDITIF DES MULTIPLICATEURS (%)
+		# ====================================================
+		var total_multiplier = 1.0 # 100% de base
+		
+		if caster_stats != null:
+			if scales_with_physical:
+				total_multiplier += max(0.0, caster_stats.get_stat_value("physical_damage") - 1.0)
+			
+			if scales_with_magic:
+				var magic_stat = caster_stats.get_stat_value("magic_damage")
+				# Cas spécial pour la stat magique où 0 dans la database = 1.0 dans le système (à uniformiser un jour)
+				if magic_stat == 0.0: magic_stat = 1.0 
+				total_multiplier += max(0.0, magic_stat - 1.0)
 				
-			final_damage = base_spell_damage * magic_stat
+			if scales_with_aoe_damage:
+				# Si un jour tu rajoutes 'aoe_damage' dans le entity_stats, il sera pris en compte
+				total_multiplier += max(0.0, caster_stats.get_stat_value("aoe_damage") - 1.0)
+				
+			if scales_with_fire:
+				total_multiplier += max(0.0, caster_stats.get_stat_value("fire_damage") - 1.0)
+				
+			if scales_with_ice:
+				total_multiplier += max(0.0, caster_stats.get_stat_value("ice_damage") - 1.0)
+				
+			if scales_with_lightning:
+				total_multiplier += max(0.0, caster_stats.get_stat_value("lightning_damage") - 1.0)
+		
+		# On applique le gros multiplicateur total
+		final_damage *= total_multiplier
 		
 		# On applique les dégâts finaux à la Hitbox
 		attack_component.damage = final_damage
 		
 		# ====================================================
-		# 2. SCALING DU KNOCKBACK ET AOE
+		# 3. SCALING DU KNOCKBACK
 		# ====================================================
 		if caster_stats != null:
 			var kb_mult = caster_stats.get_stat_value("knockback_power")
 			if kb_mult == 0.0: 
 				kb_mult = 1.0
 			attack_component.knockback_force *= kb_mult
-			
-			var aoe_mult = caster_stats.get_stat_value("area_of_effect")
-			if aoe_mult == 0.0:
-				aoe_mult = 1.0
-			final_impact_radius = base_impact_radius * aoe_mult
+	
+	# ====================================================
+	# 4. SCALING AOE (Taille) Indépendant de l'AttackComponent
+	# ====================================================
+	if caster_stats != null:
+		var aoe_mult = caster_stats.get_stat_value("area_of_effect")
+		print("DEBUG SPELL SCALING: aoe_mult recupere = ", aoe_mult)
+		if aoe_mult == 0.0:
+			aoe_mult = 1.0
+		final_aoe_multiplier = aoe_mult
+		final_impact_radius = base_impact_radius * aoe_mult
+	else:
+		print("DEBUG SPELL SCALING: caster_stats est NULL pour ", caster.name)

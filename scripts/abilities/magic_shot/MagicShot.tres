@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://2gxlbnerkd5y" path="res://scripts/abilities/magic_shot/magic_shot.tscn" id="1_fullj"]
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ty360"]
 [ext_resource type="Texture2D" uid="uid://obdfslgne3jo" path="res://assets/icon/Mythril Age Icons/arrow-scope.png" id="2_hk3mx"]
+[ext_resource type="PackedScene" uid="uid://xaa82q5x5mm7" path="res://scripts/abilities/casting_animation/arcane_casting_vfx.tscn" id="2_p1ft8"]
 
 [resource]
 script = ExtResource("1_ty360")
@@ -11,5 +12,6 @@ icon = ExtResource("2_hk3mx")
 mana_cost = 10.0
 cast_time = 0.5
 target_mode = 1
+cast_vfx_scene = ExtResource("2_p1ft8")
 ability_scene = ExtResource("1_fullj")
 metadata/_custom_type_script = "uid://3lwhmf27kto3"

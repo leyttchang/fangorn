@@ -3,7 +3,7 @@ extends Resource
 
 enum ModType { FLAT, PERCENT }
 
-@export_enum("max_health", "max_mana", "mana_regen", "armor", "flat_physical_damage", "physical_damage", "magic_damage", "attack_speed", "cd_red", "area_of_effect", "movement_speed", "knockback_power", "knockback_resistance", "casting_speed", "xp_reward") var stat_name: String = "max_health"
+@export_enum("max_health", "max_mana", "mana_regen", "armor", "flat_physical_damage", "physical_damage", "magic_damage", "fire_damage", "ice_damage", "lightning_damage", "attack_speed", "cd_red", "area_of_effect", "movement_speed", "knockback_power", "knockback_resistance", "casting_speed", "xp_reward") var stat_name: String = "max_health"
 @export var value: float = 0.0
 @export var mod_type: ModType = ModType.FLAT
 

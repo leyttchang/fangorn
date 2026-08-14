@@ -55,6 +55,7 @@ projectile_speed = 50.0
 
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("3_7deol")]
 attack_component = NodePath("../AttackComponent")
+scales_with_magic = true
 
 [node name="ImpactSpawnerComponent" parent="." unique_id=19574901 node_paths=PackedStringArray("attack_component", "scaling_component") instance=ExtResource("4_0d483")]
 attack_component = NodePath("../AttackComponent")

@@ -989,7 +989,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999781, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.006333551, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.99997795, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335495, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1014,9 +1014,15 @@ tree_root = SubResource("AnimationNodeBlendTree_combo")
 anim_player = NodePath("../attack_animation")
 parameters/TimeScale/scale = 1.0
 
+[node name="spell_casting_animation" type="AnimationPlayer" parent="Camera3D" unique_id=650569700]
+root_node = NodePath("../MainDroite")
+
 [node name="damage_screen_effect" parent="Camera3D" unique_id=1847647721 node_paths=PackedStringArray("health_component") instance=ExtResource("13_r5ovt")]
 transform = Transform3D(1.3503089, 0, 0, 0, 0.86472625, 0, 0, 0, 1, 0, 0, -0.50868833)
 health_component = NodePath("../../HealthComponent")
+
+[node name="MainGauche" type="Marker3D" parent="Camera3D" unique_id=1530092582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43797755, -0.25453138, -1.0913506)
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1688824659]
 transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 0, 0.4775703, -0.48433536)
@@ -1046,11 +1052,12 @@ knockback_component = NodePath("../knockback_componant")
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_qe16m")
 
-[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast", "anim_player", "anim_tree")]
+[node name="SkillBarComponent" type="Node3D" parent="." unique_id=1947369241 node_paths=PackedStringArray("raycast", "anim_player", "anim_tree", "cast_vfx_spawn_point")]
 script = ExtResource("8_pw6nv")
 raycast = NodePath("../Camera3D/RayCast3D")
 anim_player = NodePath("../Camera3D/attack_animation")
 anim_tree = NodePath("../Camera3D/AnimationTree")
+cast_vfx_spawn_point = NodePath("../Camera3D/MainGauche")
 
 [node name="InventoryComponent" parent="." unique_id=1175652799 instance=ExtResource("13_ps75u")]
 

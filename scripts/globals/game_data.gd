@@ -9,6 +9,9 @@ const PERCENT_STATS: Array[String] = [
 	"casting_speed",
 	"physical_damage",
 	"magic_damage",
+	"fire_damage",
+	"ice_damage",
+	"lightning_damage",
 	"knockback_power"
 ]
 
@@ -23,6 +26,9 @@ static func get_all_affixes() -> Array[AffixData]:
 			preload("res://item/affixes/affix_movement_speed.tres"),
 			preload("res://item/affixes/affix_physical_damage.tres"),
 			preload("res://item/affixes/affix_magic_damage.tres"),
+			preload("res://item/affixes/affix_fire_damage.tres"),
+			preload("res://item/affixes/affix_ice_damage.tres"),
+			preload("res://item/affixes/affix_lightning_damage.tres"),
 			preload("res://item/affixes/affix_cd_red.tres"),
 			preload("res://item/affixes/affix_area_of_effect.tres"),
 			preload("res://item/affixes/affix_knockback_resistance.tres"),
@@ -48,3 +54,18 @@ static func get_all_bases() -> Array[EquipmentItem]:
 			preload("res://item/armures/legs/heavy_pants.tres")
 		]
 	return _all_bases
+
+static var _all_spells: Array[AbilityData] = []
+
+static func get_all_spells() -> Array[AbilityData]:
+	if _all_spells.is_empty():
+		_all_spells = [
+			preload("res://scripts/abilities/fireball/Fireball.tres"),
+			preload("res://scripts/abilities/dash/dash.tres"),
+			preload("res://scripts/abilities/magic_shot/MagicShot.tres"),
+			preload("res://scripts/abilities/Burning_ground/BurningGround.tres"),
+			preload("res://scripts/abilities/Ice Crash/IceCrash.tres"),
+			preload("res://scripts/abilities/light_pilar/light_pillar.tres"),
+			preload("res://scripts/abilities/chain_lightning/chain_lightning.tres")
+		]
+	return _all_spells

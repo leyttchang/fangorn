@@ -87,7 +87,9 @@ func _apply_stats(skill_data: SkillNodeData):
 			var source_id = "skill_tree_" + skill_data.node_id
 			
 			var final_value = bonus.value
-			if bonus.mod_type == 1: # PERCENT
+			var is_percent_stat = bonus.stat_name in GameData.PERCENT_STATS
+			
+			if bonus.mod_type == StatModifierData.ModType.PERCENT or is_percent_stat:
 				final_value = final_value / 100.0
 				
 			stats_component.add_modifier(bonus.stat_name, bonus.mod_type, final_value, source_id)

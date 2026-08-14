@@ -1,7 +1,7 @@
 class_name SkillBarComponent
 extends Node
 
-enum State { IDLE, TARGETING, CASTING, AUTO_CASTING }
+enum State { IDLE, TARGETING, SELECTED, CASTING, AUTO_CASTING }
 var current_state: State = State.IDLE
 
 # --- SIGNAUX ---
@@ -23,10 +23,12 @@ signal cast_finished()
 @export var raycast: RayCast3D 
 @export var anim_player: AnimationPlayer
 @export var anim_tree: AnimationTree # <-- L'ajout est ici
+@export var cast_vfx_spawn_point: Node3D
 
 var cooldown_timers: Dictionary = {}
 var active_ability: AbilityData = null 
 var indicator_instance: Node3D = null 
+var current_vfx_instance: Node3D = null
 
 var casting_ability: AbilityData = null
 var casting_action: String = ""
@@ -61,6 +63,9 @@ func _process(delta: float) -> void:
 			_handle_inputs()
 		State.TARGETING:
 			_handle_targeting()
+		State.SELECTED:
+			_handle_selected()
+			_handle_inputs()
 		State.CASTING:
 			_handle_casting(delta)
 		State.AUTO_CASTING:
@@ -121,36 +126,96 @@ func _handle_inputs() -> void:
 					if ability.category == AbilityData.AbilityCategory.WEAPON_ATTACK:
 						current_state = State.AUTO_CASTING
 					else:
-						current_state = State.CASTING
+						current_state = State.SELECTED
 					
 					casting_ability = ability
 					casting_action = action
 					current_cast_time = 0.0
 					required_cast_time = final_required_time
 					
-					if anim_player != null and ability.anim_name != "":
-						if anim_player.has_animation(ability.anim_name):
-							var anim_length = anim_player.get_animation(ability.anim_name).length
-							var play_speed = anim_length / required_cast_time
-							
-							if _play_ability_anim_safe(ability, play_speed):
-								var recovery_anim = ability.anim_name + "_recovery"
-								if anim_player.has_animation(recovery_anim):
-									anim_player.queue(recovery_anim)
-					# =========================================================
+					if current_state == State.AUTO_CASTING:
+						if anim_player != null and ability.anim_name != "":
+							if anim_player.has_animation(ability.anim_name):
+								var anim_length = anim_player.get_animation(ability.anim_name).length
+								var play_speed = anim_length / required_cast_time
+								
+								if _play_ability_anim_safe(ability, play_speed):
+									var recovery_anim = ability.anim_name + "_recovery"
+									if anim_player.has_animation(recovery_anim):
+										anim_player.queue(recovery_anim)
+						cast_started.emit(ability.ability_name, required_cast_time)
 					
 					if ability.target_mode in [AbilityData.TargetMode.GROUND_TARGET, AbilityData.TargetMode.SUMMON]:
 						if raycast != null:
 							raycast.target_position = Vector3(0, 0, -ability.max_range)
 							raycast.force_raycast_update() 
 						
+						if indicator_instance != null:
+							indicator_instance.queue_free()
+							indicator_instance = null
+							
 						if ability.indicator_scene != null:
 							indicator_instance = ability.indicator_scene.instantiate()
 							get_tree().root.add_child(indicator_instance)
-					
-					cast_started.emit(ability.ability_name, required_cast_time)
 				
 			return
+
+func _handle_selected() -> void:
+	if indicator_instance != null and raycast != null:
+		if raycast.is_colliding():
+			indicator_instance.visible = true
+			indicator_instance.global_position = raycast.get_collision_point()
+		else:
+			indicator_instance.visible = false
+
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		print("Sélection de sort annulée !")
+		_reset_casting(true) 
+		return
+
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		current_state = State.CASTING
+		current_cast_time = 0.0
+		
+		var play_speed: float = 1.0
+		if anim_player != null and casting_ability.anim_name != "":
+			if anim_player.has_animation(casting_ability.anim_name):
+				var anim_length = anim_player.get_animation(casting_ability.anim_name).length
+				play_speed = anim_length / required_cast_time
+				
+				if _play_ability_anim_safe(casting_ability, play_speed):
+					var recovery_anim = casting_ability.anim_name + "_recovery"
+					if anim_player.has_animation(recovery_anim):
+						anim_player.queue(recovery_anim)
+						
+		# --- Gestion du VFX de Lancement ---
+		if "cast_vfx_scene" in casting_ability and casting_ability.cast_vfx_scene != null:
+			current_vfx_instance = casting_ability.cast_vfx_scene.instantiate()
+			if cast_vfx_spawn_point != null:
+				cast_vfx_spawn_point.add_child(current_vfx_instance)
+			else:
+				get_parent().add_child(current_vfx_instance)
+			
+			var vfx_anim = current_vfx_instance.get_node_or_null("VFX_anim")
+			if vfx_anim != null:
+				var vfx_anim_name = vfx_anim.autoplay
+				if vfx_anim_name == "" and vfx_anim.has_animation("default"):
+					vfx_anim_name = "default"
+					vfx_anim.play("default")
+				elif vfx_anim_name == "":
+					for anim in vfx_anim.get_animation_list():
+						if anim != "RESET":
+							vfx_anim_name = anim
+							vfx_anim.play(anim)
+							break
+				
+				if vfx_anim_name != "":
+					var vfx_length = vfx_anim.get_animation(vfx_anim_name).length
+					vfx_anim.speed_scale = vfx_length / required_cast_time
+				else:
+					vfx_anim.speed_scale = play_speed
+						
+		cast_started.emit(casting_ability.ability_name, required_cast_time)
 
 func _handle_casting(delta: float) -> void:
 	if indicator_instance != null and raycast != null:
@@ -165,18 +230,30 @@ func _handle_casting(delta: float) -> void:
 		_reset_casting(true) # TRUE = On coupe l'animation d'urgence
 		return
 
-	if Input.is_action_pressed(casting_action):
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		current_cast_time += delta
 		current_cast_time = min(current_cast_time, required_cast_time)
 		cast_updated.emit(current_cast_time, required_cast_time)
-
-	if Input.is_action_just_released(casting_action):
+	else:
 		if current_cast_time >= required_cast_time:
 			_validate_and_fire()
 		else:
 			print("Cast annulé (relâché trop tôt) !")
 			cast_canceled.emit()
-			_reset_casting(true)
+			
+			current_state = State.SELECTED
+			current_cast_time = 0.0
+			
+			if current_vfx_instance != null:
+				_kill_vfx(current_vfx_instance)
+				current_vfx_instance = null
+			
+			if anim_player != null:
+				if anim_player.has_animation("RESET"):
+					anim_player.play("RESET")
+				else:
+					anim_player.stop()
+			if anim_tree != null: anim_tree.active = true
 
 func _handle_auto_casting(delta: float) -> void:
 	if indicator_instance != null and raycast != null:
@@ -232,6 +309,10 @@ func _reset_casting(is_canceled: bool = false) -> void:
 		indicator_instance.queue_free()
 		indicator_instance = null
 		
+	if current_vfx_instance != null:
+		_kill_vfx(current_vfx_instance)
+		current_vfx_instance = null
+		
 	# Si le joueur a annulé (clic droit ou autre), on répare l'état des animations
 	if is_canceled:
 		if anim_player != null:
@@ -259,7 +340,8 @@ func _play_ability_anim_safe(ability: AbilityData, speed: float = 1.0) -> bool:
 	if anim_tree != null: 
 		anim_tree.active = false
 	
-	anim_player.play(ability.anim_name, -1, speed)
+	anim_player.play(ability.anim_name)
+	anim_player.speed_scale = speed
 	return true
 
 # ==========================================
@@ -377,3 +459,16 @@ func _start_cooldown(ability: AbilityData) -> void:
 		if is_instance_valid(timer):
 			timer.queue_free()
 	)
+
+func _kill_vfx(vfx: Node3D) -> void:
+	if vfx == null:
+		return
+	
+	var vfx_anim = vfx.get_node_or_null("VFX_anim")
+	if vfx_anim != null and vfx_anim.has_animation("casted"):
+		vfx_anim.speed_scale = 1.0
+		vfx_anim.play("casted")
+		if not vfx_anim.is_connected("animation_finished", Callable(vfx, "queue_free")):
+			vfx_anim.animation_finished.connect(func(_anim_name): vfx.queue_free())
+	else:
+		vfx.queue_free()

@@ -36,9 +36,26 @@ func setup(_data: SkillNodeData, _index: int):
 		
 		for bonus in data.stats_bonuses:
 			if bonus == null: continue
-			var prefix = "+" if bonus.value >= 0 else ""
-			var suffix = "%" if bonus.mod_type == 1 else ""
-			tooltip += prefix + str(bonus.value) + suffix + " " + bonus.stat_name + "\n"
+			
+			var stat_name = bonus.stat_name.capitalize().replace("_", " ")
+			var is_percent_stat = bonus.stat_name in GameData.PERCENT_STATS
+			var text = ""
+			
+			if is_percent_stat:
+				var prefix = "+" if bonus.value >= 0 else ""
+				if bonus.mod_type == StatModifierData.ModType.FLAT:
+					text = prefix + str(bonus.value) + "% increased " + stat_name
+				else: # PERCENT
+					text = prefix + str(bonus.value) + "% more " + stat_name
+			else:
+				if bonus.mod_type == StatModifierData.ModType.FLAT:
+					var prefix = "+" if bonus.value >= 0 else ""
+					text = prefix + str(bonus.value) + " to " + stat_name
+				else: # PERCENT
+					var prefix = "+" if bonus.value >= 0 else ""
+					text = prefix + str(bonus.value) + "% increased " + stat_name
+					
+			tooltip += text + "\n"
 			
 		tooltip_text = tooltip
 		

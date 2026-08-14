@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_20ysy"]
 [ext_resource type="PackedScene" uid="uid://coj4bs1y7mwte" path="res://scripts/abilities/fireball/fireball_c.tscn" id="1_i6nhm"]
 [ext_resource type="Texture2D" uid="uid://c71msakx26sls" path="res://assets/icon/Mythril Age Icons/flaming-sheet.png" id="1_w6ik7"]
+[ext_resource type="PackedScene" uid="uid://d2g0bngsgl1ay" path="res://scripts/abilities/casting_animation/fire_casting_VFX.tscn" id="2_86154"]
 
 [resource]
 script = ExtResource("1_20ysy")
@@ -12,5 +13,6 @@ cooldown = 3.0
 mana_cost = 50.0
 cast_time = 2.0
 target_mode = 1
+cast_vfx_scene = ExtResource("2_86154")
 ability_scene = ExtResource("1_i6nhm")
 metadata/_custom_type_script = "uid://3lwhmf27kto3"

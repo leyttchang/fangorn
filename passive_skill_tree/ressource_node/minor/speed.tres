@@ -8,7 +8,6 @@
 script = ExtResource("3_hn70t")
 stat_name = "attack_speed"
 value = 3.0
-mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [resource]
@@ -18,8 +17,7 @@ node_name = "attack speed"
 icon = ExtResource("1_q6b8f")
 zone = 3
 max_occurrences = 1000
-tier_1_multiplier = 0.4
-tier_2_multiplier = 0.4
-tier_3_multiplier = 0.2
+tier_2_multiplier = 0.8
+tier_3_multiplier = 0.4
 stats_bonuses = Array[ExtResource("3_hn70t")]([SubResource("Resource_8pdro")])
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

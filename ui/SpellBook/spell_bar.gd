@@ -22,9 +22,26 @@ func _process(_delta: float) -> void:
 
 	var slot_nodes = grid.get_children()
 	
+	var is_spell_selected = skill_bar.current_state in [SkillBarComponent.State.SELECTED, SkillBarComponent.State.CASTING]
+	var selected_action = skill_bar.casting_action
+	
 	for i in range(slot_nodes.size()):
 		var slot_key: String = "slot_" + str(i + 1)
 		var slot_node: Node = slot_nodes[i]
+		
+		# --- GESTION DE L'OUTLINE DE SÉLECTION ---
+		var outline = slot_node.get_node_or_null("SelectionOutline")
+		if outline == null:
+			outline = ReferenceRect.new()
+			outline.name = "SelectionOutline"
+			outline.border_color = Color.WHITE
+			outline.border_width = 2.0
+			outline.editor_only = false
+			outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			outline.set_anchors_preset(Control.PRESET_FULL_RECT)
+			slot_node.add_child(outline)
+			
+		outline.visible = (is_spell_selected and selected_action == slot_key)
 		
 		# On récupère les deux nœuds visuels
 		var overlay: TextureProgressBar = slot_node.get_node_or_null("CooldownOverlay")

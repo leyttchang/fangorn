@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ilgln"]
 [ext_resource type="PackedScene" uid="uid://bwq4tvxnrffrt" path="res://scripts/abilities/Burning_ground/burning_ground.tscn" id="1_x2yls"]
 [ext_resource type="Texture2D" uid="uid://dunw0haq50b7g" path="res://assets/icon/Mythril Age Icons/magic-swirl.png" id="2_8dwsn"]
+[ext_resource type="PackedScene" uid="uid://d2g0bngsgl1ay" path="res://scripts/abilities/casting_animation/fire_casting_VFX.tscn" id="2_lg8ku"]
 [ext_resource type="PackedScene" uid="uid://bnemrb3vjo0la" path="res://scripts/abilities/indicators/round_indicator.tscn" id="3_h8d7u"]
 
 [resource]
@@ -12,6 +13,7 @@ icon = ExtResource("2_8dwsn")
 mana_cost = 20.0
 cast_time = 0.5
 target_mode = 3
+cast_vfx_scene = ExtResource("2_lg8ku")
 indicator_scene = ExtResource("3_h8d7u")
 ability_scene = ExtResource("1_x2yls")
 metadata/_custom_type_script = "uid://3lwhmf27kto3"

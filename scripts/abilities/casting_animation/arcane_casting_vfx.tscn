@@ -1,0 +1,456 @@
+[gd_scene format=3 uid="uid://xaa82q5x5mm7"]
+
+[ext_resource type="Shader" uid="uid://dfs2cc1qsxaao" path="res://objet/chest/glow_shader_3d.tres" id="3_bl7kf"]
+[ext_resource type="Texture2D" uid="uid://djqg6inatmobw" path="res://assets/LeLu's Noise Pack/T_VFX_Glow31.png" id="3_nxac2"]
+[ext_resource type="Texture2D" uid="uid://ddg4ccdxptl7h" path="res://assets/LeLu's Noise Pack/T_Noise78a.png" id="4_aimmh"]
+[ext_resource type="Texture2D" uid="uid://dnirefp03wuyw" path="res://assets/LeLu's Noise Pack/T_VFX_SparklesF21.jpg" id="4_bl7kf"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_7rbp7"]
+radius = 0.001
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4r87v"]
+render_priority = 0
+shader = ExtResource("3_bl7kf")
+shader_parameter/Main_color = Color(0.24966006, 0.116800025, 0.73, 1)
+shader_parameter/BlinkingSpeed = 8.0
+shader_parameter/offset = Vector2(0, 1)
+shader_parameter/disable_time = true
+shader_parameter/Transparancy_texture = ExtResource("4_aimmh")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_87x4s"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("3_nxac2")
+albedo_texture_msdf = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Curve" id="Curve_wxft4"]
+_limits = [0.0, 5.0, 0.0, 2.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.527881, 2.4), 1.8591498, 0.0, 0, 0, Vector2(0.9516729, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_dria3"]
+curve = SubResource("Curve_wxft4")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_jmplp"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.0
+emission_ring_radius = 0.3
+emission_ring_inner_radius = 0.2
+emission_ring_cone_angle = 90.0
+angle_min = -179.99998
+angle_max = 180.00002
+direction = Vector3(0, 1, 0)
+spread = 5.0
+gravity = Vector3(0, 0, 0)
+radial_accel_min = 0.99999774
+radial_accel_max = 0.99999774
+scale_min = 0.049999997
+scale_max = 0.099999994
+scale_curve = SubResource("CurveTexture_dria3")
+color = Color(0.73955935, 0.40586767, 1.1759251, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_62gku"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7rrm5"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("4_bl7kf")
+albedo_texture_msdf = true
+use_particle_trails = true
+
+[sub_resource type="Curve" id="Curve_r87mk"]
+_data = [Vector2(0, 0.04494381), 0.0, 0.0, 0, 0, Vector2(0.1658986, 1), 0.0, 0.0, 0, 0, Vector2(0.84792626, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_x0jc3"]
+curve = SubResource("Curve_r87mk")
+
+[sub_resource type="Curve" id="Curve_idnvc"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_fm67p"]
+_limits = [-2.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_ppw3r"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0.009216592, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_ces26"]
+curve_x = SubResource("Curve_idnvc")
+curve_y = SubResource("Curve_fm67p")
+curve_z = SubResource("Curve_ppw3r")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3ymnq"]
+particle_flag_align_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.2
+emission_ring_radius = 0.6
+emission_ring_inner_radius = 0.4
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 0.0
+initial_velocity_min = 0.19999999
+initial_velocity_max = 0.39999998
+orbit_velocity_min = 0.1000001
+orbit_velocity_max = 0.5000001
+orbit_velocity_curve = SubResource("CurveXYZTexture_ces26")
+radial_velocity_min = 0.99997765
+radial_velocity_max = 0.99997765
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+scale_max = 0.7
+color = Color(1.7410523, 0.60426503, 3.7045925, 1)
+alpha_curve = SubResource("CurveTexture_x0jc3")
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_nnqd0"]
+shape = 0
+size = 0.08
+section_segments = 4
+
+[sub_resource type="Animation" id="Animation_d4827"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("OmniLight3D:light_energy")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [2.978]
+}
+
+[sub_resource type="Animation" id="Animation_c1en4"]
+resource_name = "init"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("OmniLight3D:light_energy")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.33333334, 0.76666665, 1.1333333, 1.5333333, 1.7666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [2.978, 5.765, 0.641, 9.36, 0.186]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nxac2"]
+_data = {
+&"RESET": SubResource("Animation_d4827"),
+&"init": SubResource("Animation_c1en4")
+}
+
+[sub_resource type="Animation" id="Animation_edyrm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/Main_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.24966006, 0.116800025, 0.73, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/BlinkingSpeed")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [8.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/offset")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("aura_glow_effect/particles:amount_ratio")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("aura_glow_effect/trails:amount_ratio")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/disable_time")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("aura_glow_effect:mesh:radius")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.001]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("aura_glow_effect:mesh:height")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_aimmh"]
+resource_name = "casted"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("aura_glow_effect:mesh:height")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6008998),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.001]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("aura_glow_effect:mesh:radius")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.6008998),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.5, 0.001]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("aura_glow_effect/particles:amount_ratio")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.6008998),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("aura_glow_effect/trails:amount_ratio")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.6008998),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_bl7kf"]
+resource_name = "default"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/Main_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.8),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.24966006, 0.116800025, 0.73, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/BlinkingSpeed")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.8022165),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [8.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/offset")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.8),
+"transitions": PackedFloat32Array(0.75785863, 1),
+"update": 0,
+"values": [Vector2(0, -2), Vector2(0, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("aura_glow_effect/particles:amount_ratio")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("aura_glow_effect/trails:amount_ratio")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("aura_glow_effect:surface_material_override/0:shader_parameter/disable_time")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.0009999999, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("aura_glow_effect:mesh:radius")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.21046744, 0.79916626),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.001, 0.5, 0.5]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("aura_glow_effect:mesh:height")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.21046744, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.001, 1.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ww2j3"]
+_data = {
+&"RESET": SubResource("Animation_edyrm"),
+&"casted": SubResource("Animation_aimmh"),
+&"default": SubResource("Animation_bl7kf")
+}
+
+[node name="arcane_casting_VFX" type="Node3D" unique_id=1017619717]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+
+[node name="aura_glow_effect" type="MeshInstance3D" parent="." unique_id=673474089]
+mesh = SubResource("SphereMesh_7rbp7")
+surface_material_override/0 = SubResource("ShaderMaterial_4r87v")
+
+[node name="particles" type="GPUParticles3D" parent="aura_glow_effect" unique_id=763127382]
+material_override = SubResource("StandardMaterial3D_87x4s")
+amount = 10
+lifetime = 2.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_jmplp")
+draw_pass_1 = SubResource("QuadMesh_62gku")
+
+[node name="trails" type="GPUParticles3D" parent="aura_glow_effect" unique_id=678061877]
+material_override = SubResource("StandardMaterial3D_7rrm5")
+amount = 4
+lifetime = 3.0
+fixed_fps = 60
+local_coords = true
+trail_enabled = true
+trail_lifetime = 0.7
+process_material = SubResource("ParticleProcessMaterial_3ymnq")
+draw_pass_1 = SubResource("RibbonTrailMesh_nnqd0")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=436793634]
+light_color = Color(0.86, 0.4156667, 0, 1)
+light_energy = 2.978
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1860030965]
+libraries/ = SubResource("AnimationLibrary_nxac2")
+autoplay = &"init"
+
+[node name="VFX_anim" type="AnimationPlayer" parent="." unique_id=946075540]
+libraries/ = SubResource("AnimationLibrary_ww2j3")

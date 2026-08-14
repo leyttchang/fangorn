@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cqjqr7u15ttu5"]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_a8h7x"]
+[ext_resource type="PackedScene" uid="uid://db2hwlxxok88o" path="res://scripts/abilities/chain_lightning/chain_lightning.tscn" id="1_tdoh0"]
+[ext_resource type="Texture2D" uid="uid://dk5hmbk4461pg" path="res://assets/icon/32x32/fb832.png" id="2_fpq6r"]
+[ext_resource type="PackedScene" uid="uid://djtioufafqhx8" path="res://scripts/abilities/casting_animation/lightning_casting_vfx.tscn" id="2_maggd"]
+
+[resource]
+script = ExtResource("1_a8h7x")
+ability_name = "Chaing lightning"
+icon = ExtResource("2_fpq6r")
+mana_cost = 1.0
+max_range = 10.0
+cast_time = 3.0
+target_mode = 2
+cast_vfx_scene = ExtResource("2_maggd")
+ability_scene = ExtResource("1_tdoh0")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

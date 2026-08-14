@@ -14,7 +14,6 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 script = ExtResource("3_uxca2")
 stat_name = "magic_damage"
 value = 15.0
-mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [sub_resource type="Resource" id="Resource_bamqn"]

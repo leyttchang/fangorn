@@ -28,19 +28,10 @@ func _ready() -> void:
 
 func unlock_all_spells() -> void:
 	print("Bouton cliqué : Déblocage de tous les sorts...")
-	var spell_paths = [
-		"res://scripts/abilities/fireball/Fireball.tres",
-		"res://scripts/abilities/dash/dash.tres",
-		"res://scripts/abilities/magic_shot/MagicShot.tres",
-		"res://scripts/abilities/Burning_ground/BurningGround.tres",
-		"res://scripts/abilities/Ice Crash/IceCrash.tres",
-		"res://scripts/abilities/light_pilar/light_pillar.tres"
-	]
-	for path in spell_paths:
-		if ResourceLoader.exists(path):
-			var spell_res = load(path) as AbilityData
-			if spell_res != null:
-				unlock_spell(spell_res)
+	var all_spells = GameData.get_all_spells()
+	for spell_res in all_spells:
+		if spell_res != null:
+			unlock_spell(spell_res)
 	_setup_inventory_slots()
 	print("Tous les sorts du jeu ont été débloqués !")
 

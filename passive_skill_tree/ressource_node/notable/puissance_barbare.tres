@@ -8,14 +8,12 @@
 script = ExtResource("2_eryv1")
 stat_name = "physical_damage"
 value = 30.0
-mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [sub_resource type="Resource" id="Resource_bb3rr"]
 script = ExtResource("2_eryv1")
 stat_name = "attack_speed"
 value = -10.0
-mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [resource]

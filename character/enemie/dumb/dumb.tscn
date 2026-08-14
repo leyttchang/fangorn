@@ -104,6 +104,7 @@ transitions = ["Start", "Stand", SubResource("AnimationNodeStateMachineTransitio
 graph_offset = Vector2(9, -22.435143)
 
 [node name="dumb" type="CharacterBody3D" unique_id=888204308 groups=["Enemie"]]
+collision_layer = 257
 script = ExtResource("1_ngory")
 behavior = ExtResource("2_3atj7")
 

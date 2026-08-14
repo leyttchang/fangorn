@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://db2hwlxxok88o"]
+
+[ext_resource type="Script" uid="uid://id2hjr86wvtj" path="res://scripts/abilities/chain_lightning/chain_lightning.gd" id="1_jxgql"]
+[ext_resource type="Shader" uid="uid://ci7pxvvbr4lxg" path="res://scripts/abilities/chain_lightning/chain_lightning.gdshader" id="2_q8awa"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_y8uti"]
+[ext_resource type="Shader" uid="uid://bhdxcc41b5ffu" path="res://scripts/abilities/casting_animation/lightning_ball_shader.gdshader" id="3_jfw0q"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="3_q8awa"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jfw0q"]
+render_priority = 0
+shader = ExtResource("2_q8awa")
+shader_parameter/Main_Color = Color(1, 1, 1, 1)
+shader_parameter/Effect_Color = Color(0.3, 0.3, 1, 1)
+shader_parameter/Octave_Count = 10
+shader_parameter/Amp_Start = 0.5
+shader_parameter/Amp_Coeff = 0.5
+shader_parameter/Freq_Coeff = 2.0
+shader_parameter/Speed = 3.0
+shader_parameter/Y_Size = 4.0
+shader_parameter/X_Size = 1.0
+shader_parameter/Emission_Power = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fudys"]
+render_priority = 0
+shader = ExtResource("2_q8awa")
+shader_parameter/Main_Color = Color(0.9472626, 0.57692504, 3.045841, 1)
+shader_parameter/Effect_Color = Color(0.6790433, 0.6790433, 1.0964879, 1)
+shader_parameter/Octave_Count = 10
+shader_parameter/Amp_Start = 0.5
+shader_parameter/Amp_Coeff = 0.5
+shader_parameter/Freq_Coeff = 2.0
+shader_parameter/Speed = 3.0
+shader_parameter/Y_Size = 4.0
+shader_parameter/X_Size = 1.0
+shader_parameter/Emission_Power = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ccl8d"]
+render_priority = 0
+shader = ExtResource("2_q8awa")
+shader_parameter/Main_Color = Color(0.08166675, 0, 0.7, 1)
+shader_parameter/Effect_Color = Color(1.0842435, 0, 0, 1)
+shader_parameter/Octave_Count = 10
+shader_parameter/Amp_Start = 0.5
+shader_parameter/Amp_Coeff = 0.5
+shader_parameter/Freq_Coeff = 2.0
+shader_parameter/Speed = 3.0
+shader_parameter/Y_Size = 4.0
+shader_parameter/X_Size = 1.0
+shader_parameter/Emission_Power = 2.0
+
+[sub_resource type="Gradient" id="Gradient_eb1tv"]
+offsets = PackedFloat32Array(0.7, 0.75, 0.8117647)
+colors = PackedColorArray(0.0034313723, 0.0034313723, 0.0034313723, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ateg0"]
+noise_type = 2
+fractal_octaves = 3
+fractal_weighted_strength = 0.38
+cellular_return_type = 6
+domain_warp_enabled = true
+domain_warp_amplitude = 20.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fudys"]
+noise = SubResource("FastNoiseLite_ateg0")
+color_ramp = SubResource("Gradient_eb1tv")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ccl8d"]
+noise_type = 2
+seed = 1
+fractal_octaves = 3
+fractal_weighted_strength = 0.38
+cellular_return_type = 6
+domain_warp_enabled = true
+domain_warp_amplitude = 20.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_lr3f2"]
+noise = SubResource("FastNoiseLite_ccl8d")
+color_ramp = SubResource("Gradient_eb1tv")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0ihd2"]
+noise_type = 0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_dhso1"]
+noise = SubResource("FastNoiseLite_0ihd2")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_maggd"]
+render_priority = 0
+shader = ExtResource("3_jfw0q")
+shader_parameter/lightningNoise1 = SubResource("NoiseTexture2D_fudys")
+shader_parameter/lightningNoise2 = SubResource("NoiseTexture2D_lr3f2")
+shader_parameter/tint = Color(0.7793999, 0.5490001, 4.005, 1)
+shader_parameter/distortionVertex = 0.08999999798832
+shader_parameter/speedVertex = 0.70999998413008
+shader_parameter/noiseVertex = SubResource("NoiseTexture2D_dhso1")
+
+[node name="chain_lightning" type="Node3D" unique_id=802024538]
+script = ExtResource("1_jxgql")
+line_duration = 1.0
+line_spread = 0.5
+line_material_1 = SubResource("ShaderMaterial_jfw0q")
+line_material_2 = SubResource("ShaderMaterial_fudys")
+line_material_3 = SubResource("ShaderMaterial_ccl8d")
+sphere_radius = 0.2
+sphere_material = SubResource("ShaderMaterial_maggd")
+bounce_collision_mask = 4294967048
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_y8uti")]
+damage = 70.0
+knockback_force = 1.0
+
+[node name="SpellScalingComponent" parent="." unique_id=1128614238 instance=ExtResource("3_q8awa")]
+
+[editable path="AttackComponent"]

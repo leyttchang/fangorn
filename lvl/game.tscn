@@ -163,6 +163,24 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 20, -9)
 chest_scene = ExtResource("15_apj7j")
 spawn_chance = 33.0
 
+[node name="dumb_archer" parent="spawner" unique_id=1437418324 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 21, -1)
+
+[node name="dumb_archer2" parent="spawner" unique_id=707622169 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 21, 0)
+
+[node name="dumb_archer3" parent="spawner" unique_id=400812317 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 21, 1)
+
+[node name="dumb_archer4" parent="spawner" unique_id=1194336047 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 21, 2)
+
+[node name="dumb_archer5" parent="spawner" unique_id=1727938455 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 21, 3)
+
+[node name="dumb_archer6" parent="spawner" unique_id=1646857750 instance=ExtResource("9_1eb17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 21, 4)
+
 [node name="wave_display" parent="." unique_id=114584502 node_paths=PackedStringArray("smart_spawner") instance=ExtResource("12_2ho30")]
 smart_spawner = NodePath("../spawner/SmartSpawner")
 

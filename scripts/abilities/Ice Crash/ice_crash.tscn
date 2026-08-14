@@ -24,6 +24,9 @@ shape = SubResource("CylinderShape3D_ywm6b")
 
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("3_8hd61")]
 attack_component = NodePath("../AttackComponent")
+use_weapon_damage = true
+scales_with_physical = true
+scales_with_ice = true
 
 [node name="Ice_crash_effect" type="Node3D" parent="." unique_id=1939253335]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)

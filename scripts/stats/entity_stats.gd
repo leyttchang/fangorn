@@ -10,6 +10,9 @@ extends Resource
 @export var flat_physical_damage: float = 0.0
 @export var physical_damage: float = 1
 @export var magic_damage: float = 1
+@export var fire_damage: float = 1.0
+@export var ice_damage: float = 1.0
+@export var lightning_damage: float = 1.0
 @export var attack_speed: float = 1
 @export var cd_red: float = 1 # Réduction de cooldown
 @export var area_of_effect: float = 1

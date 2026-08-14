@@ -13,6 +13,9 @@ scaling_component = NodePath("SpellScalingComponent")
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("2_to7cv")]
 attack_component = NodePath("../ground_fire/AttackComponent")
 base_impact_radius = 5.0
+scales_with_magic = true
+scales_with_aoe_damage = true
+scales_with_fire = true
 
 [editable path="ground_fire"]
 [editable path="ground_fire/AttackComponent"]

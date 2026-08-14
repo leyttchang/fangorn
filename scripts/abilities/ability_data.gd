@@ -40,6 +40,8 @@ enum TargetMode {
 @export var anim_name: String = "" 
 
 @export_group("Scènes (Les Acteurs)")
+# L'effet visuel joué pendant le temps d'incantation (optionnel)
+@export var cast_vfx_scene: PackedScene
 # L'indicateur visuel au sol (Optionnel : utile surtout pour GROUND_TARGET et SUMMON)
 @export var indicator_scene: PackedScene 
 # La scène qui sera instanciée et qui contient le code de la compétence (la logique des dégâts)
