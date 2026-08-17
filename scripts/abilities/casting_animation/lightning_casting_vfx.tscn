@@ -117,6 +117,81 @@ tracks/5/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("aura_glow_effect/spraks:emitting")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("aura_glow_effect/trails:emitting")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_2fhfb"]
+resource_name = "casted"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("aura_glow_effect/spraks:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.41178414),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("aura_glow_effect/trails:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.41178414),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("aura_glow_effect:mesh:radius")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.5, 0.001]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("aura_glow_effect:mesh:height")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.001]
+}
 
 [sub_resource type="Animation" id="Animation_ycn4f"]
 resource_name = "default"
@@ -196,6 +271,7 @@ tracks/5/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_blbn4"]
 _data = {
 &"RESET": SubResource("Animation_rdofv"),
+&"casted": SubResource("Animation_2fhfb"),
 &"default": SubResource("Animation_ycn4f")
 }
 
@@ -250,7 +326,7 @@ use_particle_trails = true
 _data = [Vector2(0, 0.04494381), 0.0, 0.0, 0, 0, Vector2(0.1658986, 1), 0.0, 0.0, 0, 0, Vector2(0.84792626, 0), 0.0, 0.0, 0, 0]
 point_count = 3
 
-[sub_resource type="CurveTexture" id="CurveTexture_loiut"]
+[sub_resource type="CurveTexture" id="CurveTexture_rdofv"]
 curve = SubResource("Curve_2tqv4")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mwgq1"]
@@ -267,7 +343,7 @@ gravity = Vector3(0, 0, 0)
 scale_min = 0.099999994
 scale_max = 0.39999998
 color = Color(0.44210172, 0, 2.5032542, 1)
-alpha_curve = SubResource("CurveTexture_loiut")
+alpha_curve = SubResource("CurveTexture_rdofv")
 turbulence_enabled = true
 turbulence_noise_scale = 1.0
 turbulence_noise_speed_random = 4.0

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://wfx1r4fejtr0"]
+
+[ext_resource type="Texture2D" uid="uid://bhwhle7dbpt21" path="res://assets/LeLu's Noise Pack/T_fire01.png" id="1_sibk7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yqkk6"]
+
+[node name="impact au sol" type="Node3D" unique_id=1563418697]
+
+[node name="Decal" type="Decal" parent="." unique_id=932080477]
+texture_albedo = ExtResource("1_sibk7")
+modulate = Color(0.3363, 0.46314996, 0.59, 1)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=717448226]
+mesh = SubResource("PlaneMesh_yqkk6")

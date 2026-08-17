@@ -3,6 +3,7 @@ extends Node
 
 @export var impact_scene: PackedScene 
 @export var duration_on_ground: float = 4.0 
+@export var destroy_parent_on_impact: bool = true
 
 # Il a besoin de l'AttackComponent pour savoir quand on touche
 @export var attack_component: AttackComponent
@@ -29,10 +30,11 @@ func _on_attack_landed(_target: Node) -> void:
 		impact_instance.global_position = _get_ground_position(get_parent().global_position)
 		
 		
-	# On détruit le sort entier
-	get_parent().hide()
-	await get_tree().create_timer(0.05).timeout
-	get_parent().queue_free()
+	# On détruit le sort entier SEULEMENT si c'est demandé (utile pour les boules de feu, pas pour les éclairs)
+	if destroy_parent_on_impact:
+		get_parent().hide()
+		await get_tree().create_timer(0.05).timeout
+		get_parent().queue_free()
 
 func _get_ground_position(current_pos: Vector3) -> Vector3:
 	var parent3d = get_parent() as Node3D

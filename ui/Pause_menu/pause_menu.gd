@@ -9,6 +9,7 @@ extends CanvasLayer
 @onready var quit_btn: Button = $Panel/VBoxContainer/Button4
 @onready var debug_btn: Button = $Panel/VBoxContainer/Button5
 @onready var create_items_btn: Button = $Panel/VBoxContainer/Button6
+@onready var god_mode_btn: Button = $Panel/VBoxContainer/Button7
 
 func _ready() -> void:
 	# Très important : le menu de pause doit pouvoir tourner même quand le jeu est en pause
@@ -19,6 +20,7 @@ func _ready() -> void:
 	quit_btn.pressed.connect(_on_quit_pressed)
 	debug_btn.pressed.connect(_on_debug_pressed)
 	create_items_btn.pressed.connect(_on_create_items_pressed)
+	god_mode_btn.pressed.connect(_on_god_mode_pressed)
 	
 	visible = false
 
@@ -115,3 +117,36 @@ func _get_random_rarity() -> ItemData.Rarity:
 	roll -= weight_magic
 	if roll <= weight_rare: return ItemData.Rarity.RARE
 	return ItemData.Rarity.LEGENDARY
+
+func _on_god_mode_pressed() -> void:
+	var player = get_tree().get_first_node_in_group("Player")
+	# Fallback si le groupe n'est pas bien défini :
+	if player == null and get_tree().current_scene:
+		player = get_tree().current_scene.find_child("player", true, false)
+		if player == null:
+			player = get_tree().current_scene.find_child("Player", true, false)
+		
+	if player == null:
+		print("Joueur introuvable pour le God Mode !")
+		return
+		
+	var stats = player.find_child("StatsComponent", true, false)
+	if stats:
+		stats.add_modifier("max_health", 0, 10000.0, "god_mode")
+		stats.add_modifier("max_mana", 0, 10000.0, "god_mode")
+		stats.add_modifier("mana_regen", 0, 100.0, "god_mode")
+		stats.add_modifier("cd_red", 0, 10000.0, "god_mode")
+		
+	var health = player.find_child("HealthComponent", true, false)
+	if health and health.has_method("heal"):
+		health.heal(10000.0)
+		
+	var mana = player.find_child("ManaComponent", true, false)
+	if mana and mana.has_method("restore_mana"):
+		mana.restore_mana(10000.0)
+		
+	var skill_tree = player.find_child("SkillTreeComponent", true, false)
+	if skill_tree:
+		skill_tree.available_skill_points += 1000
+		
+	print("God Mode activé : +10000 Vie/Mana, +100 Regen, +1000 Points de compétence !")

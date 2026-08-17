@@ -2,6 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://bhwhle7dbpt21" path="res://assets/LeLu's Noise Pack/T_fire01.png" id="1_0mese"]
 [ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="2_xvqv8"]
+[ext_resource type="Shader" uid="uid://bpooanoib8uib" path="res://scripts/abilities/fireball/fire_effect.tres" id="3_782b3"]
+[ext_resource type="Texture2D" uid="uid://ct64e4jse07mh" path="res://assets/LeLu's Noise Pack/T_Noise_HU85k.png" id="4_5qjml"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ns1hv"]
 transparency = 1
@@ -209,6 +211,30 @@ tracks/3/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("MeshInstance3D:mesh:radius")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.001]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("MeshInstance3D:mesh:height")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.001]
+}
 
 [sub_resource type="Animation" id="Animation_782b3"]
 resource_name = "casted"
@@ -259,6 +285,30 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [1.5, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("MeshInstance3D:mesh:radius")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.6131008),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.5, 0.001]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("MeshInstance3D:mesh:height")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.6131008),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.001]
 }
 
 [sub_resource type="Animation" id="Animation_n6t6l"]
@@ -311,6 +361,30 @@ tracks/3/keys = {
 "update": 0,
 "values": [0.0, 1.5]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("MeshInstance3D:mesh:radius")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.6466536),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.001, 0.5]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("MeshInstance3D:mesh:height")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.6466536),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.001, 1.0]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_782b3"]
 _data = {
@@ -318,6 +392,66 @@ _data = {
 &"casted": SubResource("Animation_782b3"),
 &"default": SubResource("Animation_n6t6l")
 }
+
+[sub_resource type="SphereMesh" id="SphereMesh_hlie2"]
+radius = 0.001
+height = 0.001
+
+[sub_resource type="Gradient" id="Gradient_t4je3"]
+offsets = PackedFloat32Array(0, 0.17283951, 0.37448558, 0.65843624, 1)
+colors = PackedColorArray(0.71, 0.023666685, 0, 0.6156863, 0.71, 0.023666685, 0, 0.64705884, 0.89, 0.25854498, 0.008899991, 1, 0.94, 0.58405334, 0.27260002, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_3bpsp"]
+gradient = SubResource("Gradient_t4je3")
+use_hdr = true
+
+[sub_resource type="Gradient" id="Gradient_v3v0n"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_8vo2n"]
+gradient = SubResource("Gradient_v3v0n")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_gmc53"]
+noise_type = 2
+frequency = 0.0094
+fractal_type = 3
+fractal_octaves = 10
+fractal_lacunarity = 2.255
+fractal_gain = -0.095
+fractal_weighted_strength = 1.0
+fractal_ping_pong_strength = 0.395
+cellular_distance_function = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_8pegv"]
+noise = SubResource("FastNoiseLite_gmc53")
+
+[sub_resource type="Gradient" id="Gradient_oj0t8"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_as728"]
+gradient = SubResource("Gradient_oj0t8")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_3v33v"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_tdiie"]
+gradient = SubResource("Gradient_3v33v")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
+render_priority = 0
+shader = ExtResource("3_782b3")
+shader_parameter/displacement_speed = Vector2(0, 6)
+shader_parameter/displacement_scale = Vector2(1, 1)
+shader_parameter/displacement = SubResource("NoiseTexture2D_8pegv")
+shader_parameter/displacement_intesity = 0.1
+shader_parameter/speed = Vector2(0, 2)
+shader_parameter/scale = Vector2(1, 1)
+shader_parameter/base_texture = ExtResource("4_5qjml")
+shader_parameter/texture_add = SubResource("GradientTexture2D_as728")
+shader_parameter/texture_substract = SubResource("GradientTexture2D_tdiie")
+shader_parameter/color_palete = SubResource("GradientTexture1D_3bpsp")
+shader_parameter/disapear_texture = SubResource("GradientTexture1D_8vo2n")
+shader_parameter/stepp = 1.0
 
 [node name="fire_casting_VFX" type="Node3D" unique_id=396274099]
 
@@ -347,3 +481,8 @@ autoplay = &"init"
 
 [node name="VFX_anim" type="AnimationPlayer" parent="." unique_id=277029680]
 libraries/ = SubResource("AnimationLibrary_782b3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=157533923]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
+mesh = SubResource("SphereMesh_hlie2")
+surface_material_override/0 = SubResource("ShaderMaterial_yqkk6")
