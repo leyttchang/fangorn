@@ -12,11 +12,15 @@ enum Zone { ANY, BARBARIAN, MAGE, DUELIST }
 
 @export_category("Placement et Type")
 @export var node_type: NodeType = NodeType.MINOR
-@export var zone: Zone = Zone.ANY
 @export var max_occurrences: int = 1 # Nombre de fois max que ce nœud peut apparaître dans l'arbre
 
 @export_category("Probabilités d'apparition (Poids)")
 @export_range(0.0, 1000.0) var base_spawn_weight: float = 100.0 # Poids global du nœud (Rareté)
+
+@export_group("Multiplicateurs par Zone")
+@export_range(0.0, 1.0) var zone_barbarian_multiplier: float = 1.0
+@export_range(0.0, 1.0) var zone_mage_multiplier: float = 1.0
+@export_range(0.0, 1.0) var zone_duelist_multiplier: float = 1.0
 
 @export_group("Multiplicateurs par Tier")
 @export_range(0.0, 1.0) var tier_1_multiplier: float = 1.0 # 1.0 = 100% du poids, 0.0 = interdit

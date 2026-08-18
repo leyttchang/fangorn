@@ -15,7 +15,6 @@ script = ExtResource("2_ofjyc")
 node_id = "atk_speed"
 node_name = "attack speed"
 icon = ExtResource("1_q6b8f")
-zone = 3
 max_occurrences = 1000
 tier_2_multiplier = 0.8
 tier_3_multiplier = 0.4

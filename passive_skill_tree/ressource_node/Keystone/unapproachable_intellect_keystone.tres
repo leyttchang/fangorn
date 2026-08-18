@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillNodeData" format=3 uid="uid://baa1l6xluc8qr"]
+
+[ext_resource type="Texture2D" uid="uid://cpw2sdqsp0fcu" path="res://assets/icon/32x32/fb661.png" id="1_diyqk"]
+[ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="2_edk30"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="3_hkfj0"]
+
+[resource]
+script = ExtResource("2_edk30")
+node_id = "unapproachable_intellect_keystone"
+node_name = "Unapproachable Intellect"
+description = "Gain a portion of your total mana as bonus life."
+icon = ExtResource("1_diyqk")
+node_type = 2
+base_spawn_weight = 10.0
+zone_barbarian_multiplier = 0.3
+zone_duelist_multiplier = 0.3
+tier_1_multiplier = 0.0
+tier_2_multiplier = 0.5
+tier_3_multiplier = 2.0
+gameplay_effect_id = "unapproachable_intellect"
+metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

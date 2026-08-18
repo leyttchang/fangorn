@@ -545,10 +545,15 @@ func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool
 	
 	for skill in deck:
 		# Vérifier la zone
-		if skill.zone != SkillNodeData.Zone.ANY and skill.zone != zone:
-			continue
+		var zone_mult = 1.0
+		if zone == SkillNodeData.Zone.MAGE:
+			zone_mult = skill.zone_mage_multiplier
+		elif zone == SkillNodeData.Zone.DUELIST:
+			zone_mult = skill.zone_duelist_multiplier
+		elif zone == SkillNodeData.Zone.BARBARIAN:
+			zone_mult = skill.zone_barbarian_multiplier
 			
-		var weight = skill.base_spawn_weight
+		var weight = skill.base_spawn_weight * zone_mult
 		if tier == 1: weight *= skill.tier_1_multiplier
 		elif tier == 2: weight *= skill.tier_2_multiplier
 		elif tier == 3: weight *= skill.tier_3_multiplier

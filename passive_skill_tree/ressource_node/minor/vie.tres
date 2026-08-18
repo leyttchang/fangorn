@@ -14,7 +14,6 @@ script = ExtResource("2_kdly0")
 node_id = "vie"
 node_name = "vie"
 icon = ExtResource("1_puids")
-zone = 1
 max_occurrences = 1000
 tier_2_multiplier = 0.8
 tier_3_multiplier = 0.4

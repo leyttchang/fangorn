@@ -15,7 +15,6 @@ script = ExtResource("2_bo8ly")
 node_id = "magie"
 node_name = "magie"
 icon = ExtResource("1_vpoy0")
-zone = 2
 max_occurrences = 1000
 tier_2_multiplier = 0.8
 tier_3_multiplier = 0.4

@@ -23,7 +23,6 @@ node_id = "serenite"
 node_name = "sérénité"
 icon = ExtResource("1_lwq55")
 node_type = 1
-zone = 2
 max_occurrences = 3
 tier_1_multiplier = 0.8
 tier_2_multiplier = 0.15

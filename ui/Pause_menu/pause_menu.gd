@@ -145,7 +145,7 @@ func _on_god_mode_pressed() -> void:
 	if mana and mana.has_method("restore_mana"):
 		mana.restore_mana(10000.0)
 		
-	var skill_tree = player.find_child("SkillTreeComponent", true, false)
+	var skill_tree = player.find_child("Skill_tree_comp", true, false)
 	if skill_tree:
 		skill_tree.available_skill_points += 1000
 		

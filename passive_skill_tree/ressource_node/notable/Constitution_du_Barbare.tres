@@ -24,7 +24,6 @@ description = "Augmente vos points de vie maximums et votre armure.
 "
 icon = ExtResource("1_kxkm4")
 node_type = 1
-zone = 1
 max_occurrences = 3
 tier_1_multiplier = 0.25
 tier_2_multiplier = 0.35

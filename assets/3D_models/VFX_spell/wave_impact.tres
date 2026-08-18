@@ -24,6 +24,10 @@ texture_repeat = 2
 expanded_output_ports = [0]
 source = 5
 
+[sub_resource type="VisualShaderNodeVec2Parameter" id="VisualShaderNodeVec2Parameter_g118b"]
+parameter_name = "text_ofset"
+default_value_enabled = true
+
 [sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_vwe1b"]
 expanded_output_ports = [0]
 texture = ExtResource("1_g118b")
@@ -86,7 +90,7 @@ nodes/fragment/9/position = Vector2(-160, -40)
 nodes/fragment/10/node = SubResource("VisualShaderNodeFloatOp_g118b")
 nodes/fragment/10/position = Vector2(100, 200)
 nodes/fragment/11/node = SubResource("VisualShaderNodeFloatFunc_vwe1b")
-nodes/fragment/11/position = Vector2(-720, 220)
+nodes/fragment/11/position = Vector2(-760, 80)
 nodes/fragment/12/node = SubResource("VisualShaderNodeTexture2DParameter_g118b")
 nodes/fragment/12/position = Vector2(-760, 800)
 nodes/fragment/13/node = SubResource("VisualShaderNodeTexture_ul3qy")
@@ -95,4 +99,6 @@ nodes/fragment/14/node = SubResource("VisualShaderNodeTexture2DParameter_vwe1b")
 nodes/fragment/14/position = Vector2(-260, 480)
 nodes/fragment/15/node = SubResource("VisualShaderNodeTexture_3uddu")
 nodes/fragment/15/position = Vector2(-220, 360)
-nodes/fragment/connections = PackedInt32Array(5, 0, 3, 2, 9, 0, 0, 0, 4, 3, 5, 0, 11, 0, 10, 0, 4, 3, 11, 0, 8, 0, 10, 1, 10, 0, 0, 1, 12, 0, 13, 2, 13, 1, 8, 1, 6, 0, 5, 1, 14, 0, 15, 2, 3, 0, 15, 0, 15, 1, 8, 0)
+nodes/fragment/16/node = SubResource("VisualShaderNodeVec2Parameter_g118b")
+nodes/fragment/16/position = Vector2(-1260, 920)
+nodes/fragment/connections = PackedInt32Array(5, 0, 3, 2, 9, 0, 0, 0, 4, 3, 5, 0, 11, 0, 10, 0, 4, 3, 11, 0, 8, 0, 10, 1, 10, 0, 0, 1, 12, 0, 13, 2, 13, 1, 8, 1, 6, 0, 5, 1, 14, 0, 15, 2, 3, 0, 15, 0, 15, 1, 8, 0, 16, 0, 5, 2)

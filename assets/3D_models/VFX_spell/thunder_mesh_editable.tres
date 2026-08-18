@@ -28,6 +28,7 @@ render_priority = 0
 shader = ExtResource("3_7r04v")
 shader_parameter/impact_color = Color(1.3293564, 1.3293564, 5.8527637, 1)
 shader_parameter/impact_speed = Vector2(0, 1)
+shader_parameter/text_ofset = Vector2(0, 0)
 shader_parameter/wave_texture = ExtResource("4_u8ewf")
 shader_parameter/fade_texturegrad2d = SubResource("GradientTexture2D_o4nlg")
 

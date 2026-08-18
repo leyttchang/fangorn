@@ -3,25 +3,60 @@
 [ext_resource type="Script" uid="uid://b8o8cfjvrulht" path="res://passive_skill_tree/generator_test.gd" id="1_k7a3p"]
 [ext_resource type="PackedScene" uid="uid://cx2n538qv3yuo" path="res://passive_skill_tree/SkillNodeUI.tscn" id="2_mr2k3"]
 [ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="3_0upt1"]
+[ext_resource type="Resource" uid="uid://bt2rrjh6hebk8" path="res://passive_skill_tree/ressource_node/minor/area_of_effect_minor.tres" id="4_721ci"]
 [ext_resource type="Resource" uid="uid://yvsptfjjhutr" path="res://passive_skill_tree/ressource_node/minor/atk.tres" id="4_rbje3"]
+[ext_resource type="Resource" uid="uid://beffiibqb4nwx" path="res://passive_skill_tree/ressource_node/minor/armor_rating_minor.tres" id="5_6krma"]
 [ext_resource type="Resource" uid="uid://bs1va2l5gob5u" path="res://passive_skill_tree/ressource_node/notable/Constitution_du_Barbare.tres" id="5_cvyny"]
 [ext_resource type="Resource" uid="uid://c2bev3u32gbba" path="res://passive_skill_tree/ressource_node/notable/l'agilite_du_chasseur.tres" id="6_7m4xt"]
 [ext_resource type="Resource" uid="uid://dmh3o0jxv00c3" path="res://passive_skill_tree/ressource_node/minor/magie.tres" id="7_6w6nr"]
+[ext_resource type="Resource" uid="uid://wgsbn78gs7kt" path="res://passive_skill_tree/ressource_node/minor/attack_speed_minor.tres" id="7_waup2"]
+[ext_resource type="Resource" uid="uid://b1yp2ltfg67iv" path="res://passive_skill_tree/ressource_node/minor/casting_speed_minor.tres" id="8_cqfvn"]
 [ext_resource type="Resource" uid="uid://b1r6dumwuvobi" path="res://passive_skill_tree/ressource_node/notable/sagesse_du_magicien.tres" id="8_frk3w"]
 [ext_resource type="Resource" uid="uid://b1p2a5356t72x" path="res://passive_skill_tree/ressource_node/minor/vie.tres" id="9_gxykh"]
-[ext_resource type="Resource" uid="uid://dv8fbhwx1nk3h" path="res://passive_skill_tree/ressource_node/minor/speed.tres" id="10_0upt1"]
+[ext_resource type="Resource" uid="uid://ck5mj3mgrolpt" path="res://passive_skill_tree/ressource_node/minor/cold_damage_minor.tres" id="9_qxli8"]
+[ext_resource type="Resource" uid="uid://baufdp0y6viv2" path="res://passive_skill_tree/ressource_node/minor/elemental_damage_minor.tres" id="10_hsmp1"]
+[ext_resource type="Resource" uid="uid://b3fn31yv12twi" path="res://passive_skill_tree/ressource_node/minor/fire_damage_minor.tres" id="11_0jfb4"]
 [ext_resource type="Resource" uid="uid://bny10w4obugxl" path="res://passive_skill_tree/ressource_node/Keystone/doulbe_jump_ks.tres" id="11_rbje3"]
 [ext_resource type="Resource" uid="uid://cvu5uc6k1n3g7" path="res://passive_skill_tree/ressource_node/Keystone/Rage_ks.tres" id="12_cvyny"]
+[ext_resource type="Resource" uid="uid://ci5nd5ftn1lm5" path="res://passive_skill_tree/ressource_node/minor/health_minor.tres" id="12_uktca"]
 [ext_resource type="Resource" uid="uid://do0pwa8ruxrh4" path="res://passive_skill_tree/ressource_node/Keystone/mana_storm_ks.tres" id="13_7m4xt"]
+[ext_resource type="Resource" uid="uid://d1beu8ml4erp1" path="res://passive_skill_tree/ressource_node/minor/lightning_damage_minor.tres" id="13_wyjs6"]
 [ext_resource type="Resource" uid="uid://b08a6xy5moiwg" path="res://passive_skill_tree/ressource_node/notable/aiguisage.tres" id="14_6w6nr"]
+[ext_resource type="Resource" uid="uid://cg3clv7w2mk27" path="res://passive_skill_tree/ressource_node/minor/mana_minor.tres" id="15_1r6tn"]
 [ext_resource type="Resource" uid="uid://c4eqp5oy2ecjo" path="res://passive_skill_tree/ressource_node/notable/puissance_barbare.tres" id="15_frk3w"]
+[ext_resource type="Resource" uid="uid://2sqh2inlfpfx" path="res://passive_skill_tree/ressource_node/minor/move_speed_minor.tres" id="16_dw146"]
 [ext_resource type="Resource" uid="uid://ct05yip6bw7n8" path="res://passive_skill_tree/ressource_node/notable/serenite.tres" id="16_gxykh"]
-[ext_resource type="Resource" uid="uid://caki0u7ww7tro" path="res://passive_skill_tree/ressource_node/notable/magic_fire_damage.tres" id="17_12rrv"]
-[ext_resource type="Resource" uid="uid://bxy5a1tvbptx" path="res://passive_skill_tree/ressource_node/notable/physical_ice_damage.tres" id="18_v5x2f"]
+[ext_resource type="Resource" uid="uid://djgj73snalbgv" path="res://passive_skill_tree/ressource_node/minor/physical_damage_minor.tres" id="17_tvrir"]
+[ext_resource type="Resource" uid="uid://n10862f6jlt7" path="res://passive_skill_tree/ressource_node/minor/spell_damage_minor.tres" id="18_ugxtr"]
+[ext_resource type="Resource" uid="uid://ddv385i4ijdh2" path="res://passive_skill_tree/ressource_node/notable/agility_notable.tres" id="20_uapqk"]
+[ext_resource type="Resource" uid="uid://co4du8cnsvj1h" path="res://passive_skill_tree/ressource_node/notable/ambitious_notable.tres" id="22_cvw4w"]
+[ext_resource type="Resource" uid="uid://6bq0g0wk2t8d" path="res://passive_skill_tree/ressource_node/notable/big_veal_notable.tres" id="23_yfspe"]
+[ext_resource type="Resource" uid="uid://cn18stlxennas" path="res://passive_skill_tree/ressource_node/notable/blizzard_notable.tres" id="24_cljs1"]
+[ext_resource type="Resource" uid="uid://ttehdtwp6tiq" path="res://passive_skill_tree/ressource_node/notable/dense_notable.tres" id="26_cq1gd"]
+[ext_resource type="Resource" uid="uid://cpgs254t0005d" path="res://passive_skill_tree/ressource_node/notable/fast_hands_notable.tres" id="27_a3gfs"]
+[ext_resource type="Resource" uid="uid://0jvvw7rebym5" path="res://passive_skill_tree/ressource_node/notable/heat_notable.tres" id="28_0gs4q"]
+[ext_resource type="Resource" uid="uid://dhpflq7r1gajc" path="res://passive_skill_tree/ressource_node/notable/hyperactivity_notable.tres" id="29_1jjp7"]
+[ext_resource type="Resource" uid="uid://b2joqsgm3ol3v" path="res://passive_skill_tree/ressource_node/notable/infusion_notable.tres" id="30_xmy8p"]
+[ext_resource type="Resource" uid="uid://d15owj44ad7rg" path="res://passive_skill_tree/ressource_node/notable/large_veal_notable.tres" id="32_lpofp"]
+[ext_resource type="Resource" uid="uid://dn4cfdcn7aiu0" path="res://passive_skill_tree/ressource_node/notable/persipacity_notable.tres" id="33_4nd6e"]
+[ext_resource type="Resource" uid="uid://c5mcn2rea71xf" path="res://passive_skill_tree/ressource_node/notable/quick_casting_notable.tres" id="35_sbss1"]
+[ext_resource type="Resource" uid="uid://dek8gf006g5jw" path="res://passive_skill_tree/ressource_node/notable/reflexion_notable.tres" id="36_twegg"]
+[ext_resource type="Resource" uid="uid://chdi3jkvypbid" path="res://passive_skill_tree/ressource_node/notable/resourceful_notable.tres" id="37_qxlgh"]
+[ext_resource type="Resource" uid="uid://csnadf3w3htai" path="res://passive_skill_tree/ressource_node/notable/sharp_notable.tres" id="40_5db8r"]
+[ext_resource type="Resource" uid="uid://bklure3onj726" path="res://passive_skill_tree/ressource_node/notable/strong_grip_notable.tres" id="41_gvfnf"]
+[ext_resource type="Resource" uid="uid://b3jegjjwvusco" path="res://passive_skill_tree/ressource_node/notable/tempest_notable.tres" id="42_r5stl"]
+[ext_resource type="Resource" uid="uid://cjvami4smty0q" path="res://passive_skill_tree/ressource_node/notable/wisedom_notable.tres" id="43_uuc47"]
+[ext_resource type="Resource" uid="uid://bpfdw4agoa8ou" path="res://passive_skill_tree/ressource_node/Keystone/anormal_concentration_keystone.tres" id="47_uktca"]
+[ext_resource type="Resource" uid="uid://ch6at745fqrou" path="res://passive_skill_tree/ressource_node/Keystone/brutality_keystone.tres" id="48_wyjs6"]
+[ext_resource type="Resource" uid="uid://ct3mob70ocldt" path="res://passive_skill_tree/ressource_node/Keystone/cunning_hands_keystone.tres" id="49_1r6tn"]
+[ext_resource type="Resource" uid="uid://c0r82ii6o4qs0" path="res://passive_skill_tree/ressource_node/Keystone/elementalist_keystone.tres" id="50_dw146"]
+[ext_resource type="Resource" uid="uid://ce7a3sdvcyb5n" path="res://passive_skill_tree/ressource_node/Keystone/giant_ancestors_keystone.tres" id="51_tvrir"]
+[ext_resource type="Resource" uid="uid://nxg8pjdlpn0u" path="res://passive_skill_tree/ressource_node/Keystone/stone_statue_keystone.tres" id="52_ugxtr"]
+[ext_resource type="Resource" uid="uid://baa1l6xluc8qr" path="res://passive_skill_tree/ressource_node/Keystone/unapproachable_intellect_keystone.tres" id="53_uapqk"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
-seed = 1732433516
+seed = -1095543727
 frequency = 0.0254
 offset = Vector3(256.55, 203.6, 0)
 fractal_octaves = 1
@@ -44,7 +79,7 @@ tree_radius = 700.0
 min_node_distance = 70.0
 tree_seed = 0
 node_ui_scene = ExtResource("2_mr2k3")
-skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_rbje3"), ExtResource("5_cvyny"), ExtResource("6_7m4xt"), ExtResource("7_6w6nr"), ExtResource("8_frk3w"), ExtResource("9_gxykh"), ExtResource("10_0upt1"), ExtResource("11_rbje3"), ExtResource("12_cvyny"), ExtResource("13_7m4xt"), ExtResource("14_6w6nr"), ExtResource("15_frk3w"), ExtResource("16_gxykh"), ExtResource("17_12rrv"), ExtResource("18_v5x2f")])
+skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_721ci"), ExtResource("5_6krma"), ExtResource("4_rbje3"), ExtResource("7_waup2"), ExtResource("8_cqfvn"), ExtResource("9_qxli8"), ExtResource("10_hsmp1"), ExtResource("11_0jfb4"), ExtResource("12_uktca"), ExtResource("13_wyjs6"), ExtResource("7_6w6nr"), ExtResource("15_1r6tn"), ExtResource("16_dw146"), ExtResource("17_tvrir"), ExtResource("18_ugxtr"), ExtResource("9_gxykh"), ExtResource("20_uapqk"), ExtResource("14_6w6nr"), ExtResource("22_cvw4w"), ExtResource("23_yfspe"), ExtResource("24_cljs1"), ExtResource("5_cvyny"), ExtResource("26_cq1gd"), ExtResource("27_a3gfs"), ExtResource("28_0gs4q"), ExtResource("29_1jjp7"), ExtResource("30_xmy8p"), ExtResource("6_7m4xt"), ExtResource("32_lpofp"), ExtResource("33_4nd6e"), ExtResource("15_frk3w"), ExtResource("35_sbss1"), ExtResource("36_twegg"), ExtResource("37_qxlgh"), ExtResource("8_frk3w"), ExtResource("16_gxykh"), ExtResource("40_5db8r"), ExtResource("41_gvfnf"), ExtResource("42_r5stl"), ExtResource("43_uuc47"), ExtResource("11_rbje3"), ExtResource("13_7m4xt"), ExtResource("12_cvyny"), ExtResource("47_uktca"), ExtResource("48_wyjs6"), ExtResource("49_1r6tn"), ExtResource("50_dw146"), ExtResource("51_tvrir"), ExtResource("52_ugxtr"), ExtResource("53_uapqk")])
 show_noise_background = false
 noise_map = SubResource("FastNoiseLite_ug1u1")
 noise_influence = 0.585

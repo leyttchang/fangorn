@@ -8,10 +8,8 @@
 script = ExtResource("1_usx02")
 node_id = "double_jump"
 node_name = "Double jump"
-description = "allow double jumping"
 icon = ExtResource("1_k3sv5")
 node_type = 2
-zone = 3
 tier_1_multiplier = 0.1
 tier_2_multiplier = 0.6
 tier_3_multiplier = 0.3

@@ -8,10 +8,8 @@
 script = ExtResource("2_l12y0")
 node_id = "rage"
 node_name = "Rage"
-description = "augmente votre vitesse d'attaque et votre knockback power de 1% par % de pv manquant"
 icon = ExtResource("1_d8u8j")
 node_type = 2
-zone = 1
 tier_1_multiplier = 0.0
 tier_2_multiplier = 0.2
 tier_3_multiplier = 0.8
