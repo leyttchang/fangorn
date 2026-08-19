@@ -77,12 +77,14 @@ func _process(delta: float) -> void:
 			_handle_auto_casting(delta)
 
 func _handle_inputs() -> void:
-	if not can_cast_spells:
-		return
 	for action in slots.keys():
 		if Input.is_action_just_pressed(action):
 			var ability: AbilityData = slots[action]
 			if ability != null:
+				if not can_cast_spells and ability.category == AbilityData.AbilityCategory.MAGIC:
+					# print(ability.ability_name, " est bloqué (Magie interdite) !")
+					continue
+					
 				if cooldown_timers.has(ability.ability_name):
 					print(ability.ability_name, " est en cooldown !")
 					continue

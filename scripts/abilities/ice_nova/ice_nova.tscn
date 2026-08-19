@@ -7,6 +7,7 @@
 [ext_resource type="Shader" uid="uid://d38u3ry78d5ro" path="res://assets/3D_models/VFX_spell/wave_impact.tres" id="6_0lfaf"]
 [ext_resource type="Texture2D" uid="uid://c6vermwacx4a4" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/Rotated/spark_06_rotated.png" id="6_movyf"]
 [ext_resource type="Texture2D" uid="uid://biff8ah2i3vrg" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/light_03.png" id="7_0lfaf"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="8_6glf2"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_ice_nova"]
 height = 3.0
@@ -50,6 +51,42 @@ tracks/2/keys = {
 "update": 0,
 "values": [Color(1.6425065, 2.954788, 3.5629182, 1)]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Visuals/wave:draw_pass_1:surface_0/material:shader_parameter/impact_speed")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -1.5)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Visuals/wave:draw_pass_1:surface_0/material:shader_parameter/text_ofset")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0.4)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Visuals/spraks:emitting")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_upbfj"]
 resource_name = "new_animation"
@@ -75,10 +112,10 @@ tracks/1/path = NodePath("Visuals/wave:emitting")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.36666667),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0.033333335, 0.8333333),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [true]
+"values": [true, true]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -99,7 +136,7 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.46666667),
+"times": PackedFloat32Array(0.53333336),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],
@@ -117,6 +154,42 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Color(1.6425065, 2.954788, 3.5629182, 0), Color(1.6425065, 2.954788, 3.5629182, 0), Color(1.6425065, 2.954788, 3.5629182, 1), Color(0.3471, 0.37284, 0.39, 1), Color(0.3471, 0.37284, 0.39, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Visuals/wave:draw_pass_1:surface_0/material:shader_parameter/impact_speed")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.8033333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -6), Vector2(0, 1.5)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Visuals/wave:draw_pass_1:surface_0/material:shader_parameter/text_ofset")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.8033333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0.4), Vector2(0, -0.4)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Visuals/spraks:emitting")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.6333333),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_vhhob"]
@@ -207,8 +280,8 @@ fill_to = Vector2(0, 1)
 render_priority = 0
 shader = ExtResource("6_0lfaf")
 shader_parameter/impact_color = Color(0.19677037, 0.78877103, 1.3807716, 1)
-shader_parameter/impact_speed = Vector2(0, 1.5)
-shader_parameter/text_ofset = Vector2(0, -0.4)
+shader_parameter/impact_speed = Vector2(0, -1.5)
+shader_parameter/text_ofset = Vector2(0, 0.4)
 shader_parameter/wave_texture = ExtResource("6_movyf")
 shader_parameter/fade_texturegrad2d = SubResource("GradientTexture2D_qhdg7")
 
@@ -241,6 +314,57 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_snelp")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a24gg"]
+render_priority = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("8_6glf2")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_ripjr"]
+offsets = PackedFloat32Array(0, 0.6460905, 1)
+colors = PackedColorArray(2.1777, 2.392336, 3.6086066, 1, 0.7186058, 0.9803191, 3.3357346, 0.3529412, 0, 0.1500001, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_dria3"]
+gradient = SubResource("Gradient_ripjr")
+use_hdr = true
+
+[sub_resource type="Curve" id="Curve_ms26t"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.14441416, 0.8482759), 0.0, 0.0, 0, 0, Vector2(0.28337875, 0), 0.0, 0.0, 0, 0, Vector2(0.36239782, 1), 0.0, 0.0, 0, 0, Vector2(0.46321523, 0.79310346), 0.0, 0.0, 0, 0, Vector2(0.5667575, 0.24137932), 0.0, 0.0, 0, 0, Vector2(0.6948229, 0.006896615), 0.0, 0.0, 0, 0, Vector2(0.70844686, 1), 0.0, 0.0, 0, 0, Vector2(0.79564035, 0.027586222), 0.0, 0.0, 0, 0, Vector2(0.8610354, 0.7172414), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 11
+
+[sub_resource type="CurveTexture" id="CurveTexture_3bpsp"]
+curve = SubResource("Curve_ms26t")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5cxje"]
+lifetime_randomness = 0.1
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.5
+emission_ring_radius = 3.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 19.021
+initial_velocity_min = 0.5
+initial_velocity_max = 2.0
+radial_velocity_min = 19.999977
+radial_velocity_max = 29.999977
+gravity = Vector3(0, 1, 0)
+scale_min = 0.04
+scale_max = 0.089999996
+scale_curve = SubResource("CurveTexture_3bpsp")
+color = Color(1.8247963, 1.8247963, 1.8247963, 1)
+color_ramp = SubResource("GradientTexture1D_dria3")
+
+[sub_resource type="QuadMesh" id="QuadMesh_11exs"]
 
 [node name="IceNova" type="Node3D" unique_id=2065212646]
 script = ExtResource("1_script")
@@ -294,5 +418,17 @@ size = Vector3(25, 2, 25)
 texture_albedo = ExtResource("7_0lfaf")
 modulate = Color(1.6425065, 2.954788, 3.5629182, 1)
 upper_fade = 1.0
+
+[node name="spraks" type="GPUParticles3D" parent="Visuals" unique_id=1441704223]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3417412, 0)
+material_override = SubResource("StandardMaterial3D_a24gg")
+emitting = false
+amount = 100
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_5cxje")
+draw_pass_1 = SubResource("QuadMesh_11exs")
 
 [editable path="AttackComponent"]

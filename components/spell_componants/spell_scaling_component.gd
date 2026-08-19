@@ -55,35 +55,37 @@ func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 			final_damage += (weapon_damage + flat_phys_stat) * mult
 			
 		# ====================================================
-		# 2. CALCUL ADDITIF DES MULTIPLICATEURS (%)
+		# 2. CALCUL PROPORTIONNEL DES ELEMENTS (CHUNKS)
 		# ====================================================
-		var total_multiplier = 1.0 # 100% de base
-		
 		if caster_stats != null:
-			if scales_with_physical:
-				total_multiplier += max(0.0, caster_stats.get_stat_value("physical_damage") - 1.0)
+			var tags_count = 0
+			if scales_with_physical: tags_count += 1
+			if scales_with_magic: tags_count += 1
+			if scales_with_aoe_damage: tags_count += 1
+			if scales_with_fire: tags_count += 1
+			if scales_with_ice: tags_count += 1
+			if scales_with_lightning: tags_count += 1
 			
-			if scales_with_magic:
-				var magic_stat = caster_stats.get_stat_value("magic_damage")
-				# Cas spécial pour la stat magique où 0 dans la database = 1.0 dans le système (à uniformiser un jour)
-				if magic_stat == 0.0: magic_stat = 1.0 
-				total_multiplier += max(0.0, magic_stat - 1.0)
+			if tags_count > 0:
+				var scaled_damage = 0.0
+				var chunk_size = final_damage / float(tags_count)
 				
-			if scales_with_aoe_damage:
-				# Si un jour tu rajoutes 'aoe_damage' dans le entity_stats, il sera pris en compte
-				total_multiplier += max(0.0, caster_stats.get_stat_value("aoe_damage") - 1.0)
-				
-			if scales_with_fire:
-				total_multiplier += max(0.0, caster_stats.get_stat_value("fire_damage") - 1.0)
-				
-			if scales_with_ice:
-				total_multiplier += max(0.0, caster_stats.get_stat_value("ice_damage") - 1.0)
-				
-			if scales_with_lightning:
-				total_multiplier += max(0.0, caster_stats.get_stat_value("lightning_damage") - 1.0)
-		
-		# On applique le gros multiplicateur total
-		final_damage *= total_multiplier
+				if scales_with_physical:
+					scaled_damage += chunk_size * caster_stats.get_stat_value("physical_damage")
+				if scales_with_magic:
+					var magic_stat = caster_stats.get_stat_value("magic_damage")
+					if magic_stat == 0.0: magic_stat = 1.0 
+					scaled_damage += chunk_size * magic_stat
+				if scales_with_aoe_damage:
+					scaled_damage += chunk_size * caster_stats.get_stat_value("aoe_damage")
+				if scales_with_fire:
+					scaled_damage += chunk_size * caster_stats.get_stat_value("fire_damage")
+				if scales_with_ice:
+					scaled_damage += chunk_size * caster_stats.get_stat_value("ice_damage")
+				if scales_with_lightning:
+					scaled_damage += chunk_size * caster_stats.get_stat_value("lightning_damage")
+					
+				final_damage = scaled_damage
 		
 		# On applique les dégâts finaux à la Hitbox
 		attack_component.damage = final_damage

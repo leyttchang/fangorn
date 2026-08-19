@@ -56,7 +56,7 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
-seed = -1933115930
+seed = 1619160796
 frequency = 0.0254
 offset = Vector3(256.55, 203.6, 0)
 fractal_octaves = 1
@@ -78,6 +78,12 @@ num_nodes = 200
 tree_radius = 1000.0
 min_node_distance = 70.0
 cross_link_percent = 15.0
+notable_match_multiplier = 8.0
+keystone_match_multiplier = 15.0
+tag_match_multiplier_per_tag_notable = 10.0
+tag_match_multiplier_per_tag_keystone = 15.0
+dead_end_keystone_multiplier_per_depth = 10.0
+dead_end_minor_cutoff_depth = 1
 starter_nodes_mage = Array[ExtResource("3_0upt1")]([ExtResource("8_cqfvn"), ExtResource("9_qxli8"), ExtResource("10_hsmp1"), ExtResource("11_0jfb4"), ExtResource("13_wyjs6"), ExtResource("15_1r6tn"), ExtResource("18_ugxtr")])
 starter_nodes_duelist = Array[ExtResource("3_0upt1")]([ExtResource("16_dw146"), ExtResource("7_waup2")])
 starter_nodes_barbarian = Array[ExtResource("3_0upt1")]([ExtResource("5_6krma"), ExtResource("12_uktca"), ExtResource("17_tvrir")])

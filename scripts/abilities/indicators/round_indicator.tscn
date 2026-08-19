@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://bnemrb3vjo0la"]
 
-[ext_resource type="Texture2D" uid="uid://cfou000j4v2wv" path="res://icon.svg" id="1_465n0"]
+[ext_resource type="Texture2D" uid="uid://ci7wwcyv5hmm5" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/magic_03.png" id="1_465n0"]
 
 [node name="round_indicator" type="Decal" unique_id=1668346238]
+size = Vector3(5, 2, 5)
 texture_albedo = ExtResource("1_465n0")
+emission_energy = 4.0
+modulate = Color(10.958597, 14.40231, 10.900229, 1)
+upper_fade = 1.0446553

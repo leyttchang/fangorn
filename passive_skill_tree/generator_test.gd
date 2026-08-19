@@ -9,21 +9,38 @@ signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
 		generate_tree()
 
 @export_category("Parameters")
+## Nombre total de nœuds de l'arbre.
 @export var num_nodes: int = 150
+## Taille globale de l'arbre (rayon en pixels).
 @export var tree_radius: float = 400.0
+## Espace minimum entre deux nœuds (empêche les superpositions).
 @export var min_node_distance: float = 40.0
 @export_range(0.0, 100.0) var cross_link_percent: float = 10.0 # Pourcentage de connexions supplémentaires
 
 @export_category("Equilibrage (Poids & Règles)")
 @export_group("Types & Thèmes")
-@export_range(1.0, 10.0) var minor_match_multiplier: float = 3.0
-@export_range(1.0, 10.0) var notable_match_multiplier: float = 3.0
-@export_range(1.0, 10.0) var keystone_match_multiplier: float = 3.0
-@export_range(0.0, 10.0) var tag_match_multiplier_per_tag: float = 4.0
+## Force avec laquelle le système tente de placer un Mineur sur un chemin normal.
+## (Mettre à 100.0+ pour forcer).
+@export var minor_match_multiplier: float = 3.0
+## Force avec laquelle le système tente de placer un Notable sur un Carrefour (3+ connexions).
+## (Mettre à 100.0+ pour forcer).
+@export var notable_match_multiplier: float = 3.0
+## Force avec laquelle le système tente de placer une Keystone sur une Impasse.
+## (Mettre à 100.0+ pour forcer).
+@export var keystone_match_multiplier: float = 3.0
+## Force d'infection : Multiplicateur de thème quand le voisin est un MINEUR.
+@export var tag_match_multiplier_per_tag_minor: float = 2.5
+## Force d'infection : Multiplicateur de thème quand le voisin est un NOTABLE.
+@export var tag_match_multiplier_per_tag_notable: float = 6.0
+## Force d'infection : Multiplicateur de thème quand le voisin est une KEYSTONE.
+@export var tag_match_multiplier_per_tag_keystone: float = 8.0
 @export_group("Zones Hybrides")
+## Réduit les chances des nœuds normaux dans les zones frontières (laissant la place aux Hybrides Exclusifs).
 @export_range(0.0, 1.0) var hybrid_penalty_multiplier: float = 0.2
 @export_group("Impasses (Dead Ends)")
+## Plus une impasse est longue, plus une Keystone a de chance d'apparaître au bout.
 @export_range(0.0, 10.0) var dead_end_keystone_multiplier_per_depth: float = 2.5
+## Interdit l'apparition de nœuds Mineurs sur les X dernières cases d'une très longue impasse.
 @export var dead_end_minor_cutoff_depth: int = 2
 
 @export_category("Zones & Hybrides")
@@ -38,6 +55,7 @@ signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
 @export var starter_nodes_barbarian: Array[SkillNodeData] = []
 
 @export_category("UI & Données")
+## Cochez pour générer un rapport complet du contenu du Skill Deck dans la console (Output).
 @export var analyze_skill_deck: bool = false :
 	set(val):
 		analyze_skill_deck = false
@@ -742,6 +760,15 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 		if is_root and skill.node_type != SkillNodeData.NodeType.MINOR:
 			continue
 			
+		# --- INTERDIRE LES KEYSTONES COTE A COTE ---
+		var is_banned_keystone = false
+		if skill.node_type == SkillNodeData.NodeType.KEYSTONE:
+			for n_skill in neighbor_skills:
+				if n_skill.node_type == SkillNodeData.NodeType.KEYSTONE:
+					is_banned_keystone = true
+					break
+		# -------------------------------------------
+		
 		var type_multiplier = 1.0
 		if skill.node_type == desired_type:
 			if desired_type == SkillNodeData.NodeType.MINOR:
@@ -774,12 +801,22 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 				while temp > 0:
 					count += temp & 1
 					temp = temp >> 1
-				thematic_multiplier += tag_match_multiplier_per_tag * count
+					
+				var force: float = 2.5
+				if tag_match_multiplier_per_tag_minor != null: force = tag_match_multiplier_per_tag_minor
+				if n_skill.node_type == SkillNodeData.NodeType.NOTABLE:
+					force = 6.0
+					if tag_match_multiplier_per_tag_notable != null: force = tag_match_multiplier_per_tag_notable
+				elif n_skill.node_type == SkillNodeData.NodeType.KEYSTONE:
+					force = 8.0
+					if tag_match_multiplier_per_tag_keystone != null: force = tag_match_multiplier_per_tag_keystone
+					
+				thematic_multiplier += force * count
 		weight *= thematic_multiplier
 		# ----------------------------------------
 		
 		if weight > 0:
-			if is_banned_minor:
+			if is_banned_minor or is_banned_keystone:
 				fallback_candidates.append({"skill": skill, "weight": weight})
 				fallback_total_weight += weight
 			else:
