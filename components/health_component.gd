@@ -17,6 +17,7 @@ signal damage_taken(amount: float)
 
 var current_health: float
 var _known_max_health: float # NOUVEAU : On mémorise l'ancienne limite
+var has_cheat_death: bool = false
 
 func _ready() -> void:
 	if stats_component == null:
@@ -66,6 +67,12 @@ func take_damage(raw_damage: float) -> void:
 	damage_taken.emit(final_damage)
 	
 	# On s'assure que la vie ne descend pas en dessous de zéro
+	# --- MÉCANIQUE CHEAT DEATH (Ignore Death) ---
+	if current_health <= 0 and has_cheat_death:
+		has_cheat_death = false
+		var max_hp_cheat = stats_component.get_stat_value("max_health")
+		current_health = max_hp_cheat * 0.25
+
 	current_health = max(current_health, 0.0)
 	
 	# 5. On prévient le reste du jeu que la vie a changé
@@ -107,3 +114,22 @@ func _on_stat_changed(stat_name: String, new_value: float) -> void:
 		
 		# On met à jour l'interface !
 		health_changed.emit(current_health, new_value)
+
+# --- FONCTIONS POUR LE BLOOD MAGIC (RENOUNCEMENT) ---
+func pay_health_cost(amount: float) -> void:
+	current_health -= amount
+	# --- MÉCANIQUE CHEAT DEATH (Ignore Death) ---
+	if current_health <= 0 and has_cheat_death:
+		has_cheat_death = false
+		var max_hp_cheat = stats_component.get_stat_value("max_health")
+		current_health = max_hp_cheat * 0.25
+
+	current_health = max(current_health, 0.0)
+	var max_hp = stats_component.get_stat_value("max_health")
+	health_changed.emit(current_health, max_hp)
+
+func heal(amount: float) -> void:
+	var max_hp = stats_component.get_stat_value("max_health")
+	current_health += amount
+	current_health = min(current_health, max_hp)
+	health_changed.emit(current_health, max_hp)

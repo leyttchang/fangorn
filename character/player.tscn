@@ -989,7 +989,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999779, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.006333549, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.9999777, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.006333548, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1171,6 +1171,11 @@ script = ExtResource("61_ay40t")
 inventory_ui = NodePath("../InventoryUI")
 spellbook_ui = NodePath("../SpellBook_UI")
 skill_tree_comp = NodePath("../Skill_tree_comp")
+
+[node name="tree_climber" type="RayCast3D" parent="." unique_id=1327609897]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8124057, -0.24893999)
+target_position = Vector3(0, 0, -1)
+collision_mask = 128
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

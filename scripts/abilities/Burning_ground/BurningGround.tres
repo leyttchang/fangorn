@@ -10,8 +10,9 @@
 script = ExtResource("1_ilgln")
 ability_name = "Burning Ground"
 icon = ExtResource("2_8dwsn")
+cooldown = 6.0
 mana_cost = 20.0
-cast_time = 0.5
+cast_time = 1.0
 target_mode = 3
 cast_vfx_scene = ExtResource("2_lg8ku")
 indicator_scene = ExtResource("3_h8d7u")

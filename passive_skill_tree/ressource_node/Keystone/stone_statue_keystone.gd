@@ -12,7 +12,7 @@ func _ready() -> void:
 	if stats != null:
 		# Double your armor rating (+100% ARMOR)
 		# 1 = ModType.PERCENT
-		stats.add_modifier("armor", 1, 100.0, "stone_statue")
+		stats.add_modifier("armor", 1, 1.0, "stone_statue")
 
 func _exit_tree() -> void:
 	if stats != null:

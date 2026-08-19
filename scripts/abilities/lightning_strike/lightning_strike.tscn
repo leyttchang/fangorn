@@ -12,19 +12,6 @@
 height = 11.0
 radius = 1.5
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lightning"]
-transparency = 1
-albedo_color = Color(0, 0.8, 1, 0.5)
-emission_enabled = true
-emission = Color(0, 0.8, 1, 1)
-emission_energy_multiplier = 2.0
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_lightning"]
-material = SubResource("StandardMaterial3D_lightning")
-top_radius = 1.5
-bottom_radius = 1.5
-height = 11.0
-
 [sub_resource type="Gradient" id="Gradient_bxvm8"]
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_yqkk6"]
@@ -268,16 +255,11 @@ scales_with_lightning = true
 [node name="AttackComponent" parent="." unique_id=1343983247 instance=ExtResource("3_attack")]
 collision_layer = 4
 collision_mask = 9
-damage = 40.0
+damage = 100.0
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
 shape = SubResource("CylinderShape3D_lightning")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2048155868]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
-visible = false
-mesh = SubResource("CylinderMesh_lightning")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=132037]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 4.4784245, 0)

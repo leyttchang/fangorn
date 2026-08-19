@@ -19,13 +19,16 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 [resource]
 script = ExtResource("2_u0bai")
 node_id = "Constitution_du_Barbare"
-node_name = "Constitution du Barbare"
-description = "Augmente vos points de vie maximums et votre armure.
+node_name = "Barbarian constitution"
+description = "
 "
 icon = ExtResource("1_kxkm4")
 node_type = 1
 max_occurrences = 3
+zone_mage_multiplier = 0.0
+zone_duelist_multiplier = 0.0
 tier_1_multiplier = 0.25
 tier_2_multiplier = 0.35
 tier_3_multiplier = 0.4
+tags = 5
 stats_bonuses = Array[ExtResource("3_dovep")]([SubResource("Resource_5vf3x"), SubResource("Resource_78dpv")])

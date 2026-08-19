@@ -3,17 +3,17 @@
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://djtioufafqhx8" path="res://scripts/abilities/casting_animation/lightning_casting_vfx.tscn" id="2_0cfru"]
 [ext_resource type="Texture2D" uid="uid://qxj2x8vgerhx" path="res://assets/icon/32x32/fb844.png" id="2_docdq"]
-[ext_resource type="PackedScene" uid="uid://by1acpsl8idq7" path="res://scripts/abilities/lightning_strike/lightning_strike.tscn" id="2_scene"]
+[ext_resource type="PackedScene" uid="uid://dpltro8wtncvc" path="res://scripts/abilities/lightning_strike/lightning_strike.tscn" id="2_scene"]
 [ext_resource type="PackedScene" uid="uid://bnemrb3vjo0la" path="res://scripts/abilities/indicators/round_indicator.tscn" id="3_indicator"]
 
 [resource]
 script = ExtResource("1_script")
 ability_name = "Lightning Strike"
 icon = ExtResource("2_docdq")
-cooldown = 12.0
-mana_cost = 50.0
+cooldown = 4.0
+mana_cost = 25.0
 max_range = 25.0
-cast_time = 2.0
+cast_time = 1.5
 target_mode = 3
 cast_vfx_scene = ExtResource("2_0cfru")
 indicator_scene = ExtResource("3_indicator")

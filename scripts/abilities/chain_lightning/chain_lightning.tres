@@ -9,7 +9,8 @@
 script = ExtResource("1_a8h7x")
 ability_name = "Chaing lightning"
 icon = ExtResource("2_fpq6r")
-mana_cost = 1.0
+cooldown = 8.0
+mana_cost = 40.0
 max_range = 10.0
 cast_time = 3.0
 target_mode = 2

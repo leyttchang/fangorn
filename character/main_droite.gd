@@ -15,6 +15,7 @@ extends Marker3D
 var current_weapon: Node3D = null
 var is_attacking: bool = false
 var combo_step: int = 1
+var has_hit_in_combo_swing: bool = false
 
 # Fenêtre de tolérance pour le buffer de combo (en millisecondes)
 var last_click_time: int = 0
@@ -152,6 +153,9 @@ func start_heavy_attack():
 
 func enable_current_hitbox():
 	if is_instance_valid(current_weapon):
+		var ac = current_weapon.attack_component
+		if ac != null and not ac.attack_landed.is_connected(_on_weapon_hit):
+			ac.attack_landed.connect(_on_weapon_hit)
 		var shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
 		if is_instance_valid(shape): shape.set_deferred("disabled", false)
 
@@ -159,6 +163,7 @@ func disable_current_hitbox():
 	if is_instance_valid(current_weapon):
 		var shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
 		current_weapon.attack_component.reset_hit_entities() 
+		has_hit_in_combo_swing = false
 		if is_instance_valid(shape): shape.set_deferred("disabled", true)
 
 func check_combo():
@@ -178,6 +183,7 @@ func check_combo():
 			combo_step += 1
 			if is_instance_valid(current_weapon):
 				current_weapon.attack_component.reset_hit_entities()
+				has_hit_in_combo_swing = false
 				current_weapon.update_damage_from_stats(player_stats, combo_step)
 			anim_tree.set("parameters/TimeScale/scale", get_current_attack_speed()) # On maintient la vitesse pour le coup 2
 			anim_playback.travel(next_anim)
@@ -196,3 +202,13 @@ func end_combat_state():
 		var style_string = WeaponItem.WeaponStyle.keys()[equipped_item.weapon_style].to_lower()
 		var idle_anim = "idle_" + style_string
 		anim_playback.start(idle_anim)
+
+func _on_weapon_hit(target: Node3D) -> void:
+	if target.get_parent().is_in_group("Enemie") or "Dummy" in target.get_parent().name:
+		print("Main_droite: Hit enemy!")
+		if not has_hit_in_combo_swing:
+			has_hit_in_combo_swing = true
+			print("Main_droite: Emitting player_hit_enemy signal!")
+			var player = get_tree().get_first_node_in_group("Player")
+			if player != null and player.has_signal("player_hit_enemy"):
+				player.emit_signal("player_hit_enemy")

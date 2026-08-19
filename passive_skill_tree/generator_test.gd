@@ -14,7 +14,90 @@ signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
 @export var min_node_distance: float = 40.0
 @export_range(0.0, 100.0) var cross_link_percent: float = 10.0 # Pourcentage de connexions supplémentaires
 
+@export_category("Equilibrage (Poids & Règles)")
+@export_group("Types & Thèmes")
+@export_range(1.0, 10.0) var minor_match_multiplier: float = 3.0
+@export_range(1.0, 10.0) var notable_match_multiplier: float = 3.0
+@export_range(1.0, 10.0) var keystone_match_multiplier: float = 3.0
+@export_range(0.0, 10.0) var tag_match_multiplier_per_tag: float = 4.0
+@export_group("Zones Hybrides")
+@export_range(0.0, 1.0) var hybrid_penalty_multiplier: float = 0.2
+@export_group("Impasses (Dead Ends)")
+@export_range(0.0, 10.0) var dead_end_keystone_multiplier_per_depth: float = 2.5
+@export var dead_end_minor_cutoff_depth: int = 2
+
+@export_category("Zones & Hybrides")
+@export var hybrid_zone_width_degrees: float = 20.0 :
+	set(val):
+		hybrid_zone_width_degrees = val
+		queue_redraw()
+
+@export_category("Starter Nodes")
+@export var starter_nodes_mage: Array[SkillNodeData] = []
+@export var starter_nodes_duelist: Array[SkillNodeData] = []
+@export var starter_nodes_barbarian: Array[SkillNodeData] = []
+
 @export_category("UI & Données")
+@export var analyze_skill_deck: bool = false :
+	set(val):
+		analyze_skill_deck = false
+		if Engine.is_editor_hint() and val == true:
+			_print_deck_statistics()
+			
+func _print_deck_statistics() -> void:
+	print("\n=======================================================")
+	print("📊 ANALYSE DU SKILL DECK (", skill_deck.size(), " Noeuds)")
+	print("=======================================================")
+	
+	var stats = {
+		"MINOR": {"barb": 0, "mage": 0, "duel": 0, "barb_mage": 0, "mage_duel": 0, "duel_barb": 0, "all_3": 0, "hybrid_exclusive": 0},
+		"NOTABLE": {"barb": 0, "mage": 0, "duel": 0, "barb_mage": 0, "mage_duel": 0, "duel_barb": 0, "all_3": 0, "hybrid_exclusive": 0},
+		"KEYSTONE": {"barb": 0, "mage": 0, "duel": 0, "barb_mage": 0, "mage_duel": 0, "duel_barb": 0, "all_3": 0, "hybrid_exclusive": 0}
+	}
+	
+	for skill in skill_deck:
+		if skill == null: continue
+		var type_str = "MINOR"
+		if skill.node_type == 1: type_str = "NOTABLE"
+		elif skill.node_type == 2: type_str = "KEYSTONE"
+		
+		if skill.is_hybrid_exclusive:
+			stats[type_str]["hybrid_exclusive"] += 1
+			continue
+			
+		var b = skill.zone_barbarian_multiplier > 0.0
+		var m = skill.zone_mage_multiplier > 0.0
+		var d = skill.zone_duelist_multiplier > 0.0
+		
+		if b and not m and not d: stats[type_str]["barb"] += 1
+		elif not b and m and not d: stats[type_str]["mage"] += 1
+		elif not b and not m and d: stats[type_str]["duel"] += 1
+		elif b and m and not d: stats[type_str]["barb_mage"] += 1
+		elif not b and m and d: stats[type_str]["mage_duel"] += 1
+		elif b and not m and d: stats[type_str]["duel_barb"] += 1
+		elif b and m and d: stats[type_str]["all_3"] += 1
+		
+	for type in ["MINOR", "NOTABLE", "KEYSTONE"]:
+		var t_barb = stats[type]["barb"] + stats[type]["barb_mage"] + stats[type]["duel_barb"] + stats[type]["all_3"]
+		var t_mage = stats[type]["mage"] + stats[type]["barb_mage"] + stats[type]["mage_duel"] + stats[type]["all_3"]
+		var t_duel = stats[type]["duel"] + stats[type]["duel_barb"] + stats[type]["mage_duel"] + stats[type]["all_3"]
+		
+		print("\n--- ", type, "S ---")
+		print(" - Exclusif BARBARE : ", stats[type]["barb"])
+		print(" - Exclusif MAGE    : ", stats[type]["mage"])
+		print(" - Exclusif DUELIST : ", stats[type]["duel"])
+		print(" - 2 Zones (Barb+Mage) : ", stats[type]["barb_mage"])
+		print(" - 2 Zones (Mage+Duel) : ", stats[type]["mage_duel"])
+		print(" - 2 Zones (Duel+Barb) : ", stats[type]["duel_barb"])
+		print(" - 3 Zones (ANY)       : ", stats[type]["all_3"])
+		print(" - HYBRID Exclusif     : ", stats[type]["hybrid_exclusive"])
+		print("   => TOTAL DISPO EN ZONE BARBARE : ", t_barb)
+		print("   => TOTAL DISPO EN ZONE MAGE    : ", t_mage)
+		print("   => TOTAL DISPO EN ZONE DUELIST : ", t_duel)
+		
+	print("=======================================================\n")
+
+
 @export var tree_seed: int = 12345 # Graine de génération pour avoir le même arbre
 @export var node_ui_scene: PackedScene
 @export var skill_deck: Array[SkillNodeData] = []
@@ -123,6 +206,8 @@ func _ready():
 		generate_tree()
 
 func generate_tree():
+	if not is_inside_tree():
+		return
 	var current_seed = tree_seed
 	if current_seed == 0:
 		randomize()
@@ -386,17 +471,17 @@ func _draw():
 		draw_texture(noise_texture, tex_pos)
 	
 	# Lignes de séparation (120 degrés)
-	var angle1 = -PI / 2.0
-	var angle2 = angle1 + (TAU / 3.0)
-	var angle3 = angle1 + (TAU * 2.0 / 3.0)
-	
-	var dir1 = Vector2(cos(angle1), sin(angle1)) * tree_radius
-	var dir2 = Vector2(cos(angle2), sin(angle2)) * tree_radius
-	var dir3 = Vector2(cos(angle3), sin(angle3)) * tree_radius
-	
-	draw_line(center_offset, center_offset + dir1, Color(1, 1, 1, 0.3), 1.0, true)
-	draw_line(center_offset, center_offset + dir2, Color(1, 1, 1, 0.3), 1.0, true)
-	draw_line(center_offset, center_offset + dir3, Color(1, 1, 1, 0.3), 1.0, true)
+	var hybrid_rad = deg_to_rad(hybrid_zone_width_degrees) / 2.0
+	for angle in [-PI / 2.0, PI / 6.0, 5.0 * PI / 6.0]:
+		var dir_mid = Vector2(cos(angle), sin(angle)) * tree_radius
+		var dir_left = Vector2(cos(angle - hybrid_rad), sin(angle - hybrid_rad)) * tree_radius
+		var dir_right = Vector2(cos(angle + hybrid_rad), sin(angle + hybrid_rad)) * tree_radius
+		
+		# Ligne centrale (optionnelle, fine)
+		draw_line(center_offset, center_offset + dir_mid, Color(1, 1, 1, 0.1), 1.0, true)
+		# Frontières de la zone hybride
+		draw_line(center_offset, center_offset + dir_left, Color(1, 1, 0, 0.4), 2.0, true)
+		draw_line(center_offset, center_offset + dir_right, Color(1, 1, 0, 0.4), 2.0, true)
 	
 	# Cercles concentriques (Tiers)
 	# Utiliser 0.5 et 0.8 équilibre beaucoup mieux les aires de chaque zone (environ 25% / 39% / 36% des points)
@@ -458,21 +543,103 @@ func _build_interactive_tree():
 			var skill_copy = skill.duplicate()
 			available_deck.append(skill_copy)
 	
-	# 3. Placer les boutons
+	# 2.5. Pré-calculer la longueur des impasses (pour les feuilles uniquement)
+	var leaf_dead_end_length = {}
 	for i in range(points.size()):
-		var pt = points[i]
+		leaf_dead_end_length[i] = 0
+		
+	for i in range(points.size()):
+		if _get_connections_count(i) == 1 and i != 0:
+			var chain_length = 1
+			var c = i
+			var p = -1
+			while true:
+				var neighbors = adjacency_list[c]
+				var next_node = -1
+				for n in neighbors:
+					if n != p:
+						next_node = n
+						break
+				if next_node == -1 or _get_connections_count(next_node) != 2:
+					break
+				p = c
+				c = next_node
+				chain_length += 1
+				
+			leaf_dead_end_length[i] = chain_length
+
+	# 3. NOUVEAU: Parcourir le graphe avec un ordre de priorité !
+	# Racines -> Feuilles (Impasses) -> Carrefours -> Le reste
+	var roots = []
+	var leaves = []
+	var hubs = []
+	var normals = []
+	
+	for i in range(1, points.size()):
+		var conns = _get_connections_count(i)
+		if i == 1 or i == 2 or i == 3:
+			roots.append(i)
+		elif conns == 1:
+			leaves.append(i)
+		elif conns >= 3:
+			hubs.append(i)
+		else:
+			normals.append(i)
+			
+	leaves.shuffle()
+	hubs.shuffle()
+	normals.shuffle()
+			
+	var processing_order = roots + leaves + hubs + normals
+	node_skills[0] = null
+	
+	for curr in processing_order:
+		var pt = points[curr]
 		var tier = _get_tier(pt)
 		var zone = _get_zone(pt)
-		var connections = _get_connections_count(i)
+		var hybrid_zone = _get_hybrid_zone(pt)
+		var connections = _get_connections_count(curr)
 		var is_leaf = (connections == 1)
 		var is_hub = (connections >= 3)
-		var is_root = (i == 1 or i == 2 or i == 3)
+		var is_root = (curr == 1 or curr == 2 or curr == 3)
 		
-		# Spécial: le noeud 0 est le point de départ
+		# Récupérer les skills des voisins déjà assignés
+		var neighbor_skills = []
+		for neighbor in adjacency_list[curr]:
+			if node_skills.has(neighbor) and node_skills[neighbor] != null:
+				neighbor_skills.append(node_skills[neighbor])
+				
 		var chosen_skill = null
-		if i != 0:
-			chosen_skill = _draft_skill(tier, zone, available_deck, is_leaf, is_hub, is_root)
+		if is_root:
+			var starter_deck = []
+			var source_array = []
+			if zone == SkillNodeData.Zone.MAGE: source_array = starter_nodes_mage
+			elif zone == SkillNodeData.Zone.DUELIST: source_array = starter_nodes_duelist
+			elif zone == SkillNodeData.Zone.BARBARIAN: source_array = starter_nodes_barbarian
 			
+			for skill in source_array:
+				if skill != null:
+					starter_deck.append(skill.duplicate())
+					
+			if starter_deck.size() > 0:
+				chosen_skill = _draft_skill(tier, zone, hybrid_zone, starter_deck, is_leaf, is_hub, is_root, neighbor_skills, leaf_dead_end_length[curr])
+			else:
+				chosen_skill = _draft_skill(tier, zone, hybrid_zone, available_deck, is_leaf, is_hub, is_root, neighbor_skills, leaf_dead_end_length[curr])
+		else:
+			chosen_skill = _draft_skill(tier, zone, hybrid_zone, available_deck, is_leaf, is_hub, is_root, neighbor_skills, leaf_dead_end_length[curr])
+		
+		node_skills[curr] = chosen_skill
+		
+		if chosen_skill != null:
+			chosen_skill.max_occurrences -= 1
+			if chosen_skill.max_occurrences <= 0:
+				available_deck.erase(chosen_skill)
+				
+	# 4. Placer les boutons
+	for i in range(points.size()):
+		var pt = points[i]
+		var chosen_skill = node_skills.get(i, null)
+		
 		var ui = node_ui_scene.instantiate() as SkillNodeUI
 		add_child(ui)
 		ui.position = pt + center_offset - (ui.size / 2.0)
@@ -480,15 +647,9 @@ func _build_interactive_tree():
 		ui.node_clicked.connect(_on_ui_node_clicked.bind(i))
 		
 		ui_nodes.append(ui)
-		node_skills[i] = chosen_skill
-		
-		# Si on a pioché une compétence, on réduit son compteur
-		if chosen_skill != null:
-			chosen_skill.max_occurrences -= 1
-			if chosen_skill.max_occurrences <= 0:
-				available_deck.erase(chosen_skill)
 
-	# 4. Initialisation des états (Seul le centre est UNLOCKED, ses voisins sont AVAILABLE)
+
+	# 4. Initialisation des états
 	# On fait ça en mode "call_deferred" pour être sûr que tout est bien ajouté à l'arbre
 	call_deferred("_init_tree_states")
 
@@ -531,9 +692,11 @@ func unlock_node(node_index: int):
 					edge_lines[edge_key].default_color = Color(1.0, 1.0, 1.0, 1.0)
 					edge_lines[edge_key].width = 6.0
 
-func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool, is_root: bool) -> SkillNodeData:
+func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is_leaf: bool, is_hub: bool, is_root: bool, neighbor_skills: Array = [], dead_end_length: int = 0) -> SkillNodeData:
 	var best_candidates = []
 	var total_weight = 0.0
+	var fallback_candidates = []
+	var fallback_total_weight = 0.0
 	
 	var desired_type = SkillNodeData.NodeType.MINOR
 	if is_root:
@@ -545,13 +708,27 @@ func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool
 	
 	for skill in deck:
 		# Vérifier la zone
-		var zone_mult = 1.0
-		if zone == SkillNodeData.Zone.MAGE:
-			zone_mult = skill.zone_mage_multiplier
-		elif zone == SkillNodeData.Zone.DUELIST:
-			zone_mult = skill.zone_duelist_multiplier
-		elif zone == SkillNodeData.Zone.BARBARIAN:
-			zone_mult = skill.zone_barbarian_multiplier
+		var zone_mult = 0.0
+		if skill.is_hybrid_exclusive:
+			if hybrid_zone == SkillNodeData.Zone.HYBRID_BARB_MAGE and skill.spawn_in_barb_mage:
+				zone_mult = 1.0
+			elif hybrid_zone == SkillNodeData.Zone.HYBRID_MAGE_DUEL and skill.spawn_in_mage_duel:
+				zone_mult = 1.0
+			elif hybrid_zone == SkillNodeData.Zone.HYBRID_DUEL_BARB and skill.spawn_in_duel_barb:
+				zone_mult = 1.0
+			else:
+				zone_mult = 0.0
+		else:
+			if strict_zone == SkillNodeData.Zone.MAGE:
+				zone_mult = skill.zone_mage_multiplier
+			elif strict_zone == SkillNodeData.Zone.DUELIST:
+				zone_mult = skill.zone_duelist_multiplier
+			elif strict_zone == SkillNodeData.Zone.BARBARIAN:
+				zone_mult = skill.zone_barbarian_multiplier
+				
+			# Malus pour laisser la place aux hybrides exclusifs
+			if hybrid_zone != SkillNodeData.Zone.ANY:
+				zone_mult *= hybrid_penalty_multiplier
 			
 		var weight = skill.base_spawn_weight * zone_mult
 		if tier == 1: weight *= skill.tier_1_multiplier
@@ -567,16 +744,55 @@ func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool
 			
 		var type_multiplier = 1.0
 		if skill.node_type == desired_type:
-			type_multiplier = 3.0 # On favorise le type idéal pour cet emplacement, mais sans excès
+			if desired_type == SkillNodeData.NodeType.MINOR:
+				type_multiplier = minor_match_multiplier
+			elif desired_type == SkillNodeData.NodeType.NOTABLE:
+				type_multiplier = notable_match_multiplier
+			elif desired_type == SkillNodeData.NodeType.KEYSTONE:
+				type_multiplier = keystone_match_multiplier
 			
 		weight *= type_multiplier
 		
+		# --- LOGIQUE D'IMPASSE (DEAD ENDS) ---
+		var is_banned_minor = false
+		if is_leaf and dead_end_length > 0:
+			if skill.node_type == SkillNodeData.NodeType.KEYSTONE:
+				weight *= (1.0 + float(dead_end_length) * dead_end_keystone_multiplier_per_depth)
+				
+			if skill.node_type == SkillNodeData.NodeType.MINOR and dead_end_length > dead_end_minor_cutoff_depth:
+				is_banned_minor = true
+		# -------------------------------------
+		
+		# --- MULTIPLICATEUR THEMATIQUE (TAGS) ---
+		var thematic_multiplier = 1.0
+		for n_skill in neighbor_skills:
+			var shared_tags = skill.tags & n_skill.tags
+			if shared_tags != 0:
+				# Compter le nombre de tags en commun (bits à 1)
+				var count = 0
+				var temp = shared_tags
+				while temp > 0:
+					count += temp & 1
+					temp = temp >> 1
+				thematic_multiplier += tag_match_multiplier_per_tag * count
+		weight *= thematic_multiplier
+		# ----------------------------------------
+		
 		if weight > 0:
-			best_candidates.append({"skill": skill, "weight": weight})
-			total_weight += weight
+			if is_banned_minor:
+				fallback_candidates.append({"skill": skill, "weight": weight})
+				fallback_total_weight += weight
+			else:
+				best_candidates.append({"skill": skill, "weight": weight})
+				total_weight += weight
 			
 	if best_candidates.is_empty():
-		return null
+		if not fallback_candidates.is_empty():
+			# Sécurité : on utilise les mineurs bannis si on a rien d'autre
+			best_candidates = fallback_candidates
+			total_weight = fallback_total_weight
+		else:
+			return null
 		
 	# Roulette
 	var roll = randf() * total_weight
@@ -590,11 +806,35 @@ func _draft_skill(tier: int, zone: int, deck: Array, is_leaf: bool, is_hub: bool
 
 func _get_zone(pos: Vector2) -> int:
 	var angle = pos.angle() 
-	if angle >= -PI/2.0 and angle < PI/6.0:
+	var bound_mage_barb = -PI/2.0
+	var bound_duel_mage = PI/6.0
+	var bound_barb_duel = 5.0*PI/6.0
+	
+	if angle >= bound_mage_barb and angle < bound_duel_mage:
 		return SkillNodeData.Zone.MAGE
-	if angle >= PI/6.0 and angle < 5.0*PI/6.0:
+	if angle >= bound_duel_mage and angle < bound_barb_duel:
 		return SkillNodeData.Zone.DUELIST
 	return SkillNodeData.Zone.BARBARIAN
+
+func _get_hybrid_zone(pos: Vector2) -> int:
+	var angle = pos.angle()
+	var hybrid_rad = deg_to_rad(hybrid_zone_width_degrees) / 2.0
+	
+	var bound_mage_barb = -PI/2.0
+	var bound_duel_mage = PI/6.0
+	var bound_barb_duel = 5.0*PI/6.0
+	
+	if abs(angle - bound_mage_barb) <= hybrid_rad:
+		return SkillNodeData.Zone.HYBRID_BARB_MAGE
+	if abs(angle - bound_duel_mage) <= hybrid_rad:
+		return SkillNodeData.Zone.HYBRID_MAGE_DUEL
+	if abs(angle - bound_barb_duel) <= hybrid_rad:
+		return SkillNodeData.Zone.HYBRID_DUEL_BARB
+	# Cas spécial pour la frontière Barb/Duelist qui pourrait déborder sur PI / -PI
+	if abs(angle - (bound_barb_duel - TAU)) <= hybrid_rad:
+		return SkillNodeData.Zone.HYBRID_DUEL_BARB
+		
+	return SkillNodeData.Zone.ANY
 
 func _get_tier(pos: Vector2) -> int:
 	var dist = pos.length()

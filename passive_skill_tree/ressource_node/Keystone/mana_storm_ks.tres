@@ -12,8 +12,11 @@ description = "declanche une tempete de mana quand votre mana descend en dessous
 20 seconde de recuperation"
 icon = ExtResource("1_2r5pq")
 node_type = 2
+zone_barbarian_multiplier = 0.0
+zone_duelist_multiplier = 0.0
 tier_1_multiplier = 0.0
 tier_2_multiplier = 0.2
 tier_3_multiplier = 0.8
+tags = 2
 gameplay_effect_id = "mana_storm"
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

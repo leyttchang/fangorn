@@ -13,12 +13,15 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 [resource]
 script = ExtResource("1_sinrn")
 node_id = "aiguisage"
-node_name = "Aiguisage"
+node_name = "Sharpening"
 icon = ExtResource("1_3wdmd")
 node_type = 1
 max_occurrences = 3
+is_hybrid_exclusive = true
+spawn_in_duel_barb = true
 tier_1_multiplier = 0.1
 tier_2_multiplier = 0.4
 tier_3_multiplier = 0.5
+tags = 8
 stats_bonuses = Array[ExtResource("2_3wdmd")]([SubResource("Resource_enlf3")])
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

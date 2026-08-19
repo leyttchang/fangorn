@@ -3,9 +3,14 @@ extends Node
 
 enum State { IDLE, TARGETING, SELECTED, CASTING, AUTO_CASTING }
 var current_state: State = State.IDLE
+var can_cast_spells: bool = true
+
+enum CastingResource { MANA, HEALTH }
+var current_casting_resource: CastingResource = CastingResource.MANA
 
 # --- SIGNAUX ---
 signal spells_updated
+signal health_spent_for_spell(amount: float)
 signal cast_started(ability_name: String, max_time: float)
 signal cast_updated(current_time: float, max_time: float)
 signal cast_canceled()
@@ -72,6 +77,8 @@ func _process(delta: float) -> void:
 			_handle_auto_casting(delta)
 
 func _handle_inputs() -> void:
+	if not can_cast_spells:
+		return
 	for action in slots.keys():
 		if Input.is_action_just_pressed(action):
 			var ability: AbilityData = slots[action]
@@ -80,13 +87,22 @@ func _handle_inputs() -> void:
 					print(ability.ability_name, " est en cooldown !")
 					continue
 
-				# Vérification du mana
-				var mana_comp = get_parent().get_node_or_null("ManaComponent")
-				if mana_comp == null:
-					mana_comp = get_parent().get_node_or_null("mana_component")
-					
-				if mana_comp != null and not mana_comp.has_enough_mana(ability.mana_cost):
-					print(ability.ability_name, " : Pas assez de mana !")
+				# Vérification de la ressource (Mana ou Vie)
+				var can_afford = false
+				if current_casting_resource == CastingResource.MANA:
+					var mana_comp = get_parent().get_node_or_null("ManaComponent")
+					if mana_comp == null: mana_comp = get_parent().get_node_or_null("mana_component")
+					if mana_comp != null:
+						can_afford = mana_comp.has_enough_mana(ability.mana_cost)
+				elif current_casting_resource == CastingResource.HEALTH:
+					var health_comp = get_parent().get_node_or_null("HealthComponent")
+					if health_comp == null: health_comp = get_parent().get_node_or_null("health_component")
+					if health_comp != null:
+						# Sécurité : la vie doit être strictement supérieure au coût pour ne pas se tuer
+						can_afford = health_comp.current_health > ability.mana_cost
+						
+				if not can_afford:
+					print(ability.ability_name, " : Pas assez de ressource (Mana/Vie) !")
 					continue
 
 				var base_cast_time = ability.cast_time if "cast_time" in ability else 0.0
@@ -414,13 +430,18 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 	print("Lancement réussi de : ", ability.ability_name)
 	_start_cooldown(ability)
 
-	# Consommation du mana
-	var mana_comp = get_parent().get_node_or_null("ManaComponent")
-	if mana_comp == null:
-		mana_comp = get_parent().get_node_or_null("mana_component")
-		
-	if mana_comp != null:
-		mana_comp.use_mana(ability.mana_cost)
+	# Consommation de la ressource
+	if current_casting_resource == CastingResource.MANA:
+		var mana_comp = get_parent().get_node_or_null("ManaComponent")
+		if mana_comp == null: mana_comp = get_parent().get_node_or_null("mana_component")
+		if mana_comp != null:
+			mana_comp.use_mana(ability.mana_cost)
+	elif current_casting_resource == CastingResource.HEALTH:
+		var health_comp = get_parent().get_node_or_null("HealthComponent")
+		if health_comp == null: health_comp = get_parent().get_node_or_null("health_component")
+		if health_comp != null:
+			health_comp.pay_health_cost(ability.mana_cost)
+			health_spent_for_spell.emit(ability.mana_cost)
 
 	if ability.ability_scene != null:
 		var spell_instance = ability.ability_scene.instantiate()

@@ -16,8 +16,8 @@ shader = ExtResource("2_7r04v")
 shader_parameter/mark_color = Color(1.0411314, 1.1452848, 2.6034334, 1)
 
 [sub_resource type="Gradient" id="Gradient_b1mpv"]
-offsets = PackedFloat32Array(0.14468086, 0.3106383, 0.47234043, 0.85106385)
-colors = PackedColorArray(0, 0, 0, 1, 0.39, 0.39, 0.39, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+offsets = PackedFloat32Array(0.14042553, 0.32340425, 0.47234043, 0.85106385)
+colors = PackedColorArray(0, 0, 0, 1, 0.12591082, 0.12591085, 0.12591079, 1, 1, 1, 1, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_o4nlg"]
 gradient = SubResource("Gradient_b1mpv")
@@ -27,8 +27,8 @@ fill_to = Vector2(0, 1)
 render_priority = 0
 shader = ExtResource("3_7r04v")
 shader_parameter/impact_color = Color(1.3293564, 1.3293564, 5.8527637, 1)
-shader_parameter/impact_speed = Vector2(0, 1)
-shader_parameter/text_ofset = Vector2(0, 0)
+shader_parameter/impact_speed = Vector2(0, 2.5)
+shader_parameter/text_ofset = Vector2(0, -0.5)
 shader_parameter/wave_texture = ExtResource("4_u8ewf")
 shader_parameter/fade_texturegrad2d = SubResource("GradientTexture2D_o4nlg")
 

@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+signal player_hit_enemy
+
 @export var camera: Camera3D
 
 # --- SYSTÈME D'ÉQUIPEMENT ET D'INVENTAIRE DE DÉPART ---

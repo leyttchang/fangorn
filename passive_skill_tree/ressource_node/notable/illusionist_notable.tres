@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="SkillNodeData" format=3]
+[gd_resource type="Resource" script_class="SkillNodeData" format=3 uid="uid://b8sr1xss6qukk"]
 
-[ext_resource type="Texture2D" path="res://assets/icon/fc155.png" id="1_icon"]
+[ext_resource type="Texture2D" uid="uid://ck8h5gv46wfg4" path="res://assets/icon/32x32/fb289.png" id="1_2eu76"]
 [ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="2_edk30"]
 [ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="3_hkfj0"]
 
@@ -22,17 +22,14 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 script = ExtResource("2_edk30")
 node_id = "illusionist_notable"
 node_name = "Illusionist"
-description = ""
-icon = ExtResource("1_icon")
+icon = ExtResource("1_2eu76")
 node_type = 1
-zone_barbarian_multiplier = 0.3
-zone_mage_multiplier = 1.0
-zone_duelist_multiplier = 0.3
-max_occurrences = 1
 base_spawn_weight = 10.0
+zone_barbarian_multiplier = 0.0
+zone_duelist_multiplier = 0.0
 tier_1_multiplier = 0.2
 tier_2_multiplier = 1.0
-tier_3_multiplier = 1.2
+tier_3_multiplier = 1.0
+tags = 3072
 stats_bonuses = Array[ExtResource("3_hkfj0")]([SubResource("Resource_0"), SubResource("Resource_1")])
-gameplay_effect_id = ""
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

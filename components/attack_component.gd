@@ -26,6 +26,7 @@ func _on_area_entered(area: Area3D) -> void:
 		hit_entities.append(area)
 		if area.has_method("receive_hit"):
 			area.receive_hit(self)
+			
 		attack_landed.emit(area)
 
 # 2. Collision avec le DÉCOR (Sol, Murs)

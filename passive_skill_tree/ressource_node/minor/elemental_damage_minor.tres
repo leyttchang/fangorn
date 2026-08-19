@@ -7,21 +7,21 @@
 [sub_resource type="Resource" id="Resource_0"]
 script = ExtResource("3_hkfj0")
 stat_name = "fire_damage"
-value = 10.0
+value = 3.0
 mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [sub_resource type="Resource" id="Resource_1"]
 script = ExtResource("3_hkfj0")
 stat_name = "ice_damage"
-value = 10.0
+value = 3.0
 mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [sub_resource type="Resource" id="Resource_2"]
 script = ExtResource("3_hkfj0")
 stat_name = "lightning_damage"
-value = 10.0
+value = 3.0
 mod_type = 1
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
@@ -30,8 +30,11 @@ script = ExtResource("2_edk30")
 node_id = "elemental_damage_minor"
 node_name = "Elemental Damage"
 icon = ExtResource("1_emntq")
-max_occurrences = 10
+max_occurrences = 5
+zone_barbarian_multiplier = 0.0
+zone_duelist_multiplier = 0.0
 tier_2_multiplier = 0.8
 tier_3_multiplier = 0.4
+tags = 240
 stats_bonuses = Array[ExtResource("3_hkfj0")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2")])
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

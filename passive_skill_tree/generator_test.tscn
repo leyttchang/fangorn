@@ -4,15 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://cx2n538qv3yuo" path="res://passive_skill_tree/SkillNodeUI.tscn" id="2_mr2k3"]
 [ext_resource type="Script" uid="uid://c1pu2gfp6s41m" path="res://passive_skill_tree/ressource_node/skill_node_data.gd" id="3_0upt1"]
 [ext_resource type="Resource" uid="uid://bt2rrjh6hebk8" path="res://passive_skill_tree/ressource_node/minor/area_of_effect_minor.tres" id="4_721ci"]
-[ext_resource type="Resource" uid="uid://yvsptfjjhutr" path="res://passive_skill_tree/ressource_node/minor/atk.tres" id="4_rbje3"]
 [ext_resource type="Resource" uid="uid://beffiibqb4nwx" path="res://passive_skill_tree/ressource_node/minor/armor_rating_minor.tres" id="5_6krma"]
 [ext_resource type="Resource" uid="uid://bs1va2l5gob5u" path="res://passive_skill_tree/ressource_node/notable/Constitution_du_Barbare.tres" id="5_cvyny"]
 [ext_resource type="Resource" uid="uid://c2bev3u32gbba" path="res://passive_skill_tree/ressource_node/notable/l'agilite_du_chasseur.tres" id="6_7m4xt"]
-[ext_resource type="Resource" uid="uid://dmh3o0jxv00c3" path="res://passive_skill_tree/ressource_node/minor/magie.tres" id="7_6w6nr"]
 [ext_resource type="Resource" uid="uid://wgsbn78gs7kt" path="res://passive_skill_tree/ressource_node/minor/attack_speed_minor.tres" id="7_waup2"]
 [ext_resource type="Resource" uid="uid://b1yp2ltfg67iv" path="res://passive_skill_tree/ressource_node/minor/casting_speed_minor.tres" id="8_cqfvn"]
-[ext_resource type="Resource" uid="uid://b1r6dumwuvobi" path="res://passive_skill_tree/ressource_node/notable/sagesse_du_magicien.tres" id="8_frk3w"]
-[ext_resource type="Resource" uid="uid://b1p2a5356t72x" path="res://passive_skill_tree/ressource_node/minor/vie.tres" id="9_gxykh"]
 [ext_resource type="Resource" uid="uid://ck5mj3mgrolpt" path="res://passive_skill_tree/ressource_node/minor/cold_damage_minor.tres" id="9_qxli8"]
 [ext_resource type="Resource" uid="uid://baufdp0y6viv2" path="res://passive_skill_tree/ressource_node/minor/elemental_damage_minor.tres" id="10_hsmp1"]
 [ext_resource type="Resource" uid="uid://b3fn31yv12twi" path="res://passive_skill_tree/ressource_node/minor/fire_damage_minor.tres" id="11_0jfb4"]
@@ -50,13 +46,17 @@
 [ext_resource type="Resource" uid="uid://ch6at745fqrou" path="res://passive_skill_tree/ressource_node/Keystone/brutality_keystone.tres" id="48_wyjs6"]
 [ext_resource type="Resource" uid="uid://ct3mob70ocldt" path="res://passive_skill_tree/ressource_node/Keystone/cunning_hands_keystone.tres" id="49_1r6tn"]
 [ext_resource type="Resource" uid="uid://c0r82ii6o4qs0" path="res://passive_skill_tree/ressource_node/Keystone/elementalist_keystone.tres" id="50_dw146"]
+[ext_resource type="Resource" uid="uid://qxyq0v7iq5qu" path="res://passive_skill_tree/ressource_node/Keystone/renouncement_keystone.tres" id="50_qxli8"]
+[ext_resource type="Resource" uid="uid://bi2andtvmrkbn" path="res://passive_skill_tree/ressource_node/Keystone/ignore_death_keystone.tres" id="51_hsmp1"]
 [ext_resource type="Resource" uid="uid://ce7a3sdvcyb5n" path="res://passive_skill_tree/ressource_node/Keystone/giant_ancestors_keystone.tres" id="51_tvrir"]
+[ext_resource type="Resource" uid="uid://binw1q08mlpts" path="res://passive_skill_tree/ressource_node/Keystone/hut_builder_keystone.tres" id="52_0jfb4"]
 [ext_resource type="Resource" uid="uid://nxg8pjdlpn0u" path="res://passive_skill_tree/ressource_node/Keystone/stone_statue_keystone.tres" id="52_ugxtr"]
 [ext_resource type="Resource" uid="uid://baa1l6xluc8qr" path="res://passive_skill_tree/ressource_node/Keystone/unapproachable_intellect_keystone.tres" id="53_uapqk"]
+[ext_resource type="Resource" uid="uid://b4ow0wggj4f55" path="res://passive_skill_tree/ressource_node/Keystone/overwhelming_combo_keystone.tres" id="53_uktca"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
-seed = -1095543727
+seed = -1933115930
 frequency = 0.0254
 offset = Vector3(256.55, 203.6, 0)
 fractal_octaves = 1
@@ -74,12 +74,16 @@ offset_bottom = 3000.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_k7a3p")
-num_nodes = 100
-tree_radius = 700.0
+num_nodes = 200
+tree_radius = 1000.0
 min_node_distance = 70.0
+cross_link_percent = 15.0
+starter_nodes_mage = Array[ExtResource("3_0upt1")]([ExtResource("8_cqfvn"), ExtResource("9_qxli8"), ExtResource("10_hsmp1"), ExtResource("11_0jfb4"), ExtResource("13_wyjs6"), ExtResource("15_1r6tn"), ExtResource("18_ugxtr")])
+starter_nodes_duelist = Array[ExtResource("3_0upt1")]([ExtResource("16_dw146"), ExtResource("7_waup2")])
+starter_nodes_barbarian = Array[ExtResource("3_0upt1")]([ExtResource("5_6krma"), ExtResource("12_uktca"), ExtResource("17_tvrir")])
 tree_seed = 0
 node_ui_scene = ExtResource("2_mr2k3")
-skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_721ci"), ExtResource("5_6krma"), ExtResource("4_rbje3"), ExtResource("7_waup2"), ExtResource("8_cqfvn"), ExtResource("9_qxli8"), ExtResource("10_hsmp1"), ExtResource("11_0jfb4"), ExtResource("12_uktca"), ExtResource("13_wyjs6"), ExtResource("7_6w6nr"), ExtResource("15_1r6tn"), ExtResource("16_dw146"), ExtResource("17_tvrir"), ExtResource("18_ugxtr"), ExtResource("9_gxykh"), ExtResource("20_uapqk"), ExtResource("14_6w6nr"), ExtResource("22_cvw4w"), ExtResource("23_yfspe"), ExtResource("24_cljs1"), ExtResource("5_cvyny"), ExtResource("26_cq1gd"), ExtResource("27_a3gfs"), ExtResource("28_0gs4q"), ExtResource("29_1jjp7"), ExtResource("30_xmy8p"), ExtResource("6_7m4xt"), ExtResource("32_lpofp"), ExtResource("33_4nd6e"), ExtResource("15_frk3w"), ExtResource("35_sbss1"), ExtResource("36_twegg"), ExtResource("37_qxlgh"), ExtResource("8_frk3w"), ExtResource("16_gxykh"), ExtResource("40_5db8r"), ExtResource("41_gvfnf"), ExtResource("42_r5stl"), ExtResource("43_uuc47"), ExtResource("11_rbje3"), ExtResource("13_7m4xt"), ExtResource("12_cvyny"), ExtResource("47_uktca"), ExtResource("48_wyjs6"), ExtResource("49_1r6tn"), ExtResource("50_dw146"), ExtResource("51_tvrir"), ExtResource("52_ugxtr"), ExtResource("53_uapqk")])
+skill_deck = Array[ExtResource("3_0upt1")]([ExtResource("4_721ci"), ExtResource("5_6krma"), ExtResource("7_waup2"), ExtResource("8_cqfvn"), ExtResource("9_qxli8"), ExtResource("10_hsmp1"), ExtResource("11_0jfb4"), ExtResource("12_uktca"), ExtResource("13_wyjs6"), ExtResource("15_1r6tn"), ExtResource("16_dw146"), ExtResource("17_tvrir"), ExtResource("18_ugxtr"), ExtResource("20_uapqk"), ExtResource("14_6w6nr"), ExtResource("22_cvw4w"), ExtResource("23_yfspe"), ExtResource("24_cljs1"), ExtResource("5_cvyny"), ExtResource("26_cq1gd"), ExtResource("27_a3gfs"), ExtResource("28_0gs4q"), ExtResource("29_1jjp7"), ExtResource("30_xmy8p"), ExtResource("6_7m4xt"), ExtResource("32_lpofp"), ExtResource("33_4nd6e"), ExtResource("15_frk3w"), ExtResource("35_sbss1"), ExtResource("36_twegg"), ExtResource("37_qxlgh"), ExtResource("16_gxykh"), ExtResource("40_5db8r"), ExtResource("41_gvfnf"), ExtResource("42_r5stl"), ExtResource("43_uuc47"), ExtResource("11_rbje3"), ExtResource("13_7m4xt"), ExtResource("12_cvyny"), ExtResource("47_uktca"), ExtResource("48_wyjs6"), ExtResource("49_1r6tn"), ExtResource("50_dw146"), ExtResource("51_tvrir"), ExtResource("52_ugxtr"), ExtResource("53_uapqk"), ExtResource("50_qxli8"), ExtResource("51_hsmp1"), ExtResource("52_0jfb4"), ExtResource("53_uktca")])
 show_noise_background = false
 noise_map = SubResource("FastNoiseLite_ug1u1")
 noise_influence = 0.585

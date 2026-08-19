@@ -19,12 +19,15 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 [resource]
 script = ExtResource("1_dg8p6")
 node_id = "Puissance_barbare"
-node_name = "Puissance barbare"
+node_name = "Barbarian strength"
 icon = ExtResource("1_eryv1")
 node_type = 1
 max_occurrences = 3
+zone_mage_multiplier = 0.0
+zone_duelist_multiplier = 0.0
 tier_1_multiplier = 0.2
 tier_2_multiplier = 0.6
 tier_3_multiplier = 0.2
+tags = 520
 stats_bonuses = Array[ExtResource("2_eryv1")]([SubResource("Resource_1c0pv"), SubResource("Resource_bb3rr")])
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

@@ -2,6 +2,7 @@
 
 var player: Node3D
 var stats: StatsComponent
+var skill_bar: SkillBarComponent
 var is_updating: bool = false
 
 func _ready() -> void:
@@ -10,6 +11,13 @@ func _ready() -> void:
 	if stats == null:
 		stats = player.get_node_or_null("StatsComponent")
 	
+	skill_bar = player.get_node_or_null("SkillBarComponent")
+	if skill_bar == null:
+		skill_bar = player.get_node_or_null("%SkillBarComponent")
+		
+	if skill_bar != null:
+		skill_bar.can_cast_spells = false
+		
 	if stats != null:
 		stats.stat_changed.connect(_on_stat_changed)
 		_apply_brutality()
@@ -17,7 +25,7 @@ func _ready() -> void:
 func _on_stat_changed(stat_name: String, _new_value: float) -> void:
 	if is_updating: return
 	
-	if stat_name in ["max_mana", "mana_regen", "fire_damage", "ice_damage", "lightning_damage"]:
+	if stat_name in ["fire_damage", "ice_damage", "lightning_damage"]:
 		_apply_brutality()
 
 func _apply_brutality() -> void:
@@ -30,11 +38,9 @@ func _apply_brutality() -> void:
 	stats.add_modifier("physical_damage", 1, 0.50, "brutality_phys")
 	
 	# 2. Force stats
-	_force_stat("max_mana", 0.0)
-	_force_stat("mana_regen", 0.0)
-	_force_stat("fire_damage", 1.0)
-	_force_stat("ice_damage", 1.0)
-	_force_stat("lightning_damage", 1.0)
+	_force_stat("fire_damage", 0.0)
+	_force_stat("ice_damage", 0.0)
+	_force_stat("lightning_damage", 0.0)
 	
 	is_updating = false
 
@@ -62,11 +68,12 @@ func _force_stat(stat_name: String, target_value: float) -> void:
 	stats.add_modifier(stat_name, 0, flat_needed, "brutality_" + stat_name)
 
 func _exit_tree() -> void:
+	if skill_bar != null:
+		skill_bar.can_cast_spells = true
+		
 	if stats != null:
 		stats.stat_changed.disconnect(_on_stat_changed)
 		stats.remove_modifier_by_source("brutality_phys")
-		stats.remove_modifier_by_source("brutality_max_mana")
-		stats.remove_modifier_by_source("brutality_mana_regen")
 		stats.remove_modifier_by_source("brutality_fire_damage")
 		stats.remove_modifier_by_source("brutality_ice_damage")
 		stats.remove_modifier_by_source("brutality_lightning_damage")

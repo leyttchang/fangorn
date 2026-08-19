@@ -21,12 +21,15 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 [resource]
 script = ExtResource("2_j5545")
 node_id = "agilité_du_chasseur"
-node_name = "L'agilité du chasseur"
+node_name = "Hunter's senses"
 icon = ExtResource("1_k82j2")
 node_type = 1
 max_occurrences = 3
+zone_barbarian_multiplier = 0.0
+zone_mage_multiplier = 0.0
 tier_1_multiplier = 0.25
 tier_2_multiplier = 0.35
 tier_3_multiplier = 0.4
+tags = 768
 stats_bonuses = Array[ExtResource("3_k7wpx")]([SubResource("Resource_aj1vt"), SubResource("Resource_8u2dc")])
 metadata/_custom_type_script = "uid://c1pu2gfp6s41m"

@@ -3,14 +3,14 @@
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://7ps47quwy8v5" path="res://assets/icon/32x32/fb787.png" id="2_iffjh"]
 [ext_resource type="PackedScene" uid="uid://dtc7yo2hbaf0f" path="res://scripts/abilities/casting_animation/ice_casting_vfx.tscn" id="2_ol0i7"]
-[ext_resource type="PackedScene" uid="uid://lng8lbsst72u" path="res://scripts/abilities/ice_nova/ice_nova.tscn" id="2_scene"]
+[ext_resource type="PackedScene" uid="uid://b0y68h7lj21hl" path="res://scripts/abilities/ice_nova/ice_nova.tscn" id="2_scene"]
 
 [resource]
 script = ExtResource("1_script")
 ability_name = "Ice Nova"
 icon = ExtResource("2_iffjh")
-cooldown = 8.0
-mana_cost = 40.0
+cooldown = 6.0
+mana_cost = 30.0
 max_range = 5.0
 cast_time = 2.0
 cast_vfx_scene = ExtResource("2_ol0i7")
