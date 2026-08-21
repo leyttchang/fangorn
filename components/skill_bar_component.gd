@@ -583,13 +583,15 @@ func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: V
 	
 	var spell_instance = scene.instantiate()
 	
+	get_tree().root.add_child(spell_instance)
+	
+	# IMPORTANT : On modifie is_active_for_network APRES le add_child() 
+	# sinon la fonction _ready() de l'AttackComponent r-crase la valeur et la remet  True chez le Host !
 	var attack_comp = spell_instance.get_node_or_null("AttackComponent")
 	if attack_comp == null:
 		attack_comp = spell_instance.find_child("AttackComponent*", true, false)
 	if attack_comp != null:
 		attack_comp.is_active_for_network = false
-		
-	get_tree().root.add_child(spell_instance)
 	
 	if has_impact:
 		spell_instance.global_position = impact_point

@@ -26,6 +26,15 @@ func _on_attack_landed(_target: Node) -> void:
 				
 			impact_instance.setup(radius, duration_on_ground) 
 		
+		# --- TRANSMISSION DE L'AUTORITE RESEAU ---
+		# On passe l'identit du lanceur de la boule de feu au burning ground
+		if attack_component != null and attack_component.has_meta("caster_authority"):
+			var impact_attack_comp = impact_instance.get_node_or_null("AttackComponent")
+			if impact_attack_comp == null:
+				impact_attack_comp = impact_instance.find_child("AttackComponent*", true, false)
+			if impact_attack_comp != null:
+				impact_attack_comp.set_meta("caster_authority", attack_component.get_meta("caster_authority"))
+				
 		get_tree().root.add_child(impact_instance)
 		impact_instance.global_position = _get_ground_position(get_parent().global_position)
 		
