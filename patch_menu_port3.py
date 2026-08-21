@@ -1,16 +1,18 @@
-extends Node3D
+# -*- coding: utf-8 -*-
+with open('Y:/Fangorn/fangorn/lvl/starting_menu.gd', 'w', encoding='utf-8') as f:
+    f.write('''extends Node3D
 
-@onready var main_menu = $CanvasLayer/VBoxContainer
-@onready var anim_player = $AnimationPlayer
+@onready var main_menu = /VBoxContainer
+@onready var anim_player = 
 
-@onready var btn_singleplayer: Button = $CanvasLayer/VBoxContainer/singleplayer
-@onready var btn_multiplayer: Button = $CanvasLayer/VBoxContainer/multiplayer
+@onready var btn_singleplayer: Button = /VBoxContainer/singleplayer
+@onready var btn_multiplayer: Button = /VBoxContainer/multiplayer
 
-@onready var multiplayer_panel = $CanvasLayer/Host_menu
-@onready var btn_host: Button = $CanvasLayer/Host_menu/btnHost
-@onready var btn_join: Button = $CanvasLayer/Host_menu/btnJoin
-@onready var btn_back: Button = $CanvasLayer/Host_menu/btnBack
-@onready var ip_input: LineEdit = $CanvasLayer/Host_menu/IPInput
+@onready var multiplayer_panel = /Host_menu
+@onready var btn_host: Button = /Host_menu/btnHost
+@onready var btn_join: Button = /Host_menu/btnJoin
+@onready var btn_back: Button = /Host_menu/btnBack
+@onready var ip_input: LineEdit = /Host_menu/IPInput
 
 const PORT = 8910
 
@@ -75,3 +77,4 @@ func _on_join_pressed() -> void:
 		get_tree().change_scene_to_file("res://lvl/game.tscn")
 	else:
 		print("Erreur lors de la connexion : ", error)
+''')

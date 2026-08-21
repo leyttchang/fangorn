@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-with open('Y:/Fangorn/fangorn/character/enemie/dumb/dumb.gd', 'r', encoding='utf-8') as f:
+with open('Y:/Fangorn/fangorn/character/enemie/dumb_archer/dumb_archer.gd', 'r', encoding='utf-8') as f:
     content = f.read()
 
 content = content.replace('''func actor_setup() -> void:
@@ -27,7 +27,7 @@ func _on_hit_received(attack: AttackComponent) -> void:
 			break
 		p = p.get_parent()
 		
-	# Si l'attaque vient d'un sort d'tachet
+	# Si l'attaque vient d'un sort
 	if p == null and attack.has_meta("caster_authority"):
 		var caster_id = attack.get_meta("caster_authority")
 		var players = get_tree().get_nodes_in_group("Player")
@@ -68,5 +68,5 @@ content = content.replace('''func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():''')
 
-with open('Y:/Fangorn/fangorn/character/enemie/dumb/dumb.gd', 'w', encoding='utf-8') as f:
+with open('Y:/Fangorn/fangorn/character/enemie/dumb_archer/dumb_archer.gd', 'w', encoding='utf-8') as f:
     f.write(content)

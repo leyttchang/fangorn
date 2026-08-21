@@ -4,6 +4,9 @@ extends Area3D
 @export var health_component: HealthComponent
 @export var knockback_component: KnockbackComponent # NOUVEAU
 
+signal hit_received(attack: AttackComponent)
+signal aggro_requested(attacker: Node3D) # NOUVEAU SIGNAL RESEAU
+
 func _ready() -> void:
 	if health_component == null:
 		push_warning("HitboxComponent sur " + get_parent().name + " n'a pas de HealthComponent assigné !")
@@ -13,6 +16,26 @@ func receive_hit(attack: AttackComponent) -> void:
 	# 1. On applique les dégâts
 	if health_component != null:
 		health_component.take_damage(attack.damage)
+		
+	hit_received.emit(attack)
+	
+	# NOUVEAU : On gre l'aggro en rseau
+	var attacker_id = 0
+	var p = attack.get_parent()
+	while p != null:
+		if p.is_in_group("Player"):
+			attacker_id = p.get_multiplayer_authority()
+			break
+		p = p.get_parent()
+		
+	if attacker_id == 0 and attack.has_meta("caster_authority"):
+		attacker_id = attack.get_meta("caster_authority")
+		
+	if attacker_id != 0:
+		if get_parent().is_multiplayer_authority():
+			_apply_aggro(attacker_id)
+		else:
+			rpc_id(get_parent().get_multiplayer_authority(), "_rpc_notify_aggro", attacker_id)
 		
 	# 2. On calcule et applique le recul
 	if knockback_component != null:
@@ -39,3 +62,16 @@ func receive_hit(attack: AttackComponent) -> void:
 			
 		# On envoie directement la direction calculée au composant de recul
 		knockback_component.apply_knockback(push_dir, attack.knockback_force)
+
+
+func _apply_aggro(attacker_id: int) -> void:
+	var players = get_tree().get_nodes_in_group("Player")
+	for pl in players:
+		if pl.get_multiplayer_authority() == attacker_id:
+			aggro_requested.emit(pl)
+			break
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_notify_aggro(attacker_id: int) -> void:
+	if get_parent().is_multiplayer_authority():
+		_apply_aggro(attacker_id)

@@ -1,4 +1,6 @@
-extends Node3D
+# -*- coding: utf-8 -*-
+with open('Y:/Fangorn/fangorn/lvl/starting_menu.gd', 'w', encoding='utf-8') as f:
+    f.write('''extends Node3D
 
 @onready var main_menu = $CanvasLayer/VBoxContainer
 @onready var anim_player = $AnimationPlayer
@@ -75,3 +77,4 @@ func _on_join_pressed() -> void:
 		get_tree().change_scene_to_file("res://lvl/game.tscn")
 	else:
 		print("Erreur lors de la connexion : ", error)
+''')

@@ -56,8 +56,48 @@ func _ready() -> void:
 
 func actor_setup() -> void:
 	await get_tree().physics_frame
-	target = get_tree().get_first_node_in_group("Player")
+	_update_closest_target()
 	change_state(State.IDLE)
+	
+	# On s'abonne au signal pour l'aggro si on se fait taper
+	var hitbox = find_child("HitboxComponent*", true, false)
+	if hitbox != null:
+		hitbox.aggro_requested.connect(_on_aggro_requested)
+	else:
+		pass
+
+var _pending_attacker: Node3D = null
+var _is_waiting_for_aggro: bool = false
+
+func _on_aggro_requested(attacker: Node3D) -> void:
+	if not is_multiplayer_authority() or current_state == State.DEAD: return
+	
+	_pending_attacker = attacker
+	if not _is_waiting_for_aggro:
+		_is_waiting_for_aggro = true
+		await get_tree().create_timer(1.0).timeout
+		if not is_instance_valid(self) or current_state == State.DEAD: return
+		target = _pending_attacker
+		_target_update_timer = 0.0
+		_is_waiting_for_aggro = false
+
+var _target_update_timer: float = 0.0
+
+func _update_closest_target() -> void:
+	var players = get_tree().get_nodes_in_group("Player")
+	if players.is_empty():
+		target = null
+		return
+		
+	var closest = null
+	var min_dist = 999999.0
+	for p in players:
+		var d = global_position.distance_squared_to(p.global_position)
+		if d < min_dist:
+			min_dist = d
+			closest = p
+			
+	target = closest
 
 
 # ==========================================================
@@ -91,6 +131,17 @@ func _rpc_apply_state(new_state: int) -> void:
 # ==========================================================
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority(): return
+
+	# Verrouillage de la cible pendant 15s
+	_target_update_timer += delta
+	
+	# On cherche une nouvelle cible si :
+	# 1. a fait 15 secondes qu'on suit le mme gars
+	# 2. On n'a pas de cible
+	# 3. La cible a t dtruite / dconnecte
+	if _target_update_timer > 15.0 or target == null or not is_instance_valid(target):
+		_target_update_timer = 0.0
+		_update_closest_target()
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta
