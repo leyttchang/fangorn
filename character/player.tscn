@@ -1025,7 +1025,7 @@ attack_sound_volume_db = -40.0
 target_position = Vector3(0, 0, -50)
 
 [node name="CastPoint" type="Marker3D" parent="Camera3D" unique_id=288234638]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.2)
 
 [node name="attack_animation" type="AnimationPlayer" parent="Camera3D" unique_id=1837715065]
 unique_name_in_owner = true

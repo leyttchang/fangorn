@@ -459,7 +459,17 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 
 	if ability.ability_scene != null:
 		var spell_instance = ability.ability_scene.instantiate()
+		
+		# On ne change pas l'autorit du mesh pour ne pas le casser (les shaders dtestent a) !
+		# On glisse juste l'identit du lanceur dans l'AttackComponent
+		var attack_comp = spell_instance.get_node_or_null("AttackComponent")
+		if attack_comp == null:
+			attack_comp = spell_instance.find_child("AttackComponent*", true, false)
+		if attack_comp != null:
+			attack_comp.set_meta("caster_authority", get_parent().get_multiplayer_authority())
+			
 		get_tree().root.add_child(spell_instance)
+
 		
 		target_data["ability_data"] = ability 
 		
@@ -469,6 +479,14 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 				
 		if spell_instance.has_method("execute"):
 			spell_instance.execute(get_parent(), target_data)
+			
+		var impact = Vector3.ZERO
+		var has_impact = false
+		if target_data.has("impact_point"):
+			impact = target_data["impact_point"]
+			has_impact = true
+			
+		rpc("_rpc_spawn_spell_visual", ability.ability_scene.resource_path, get_parent().get_multiplayer_authority(), impact, has_impact)
 
 func _start_cooldown(ability: AbilityData) -> void:
 	if ability.cooldown <= 0.0:
@@ -556,3 +574,26 @@ func _rpc_stop_casting_vfx(recovery_anim: String) -> void:
 				anim_player.play("RESET")
 			else:
 				anim_player.stop()
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: Vector3, has_impact: bool) -> void:
+	if scene_path == "": return
+	var scene = load(scene_path)
+	if scene == null: return
+	
+	var spell_instance = scene.instantiate()
+	
+	var attack_comp = spell_instance.get_node_or_null("AttackComponent")
+	if attack_comp == null:
+		attack_comp = spell_instance.find_child("AttackComponent*", true, false)
+	if attack_comp != null:
+		attack_comp.is_active_for_network = false
+		
+	get_tree().root.add_child(spell_instance)
+	
+	if has_impact:
+		spell_instance.global_position = impact_point
+		
+	if spell_instance.has_method("execute"):
+		# Puisque ce RPC est appel sur le composant rseau du mme joueur, get_parent() EST le bon lanceur !
+		spell_instance.execute(get_parent(), {})

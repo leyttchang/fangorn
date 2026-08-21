@@ -19,9 +19,17 @@ func _ready() -> void:
 			is_active_for_network = p.is_multiplayer_authority()
 			break
 		p = p.get_parent()
-	# Si ce n'est pas attach un personnage, le serveur est l'autorit
+	# Si ce n'est pas attach un personnage (ex: sort instanci, pic)
 	if p == null:
-		is_active_for_network = multiplayer.is_server()
+		if has_meta("caster_authority"):
+			var caster_id = get_meta("caster_authority")
+			if caster_id != 1:
+				is_active_for_network = (caster_id == multiplayer.get_unique_id())
+			else:
+				is_active_for_network = multiplayer.is_server()
+		else:
+			# Par dfaut (pics, flches de mobs sans meta), le serveur gre
+			is_active_for_network = multiplayer.is_server()
 
 	# On écoute les Hitboxes (Area3D)
 	area_entered.connect(_on_area_entered)
