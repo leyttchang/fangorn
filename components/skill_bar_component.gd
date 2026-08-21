@@ -63,6 +63,9 @@ func unequip_spell(slot_name: String) -> void:
 		push_error("SkillBarComponent : Impossible de déséquiper, le slot '" + slot_name + "' n'existe pas.")
 
 func _process(delta: float) -> void:
+	if not get_parent().is_multiplayer_authority():
+		return
+
 	match current_state:
 		State.IDLE:
 			_handle_inputs()
@@ -234,6 +237,10 @@ func _handle_selected() -> void:
 					vfx_anim.speed_scale = play_speed
 						
 		cast_started.emit(casting_ability.ability_name, required_cast_time)
+		var vfx_path = ""
+		if "cast_vfx_scene" in casting_ability and casting_ability.cast_vfx_scene != null:
+			vfx_path = casting_ability.cast_vfx_scene.resource_path
+		rpc("_rpc_play_casting_vfx", casting_ability.anim_name, vfx_path, play_speed)
 
 func _handle_casting(delta: float) -> void:
 	if indicator_instance != null and raycast != null:
@@ -317,6 +324,11 @@ func _validate_and_fire() -> void:
 	_reset_casting(false) 
 
 func _reset_casting(is_canceled: bool = false) -> void:
+	var rec_anim = ""
+	if not is_canceled and casting_ability != null and casting_ability.anim_name != "":
+		rec_anim = casting_ability.anim_name + "_recovery"
+	rpc("_rpc_stop_casting_vfx", rec_anim)
+
 	current_state = State.IDLE
 	casting_ability = null
 	casting_action = ""
@@ -495,3 +507,52 @@ func _kill_vfx(vfx: Node3D) -> void:
 			vfx_anim.animation_finished.connect(func(_anim_name): vfx.queue_free())
 	else:
 		vfx.queue_free()
+
+# ==========================================
+# GESTION RESEAU DES ANIMATIONS DE CAST
+# ==========================================
+@rpc("any_peer", "call_remote", "unreliable")
+func _rpc_play_casting_vfx(anim_name: String, vfx_scene_path: String, play_speed: float) -> void:
+	if anim_player != null and anim_name != "":
+		if anim_player.has_animation(anim_name):
+			anim_player.play(anim_name, -1, play_speed)
+	
+	if vfx_scene_path != "":
+		var vfx_scene = load(vfx_scene_path)
+		if vfx_scene != null:
+			current_vfx_instance = vfx_scene.instantiate()
+			
+			# L'cho visuel ne doit surtout pas infliger de dgts
+			var attack_comp = current_vfx_instance.get_node_or_null("AttackComponent")
+			if attack_comp != null:
+				attack_comp.is_active_for_network = false
+				
+			if cast_vfx_spawn_point != null:
+				cast_vfx_spawn_point.add_child(current_vfx_instance)
+			else:
+				get_parent().add_child(current_vfx_instance)
+				
+			var vfx_anim = current_vfx_instance.get_node_or_null("VFX_anim")
+			if vfx_anim != null:
+				var vfx_anim_name = vfx_anim.autoplay
+				if vfx_anim_name == "" and vfx_anim.has_animation("default"):
+					vfx_anim_name = "default"
+					vfx_anim.play("default")
+				if vfx_anim_name != "":
+					var vfx_length = vfx_anim.get_animation(vfx_anim_name).length
+					vfx_anim.speed_scale = vfx_length / (1.0 / play_speed) # Approximation
+
+@rpc("any_peer", "call_remote", "unreliable")
+func _rpc_stop_casting_vfx(recovery_anim: String) -> void:
+	if current_vfx_instance != null:
+		_kill_vfx(current_vfx_instance)
+		current_vfx_instance = null
+		
+	if anim_player != null:
+		if recovery_anim != "" and anim_player.has_animation(recovery_anim):
+			anim_player.play(recovery_anim)
+		else:
+			if anim_player.has_animation("RESET"):
+				anim_player.play("RESET")
+			else:
+				anim_player.stop()

@@ -19,9 +19,9 @@ func _ready() -> void:
 			is_active_for_network = p.is_multiplayer_authority()
 			break
 		p = p.get_parent()
-	# Si ce n'est pas attach un personnage, on vrifie si c'est un projectile gr par le serveur
-	if p == null and multiplayer.is_server():
-		is_active_for_network = true
+	# Si ce n'est pas attach un personnage, le serveur est l'autorit
+	if p == null:
+		is_active_for_network = multiplayer.is_server()
 
 	# On écoute les Hitboxes (Area3D)
 	area_entered.connect(_on_area_entered)
