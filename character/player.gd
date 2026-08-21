@@ -4,16 +4,16 @@ signal player_hit_enemy
 
 @export var camera: Camera3D
 
-# --- SYSTÈME D'ÉQUIPEMENT ET D'INVENTAIRE DE DÉPART ---
+# --- SYSTÃˆME D'Ã‰QUIPEMENT ET D'INVENTAIRE DE DÃ‰PART ---
 @export var starting_equipped_weapon: WeaponItem 
 @export var starting_inventory_items: Array[ItemData] = []
 # ------------------------------------------------------
 
 @export var base_movement_speed: float = 6.0
 @export var acceleration: float = 40.0
-@export var air_acceleration: float = 10.0 # Accélération réduite en l'air (inertie)
+@export var air_acceleration: float = 10.0 # AccÃ©lÃ©ration rÃ©duite en l'air (inertie)
 @export var friction: float = 35.0
-@export var air_friction: float = 5.0 # Moins de friction en l'air pour garder l'élan du saut
+@export var air_friction: float = 5.0 # Moins de friction en l'air pour garder l'Ã©lan du saut
 # ------------------------------------------------------
 
 @onready var stats_component: StatsComponent = %StatsComponent
@@ -21,21 +21,31 @@ signal player_hit_enemy
 @onready var main_droite = $Camera3D/MainDroite
 
 @export var custom_footstep_sound: AudioStream # Optionnel : Glisser un fichier .wav / .ogg
-@export var step_interval: float = 2.8 # Distance en mètres entre deux bruits de pas
+@export var step_interval: float = 2.8 # Distance en mÃ¨tres entre deux bruits de pas
 
 var _footstep_distance: float = 0.0
 
 const JUMP_VELOCITY = 4.5
 const mouse_sensitivity = 0.002
 
+func _enter_tree() -> void:
+	set_multiplayer_authority(name.to_int())
+
 func _ready() -> void:
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if not is_multiplayer_authority():
+		# Cacher toute l'UI du joueur si ce n'est pas NOTRE joueur !
+		for child in get_children():
+			if child is CanvasLayer:
+				child.visible = false
+	if is_multiplayer_authority():
+		camera.current = true
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	health_component.died.connect(_on_died)
 	health_component.damage_taken.connect(_on_damage_taken)
 	
 	var equip_comp = $EquipmentComponent 
 	if equip_comp != null and starting_equipped_weapon != null:
-		# On équipe l'arme telle qu'elle est définie dans l'inspecteur
+		# On Ã©quipe l'arme telle qu'elle est dÃ©finie dans l'inspecteur
 		equip_comp.equip_item(starting_equipped_weapon.duplicate(true), "main_hand")
 		
 	var inv_comp = $InventoryComponent
@@ -46,7 +56,10 @@ func _ready() -> void:
 	# ========================================
 	
 func _physics_process(delta: float) -> void:
-	# 1. Gestion de la gravité
+	if not is_multiplayer_authority():
+		return
+
+	# 1. Gestion de la gravitÃ©
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
@@ -64,13 +77,13 @@ func _physics_process(delta: float) -> void:
 				current_speed *= weapon.hit_slow
 
 	# ==========================================================
-	# 3. NOUVELLE GESTION DU MOUVEMENT (Inspirée de tes anciens scripts)
+	# 3. NOUVELLE GESTION DU MOUVEMENT (InspirÃ©e de tes anciens scripts)
 	# ==========================================================
 	
-	# On isole la vitesse horizontale dans un Vector2 (pour ne pas casser la gravité)
+	# On isole la vitesse horizontale dans un Vector2 (pour ne pas casser la gravitÃ©)
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
-	# On récupère les inputs du joueur
+	# On rÃ©cupÃ¨re les inputs du joueur
 	var input_dir := Input.get_vector("left", "right", "forward", "backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
@@ -78,20 +91,20 @@ func _physics_process(delta: float) -> void:
 	var direction_2d = Vector2(direction.x, direction.z)
 	
 	if direction_2d != Vector2.ZERO:
-		# S'il y a un input, on calcule la vitesse à atteindre
+		# S'il y a un input, on calcule la vitesse Ã  atteindre
 		var vitesse_cible_2d = direction_2d * current_speed
 		
-		# On choisit l'accélération selon si on est au sol ou en l'air
+		# On choisit l'accÃ©lÃ©ration selon si on est au sol ou en l'air
 		var accel_actuelle = acceleration if is_on_floor() else air_acceleration
 		
-		# On ACCÉLÈRE vers cette vitesse cible. 
+		# On ACCÃ‰LÃˆRE vers cette vitesse cible. 
 		vitesse_horizontale = vitesse_horizontale.move_toward(vitesse_cible_2d, accel_actuelle * delta)
 	else:
-		# Si on lâche les touches, on applique la friction
+		# Si on lÃ¢che les touches, on applique la friction
 		var friction_actuelle = friction if is_on_floor() else air_friction
 		vitesse_horizontale = vitesse_horizontale.move_toward(Vector2.ZERO, friction_actuelle * delta)
 
-	# On réapplique la vélocité horizontale calculée à la vraie vélocité 3D du CharacterBody
+	# On rÃ©applique la vÃ©locitÃ© horizontale calculÃ©e Ã  la vraie vÃ©locitÃ© 3D du CharacterBody
 	velocity.x = vitesse_horizontale.x
 	velocity.z = vitesse_horizontale.y
 
@@ -108,6 +121,9 @@ func _physics_process(delta: float) -> void:
 		_footstep_distance = 0.0
 	
 func _unhandled_input(event: InputEvent) -> void:
+	if not is_multiplayer_authority():
+		return
+
 	if event is InputEventMouseMotion:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
@@ -122,8 +138,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_died() -> void:
 	print("mort")
-	await get_tree().create_timer(2.0).timeout
-	get_tree().quit()
+	# Temporairement, on empeche le jeu de se fermer en multi !
+	# await get_tree().create_timer(2.0).timeout
+	# get_tree().quit()
+
 
 func _on_damage_taken(amount: float) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")

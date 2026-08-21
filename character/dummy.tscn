@@ -16,6 +16,11 @@
 height = 2.1
 radius = 0.6
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_luoob"]
+properties/0/path = NodePath("HealthComponent:current_health")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
 [node name="Dummy" type="CharacterBody3D" unique_id=198686853]
 collision_layer = 8
 collision_mask = 7
@@ -50,5 +55,8 @@ shape = SubResource("CylinderShape3D_2vqka")
 
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("7_luoob")]
 stats_component = NodePath("../StatsComponent")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1569781292]
+replication_config = SubResource("SceneReplicationConfig_luoob")
 
 [editable path="HitboxComponent"]

@@ -46,15 +46,24 @@ func _setup_inventory_slots() -> void:
 
 # Débloque un nouveau sort s'il n'est pas déjà possédé
 func unlock_spell(ability: AbilityData) -> bool:
-	if ability == null:
-		return false
+	if ability == null: return false
+	
+	# Appel le RPC pour tout le monde (surtout le client concern?)
+	rpc("_rpc_unlock_spell", ability.resource_path)
+	return true
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_unlock_spell(ability_path: String) -> void:
+	var ability = load(ability_path) as AbilityData
+	if ability == null: return
+	
 	for s in unlocked_spells:
 		if s != null and (s == ability or s.ability_name == ability.ability_name):
-			return false
+			return
 			
 	unlocked_spells.append(ability)
 	_setup_inventory_slots()
-	return true
+
 
 # Prépare les 6 cases de gauche (assignation des noms et du lien vers le joueur)
 func _setup_equipment_slots() -> void:

@@ -36,6 +36,7 @@ var _waiting_for_next_wave: bool = false
 var _waiting_for_beacon: bool = false
 
 func _ready() -> void:
+	if not multiplayer.is_server(): return
 	add_to_group("SmartSpawner")
 	if auto_start:
 		if is_inside_tree():
@@ -101,7 +102,7 @@ func _spawn_single_enemy() -> void:
 	if enemy_scene == null: return
 	
 	var enemy_instance: Node3D = enemy_scene.instantiate() as Node3D
-	get_tree().current_scene.add_child(enemy_instance)
+	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
 	
 	# Position aléatoire dans le rayon autour du spawner
 	var random_angle: float = randf_range(0, TAU)
@@ -158,7 +159,7 @@ func _spawn_beacon() -> void:
 	
 	if beacon_scene != null and beacon_spawn_point != null:
 		var beacon = beacon_scene.instantiate() as Node3D
-		get_tree().current_scene.add_child(beacon)
+		get_tree().current_scene.get_node("NetworkObjects").add_child(beacon)
 		beacon.global_position = beacon_spawn_point.global_position
 		
 		# Connecter un signal si le beacon a un signal "interacted" (optionnel, selon ce que tu feras)

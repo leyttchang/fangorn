@@ -8,7 +8,7 @@ extends Marker3D
 @onready var anim_playback: AnimationNodeStateMachinePlayback = anim_tree.get("parameters/StateMachine/playback")
 @onready var anim_player: AnimationPlayer = %attack_animation 
 
-## Liste des sons de frappe d'arme (un son sera tiré au hasard par play_sound())
+## Liste des sons de frappe d'arme (un son sera tirÃ© au hasard par play_sound())
 @export var attack_sounds: Array[AudioStream] = []
 @export_range(-80.0, 24.0, 0.5) var attack_sound_volume_db: float = 0.0
 
@@ -17,11 +17,11 @@ var is_attacking: bool = false
 var combo_step: int = 1
 var has_hit_in_combo_swing: bool = false
 
-# Fenêtre de tolérance pour le buffer de combo (en millisecondes)
+# FenÃªtre de tolÃ©rance pour le buffer de combo (en millisecondes)
 var last_click_time: int = 0
 const COMBO_BUFFER_MS: int = 350
 
-## Méthode appelée depuis les pistes d'animation de l'AnimationPlayer
+## MÃ©thode appelÃ©e depuis les pistes d'animation de l'AnimationPlayer
 func play_sound() -> void:
 	if attack_sounds.is_empty():
 		return
@@ -43,20 +43,22 @@ func _on_equipment_changed(slot_name: String, _item: ItemData) -> void:
 			update_idle_stance()
 
 func _input(event):
+	if not owner.is_multiplayer_authority(): return
 	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE: return
 	if skill_bar != null and skill_bar.current_state != SkillBarComponent.State.IDLE: return
-	# Les autres inputs spécifiques (si présents) peuvent rester ici
+	# Les autres inputs spÃ©cifiques (si prÃ©sents) peuvent rester ici
 
 func _process(delta: float) -> void:
+	if not owner.is_multiplayer_authority(): return
 	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE: return
 	if skill_bar != null and skill_bar.current_state != SkillBarComponent.State.IDLE: return
 	
-	# 1. Mémoriser les clics rapides (spam) pendant une attaque
+	# 1. MÃ©moriser les clics rapides (spam) pendant une attaque
 	if Input.is_action_just_pressed("r_click"):
 		if is_attacking:
 			last_click_time = Time.get_ticks_msec()
 			
-	# 2. Maintenir le bouton ou démarrer une nouvelle attaque
+	# 2. Maintenir le bouton ou dÃ©marrer une nouvelle attaque
 	if Input.is_action_pressed("r_click"):
 		_validate_attack_state()
 		if not is_attacking:
@@ -65,7 +67,7 @@ func _process(delta: float) -> void:
 func _validate_attack_state():
 	if not is_attacking: return
 	
-	# 1. Si l'AnimationTree a été désactivé par un dash ou un sort
+	# 1. Si l'AnimationTree a Ã©tÃ© dÃ©sactivÃ© par un dash ou un sort
 	if not anim_tree.active:
 		reset_attack_state()
 		return
@@ -88,7 +90,7 @@ func reset_attack_state():
 func update_idle_stance():
 	var equipped_item = equipment.equipped_items.get("main_hand") as WeaponItem
 	if equipped_item == null: 
-		# Optionnel: on pourrait revenir à un idle sans arme si on n'a plus d'arme
+		# Optionnel: on pourrait revenir Ã  un idle sans arme si on n'a plus d'arme
 		return
 	var style_string = WeaponItem.WeaponStyle.keys()[equipped_item.weapon_style].to_lower()
 	var idle_anim = "idle_" + style_string
@@ -130,7 +132,7 @@ func start_attack():
 	anim_tree.set("parameters/TimeScale/scale", get_current_attack_speed())
 	anim_playback.travel(anim_name)
 
-# Fonction appelée par le SkillBarComponent
+# Fonction appelÃ©e par le SkillBarComponent
 func start_heavy_attack():
 	if get_child_count() == 0: return
 	current_weapon = get_child(0)
@@ -167,8 +169,8 @@ func disable_current_hitbox():
 		if is_instance_valid(shape): shape.set_deferred("disabled", true)
 
 func check_combo():
-	# On vérifie si le dernier clic a eu lieu dans la fenêtre de tolérance (ex: moins de 350ms)
-	# OU si le joueur est tout simplement en train de maintenir le bouton enfoncé !
+	# On vÃ©rifie si le dernier clic a eu lieu dans la fenÃªtre de tolÃ©rance (ex: moins de 350ms)
+	# OU si le joueur est tout simplement en train de maintenir le bouton enfoncÃ© !
 	var time_since_click = Time.get_ticks_msec() - last_click_time
 	var clicked_recently = (time_since_click <= COMBO_BUFFER_MS) and (last_click_time > 0)
 	
@@ -189,10 +191,10 @@ func check_combo():
 			anim_playback.travel(next_anim)
 		else:
 			last_click_time = 0
-			anim_tree.set("parameters/TimeScale/scale", 1.0) # Fin du combo, on remet le retour d'arme à vitesse normale
+			anim_tree.set("parameters/TimeScale/scale", 1.0) # Fin du combo, on remet le retour d'arme Ã  vitesse normale
 	else:
 		last_click_time = 0
-		anim_tree.set("parameters/TimeScale/scale", 1.0) # Pas de combo, le retour d'arme se fait à vitesse normale
+		anim_tree.set("parameters/TimeScale/scale", 1.0) # Pas de combo, le retour d'arme se fait Ã  vitesse normale
 
 func end_combat_state():
 	reset_attack_state()

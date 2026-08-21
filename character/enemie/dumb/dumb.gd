@@ -64,6 +64,11 @@ func actor_setup() -> void:
 # LA VRAIE MACHINE À ÉTATS
 # ==========================================================
 func change_state(new_state: State) -> void:
+	if is_multiplayer_authority():
+		rpc("_rpc_apply_state", new_state)
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_apply_state(new_state: int) -> void:
 	if current_state == State.DEAD or current_state == new_state:
 		return 
 		
@@ -85,6 +90,8 @@ func change_state(new_state: State) -> void:
 # LA PHYSIQUE ET SYNCHRONISATION
 # ==========================================================
 func _physics_process(delta: float) -> void:
+	if not is_multiplayer_authority(): return
+
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 		

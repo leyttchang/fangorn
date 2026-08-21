@@ -36,6 +36,11 @@ func _ready() -> void:
 
 # Fonction appelée quand une arme ou un sort touche ce personnage
 func take_damage(raw_damage: float) -> void:
+
+	if not owner.is_multiplayer_authority():
+		# Ce n'est pas mon entite ! Je demande au proprietaire d'appliquer les degats
+		rpc_id(owner.get_multiplayer_authority(), "_rpc_take_damage", raw_damage)
+		return
 	if current_health <= 0:
 		return
 		
@@ -65,6 +70,7 @@ func take_damage(raw_damage: float) -> void:
 	# 4. On applique les dégâts
 	current_health -= final_damage
 	damage_taken.emit(final_damage)
+	rpc("_rpc_broadcast_damage", final_damage)
 	
 	# On s'assure que la vie ne descend pas en dessous de zéro
 	# --- MÉCANIQUE CHEAT DEATH (Ignore Death) ---
@@ -133,3 +139,13 @@ func heal(amount: float) -> void:
 	current_health += amount
 	current_health = min(current_health, max_hp)
 	health_changed.emit(current_health, max_hp)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_broadcast_damage(final_damage: float) -> void:
+	damage_taken.emit(final_damage)
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_take_damage(raw_damage: float) -> void:
+	if owner.is_multiplayer_authority():
+		take_damage(raw_damage)

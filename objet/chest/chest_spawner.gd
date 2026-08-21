@@ -19,6 +19,7 @@ func _on_node_added(node: Node) -> void:
 			node.wave_completed.connect(_on_wave_completed)
 
 func _on_wave_completed(wave_number: int) -> void:
+	if not multiplayer.is_server(): return
 	if chest_scene == null: return
 	
 	# Tirage au sort : est-ce que le coffre apparaît ?
@@ -31,7 +32,7 @@ func _on_wave_completed(wave_number: int) -> void:
 	# L'ajouter au monde (au parent du spawner pour qu'il soit bien placé dans la scène globale)
 	var world = get_parent()
 	if world != null:
-		world.add_child(chest)
+		get_tree().current_scene.get_node("NetworkObjects").add_child(chest, true)
 		# Positionner le coffre exactement à la position du spawner
 		chest.global_position = self.global_position
 		chest.global_rotation = self.global_rotation

@@ -1,0 +1,132 @@
+[gd_scene format=3 uid="uid://cpvcfdqrbu4i4"]
+
+[ext_resource type="Script" uid="uid://c5srngllwttxc" path="res://lvl/starting_menu.gd" id="1_f8y02"]
+[ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="1_x1u6o"]
+
+[sub_resource type="Animation" id="Animation_f8y02"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Map1T3d/Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(14, 68.23807, -8)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CanvasLayer/VBoxContainer:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_4kshr"]
+resource_name = "open"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Map1T3d/Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.9666667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(14, 68.23807, -8), Vector3(14, 23.238068, -8)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CanvasLayer/VBoxContainer:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.79, 1.81),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_jfofm"]
+_data = {
+&"RESET": SubResource("Animation_f8y02"),
+&"open": SubResource("Animation_4kshr")
+}
+
+[node name="starting_menu" type="Node3D" unique_id=1895280778]
+script = ExtResource("1_f8y02")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1201820351]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer" unique_id=1205279296]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 41.0
+offset_top = -154.0
+offset_right = 283.0
+offset_bottom = 160.0
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="singleplayer" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=422003846]
+layout_mode = 2
+text = "Singleplayer
+"
+
+[node name="multiplayer" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=917636291]
+layout_mode = 2
+text = "Multiplayer
+"
+
+[node name="Host_menu" type="VBoxContainer" parent="CanvasLayer" unique_id=1219959799]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -99.25
+offset_top = -125.0
+offset_right = 99.25
+offset_bottom = 125.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="btnHost" type="Button" parent="CanvasLayer/Host_menu" unique_id=599028656]
+layout_mode = 2
+text = "Host"
+
+[node name="IPInput" type="LineEdit" parent="CanvasLayer/Host_menu" unique_id=77109580]
+layout_mode = 2
+text = "127.0.0.1"
+
+[node name="btnJoin" type="Button" parent="CanvasLayer/Host_menu" unique_id=525293759]
+layout_mode = 2
+text = "Join
+"
+
+[node name="btnBack" type="Button" parent="CanvasLayer/Host_menu" unique_id=2136746037]
+layout_mode = 2
+text = "Back"
+
+[node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("1_x1u6o")]
+
+[node name="Camera3D" type="Camera3D" parent="Map1T3d" unique_id=1303570228]
+transform = Transform3D(0.25881907, 7.713409e-09, -0.9659258, -2.9802319e-08, 1, 0, 0.9659258, 2.8786829e-08, 0.25881907, 14, 68.23807, -8)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=469834302]
+libraries/ = SubResource("AnimationLibrary_jfofm")
+autoplay = &"open"

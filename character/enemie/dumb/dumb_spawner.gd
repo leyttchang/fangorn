@@ -74,9 +74,10 @@ func _on_timeout() -> void:
 
 
 func spawn_dumb() -> void:
+	if not multiplayer.is_server(): return
 	if is_disabled or Dumb == null:
 		return
 		
 	var new_dumb = Dumb.instantiate()
-	get_tree().current_scene.add_child(new_dumb)
+	get_tree().current_scene.get_node("NetworkObjects").add_child(new_dumb, true)
 	new_dumb.global_position = global_position

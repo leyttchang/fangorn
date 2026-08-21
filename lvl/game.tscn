@@ -1,11 +1,8 @@
 [gd_scene format=3 uid="uid://y502le1sqeb3"]
 
-[ext_resource type="PackedScene" uid="uid://dad6pbsu7b6s5" path="res://character/player.tscn" id="1_c3mjc"]
-[ext_resource type="Script" uid="uid://51rh523r8oxe" path="res://item/item_data.gd" id="2_2nma1"]
-[ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="3_2g21l"]
+[ext_resource type="Script" uid="uid://ca453byxsm7h8" path="res://lvl/game.gd" id="1_2nma1"]
 [ext_resource type="PackedScene" uid="uid://jvy84ml4qbnk" path="res://character/dummy.tscn" id="3_7mfpx"]
 [ext_resource type="PackedScene" uid="uid://ps4gscdkslsn" path="res://objet/pic.tscn" id="4_41cxx"]
-[ext_resource type="Resource" uid="uid://biqusejrat6c6" path="res://item/armes/spear_test.tres" id="4_bqr07"]
 [ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="5_gglad"]
 [ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="5_vkv4l"]
 [ext_resource type="PackedScene" uid="uid://ciorbt48rdjri" path="res://character/enemie/dumb/dumb_spawner.tscn" id="7_ayx17"]
@@ -58,13 +55,20 @@ volumetric_fog_length = 152.09
 volumetric_fog_sky_affect = 0.95
 
 [node name="game" type="Node3D" unique_id=1242181288]
+script = ExtResource("1_2nma1")
 
-[node name="player" parent="." unique_id=967643559 instance=ExtResource("1_c3mjc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21, 0)
-starting_inventory_items = Array[ExtResource("2_2nma1")]([ExtResource("3_2g21l"), ExtResource("4_bqr07")])
-air_acceleration = 8.0
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2015162710]
+_spawnable_scenes = PackedStringArray("uid://dad6pbsu7b6s5")
+spawn_path = NodePath("../Players")
 
-[node name="KeystoneModifiers" type="Node3D" parent="player" unique_id=1845182723]
+[node name="Players" type="Node3D" parent="." unique_id=495715475]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26, 2)
+
+[node name="NetworkObjects" type="Node3D" parent="." unique_id=1188869520]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="NetworkObjects" unique_id=990877686]
+_spawnable_scenes = PackedStringArray("uid://bh02yc666r2ee", "uid://5wrdcmpkd7se", "uid://dw8bplvo56b74", "uid://cekr3wmhu571c", "uid://uwqnpr24nibv", "uid://bgl8ep1qhsou4")
+spawn_path = NodePath("..")
 
 [node name="Dummy" parent="." unique_id=922894006 instance=ExtResource("3_7mfpx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 20, -3)

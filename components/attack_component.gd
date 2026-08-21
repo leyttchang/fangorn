@@ -10,8 +10,19 @@ extends Area3D
 signal attack_landed(target)
 
 var hit_entities: Array[Area3D] = []
+var is_active_for_network: bool = true
 
 func _ready() -> void:
+	var p = get_parent()
+	while p != null:
+		if p is CharacterBody3D:
+			is_active_for_network = p.is_multiplayer_authority()
+			break
+		p = p.get_parent()
+	# Si ce n'est pas attach un personnage, on vrifie si c'est un projectile gr par le serveur
+	if p == null and multiplayer.is_server():
+		is_active_for_network = true
+
 	# On écoute les Hitboxes (Area3D)
 	area_entered.connect(_on_area_entered)
 	# NOUVEAU : On écoute la physique pure (RigidBody, StaticBody...)
@@ -19,6 +30,7 @@ func _ready() -> void:
 
 # 1. Collision avec un MONSTRE (Hitbox)
 func _on_area_entered(area: Area3D) -> void:
+	if not is_active_for_network: return
 	if area is HitboxComponent:
 		if hit_entities.has(area):
 			return

@@ -24,6 +24,8 @@ func use(player: CharacterBody3D) -> void:
 	player_in_range = player
 	open_chest()
 
+
+
 func open_chest() -> void:
 	if is_open or player_in_range == null:
 		return
@@ -74,7 +76,11 @@ func open_chest() -> void:
 	is_open = true
 
 	# Destruction du coffre après ouverture
-	queue_free()
+	# Au lieu de queue_free() qui le d?truit pour tout le monde, on le cache juste localement
+	visible = false
+	var interact = get_node_or_null("InteractionComponent")
+	if interact:
+		interact.queue_free()
 
 func _get_spellbook_ui(player: Node) -> SpellBookUI:
 	if player == null: return null
@@ -89,3 +95,19 @@ func _get_skill_bar(player: Node) -> SkillBarComponent:
 		if child is SkillBarComponent:
 			return child
 	return player.find_child("SkillBar*", true, false) as SkillBarComponent
+
+var players_looted: Array[int] = []
+
+func _notify_looted() -> void:
+	var my_id = multiplayer.get_unique_id()
+	rpc_id(1, "_rpc_chest_looted", my_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_chest_looted(peer_id: int) -> void:
+	if not multiplayer.is_server(): return
+	if not players_looted.has(peer_id):
+		players_looted.append(peer_id)
+		
+	var total_players = multiplayer.get_peers().size() + 1
+	if players_looted.size() >= total_players:
+		queue_free()

@@ -97,7 +97,18 @@ func open_chest() -> void:
 func _on_inventory_closed() -> void:
 	is_open = false
 	if chest_inventory.is_empty():
-		queue_free()
+		visible = false
+		var interact = get_node_or_null("InteractionComponent")
+		if interact:
+			interact.queue_free()
+		
+		# On supprime l'obstacle physique LOCALEMENT
+		# Ca ne le supprimera PAS pour les autres joueurs !
+		var static_body = get_node_or_null("StaticBody3D")
+		if static_body:
+			static_body.queue_free()
+			
+		_notify_looted()
 
 func _get_ilvl_from_wave() -> int:
 	var wave_num = 1
@@ -123,3 +134,19 @@ func _get_random_rarity() -> ItemData.Rarity:
 		return ItemData.Rarity.RARE
 		
 	return ItemData.Rarity.LEGENDARY
+
+var players_looted: Array[int] = []
+
+func _notify_looted() -> void:
+	var my_id = multiplayer.get_unique_id()
+	rpc_id(1, "_rpc_chest_looted", my_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_chest_looted(peer_id: int) -> void:
+	if not multiplayer.is_server(): return
+	if not players_looted.has(peer_id):
+		players_looted.append(peer_id)
+		
+	var total_players = multiplayer.get_peers().size() + 1
+	if players_looted.size() >= total_players:
+		queue_free()

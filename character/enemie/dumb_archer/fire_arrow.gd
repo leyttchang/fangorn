@@ -14,7 +14,8 @@ func _ready() -> void:
 	# Destruction après la durée de vie max si elle n'a rien touché
 	await get_tree().create_timer(lifespan).timeout
 	if is_instance_valid(self) and not _has_impacted:
-		queue_free()
+		if is_inside_tree() and multiplayer.is_server():
+			queue_free()
 
 func execute(caster: Node3D, target_data: Dictionary) -> void:
 	# On fouille dans tous les composants attachés à ce sort
@@ -28,7 +29,20 @@ func _on_attack_landed(target: Node) -> void:
 		return
 	_has_impacted = true
 
-	# 1. Stopper la physique et désactiver la collision principale du projectile
+	var is_character = false
+	if target is HitboxComponent:
+		if target.get_parent() is CharacterBody3D:
+			is_character = true
+	elif target is CharacterBody3D:
+		is_character = true
+
+	if is_character:
+		# Si on touche un personnage (joueur ou autre), la flche se dtruit immdiatement
+		if is_inside_tree() and multiplayer.is_server():
+			queue_free()
+		return
+
+	# 1. Stopper la physique et dsactiver la collision principale du projectile (si on touche le dcor)
 	freeze = true
 	sleeping = true
 	linear_velocity = Vector3.ZERO
@@ -39,7 +53,7 @@ func _on_attack_landed(target: Node) -> void:
 	if col != null:
 		col.set_deferred("disabled", true)
 
-	# 2. Désactiver la Hurtbox / AttackComponent pour éviter d'infliger des dégâts à nouveau
+	# 2. Dsactiver la Hurtbox / AttackComponent pour viter d'infliger des dgts  nouveau
 	if attack_component != null:
 		attack_component.set_deferred("monitoring", false)
 		attack_component.set_deferred("monitorable", false)
@@ -47,18 +61,8 @@ func _on_attack_landed(target: Node) -> void:
 		if attack_col != null:
 			attack_col.set_deferred("disabled", true)
 
-	# 3. Reparenter la flèche (en différé call_deferred pour ne pas bloquer le serveur de physique Godot)
-	if is_instance_valid(target) and target.is_inside_tree():
-		var parent_node: Node3D = null
-		if target is HitboxComponent:
-			parent_node = target.get_parent() as Node3D
-		elif target is Node3D:
-			parent_node = target as Node3D
-			
-		if parent_node != null and is_instance_valid(parent_node) and parent_node.is_inside_tree():
-			call_deferred("reparent", parent_node, true)
-
-	# 4. Faire disparaître la flèche après 10 secondes
+	# 3. Faire disparatre la flche aprs 10 secondes (si elle est dans un mur)
 	await get_tree().create_timer(stick_duration).timeout
 	if is_instance_valid(self):
-		queue_free()
+		if is_inside_tree() and multiplayer.is_server():
+			queue_free()

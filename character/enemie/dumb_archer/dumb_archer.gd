@@ -47,6 +47,11 @@ func actor_setup() -> void:
 # LA VRAIE MACHINE À ÉTATS
 # ==========================================================
 func change_state(new_state: State) -> void:
+	if is_multiplayer_authority():
+		rpc("_rpc_apply_state", new_state)
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_apply_state(new_state: int) -> void:
 	if current_state == State.DEAD or current_state == new_state:
 		return 
 		
@@ -70,6 +75,8 @@ func change_state(new_state: State) -> void:
 # LA PHYSIQUE ET SYNCHRONISATION
 # ==========================================================
 func _physics_process(delta: float) -> void:
+	if not is_multiplayer_authority(): return
+
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
@@ -110,14 +117,12 @@ func _physics_process(delta: float) -> void:
 # GESTION DU TIR (APPELÉ PAR L'ANIMATION PLAYER)
 # ==========================================================
 func fire_arrow() -> void:
-	if arrow_scene == null:
-		push_error("L'Archer essaie de tirer, mais aucune scène de flèche n'est assignée dans l'inspecteur !")
-		return
+	if not multiplayer.is_server(): return
+	if arrow_scene == null: return
 		
 	var new_arrow = arrow_scene.instantiate()
-	get_tree().current_scene.add_child(new_arrow)
+	get_tree().current_scene.get_node("NetworkObjects").add_child(new_arrow, true)
 	new_arrow.execute(self, {})
-
 
 # ==========================================================
 # LOGIQUE DES COMPORTEMENTS (Le Cerveau)

@@ -103,6 +103,17 @@ states/Walk2/position = Vector2(469, 88)
 transitions = ["Start", "Stand", SubResource("AnimationNodeStateMachineTransition_3kx3y"), "Stand", "Walk2", SubResource("AnimationNodeStateMachineTransition_rnfn3"), "Walk2", "Stand", SubResource("AnimationNodeStateMachineTransition_ensva"), "Walk2", "Punch", SubResource("AnimationNodeStateMachineTransition_qj2y1"), "Stand", "Punch", SubResource("AnimationNodeStateMachineTransition_67x00"), "Walk2", "Death", SubResource("AnimationNodeStateMachineTransition_6o7hd"), "Punch", "Death", SubResource("AnimationNodeStateMachineTransition_k0o0d"), "Stand", "Death", SubResource("AnimationNodeStateMachineTransition_nv5u7"), "Punch", "Stand", SubResource("AnimationNodeStateMachineTransition_is52v")]
 graph_offset = Vector2(9, -22.435143)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_holf7"]
+properties/0/path = NodePath("HealthComponent:current_health")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
 [node name="dumb" type="CharacterBody3D" unique_id=888204308 groups=["Enemie"]]
 collision_layer = 257
 script = ExtResource("1_ngory")
@@ -204,6 +215,9 @@ max_distance = 50.0
 health_component = NodePath("../HealthComponent")
 hurt_sounds = Array[AudioStream]([ExtResource("38_g26vk"), ExtResource("39_vhgsy"), ExtResource("40_0x4wk")])
 volume_db = -40.5
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=307709312]
+replication_config = SubResource("SceneReplicationConfig_holf7")
 
 [editable path="Orc"]
 [editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]

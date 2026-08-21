@@ -11,6 +11,7 @@ func _ready() -> void:
 	pass
 
 func _input(event: InputEvent) -> void:
+	if not owner.is_multiplayer_authority(): return
 	if event.is_action_pressed("toggle_inventory"):
 		_toggle_ui(UIState.INVENTORY)
 	elif event.is_action_pressed("toggle_spellbook") or (event is InputEventKey and event.physical_keycode == KEY_TAB and event.pressed):
@@ -24,7 +25,7 @@ func _input(event: InputEvent) -> void:
 
 func _toggle_ui(target_state: UIState) -> void:
 	if current_state == target_state:
-		# Si on réappuie sur la même touche, on ferme
+		# Si on rÃ©appuie sur la mÃªme touche, on ferme
 		close_all_ui()
 	else:
 		# Sinon on ferme ce qui est ouvert et on ouvre le nouveau
@@ -41,7 +42,7 @@ func _open_ui(state: UIState) -> void:
 	elif state == UIState.SKILL_TREE and skill_tree_comp:
 		skill_tree_comp.open_tree()
 		
-	# On libère la souris pour tous les menus
+	# On libÃ¨re la souris pour tous les menus
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func open_inventory_with_chest(chest_inv: Node) -> void:

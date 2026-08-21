@@ -16,6 +16,14 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
 size = Vector3(1.2149, 0.9249, 0.7678)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_n3aon"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
 [node name="Chest" type="Node3D" unique_id=1680074549]
 script = ExtResource("2_script")
 possible_bases = Array[ExtResource("2_i55t8")]([ExtResource("3_8rmxv"), ExtResource("4_n3aon"), ExtResource("5_f85ld"), ExtResource("6_6pnsy"), ExtResource("7_dre1o"), ExtResource("8_tnj3d"), ExtResource("9_wr6mb")])
@@ -36,5 +44,9 @@ prompt_text = "Press E to open chest"
 
 [node name="InventoryComponent" parent="." unique_id=53472195 instance=ExtResource("11_inv_comp")]
 max_slots = 4
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=780913408]
+replication_interval = 5.0
+replication_config = SubResource("SceneReplicationConfig_n3aon")
 
 [editable path="InteractionComponent"]
