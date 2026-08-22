@@ -1,0 +1,140 @@
+[gd_scene format=3 uid="uid://pgh7edv3pnkx"]
+
+[ext_resource type="Script" uid="uid://tvff4vdh642a" path="res://ui/game_over_text.gd" id="1_0qyc7"]
+[ext_resource type="Shader" uid="uid://mwuyg7isl0dt" path="res://ui/2d_screen_effect.tres" id="2_0qyc7"]
+[ext_resource type="Texture2D" uid="uid://bmkfd0edlbe85" path="res://assets/LeLu's Noise Pack/Grad_2d_black_center.tres" id="3_danmy"]
+[ext_resource type="Texture2D" uid="uid://ct64e4jse07mh" path="res://assets/LeLu's Noise Pack/T_Noise_HU85k.png" id="3_uejfo"]
+
+[sub_resource type="Gradient" id="Gradient_danmy"]
+offsets = PackedFloat32Array(0, 0.062015504, 0.36821705, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.011036605, 0.0075203427, 0.005279339, 0.6745098, 0.17754582, 0, 0.029918514, 1, 0.9827443, 0.7173739, 0.6707777, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_704m5"]
+gradient = SubResource("Gradient_danmy")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hlie2"]
+shader = ExtResource("2_0qyc7")
+shader_parameter/zoom_strength = 1.0
+shader_parameter/repeat_circle = 3.0
+shader_parameter/offset = Vector2(0.3, 0.1)
+shader_parameter/base_texture = ExtResource("3_uejfo")
+shader_parameter/Mask_texture = ExtResource("3_danmy")
+shader_parameter/color_gradiant = SubResource("GradientTexture1D_704m5")
+shader_parameter/visibility = 1.0
+
+[sub_resource type="Animation" id="Animation_dom6j"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Label:theme_override_colors/font_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(2.3990417, 0.57033473, 0.32880747, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Label:theme_override_colors/font_shadow_color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ColorRect:material:shader_parameter/visibility")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_s6vck"]
+resource_name = "spawn"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Label:theme_override_colors/font_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.95),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(2.3990417, 0.57033473, 0.32880747, 0), Color(2.3990417, 0.57033473, 0.32880747, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Label:theme_override_colors/font_shadow_color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.95),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 0.8980392)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ColorRect:material:shader_parameter/visibility")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.9450867),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_28wvf"]
+_data = {
+&"RESET": SubResource("Animation_dom6j"),
+&"spawn": SubResource("Animation_s6vck")
+}
+
+[node name="GameOverText" type="CanvasLayer" unique_id=962979278]
+layer = 10
+script = ExtResource("1_0qyc7")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=914378121]
+material = SubResource("ShaderMaterial_hlie2")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="Label" type="Label" parent="." unique_id=1722999609]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -58.5
+offset_top = -11.5
+offset_right = 58.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(2.3990417, 0.57033473, 0.32880747, 0)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_font_sizes/font_size = 68
+text = "Vous Etes Mort"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1481085589]
+libraries/ = SubResource("AnimationLibrary_28wvf")

@@ -138,6 +138,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_died() -> void:
 	print("mort")
+	
+	# On rcupre le Game Over s'il existe et on l'affiche !
+	var game_over = get_node_or_null("GameOverText")
+	if game_over != null and is_multiplayer_authority():
+		game_over.afficher_game_over()
+
 	# Temporairement, on empeche le jeu de se fermer en multi !
 	# await get_tree().create_timer(2.0).timeout
 	# get_tree().quit()

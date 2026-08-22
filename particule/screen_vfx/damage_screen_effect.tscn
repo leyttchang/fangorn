@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cly4pui7duo3p"]
 
 [ext_resource type="Shader" uid="uid://dg82oeajxx8ti" path="res://particule/screen_vfx/shader_fullscreen.tres" id="1_evjiv"]
-[ext_resource type="Script" path="res://particule/screen_vfx/damage_screen_effect.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://d3wc3tutul3uo" path="res://particule/screen_vfx/damage_screen_effect.gd" id="1_script"]
 
 [sub_resource type="Gradient" id="Gradient_kh5vw"]
 offsets = PackedFloat32Array(0.75103736, 1)
