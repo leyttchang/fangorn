@@ -42,6 +42,7 @@ starting_stats = ExtResource("2_sjyxn")
 script = ExtResource("3_hw4ky")
 stats_component = NodePath("../StatsComponent")
 armor_curve = ExtResource("5_2vqka")
+max_expected_armor = 200.0
 
 [node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("4_uij62")]
 collision_layer = 8
