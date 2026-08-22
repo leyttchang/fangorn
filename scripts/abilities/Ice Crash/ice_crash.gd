@@ -1,14 +1,25 @@
 extends Node3D
 
-@export var duration_on_ground: float = 5.0
+@export var duration_on_ground: float = 15.0
 
 # On récupère directement les enfants grâce à ton architecture
 @onready var scaling_component = $SpellScalingComponent
 @onready var collision = $AttackComponent/CollisionShape3D
 @onready var decal = $Ice_crash_effect/Decal
+@onready var attack_component = $AttackComponent
+@onready var ice_crash_effect = $Ice_crash_effect
+
+
+
+
+
+
 
 func _ready() -> void:
-	pass
+	await get_tree().create_timer(1.5).timeout
+	if is_instance_valid(attack_component):
+		attack_component.queue_free()
+
 
 
 func execute(caster: Node, target_data: Dictionary) -> void:
@@ -43,10 +54,17 @@ func execute(caster: Node, target_data: Dictionary) -> void:
 			collision.shape = collision.shape.duplicate()
 			collision.shape.radius = final_radius
 			
-		# 3. SCALING DU VISUEL (Le Decal)
-		if decal != null:
-			decal.size = Vector3(final_radius * 2.0, decal.size.y, final_radius * 2.0)
+		# 3. SCALING DU VISUEL (Le Decal + Les Pics + La fume)
+		var scale_factor = final_radius / 6.0 # 6.0 est le radius de base de ton sort
+		if ice_crash_effect != null:
+			# a va scale TOUT ce qu'il y a dans Ice_crash_effect (pics, fume, decal)
+			ice_crash_effect.scale = Vector3(scale_factor, scale_factor, scale_factor)
 			
-	# 4. DESTRUCTION AUTOMATIQUE
+	# 4. DESTRUCTION AUTOMATIQUE DE SECOURS
 	await get_tree().create_timer(duration_on_ground).timeout
-	queue_free()
+	destroy_spell()
+	
+# --- NOUVELLE METHODE POUR LE DETRUIRE MANUELLEMENT ---
+func destroy_spell() -> void:
+	if is_instance_valid(self) and not is_queued_for_deletion():
+		queue_free()
