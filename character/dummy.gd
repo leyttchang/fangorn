@@ -13,6 +13,7 @@ var dps_phase_active: bool = false
 var phase_time_remaining: float = 0.0
 
 var timer_label: Label3D
+var _active_text: Label3D = null
 
 func _ready() -> void:
 	health_component.damage_taken.connect(_on_damage_taken)
@@ -24,7 +25,7 @@ func _ready() -> void:
 	timer_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	timer_label.font_size = 48
 	timer_label.outline_size = 8
-	timer_label.position.y = 2.5
+	timer_label.position.y = 3.2
 	timer_label.visible = false
 	add_child(timer_label)
 	
@@ -54,10 +55,15 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_damage_taken(amount: float) -> void:
-	var text_instance = damage_text_scene.instantiate()
-	add_child(text_instance)
-	text_instance.position.y = 1.0 
-	text_instance.animate(amount)
+	if is_instance_valid(_active_text):
+		var pos = global_position
+		pos.y += 1.0
+		_active_text.add_damage(amount, pos)
+	else:
+		_active_text = damage_text_scene.instantiate()
+		add_child(_active_text)
+		_active_text.position.y = 1.0 
+		_active_text.start_animation(amount)
 	
 	total_damage_taken += amount
 	
@@ -79,7 +85,7 @@ func _end_dps_phase() -> void:
 	dps_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	dps_label.font_size = 64
 	dps_label.outline_size = 12
-	dps_label.position.y = 2.5 # À la même hauteur que le timer
+	dps_label.position.y = 3.2 # À la même hauteur que le timer
 	add_child(dps_label)
 	
 	# Le faire disparaître au bout de 10 secondes

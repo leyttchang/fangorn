@@ -28,7 +28,6 @@ func execute(caster: Node3D, target_data: Dictionary) -> void:
 		var old_bounces = max_bounces
 		# On augmente le nombre de rebonds (en gardant un entier) basé sur la stat AoE du joueur
 		max_bounces = int(round(max_bounces * spell_scaling_component.final_aoe_multiplier))
-		print("⚡ Chain Lightning: Multiplicateur AoE = ", spell_scaling_component.final_aoe_multiplier, " | Bounces: ", old_bounces, " -> ", max_bounces)
 		
 	var initial_target = target_data["collider"]
 	var hit_targets: Array[Node3D] = []
@@ -39,7 +38,6 @@ func execute(caster: Node3D, target_data: Dictionary) -> void:
 		start_node = main_gauche
 		
 	_process_bounce(initial_target, start_node, hit_targets)
-	
 	# Le sort n'a plus besoin d'exister en tant que nœud, les lignes gèrent leur propre durée de vie
 	queue_free()
 

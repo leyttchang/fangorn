@@ -22,6 +22,8 @@ properties/1/spawn = true
 properties/1/replication_mode = 1
 
 [node name="fire_arrow" type="RigidBody3D" unique_id=842953379]
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("1_j4con")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1593908456]
@@ -35,7 +37,6 @@ mesh = SubResource("CylinderMesh_hlie2")
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_xvqqq")]
 collision_layer = 16
 collision_mask = 138
-damage = 20.0
 destroy_on_environment = true
 is_projectile = true
 
