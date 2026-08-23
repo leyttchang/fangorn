@@ -154,7 +154,14 @@ func start_heavy_attack():
 	anim_playback.travel(anim_name)
 
 func enable_current_hitbox():
+	# Si l'arme n'est pas encore liee, on le fait maintenant
+	if current_weapon == null and get_child_count() > 0:
+		current_weapon = get_child(0)
+		
 	if is_instance_valid(current_weapon):
+		# On recalcule les degats systematiquement (comme ca, meme lance via un sort, ca tape juste !)
+		current_weapon.update_damage_from_stats(player_stats, combo_step)
+		
 		var ac = current_weapon.attack_component
 		if ac != null and not ac.attack_landed.is_connected(_on_weapon_hit):
 			ac.attack_landed.connect(_on_weapon_hit)

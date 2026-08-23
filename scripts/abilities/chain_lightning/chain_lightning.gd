@@ -55,7 +55,9 @@ func _process_bounce(current_target: Node3D, previous_target: Node3D, hit_target
 		
 	if hitbox != null and hitbox.has_method("receive_hit"):
 		hit_targets.append(current_target)
-		hitbox.receive_hit(attack_component)
+		
+		if attack_component.is_active_for_network:
+			hitbox.receive_hit(attack_component)
 		
 		# 3. Dessiner la ligne du nœud précédent jusqu'à cet ennemi
 		_draw_line(previous_target, current_target)

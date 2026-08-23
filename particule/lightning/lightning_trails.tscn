@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://b864y5lmf88we"]
+
+[ext_resource type="Texture2D" uid="uid://dnirefp03wuyw" path="res://assets/LeLu's Noise Pack/T_VFX_SparklesF21.jpg" id="1_3jsnn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dcrnf"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("1_3jsnn")
+albedo_texture_msdf = true
+use_particle_trails = true
+
+[sub_resource type="Curve" id="Curve_gfjv0"]
+_data = [Vector2(0, 0.04494381), 0.0, 0.0, 0, 0, Vector2(0.1658986, 1), 0.0, 0.0, 0, 0, Vector2(0.84792626, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_loiut"]
+curve = SubResource("Curve_gfjv0")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_20t7j"]
+particle_flag_align_y = true
+emission_shape = 1
+emission_sphere_radius = 0.5
+direction = Vector3(0, 1, 0)
+spread = 90.0
+initial_velocity_min = 3.0
+initial_velocity_max = 6.0
+radial_velocity_min = 0.99997765
+radial_velocity_max = 3.9999776
+gravity = Vector3(0, 0, 0)
+scale_min = 0.099999994
+scale_max = 0.39999998
+color = Color(0.44210172, 0, 2.5032542, 1)
+alpha_curve = SubResource("CurveTexture_loiut")
+turbulence_enabled = true
+turbulence_noise_scale = 1.0
+turbulence_noise_speed_random = 4.0
+turbulence_influence_max = 0.8
+turbulence_initial_displacement_min = 5.0000014
+turbulence_initial_displacement_max = 10.000002
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_i7pw1"]
+shape = 0
+size = 0.08
+section_segments = 4
+
+[node name="trails" type="GPUParticles3D" unique_id=1188745182]
+transform = Transform3D(0.14347751, -0.08774659, 0.9857558, -0.5632978, 0.8117292, 0.15424417, -0.81370115, -0.5774048, 0.06703741, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_dcrnf")
+amount = 30
+speed_scale = 3.05
+explosiveness = 1.0
+fixed_fps = 60
+local_coords = true
+trail_enabled = true
+trail_lifetime = 5.0
+process_material = SubResource("ParticleProcessMaterial_20t7j")
+draw_pass_1 = SubResource("RibbonTrailMesh_i7pw1")

@@ -34,6 +34,7 @@ var cooldown_timers: Dictionary = {}
 var active_ability: AbilityData = null 
 var indicator_instance: Node3D = null 
 var current_vfx_instance: Node3D = null
+var current_complex_spell_instance: Node3D = null
 
 var casting_ability: AbilityData = null
 var casting_action: String = ""
@@ -123,10 +124,6 @@ func _handle_inputs() -> void:
 						else:
 							base_cast_time = 1.0
 					
-					# On applique le multiplicateur propre a la competence
-					if "weapon_speed_multiplier" in ability and ability.weapon_speed_multiplier > 0.0:
-						base_cast_time /= ability.weapon_speed_multiplier
-					
 					if player_stats != null:
 						var p_speed = player_stats.get_stat_value("attack_speed")
 						if p_speed != 0.0:
@@ -157,6 +154,22 @@ func _handle_inputs() -> void:
 					casting_action = action
 					current_cast_time = 0.0
 					required_cast_time = final_required_time
+					
+					if ability.target_mode == AbilityData.TargetMode.COMPLEX_ATTACK:
+						if ability.ability_scene != null:
+							var spell_instance = ability.ability_scene.instantiate()
+							
+							# Transmission de l'autorite locale pour les degats (AVANT add_child pour que _ready marche)
+							var auth = get_parent().get_multiplayer_authority()
+							for child in spell_instance.find_children("AttackComponent*", "Area3D", true, false):
+								child.set_meta("caster_authority", auth)
+							
+							get_tree().root.add_child(spell_instance)
+							current_complex_spell_instance = spell_instance
+							spell_instance.global_position = get_parent().global_position
+							
+							if spell_instance.has_method("start_complex_cast"):
+								spell_instance.start_complex_cast(get_parent())
 					
 					if current_state == State.AUTO_CASTING:
 						if anim_player != null and ability.anim_name != "":
@@ -335,6 +348,10 @@ func _reset_casting(is_canceled: bool = false) -> void:
 
 	current_state = State.IDLE
 	casting_ability = null
+	
+	# Si on avait un spell complex en attente, on oublie le lien (il s'auto-detruira ou restera en vie selon son script)
+	current_complex_spell_instance = null
+
 	casting_action = ""
 	current_cast_time = 0.0
 	required_cast_time = 0.0
@@ -382,9 +399,20 @@ func _play_ability_anim_safe(ability: AbilityData, speed: float = 1.0) -> bool:
 # (Les fonctions qui ont sauté au copier-coller !)
 # ==========================================
 
+
+# --- LE RELAIS MAGIQUE POUR COMPLEX_ATTACK ---
+func trigger_mid_cast_event(event_name: String) -> void:
+	print("Event animation recu : ", event_name)
+	if current_complex_spell_instance != null and current_complex_spell_instance.has_method("on_mid_cast_event"):
+		current_complex_spell_instance.on_mid_cast_event(event_name)
+		
+		# Synchronisation multijoueur : on previent les autres clients de lancer cet evenement !
+		if is_multiplayer_authority() and casting_ability != null and casting_ability.ability_scene != null:
+			rpc("_rpc_trigger_mid_cast_event", event_name, casting_ability.ability_scene.resource_path)
+
 func _try_cast_ability(ability: AbilityData) -> void:
 	match ability.target_mode:
-		AbilityData.TargetMode.INSTANT, AbilityData.TargetMode.PROJECTILE:
+		AbilityData.TargetMode.INSTANT, AbilityData.TargetMode.PROJECTILE, AbilityData.TargetMode.COMPLEX_ATTACK:
 			_execute_ability(ability, {})
 			
 		AbilityData.TargetMode.GROUND_TARGET, AbilityData.TargetMode.SUMMON:
@@ -445,7 +473,7 @@ func _cleanup_targeting() -> void:
 		indicator_instance = null
 
 func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
-	print("Lancement réussi de : ", ability.ability_name)
+	print("Lancement reussi de : ", ability.ability_name)
 	_start_cooldown(ability)
 
 	# Consommation de la ressource
@@ -462,25 +490,31 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 			health_spent_for_spell.emit(ability.mana_cost)
 
 	if ability.ability_scene != null:
-		var spell_instance = ability.ability_scene.instantiate()
+		var spell_instance = null
 		
-		# On ne change pas l'autorit du mesh pour ne pas le casser (les shaders dtestent a) !
-		# On glisse juste l'identit du lanceur dans l'AttackComponent
-		var attack_comp = spell_instance.get_node_or_null("AttackComponent")
-		if attack_comp == null:
-			attack_comp = spell_instance.find_child("AttackComponent*", true, false)
-		if attack_comp != null:
-			attack_comp.set_meta("caster_authority", get_parent().get_multiplayer_authority())
+		if ability.target_mode == AbilityData.TargetMode.COMPLEX_ATTACK and current_complex_spell_instance != null:
+			# Le sort est deja sur le terrain car instancie au debut de l'animation !
+			spell_instance = current_complex_spell_instance
+		else:
+			# Sort normal : on l'instancie maintenant
+			spell_instance = ability.ability_scene.instantiate()
 			
-		get_tree().root.add_child(spell_instance)
-
+			var attack_comp = spell_instance.get_node_or_null("AttackComponent")
+			if attack_comp == null:
+				attack_comp = spell_instance.find_child("AttackComponent*", true, false)
+			if attack_comp != null:
+				attack_comp.set_meta("caster_authority", get_parent().get_multiplayer_authority())
+				
+			get_tree().root.add_child(spell_instance)
 		
 		target_data["ability_data"] = ability 
 		
+		# Placement au sol si necessaire
 		if ability.target_mode in [AbilityData.TargetMode.GROUND_TARGET, AbilityData.TargetMode.SUMMON]:
 			if target_data.has("impact_point"):
 				spell_instance.global_position = target_data["impact_point"]
-				
+		
+		# IMPORTANT : EXECUTION POUR TOUS LES SORTS !
 		if spell_instance.has_method("execute"):
 			spell_instance.execute(get_parent(), target_data)
 			
@@ -490,7 +524,11 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 			impact = target_data["impact_point"]
 			has_impact = true
 			
-		rpc("_rpc_spawn_spell_visual", ability.ability_scene.resource_path, get_parent().get_multiplayer_authority(), impact, has_impact)
+		var target_path = ^""
+		if target_data.has("collider") and target_data["collider"] != null:
+			target_path = target_data["collider"].get_path()
+			
+		rpc("_rpc_spawn_spell_visual", ability.ability_scene.resource_path, get_parent().get_multiplayer_authority(), impact, has_impact, target_path)
 
 func _start_cooldown(ability: AbilityData) -> void:
 	if ability.cooldown <= 0.0:
@@ -580,15 +618,34 @@ func _rpc_stop_casting_vfx(recovery_anim: String) -> void:
 				anim_player.stop()
 
 @rpc("any_peer", "call_remote", "reliable")
-func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: Vector3, has_impact: bool) -> void:
+func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: Vector3, has_impact: bool, target_path: NodePath = ^"") -> void:
 	if scene_path == "": return
-	var scene = load(scene_path)
-	if scene == null: return
 	
-	var spell_instance = scene.instantiate()
+	var spell_instance = null
 	
-	get_tree().root.add_child(spell_instance)
-	
+	# Si c'est un sort complexe dejà instancié (par _rpc_trigger_mid_cast_event), on le recupere au lieu d'en creer un deuxieme !
+	if current_complex_spell_instance != null and current_complex_spell_instance.scene_file_path == scene_path:
+		spell_instance = current_complex_spell_instance
+		current_complex_spell_instance = null # On nettoie la reference
+	else:
+		var scene = load(scene_path)
+		if scene == null: return
+		spell_instance = scene.instantiate()
+		get_tree().root.add_child(spell_instance)
+		
+		if has_impact:
+			spell_instance.global_position = impact_point
+		
+	var target_data = {}
+	if has_impact:
+		target_data["impact_point"] = impact_point
+	if target_path != ^"" and get_node_or_null(target_path) != null:
+		target_data["collider"] = get_node(target_path)
+		
+	if spell_instance.has_method("execute"):
+		# Puisque ce RPC est appele sur le composant reseau du meme joueur, get_parent() EST le bon lanceur !
+		spell_instance.execute(get_parent(), target_data)
+		
 	# IMPORTANT : On modifie is_active_for_network APRES le add_child() 
 	# sinon la fonction _ready() de l'AttackComponent r-crase la valeur et la remet  True chez le Host !
 	var attack_comp = spell_instance.get_node_or_null("AttackComponent")
@@ -596,10 +653,37 @@ func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: V
 		attack_comp = spell_instance.find_child("AttackComponent*", true, false)
 	if attack_comp != null:
 		attack_comp.is_active_for_network = false
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_trigger_mid_cast_event(event_name: String, scene_path: String) -> void:
+	print("RESEAU: RPC mid_cast_event recu sur ", multiplayer.get_unique_id(), " pour event: ", event_name, " scene: ", scene_path)
+	# Sur les autres clients, on instancie le sort juste a temps s'il n'existe pas encore
+	if current_complex_spell_instance == null and scene_path != "":
+		var scene = load(scene_path)
+		if scene != null:
+			current_complex_spell_instance = scene.instantiate()
+			get_tree().root.add_child(current_complex_spell_instance)
+			print("RESEAU: Instanciation reussie de ", scene_path)
+			
+			# IMPORTANT : On place la racine au niveau du joueur pour les animations qui utilisent des coordonnees locales
+			current_complex_spell_instance.global_position = get_parent().global_position
+			
+			# Transmission de l'autorite pour les degats
+			var auth = get_parent().get_multiplayer_authority()
+			for child in current_complex_spell_instance.find_children("AttackComponent*", "Area3D", true, false):
+				child.set_meta("caster_authority", auth)
+				# Puisqu'on est sur les autres clients (RPC), ce sort est purement visuel pour eux :
+				child.is_active_for_network = false
+
+				
+			if current_complex_spell_instance.has_method("start_complex_cast"):
+				current_complex_spell_instance.start_complex_cast(get_parent())
+		else:
+			print("RESEAU: ERREUR - Impossible de charger la scene ", scene_path)
 	
-	if has_impact:
-		spell_instance.global_position = impact_point
-		
-	if spell_instance.has_method("execute"):
-		# Puisque ce RPC est appel sur le composant rseau du mme joueur, get_parent() EST le bon lanceur !
-		spell_instance.execute(get_parent(), {})
+	if current_complex_spell_instance != null and current_complex_spell_instance.has_method("on_mid_cast_event"):
+		print("RESEAU: Appel de on_mid_cast_event(", event_name, ") sur l'instance.")
+		current_complex_spell_instance.on_mid_cast_event(event_name)
+	else:
+		print("RESEAU: ERREUR - Instance introuvable ou n'a pas la methode on_mid_cast_event.")

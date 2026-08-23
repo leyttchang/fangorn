@@ -826,6 +826,77 @@ tracks/1/keys = {
 "values": [Vector3(0, 0, 0), Vector3(0.017177094, 0, 0), Vector3(0.12670197, 0, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_ce8hk"]
+resource_name = "thunder_slash"
+length = 3.3666666
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("%Camera3D/../SkillBarComponent")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.56666666, 2.2749996),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["slash_1"],
+"method": &"trigger_mid_cast_event"
+}, {
+"args": ["slash_2"],
+"method": &"trigger_mid_cast_event"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.20077205, 1, 1.18, 1.9599999, 2.3333333, 2.9, 3.3333333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -0.45008093), Vector3(1.2997019, 0.6940279, -0.45008093), Vector3(-0.8240243, -0.89782643, -1.5902176), Vector3(-0.7692261, -0.43381345, -0.45008093), Vector3(-1.0655518, -0.43381345, -0.168953), Vector3(-1.0655518, -0.43381345, -1.2918777), Vector3(1.072937, -0.43381345, -1.7686844), Vector3(0.5, -0.9, -0.45008093)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.20077205, 1, 1.18, 1.9599999, 2.3333333, 2.9, 3.3333333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-0.15533431, -1.9704767, 0.008726646), Vector3(-0.24611819, -1.9207654, -0.22873504), Vector3(-1.3344291, -1.9762908, 2.984473), Vector3(-1.3344291, -1.3279938, 2.984473), Vector3(-0.1134464, 1.7523105, 0.44156832), Vector3(-0.2848688, 1.9850223, -0.54530495), Vector3(0.41067666, 0.2410381, -2.0427506), Vector3(-0.15533431, -1.9704767, 0.008726646)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.36666667, 0.93333334, 2.1, 2.833333, 3.2666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}, {
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_aw5rd"]
 _data = {
 &"RESET": SubResource("Animation_xqqx8"),
@@ -841,7 +912,8 @@ _data = {
 &"attack_sword_4": SubResource("Animation_4vy5w"),
 &"idle_axe": SubResource("Animation_aayji"),
 &"idle_spear": SubResource("Animation_e72n5"),
-&"idle_sword": SubResource("Animation_sexlj")
+&"idle_sword": SubResource("Animation_sexlj"),
+&"thunder_slash": SubResource("Animation_ce8hk")
 }
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8vi7a"]
@@ -962,11 +1034,12 @@ states/idle_spear/position = Vector2(231, 86)
 states/idle_sword/node = SubResource("AnimationNodeAnimation_6e1i3")
 states/idle_sword/position = Vector2(231, 189)
 transitions = ["attack_axe_1", "attack_axe_2", SubResource("AnimationNodeStateMachineTransition_bpixc"), "idle_axe", "attack_axe_1", SubResource("AnimationNodeStateMachineTransition_8amhy"), "Start", "idle_axe", SubResource("AnimationNodeStateMachineTransition_6e1i3"), "attack_axe_2", "idle_axe", SubResource("AnimationNodeStateMachineTransition_rtbr7"), "attack_axe_1", "idle_axe", SubResource("AnimationNodeStateMachineTransition_f3w6d"), "idle_spear", "attack_spear_1", SubResource("AnimationNodeStateMachineTransition_2qmbm"), "attack_spear_1", "attack_spear_2", SubResource("AnimationNodeStateMachineTransition_8weaa"), "attack_spear_2", "idle_spear", SubResource("AnimationNodeStateMachineTransition_o88sh"), "attack_spear_1", "idle_spear", SubResource("AnimationNodeStateMachineTransition_3k6pu"), "attack_heavy_slam", "attack_heavy_slam_recovery", SubResource("AnimationNodeStateMachineTransition_7e1ce"), "idle_sword", "attack_sword_1", SubResource("AnimationNodeStateMachineTransition_6vepr"), "idle_sword", "attack_heavy_slam", SubResource("AnimationNodeStateMachineTransition_ek25o"), "attack_sword_1", "idle_sword", SubResource("AnimationNodeStateMachineTransition_nnepy"), "attack_sword_1", "attack_sword_2", SubResource("AnimationNodeStateMachineTransition_r5ovt"), "attack_sword_2", "idle_sword", SubResource("AnimationNodeStateMachineTransition_4vy5w"), "attack_sword_2", "attack_sword_3", SubResource("AnimationNodeStateMachineTransition_vp26o"), "attack_sword_3", "idle_sword", SubResource("AnimationNodeStateMachineTransition_ooc2e"), "attack_sword_4", "idle_sword", SubResource("AnimationNodeStateMachineTransition_dadkq"), "attack_sword_3", "attack_sword_4", SubResource("AnimationNodeStateMachineTransition_aynll")]
-graph_offset = Vector2(143.77113, 49.30229)
+graph_offset = Vector2(12.771133, 10.302292)
 
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_speed"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_combo"]
+graph_offset = Vector2(-384.7637, -42.347107)
 nodes/output/position = Vector2(340, 140)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_yqkk6")
 nodes/StateMachine/position = Vector2(-100, 140)
@@ -1017,7 +1090,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.99997723, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335453, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.9999777, -0.0061649983, 0.0014514605, 0, 0.22916964, 0.9733859, -0.006333548, -0.9733661, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0

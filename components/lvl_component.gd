@@ -26,6 +26,11 @@ func add_xp(amount: int) -> void:
 	# On émet le signal pour que l'interface puisse mettre à jour la barre d'XP
 	xp_changed.emit(current_xp, xp_to_next_level)
 
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_add_xp(amount: int) -> void:
+	if get_parent().is_multiplayer_authority():
+		add_xp(amount)
+
 func _level_up() -> void:
 	# On retire l'XP requise pour le niveau actuel
 	current_xp -= xp_to_next_level

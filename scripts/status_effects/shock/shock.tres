@@ -1,8 +1,45 @@
 [gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://7atldbjtevqe"]
 
-[ext_resource type="Material" uid="uid://bjp26qe2dv6hn" path="res://scripts/status_effects/shock/shock_shader.tres" id="1_4b6b3"]
+[ext_resource type="Shader" uid="uid://bhdxcc41b5ffu" path="res://scripts/abilities/casting_animation/lightning_ball_shader.gdshader" id="1_d5qtw"]
 [ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_gqjw2"]
 [ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_4b6b3"]
+[ext_resource type="Texture2D" uid="uid://bplw0wn3cot0f" path="res://scripts/abilities/chain_lightning/lighting_ball_noise_texture.tres" id="2_mqfpg"]
+
+[sub_resource type="Gradient" id="Gradient_eb1tv"]
+offsets = PackedFloat32Array(0.7, 0.75, 0.8117647)
+colors = PackedColorArray(0.0034313723, 0.0034313723, 0.0034313723, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ohe6h"]
+noise_type = 2
+seed = 1
+fractal_octaves = 3
+fractal_weighted_strength = 0.38
+cellular_return_type = 6
+domain_warp_enabled = true
+domain_warp_amplitude = 20.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_rdofv"]
+noise = SubResource("FastNoiseLite_ohe6h")
+color_ramp = SubResource("Gradient_eb1tv")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_poreu"]
+noise_type = 0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_blbn4"]
+noise = SubResource("FastNoiseLite_poreu")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0ifye"]
+render_priority = 0
+shader = ExtResource("1_d5qtw")
+shader_parameter/lightningNoise1 = ExtResource("2_mqfpg")
+shader_parameter/lightningNoise2 = SubResource("NoiseTexture2D_rdofv")
+shader_parameter/tint = Color(1.9609993, 2.0054464, 3.2944162, 1)
+shader_parameter/disapear = 1.0
+shader_parameter/distortionVertex = 0.05999999865888
+shader_parameter/speedVertex = 0.999999977648
+shader_parameter/noiseVertex = SubResource("NoiseTexture2D_blbn4")
 
 [sub_resource type="Resource" id="Resource_ly833"]
 script = ExtResource("2_4b6b3")
@@ -14,5 +51,5 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 script = ExtResource("1_gqjw2")
 effect_id = "shock"
 stat_modifiers = Array[ExtResource("2_4b6b3")]([SubResource("Resource_ly833")])
-overlay_material = ExtResource("1_4b6b3")
+overlay_material = SubResource("ShaderMaterial_0ifye")
 metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

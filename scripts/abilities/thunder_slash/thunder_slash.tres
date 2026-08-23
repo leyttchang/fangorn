@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cuypi77a4wo07"]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_f5dn0"]
+[ext_resource type="PackedScene" uid="uid://cwdxsnmvc58je" path="res://scripts/abilities/thunder_slash/thunder_slash.tscn" id="1_rdmw5"]
+[ext_resource type="Texture2D" uid="uid://bx6mkrj1db5qw" path="res://assets/icon/32x32/fb1035.png" id="2_rdmw5"]
+
+[resource]
+script = ExtResource("1_f5dn0")
+ability_name = "Thunder slash"
+icon = ExtResource("2_rdmw5")
+category = 1
+cooldown = 5.0
+mana_cost = 20.0
+weapon_damage_multiplier = 1.0
+weapon_speed_multiplier = 0.8
+target_mode = 5
+anim_name = "thunder_slash"
+ability_scene = ExtResource("1_rdmw5")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

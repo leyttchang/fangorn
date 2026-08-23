@@ -63,15 +63,14 @@ func take_damage(raw_damage: float) -> void:
 	
 	# 6. On vrifie si le personnage est mort
 	if current_health == 0:
-		# NOUVEAU : Rcompense d'XP si applicable
+		# NOUVEAU : Rcompense d'XP multijoueur
 		var xp = stats_component.get_stat_value("xp_reward")
 		if xp > 0:
-			var player = get_tree().get_first_node_in_group("Player")
-				
-			if player != null and player != get_parent():
-				var lvl_comp = player.get_node_or_null("lvl_component") as LevelComponent
-				if lvl_comp != null:
-					lvl_comp.add_xp(int(xp))
+			for p in get_tree().get_nodes_in_group("Player"):
+				if p != get_parent():
+					var lvl_comp = p.get_node_or_null("lvl_component")
+					if lvl_comp != null:
+						lvl_comp.rpc_id(p.get_multiplayer_authority(), "_rpc_add_xp", int(xp))
 					
 		died.emit()
 

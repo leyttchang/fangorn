@@ -13,7 +13,8 @@ enum TargetMode {
 	PROJECTILE,     # Part de la caméra et avance (Boule de feu, Onde de choc)
 	HITSCAN,        # Tir instantané via le RayCast (Laser)
 	GROUND_TARGET,  # Nécessite de viser le sol avec un indicateur (Météore, Ice Crash)
-	SUMMON          # Invocation au sol
+	SUMMON,         # Invocation au sol
+	COMPLEX_ATTACK  # Instancie des le debut, pilote par l'AnimationPlayer (Call Method Tracks)
 }
 
 @export_group("Informations Générales")

@@ -311,7 +311,6 @@ explosiveness = 1.0
 fixed_fps = 60
 local_coords = true
 trail_enabled = true
-trail_lifetime = 5.0
 process_material = SubResource("ParticleProcessMaterial_kif2n")
 draw_pass_1 = SubResource("RibbonTrailMesh_i7pw1")
 

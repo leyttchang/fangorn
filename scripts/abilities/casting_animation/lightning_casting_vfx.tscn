@@ -262,10 +262,10 @@ tracks/5/path = NodePath("aura_glow_effect:surface_material_override/0:shader_pa
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.6, 0.9814368),
+"times": PackedFloat32Array(0.033333335, 0.6, 0.9814368),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [0.0, 0.0, 0.30000001192093]
+"values": [0.0, 0.0, 0.0999999977648]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_blbn4"]
@@ -308,6 +308,7 @@ shader = ExtResource("1_ohe6h")
 shader_parameter/lightningNoise1 = ExtResource("2_rdofv")
 shader_parameter/lightningNoise2 = SubResource("NoiseTexture2D_rdofv")
 shader_parameter/tint = Color(0.3658192, 0.43691558, 2.441911, 1)
+shader_parameter/disapear = 1.0
 shader_parameter/distortionVertex = 0.0
 shader_parameter/speedVertex = 0.999999977648
 shader_parameter/noiseVertex = SubResource("NoiseTexture2D_blbn4")
@@ -342,10 +343,11 @@ radial_velocity_max = 3.9999776
 gravity = Vector3(0, 0, 0)
 scale_min = 0.099999994
 scale_max = 0.39999998
-color = Color(0.44210172, 0, 2.5032542, 1)
+color = Color(0.7867462, 1.1390204, 2.5029187, 1)
 alpha_curve = SubResource("CurveTexture_rdofv")
 turbulence_enabled = true
 turbulence_noise_scale = 1.0
+turbulence_noise_speed = Vector3(1, 0, 0)
 turbulence_noise_speed_random = 4.0
 turbulence_influence_max = 0.8
 turbulence_initial_displacement_min = 5.0000014
@@ -424,11 +426,13 @@ surface_material_override/0 = SubResource("ShaderMaterial_poreu")
 
 [node name="trails" type="GPUParticles3D" parent="aura_glow_effect" unique_id=727409776]
 material_override = SubResource("StandardMaterial3D_3a7pm")
-amount = 10
+amount = 30
+lifetime = 0.2
+speed_scale = 2.99
 fixed_fps = 60
 local_coords = true
 trail_enabled = true
-trail_lifetime = 0.7
+trail_lifetime = 0.09999999999999999
 process_material = SubResource("ParticleProcessMaterial_mwgq1")
 draw_pass_1 = SubResource("RibbonTrailMesh_xsqty")
 
