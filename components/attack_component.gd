@@ -1,7 +1,15 @@
 class_name AttackComponent
 extends Area3D
 
-@export var damage: float = 1
+@export var base_damage: float = 1.0
+
+# Les dgts finaux calculs (remplis par le SpellScalingComponent)
+var damage_physical: float = 0.0
+var damage_magic: float = 0.0
+var damage_fire: float = 0.0
+var damage_ice: float = 0.0
+var damage_lightning: float = 0.0
+
 # NOUVEAU : Une case à cocher dans l'inspecteur, à activer UNIQUEMENT pour tes projectiles
 @export var destroy_on_environment: bool = false 
 @export var knockback_force: float = 15.0 # La force de poussée de cette attaque
@@ -13,6 +21,9 @@ var hit_entities: Array[Area3D] = []
 var is_active_for_network: bool = true
 
 func _ready() -> void:
+	# Par dfaut (sans SpellScalingComponent), 100% des dgts sont physiques
+	damage_physical = base_damage
+
 	var p = get_parent()
 	while p != null:
 		if p is CharacterBody3D:

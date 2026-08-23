@@ -108,11 +108,12 @@ sphere_material = SubResource("ShaderMaterial_maggd")
 bounce_collision_mask = 4278190344
 
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_y8uti")]
-damage = 70.0
+base_damage = 100.0
 knockback_force = 1.0
 
-[node name="SpellScalingComponent" parent="." unique_id=1128614238 instance=ExtResource("3_q8awa")]
-scales_with_magic = true
-scales_with_lightning = true
+[node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("3_q8awa")]
+attack_component = NodePath("../AttackComponent")
+phys_ratio = 0.0
+lightning_ratio = 1.0
 
 [editable path="AttackComponent"]

@@ -14,10 +14,13 @@ extends Resource
 @export var ice_damage: float = 1.0
 @export var lightning_damage: float = 1.0
 @export var attack_speed: float = 1
-@export var cd_red: float = 1 # Réduction de cooldown
+@export var cd_red: float = 1 # Rduction de cooldown
 @export var area_of_effect: float = 1
 @export var movement_speed: float = 1.0
 @export var knockback_resistance: float = 1
 @export var knockback_power: float = 1
 @export var casting_speed: float = 1
 @export var xp_reward: float = 10.0
+@export var fire_resistance: float = 0.0
+@export var ice_resistance: float = 0.0
+@export var lightning_resistance: float = 0.0

@@ -372,15 +372,15 @@ script = ExtResource("1_script")
 [node name="SpellScalingComponent" parent="." unique_id=1354020020 node_paths=PackedStringArray("attack_component") instance=ExtResource("2_scaling")]
 attack_component = NodePath("../AttackComponent")
 base_impact_radius = 10.0
-scales_with_magic = true
-scales_with_aoe_damage = true
-scales_with_ice = true
+is_aoe = true
+phys_ratio = 0.0
+ice_ratio = 1.0
 
 [node name="AttackComponent" parent="." unique_id=772369518 instance=ExtResource("3_attack")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.82263756, 0)
 collision_layer = 4
 collision_mask = 9
-damage = 60.0
+base_damage = 60.0
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 shape = SubResource("CylinderShape3D_ice_nova")

@@ -122,7 +122,7 @@ shape = SubResource("SphereShape3D_hlie2")
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("3_vrer4")]
 collision_layer = 4
 collision_mask = 9
-damage = 100.0
+base_damage = 100.0
 destroy_on_environment = true
 knockback_force = 10.0
 knockback_angle = 40.0
@@ -138,9 +138,9 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0
 
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("5_vrer4")]
 attack_component = NodePath("../AttackComponent")
-scales_with_magic = true
-scales_with_aoe_damage = true
-scales_with_fire = true
+is_aoe = true
+phys_ratio = 0.0
+fire_ratio = 1.0
 
 [node name="ImpactSpawnerComponent" parent="." unique_id=19574901 node_paths=PackedStringArray("attack_component", "scaling_component") instance=ExtResource("6_0x40h")]
 impact_scene = ExtResource("2_24oj3")
@@ -157,6 +157,7 @@ ratio_degat = 0.3
 [node name="explosion" parent="explosion_after_hit" index="0" unique_id=63324796]
 collision_layer = 4
 collision_mask = 8
+base_damage = 50.0
 knockback_force = 9.0
 knockback_angle = 50.0
 

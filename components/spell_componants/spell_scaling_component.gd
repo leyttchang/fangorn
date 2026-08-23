@@ -4,39 +4,39 @@ extends Node
 @export var attack_component: AttackComponent
 @export var base_impact_radius: float = 4.0
 
-@export_group("Weapon Scaling")
-## Si coché, ajoute les dégâts de l'arme + le flat_physical_damage aux dégâts de base du sort.
-@export var use_weapon_damage: bool = false
-## Utilisé si le sort est passif ou n'a pas d'ability_data (1.0 = 100% des dégâts d'arme)
+@export_group("Type de Competence")
+enum SkillType { SPELL, ATTACK }
+@export var skill_type: SkillType = SkillType.SPELL
+
+@export_group("Tags Globaux")
+## Si coche, le sort beneficie de la stat aoe_damage (en plus de magic_damage si SPELL)
+@export var is_aoe: bool = false
+
+@export_group("Weapon Scaling (Si ATTACK)")
+## Utilise si le sort n'a pas d'AbilityData (1.0 = 100% des degats de l'arme)
 @export var base_weapon_multiplier: float = 1.0
 
-@export_group("Damage Scaling Multipliers")
-@export var scales_with_physical: bool = false
-@export var scales_with_magic: bool = false
-@export var scales_with_aoe_damage: bool = false
-@export var scales_with_fire: bool = false
-@export var scales_with_ice: bool = false
-@export var scales_with_lightning: bool = false
+@export_group("Base Damage Split (%)")
+@export_range(0.0, 1.0) var phys_ratio: float = 1.0
+@export_range(0.0, 1.0) var fire_ratio: float = 0.0
+@export_range(0.0, 1.0) var ice_ratio: float = 0.0
+@export_range(0.0, 1.0) var lightning_ratio: float = 0.0
 
 var final_impact_radius: float = 4.0 
 var final_aoe_multiplier: float = 1.0
 
 func on_execute(caster: Node3D, target_data: Dictionary) -> void:
-	
-	# On récupère le .tres depuis le dictionnaire (injecté par la SkillBar)
 	var ability_data = target_data.get("ability_data") as AbilityData
-	
 	var caster_stats = caster.find_child("StatsComponent", true, false)
 	var equipment = caster.find_child("EquipmentComponent", true, false)
 	
 	if attack_component != null:
-		var base_spell_damage = attack_component.damage
-		var final_damage = base_spell_damage
+		var final_base = attack_component.base_damage
 		
 		# ====================================================
-		# 1. AJOUT DES DÉGÂTS D'ARME (Si coché)
+		# 1. GESTION DE L'ARME (Si c'est une Attaque)
 		# ====================================================
-		if use_weapon_damage:
+		if skill_type == SkillType.ATTACK:
 			var weapon_damage = 0.0
 			if equipment != null and equipment.equipped_items.has("main_hand"):
 				var weapon = equipment.equipped_items["main_hand"]
@@ -45,69 +45,79 @@ func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 			
 			var flat_phys_stat = 0.0
 			if caster_stats != null:
-				flat_phys_stat = caster_stats.get_stat_value("flat_physical_damage")
+				var stat = caster_stats.get_stat("flat_physical_damage")
+				if stat != null: flat_phys_stat = stat.get_value()
 				
 			var mult = base_weapon_multiplier
 			if ability_data != null:
 				mult = ability_data.weapon_damage_multiplier
 				
-			# On additionne les dégâts de l'arme modifiés aux dégâts de base du sort
-			final_damage += (weapon_damage + flat_phys_stat) * mult
+			final_base += (weapon_damage + flat_phys_stat) * mult
 			
 		# ====================================================
-		# 2. CALCUL PROPORTIONNEL DES ELEMENTS (CHUNKS)
+		# 2. CALCUL DES DEGATS (Systeme Additif)
 		# ====================================================
 		if caster_stats != null:
-			var tags_count = 0
-			if scales_with_physical: tags_count += 1
-			if scales_with_magic: tags_count += 1
-			if scales_with_aoe_damage: tags_count += 1
-			if scales_with_fire: tags_count += 1
-			if scales_with_ice: tags_count += 1
-			if scales_with_lightning: tags_count += 1
+			# A. Recuperation des bonus globaux (Tags)
+			var global_bonus = 0.0
+			if skill_type == SkillType.SPELL:
+				global_bonus += _get_stat_bonus(caster_stats, "magic_damage")
+			if is_aoe:
+				global_bonus += _get_stat_bonus(caster_stats, "aoe_damage")
 			
-			if tags_count > 0:
-				var scaled_damage = 0.0
-				var chunk_size = final_damage / float(tags_count)
-				
-				if scales_with_physical:
-					scaled_damage += chunk_size * caster_stats.get_stat_value("physical_damage")
-				if scales_with_magic:
-					var magic_stat = caster_stats.get_stat_value("magic_damage")
-					if magic_stat == 0.0: magic_stat = 1.0 
-					scaled_damage += chunk_size * magic_stat
-				if scales_with_aoe_damage:
-					scaled_damage += chunk_size * caster_stats.get_stat_value("aoe_damage")
-				if scales_with_fire:
-					scaled_damage += chunk_size * caster_stats.get_stat_value("fire_damage")
-				if scales_with_ice:
-					scaled_damage += chunk_size * caster_stats.get_stat_value("ice_damage")
-				if scales_with_lightning:
-					scaled_damage += chunk_size * caster_stats.get_stat_value("lightning_damage")
-					
-				final_damage = scaled_damage
-		
-		# On applique les dégâts finaux à la Hitbox
-		attack_component.damage = final_damage
+			# B. Repartition sur les elements (On ajoute les bonus elementaires bruts, puis on remet la base 1.0)
+			var physical_bonus = global_bonus + _get_stat_bonus(caster_stats, "physical_damage")
+			attack_component.damage_physical = (final_base * phys_ratio) * (1.0 + physical_bonus)
+			
+			var fire_bonus = global_bonus + _get_stat_bonus(caster_stats, "fire_damage")
+			attack_component.damage_fire = (final_base * fire_ratio) * (1.0 + fire_bonus)
+			
+			var ice_bonus = global_bonus + _get_stat_bonus(caster_stats, "ice_damage")
+			attack_component.damage_ice = (final_base * ice_ratio) * (1.0 + ice_bonus)
+			
+			var lightning_bonus = global_bonus + _get_stat_bonus(caster_stats, "lightning_damage")
+			attack_component.damage_lightning = (final_base * lightning_ratio) * (1.0 + lightning_bonus)
+		else:
+			# Sans stats, on divise juste la base
+			attack_component.damage_physical = final_base * phys_ratio
+			attack_component.damage_fire = final_base * fire_ratio
+			attack_component.damage_ice = final_base * ice_ratio
+			attack_component.damage_lightning = final_base * lightning_ratio
 		
 		# ====================================================
 		# 3. SCALING DU KNOCKBACK
 		# ====================================================
 		if caster_stats != null:
-			var kb_mult = caster_stats.get_stat_value("knockback_power")
+			var kb_stat = caster_stats.get_stat("knockback_power")
+			var kb_mult = 1.0
+			if kb_stat != null:
+				kb_mult = kb_stat.get_value()
 			if kb_mult == 0.0: 
 				kb_mult = 1.0
 			attack_component.knockback_force *= kb_mult
 	
 	# ====================================================
-	# 4. SCALING AOE (Taille) Indépendant de l'AttackComponent
+	# 4. SCALING AOE (Taille visuelle/hitbox)
 	# ====================================================
 	if caster_stats != null:
-		var aoe_mult = caster_stats.get_stat_value("area_of_effect")
-		print("DEBUG SPELL SCALING: aoe_mult recupere = ", aoe_mult)
+		var aoe_stat = caster_stats.get_stat("area_of_effect")
+		var aoe_mult = 1.0
+		if aoe_stat != null:
+			aoe_mult = aoe_stat.get_value()
 		if aoe_mult == 0.0:
 			aoe_mult = 1.0
 		final_aoe_multiplier = aoe_mult
 		final_impact_radius = base_impact_radius * aoe_mult
-	else:
-		print("DEBUG SPELL SCALING: caster_stats est NULL pour ", caster.name)
+
+
+# --- NOUVELLE FONCTION ---
+# Permet de faire la difference entre "La stat n'existe pas" et "La stat a ete reduite a 0 par des malus"
+func _get_stat_bonus(stats_node: Node, stat_name: String) -> float:
+	var stat = stats_node.get_stat(stat_name)
+	if stat == null:
+		# La stat n'a pas encore ete codee dans StatsComponent -> Pas de bonus, pas de malus
+		return 0.0
+	
+	# La stat existe ! On soustrait 1.0 pour recuperer UNIQUEMENT le bonus
+	# (Si des malus ont mis la valeur a 0.0, ca renverra bien 0.0 - 1.0 = -1.0)
+	return stat.get_value() - 1.0

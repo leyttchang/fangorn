@@ -12,7 +12,6 @@
 [ext_resource type="PackedScene" uid="uid://pgh7edv3pnkx" path="res://ui/game_over_text.tscn" id="5_ce8hk"]
 [ext_resource type="AudioStream" uid="uid://6f0x848aplbp" path="res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Swipe - 1.wav" id="6_r5ovt"]
 [ext_resource type="AudioStream" uid="uid://o72085f1gr8u" path="res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Swipe - 2.wav" id="7_4vy5w"]
-[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="7_hn1kw"]
 [ext_resource type="AudioStream" uid="uid://etu2ylsuirfg" path="res://assets/sound_effects/UI/wav (HD)/Swoosh_3.wav" id="8_dadkq"]
 [ext_resource type="Script" uid="uid://d0hmmguqjxq8v" path="res://components/skill_bar_component.gd" id="8_pw6nv"]
 [ext_resource type="AudioStream" uid="uid://bywd2jahco1bk" path="res://assets/sound_effects/UI/wav (HD)/woosh.wav" id="9_aynll"]
@@ -1017,7 +1016,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999774, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335462, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.9999773, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335453, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1065,7 +1064,6 @@ starting_stats = ExtResource("3_hhoun")
 [node name="HealthComponent" type="Node3D" parent="." unique_id=1333908518 node_paths=PackedStringArray("stats_component")]
 script = ExtResource("4_hhoun")
 stats_component = NodePath("../StatsComponent")
-armor_curve = ExtResource("7_hn1kw")
 
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("21_yr573")]
 stats_component = NodePath("../StatsComponent")

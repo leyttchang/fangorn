@@ -4,7 +4,9 @@
 
 [resource]
 script = ExtResource("1_7j2mx")
-armor = 30.0
 physical_damage = 3.0
 xp_reward = 30.0
+fire_resistance = 0.4
+ice_resistance = 0.4
+lightning_resistance = 0.4
 metadata/_custom_type_script = "uid://dpiksbl0a1f5"

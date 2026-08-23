@@ -1,16 +1,16 @@
 class_name StatsComponent
 extends Node
 
-# On demande à Godot de nous afficher une case pour glisser notre fichier .tres
+# On demande  Godot de nous afficher une case pour glisser notre fichier .tres
 @export var starting_stats: EntityStats 
 
 # Le dictionnaire qui va contenir nos objets Stat
 var _stats: Dictionary = {}
 signal stat_changed(stat_name: String, new_value: float)
 func _ready():
-	# 1. Sécurité : On vérifie qu'on a bien assigné un fichier de stats
+	# 1. Scurit : On vrifie qu'on a bien assign un fichier de stats
 	if starting_stats == null:
-		push_error("StatsComponent sur " + get_parent().name + " : Pas de starting_stats assigné !")
+		push_error("StatsComponent sur " + get_parent().name + " : Pas de starting_stats assign !")
 		return
 		
 	# 2. On initialise le dictionnaire avec des objets Stat.new()
@@ -32,15 +32,18 @@ func _ready():
 	_stats["knockback_resistance"] = Stat.new(starting_stats.knockback_resistance)
 	_stats["casting_speed"] = Stat.new(starting_stats.casting_speed)
 	_stats["xp_reward"] = Stat.new(starting_stats.xp_reward)
-# Fonction pour récupérer rapidement la valeur finale (ex: pour taper un ennemi)
+	_stats["fire_resistance"] = Stat.new(starting_stats.fire_resistance)
+	_stats["ice_resistance"] = Stat.new(starting_stats.ice_resistance)
+	_stats["lightning_resistance"] = Stat.new(starting_stats.lightning_resistance)
+# Fonction pour rcuprer rapidement la valeur finale (ex: pour taper un ennemi)
 func get_stat_value(stat_name: String) -> float:
 	if _stats.has(stat_name):
 		return _stats[stat_name].get_value()
 	
-	push_warning("La stat demandée n'existe pas : " + stat_name)
+	push_warning("La stat demande n'existe pas : " + stat_name)
 	return 0.0
 
-# Fonction pour récupérer l'objet Stat complet (ex: pour lui ajouter un buff)
+# Fonction pour rcuprer l'objet Stat complet (ex: pour lui ajouter un buff)
 func get_stat(stat_name: String) -> Stat:
 	if _stats.has(stat_name):
 		return _stats[stat_name]
@@ -54,7 +57,7 @@ func add_modifier(stat_name: String, mod_type: int, value: float, source_id: Str
 			var new_modifier = StatModifier.new(source_id, value, mod_type)
 			stat.add_modifier(new_modifier)
 			
-			# NOUVEAU : On prévient le reste du jeu de la nouvelle valeur !
+			# NOUVEAU : On prvient le reste du jeu de la nouvelle valeur !
 			stat_changed.emit(stat_name, stat.get_value())
 		else:
 			push_warning("Attention, la classe Stat n'a pas de fonction add_modifier()")
@@ -63,10 +66,10 @@ func remove_modifier_by_source(source_id: String) -> void:
 	for stat_name in _stats:
 		var stat = _stats[stat_name]
 		if stat.has_method("remove_modifier"):
-			# On garde l'ancienne valeur en mémoire pour voir si ça a vraiment changé
+			# On garde l'ancienne valeur en mmoire pour voir si a a vraiment chang
 			var old_value = stat.get_value()
 			stat.remove_modifier(source_id)
 			
-			# NOUVEAU : Si la stat a changé après le retrait, on prévient le jeu
+			# NOUVEAU : Si la stat a chang aprs le retrait, on prvient le jeu
 			if stat.get_value() != old_value:
 				stat_changed.emit(stat_name, stat.get_value())

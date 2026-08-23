@@ -123,6 +123,10 @@ func _handle_inputs() -> void:
 						else:
 							base_cast_time = 1.0
 					
+					# On applique le multiplicateur propre a la competence
+					if "weapon_speed_multiplier" in ability and ability.weapon_speed_multiplier > 0.0:
+						base_cast_time /= ability.weapon_speed_multiplier
+					
 					if player_stats != null:
 						var p_speed = player_stats.get_stat_value("attack_speed")
 						if p_speed != 0.0:

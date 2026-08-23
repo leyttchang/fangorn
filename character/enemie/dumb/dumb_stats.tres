@@ -5,5 +5,6 @@
 [resource]
 script = ExtResource("1_2yhjv")
 max_health = 200.0
+armor = 60.0
 xp_reward = 30.0
 metadata/_custom_type_script = "uid://dpiksbl0a1f5"

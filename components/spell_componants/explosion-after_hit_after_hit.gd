@@ -14,39 +14,43 @@ var has_exploded: bool = false # NOTRE VERROU
 
 func _ready() -> void:
 	if attack_component == null:
-		push_error("ERREUR : attack_component est vide ! Glisse le nœud depuis l'arbre vers l'inspecteur.")
+		push_error("ERREUR : attack_component est vide ! Glisse le nud depuis l'arbre vers l'inspecteur.")
 		return
 		
 	attack_component.attack_landed.connect(_on_attack_landed)
 
 func _on_attack_landed(_target: Node) -> void:
-	# Si ça a déjà explosé, on bloque tout de suite !
+	# Si a a dj explos, on bloque tout de suite !
 	if has_exploded:
-		print("--- X. DOUBLE IMPACT IGNORÉ grâce au verrou ! ---")
+		print("--- X. DOUBLE IMPACT IGNOR grce au verrou ! ---")
 		return
 		
 	has_exploded = true 
-	print("--- 1. IMPACT DÉTECTÉ ! Déclenchement de l'explosion ---")
+	print("--- 1. IMPACT DTECT ! Dclenchement de l'explosion ---")
 	
 	if scaling_component != null:
 		radius = scaling_component.final_impact_radius * radius_ratio
 		if explosion_area.shape is SphereShape3D:
 			explosion_area.shape.radius = radius
-			print("--- 2. Rayon de l'explosion mis à jour : ", radius, " ---")
+			print("--- 2. Rayon de l'explosion mis  jour : ", radius, " ---")
 	else:
-		push_warning("ATTENTION : Pas de scaling_component assigné.")
+		push_warning("ATTENTION : Pas de scaling_component assign.")
 
 	if attack_component != null and explosion != null:
-		explosion.damage = attack_component.damage * ratio_degat
-		print("--- 3. Dégâts de l'explosion réglés sur : ", explosion.damage, " ---")
+		explosion.base_damage = attack_component.base_damage * ratio_degat
+		explosion.damage_physical = attack_component.damage_physical * ratio_degat
+		explosion.damage_fire = attack_component.damage_fire * ratio_degat
+		explosion.damage_ice = attack_component.damage_ice * ratio_degat
+		explosion.damage_lightning = attack_component.damage_lightning * ratio_degat
+		print("--- 3. Dgts de l'explosion rgls sur : ", explosion.base_damage, " ---")
 		
 		if explosion.has_method("reset_hit_entities"):
 			explosion.reset_hit_entities()
 			
 		explosion_area.set_deferred("disabled", false)
-		print("--- 4. Hitbox de l'explosion activée ! ---")
+		print("--- 4. Hitbox de l'explosion active ! ---")
 		
 		await get_tree().create_timer(0.2).timeout
 		if is_instance_valid(explosion_area):
 			explosion_area.set_deferred("disabled", true)
-			print("--- 5. Hitbox de l'explosion désactivée. Fin de l'explosion. ---")
+			print("--- 5. Hitbox de l'explosion dsactive. Fin de l'explosion. ---")

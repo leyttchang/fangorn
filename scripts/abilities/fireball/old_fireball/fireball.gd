@@ -15,7 +15,7 @@ extends RigidBody3D
 var final_impact_radius: float = 4.0 
 
 func _ready() -> void:
-	attack_component.damage = base_damage
+	attack_component.base_damage = base_damage
 	if attack_component != null:
 		attack_component.attack_landed.connect(_on_attack_landed)
 	
@@ -28,7 +28,7 @@ func execute(caster: Node3D, target_data: Dictionary) -> void:
 	
 	if caster_stats != null:
 		if attack_component != null:
-			attack_component.damage *= caster_stats.get_stat_value("magic_damage")
+			attack_component.base_damage *= caster_stats.get_stat_value("magic_damage")
 		
 		# --- LE CALCUL DE L'AOE EST ICI ---
 		var aoe_mult = caster_stats.get_stat_value("area_of_effect")

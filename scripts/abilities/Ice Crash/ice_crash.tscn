@@ -4540,7 +4540,7 @@ script = ExtResource("1_4d8mh")
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_m5xq4")]
 collision_layer = 4
 collision_mask = 8
-damage = 10.0
+base_damage = 10.0
 knockback_angle = 40.0
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
@@ -4551,9 +4551,10 @@ shape = SubResource("CylinderShape3D_ywm6b")
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("3_8hd61")]
 attack_component = NodePath("../AttackComponent")
 base_impact_radius = 5.0
-use_weapon_damage = true
-scales_with_physical = true
-scales_with_ice = true
+skill_type = 1
+is_aoe = true
+phys_ratio = 0.5
+ice_ratio = 0.5
 
 [node name="Ice_crash_effect" type="Node3D" parent="." unique_id=1939253335]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, -0.7, -1)
