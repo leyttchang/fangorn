@@ -15,6 +15,9 @@ var damage_lightning: float = 0.0
 @export var knockback_force: float = 15.0 # La force de poussée de cette attaque
 @export_range(0.0, 90.0) var knockback_angle: float = 0.0 # L'angle d'élévation de la cible (0 = plat, 90 = vertical)
 @export var is_projectile: bool = false
+
+@export_group("Status Effects")
+@export var status_effects_to_apply: Array[StatusEffectApplication] = []
 signal attack_landed(target)
 
 var hit_entities: Array[Area3D] = []

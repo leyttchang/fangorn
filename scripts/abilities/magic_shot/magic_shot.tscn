@@ -4,9 +4,16 @@
 [ext_resource type="Script" uid="uid://dan4awd35g8on" path="res://scripts/abilities/magic_shot/magic_shot.gd" id="1_7deol"]
 [ext_resource type="PackedScene" uid="uid://c8vpbw6n27cqq" path="res://components/spell_componants/projectile_movement_component.tscn" id="2_0d483"]
 [ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="3_7deol"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="3_pijyb"]
 [ext_resource type="PackedScene" uid="uid://3nja3oqtkxia" path="res://components/spell_componants/impact_spawner_component.tscn" id="4_0d483"]
+[ext_resource type="Resource" uid="uid://bnejg5v1r0i1w" path="res://scripts/status_effects/break_armor_50/break_armor_50.tres" id="4_pijyb"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
+
+[sub_resource type="Resource" id="Resource_0ifye"]
+script = ExtResource("3_pijyb")
+effect = ExtResource("4_pijyb")
+metadata/_custom_type_script = "uid://f3s08057cvjq"
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yqkk6"]
 
@@ -41,6 +48,7 @@ base_damage = 30.0
 destroy_on_environment = true
 knockback_force = 2.0
 is_projectile = true
+status_effects_to_apply = Array[ExtResource("3_pijyb")]([SubResource("Resource_0ifye")])
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(0.3, 0, 0, 0, -1.3113417e-08, -0.3, 0, 0.3, -1.3113417e-08, 0, 0, 0.2)

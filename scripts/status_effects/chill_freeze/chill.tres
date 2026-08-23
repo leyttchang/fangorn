@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://bpl0lg7b1p6eu"]
+
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_28nk2"]
+[ext_resource type="PackedScene" uid="uid://bvoab37320xyw" path="res://scripts/status_effects/chill_freeze/chill_particle.tscn" id="1_rdgv0"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_ecklf"]
+[ext_resource type="Material" uid="uid://bbiah6hbn214e" path="res://scripts/status_effects/chill_freeze/freeze_shader.tres" id="2_wxhab"]
+
+[sub_resource type="Resource" id="Resource_wxhab"]
+script = ExtResource("2_ecklf")
+stat_name = "movement_speed"
+value = -0.5
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_rdgv0"]
+script = ExtResource("2_ecklf")
+stat_name = "attack_speed"
+value = -0.5
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_28nk2")
+effect_id = "chill"
+stat_modifiers = Array[ExtResource("2_ecklf")]([SubResource("Resource_wxhab"), SubResource("Resource_rdgv0")])
+enemie_effect = ExtResource("1_rdgv0")
+overlay_material = ExtResource("2_wxhab")
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

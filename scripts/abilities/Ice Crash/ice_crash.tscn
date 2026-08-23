@@ -3,11 +3,20 @@
 [ext_resource type="Script" uid="uid://cj3uotxqr71cy" path="res://scripts/abilities/Ice Crash/ice_crash.gd" id="1_4d8mh"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_m5xq4"]
 [ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="3_8hd61"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="3_mdvlo"]
+[ext_resource type="Resource" uid="uid://c76v08u2uw0ke" path="res://scripts/status_effects/chill_freeze/chill_freeze.tres" id="4_mdvlo"]
 [ext_resource type="Texture2D" uid="uid://crixvm0smjia1" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/light_01.png" id="4_ywm6b"]
 [ext_resource type="Shader" uid="uid://dsih8htkctkl1" path="res://scripts/abilities/casting_animation/ice_shader.tres" id="5_ywm6b"]
 [ext_resource type="Texture2D" uid="uid://hpbjrjvttuj4" path="res://assets/LeLu's Noise Pack/T_smoke_b7.png" id="7_bchdy"]
 [ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="7_yy7jn"]
 [ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="8_yy7jn"]
+
+[sub_resource type="Resource" id="Resource_jvdov"]
+script = ExtResource("3_mdvlo")
+effect = ExtResource("4_mdvlo")
+duration = 4.0
+apply_chance = 0.8
+metadata/_custom_type_script = "uid://f3s08057cvjq"
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_ywm6b"]
 height = 0.5
@@ -4542,6 +4551,7 @@ collision_layer = 4
 collision_mask = 8
 base_damage = 10.0
 knockback_angle = 40.0
+status_effects_to_apply = Array[ExtResource("3_mdvlo")]([SubResource("Resource_jvdov")])
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1)

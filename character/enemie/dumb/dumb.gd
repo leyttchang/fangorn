@@ -131,6 +131,30 @@ func _rpc_apply_state(new_state: int) -> void:
 # ==========================================================
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority(): return
+	
+	var action_speed = 1.0
+	if stats_component != null:
+		action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
+		
+	# --- STUN TOTAL ---
+	if action_speed <= 0.0:
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		velocity.x = move_toward(velocity.x, 0, 10.0 * delta)
+		velocity.z = move_toward(velocity.z, 0, 10.0 * delta)
+		move_and_slide()
+		
+		# On fige l'arbre d'animation !
+		if anim_tree.active:
+			anim_tree.active = false
+		
+		# Securite pour la hitbox
+		if attack_shape != null and not attack_shape.disabled:
+			attack_shape.disabled = true
+		return
+		
+	if not anim_tree.active:
+		anim_tree.active = true
 
 	# Verrouillage de la cible pendant 15s
 	_target_update_timer += delta
@@ -158,7 +182,7 @@ func _physics_process(delta: float) -> void:
 		if current_state != State.ATTACK and not attack_shape.disabled:
 			attack_shape.disabled = true
 
-	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
+	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed") * action_speed
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
 	# On passe la vitesse horizontale à nos comportements

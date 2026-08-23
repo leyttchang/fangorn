@@ -2,14 +2,15 @@
 
 [ext_resource type="Script" uid="uid://dmkj7y2chruav" path="res://scripts/abilities/fireball/fireball_c.gd" id="1_i3gd7"]
 [ext_resource type="PackedScene" uid="uid://bq82o86mbcy58" path="res://objet/ground_fire.tscn" id="2_24oj3"]
-[ext_resource type="Shader" uid="uid://bpooanoib8uib" path="res://scripts/abilities/fireball/fire_effect.tres" id="2_jd4mf"]
 [ext_resource type="PackedScene" uid="uid://ecsymwlpd5bj" path="res://assets/3D_models/VFX_spell/fireball_head.glb" id="2_oemw2"]
+[ext_resource type="Material" uid="uid://cck1dcrxivlua" path="res://scripts/status_effects/burn/burn_shader.tres" id="3_6sc7u"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_vrer4"]
 [ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="4_0x40h"]
-[ext_resource type="Texture2D" uid="uid://dgu2l66qeji0t" path="res://assets/LeLu's Noise Pack/T_MarbleNoise_tiled.png" id="4_6sc7u"]
 [ext_resource type="PackedScene" uid="uid://c8vpbw6n27cqq" path="res://components/spell_componants/projectile_movement_component.tscn" id="4_24oj3"]
 [ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="5_vrer4"]
 [ext_resource type="PackedScene" uid="uid://3nja3oqtkxia" path="res://components/spell_componants/impact_spawner_component.tscn" id="6_0x40h"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="6_kdt48"]
+[ext_resource type="Resource" uid="uid://cwl1x2y7sug0o" path="res://scripts/status_effects/burn/burn.tres" id="7_lbd7v"]
 [ext_resource type="PackedScene" uid="uid://bkf8u24x228xv" path="res://components/spell_componants/area_damage_after_hit.tscn" id="8_x5wq2"]
 [ext_resource type="Script" uid="uid://754224kx8r1s" path="res://components/spell_componants/explosion-after_hit_after_hit.gd" id="9_o14cw"]
 
@@ -47,63 +48,21 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_i7cyh")
 
-[sub_resource type="Gradient" id="Gradient_lbd7v"]
-offsets = PackedFloat32Array(0, 0.16078432, 0.46666667, 0.9843137)
-colors = PackedColorArray(0.6039964, 0.07064223, 0.07064223, 0, 1.5895121, 0.5763056, 0, 0.35686275, 1.53993, 0, 0, 0.5921569, 1.4547668, 1.3284748, 0.30999184, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_xo0li"]
-gradient = SubResource("Gradient_lbd7v")
-use_hdr = true
-
-[sub_resource type="Gradient" id="Gradient_oemw2"]
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_v36gt"]
-gradient = SubResource("Gradient_oemw2")
-fill_to = Vector2(0.0042735045, 1)
-
-[sub_resource type="Gradient" id="Gradient_6sc7u"]
-offsets = PackedFloat32Array(0, 0.16470589, 0.4509804, 0.56078434, 0.78431374, 0.93333334)
-colors = PackedColorArray(0, 0, 0, 1, 0.92, 0.92, 0.92, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_qgnve"]
-gradient = SubResource("Gradient_6sc7u")
-fill_to = Vector2(0, 1)
-
-[sub_resource type="Gradient" id="Gradient_i64jh"]
-offsets = PackedFloat32Array(0.16862746, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_id5gp"]
-gradient = SubResource("Gradient_i64jh")
-fill_to = Vector2(0, 1)
-
-[sub_resource type="Gradient" id="Gradient_okf3j"]
-offsets = PackedFloat32Array(0, 0.32156864, 0.85490197, 0.96862745)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_6f7du"]
-gradient = SubResource("Gradient_okf3j")
-fill_to = Vector2(0, 1)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_bhy7e"]
-render_priority = 1
-shader = ExtResource("2_jd4mf")
-shader_parameter/displacement_speed = Vector2(1, 1)
-shader_parameter/displacement_scale = Vector2(1, 1)
-shader_parameter/displacement = SubResource("GradientTexture2D_qgnve")
-shader_parameter/displacement_intesity = 0.2
-shader_parameter/speed = Vector2(0.5, 1)
-shader_parameter/scale = Vector2(1, 1)
-shader_parameter/base_texture = ExtResource("4_6sc7u")
-shader_parameter/texture_add = SubResource("GradientTexture2D_id5gp")
-shader_parameter/texture_substract = SubResource("GradientTexture2D_6f7du")
-shader_parameter/color_palete = SubResource("GradientTexture1D_xo0li")
-shader_parameter/disapear_texture = SubResource("GradientTexture2D_v36gt")
-shader_parameter/stepp = 1.0
-
 [sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
+
+[sub_resource type="Resource" id="Resource_xoocw"]
+script = ExtResource("6_kdt48")
+effect = ExtResource("7_lbd7v")
+metadata/_custom_type_script = "uid://f3s08057cvjq"
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_56r4w"]
 radius = 0.6
+
+[sub_resource type="Resource" id="Resource_aqdbj"]
+script = ExtResource("6_kdt48")
+effect = ExtResource("7_lbd7v")
+apply_chance = 0.33
+metadata/_custom_type_script = "uid://f3s08057cvjq"
 
 [node name="fireball" type="RigidBody3D" unique_id=247738793]
 collision_layer = 0
@@ -114,7 +73,7 @@ transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0)
 
 [node name="Sphere" parent="fireball_head" index="0" unique_id=1102591214]
 mesh = SubResource("ArrayMesh_kdt48")
-surface_material_override/0 = SubResource("ShaderMaterial_bhy7e")
+surface_material_override/0 = ExtResource("3_6sc7u")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2120570958]
 shape = SubResource("SphereShape3D_hlie2")
@@ -127,6 +86,7 @@ destroy_on_environment = true
 knockback_force = 10.0
 knockback_angle = 40.0
 is_projectile = true
+status_effects_to_apply = Array[ExtResource("6_kdt48")]([SubResource("Resource_xoocw")])
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 shape = SubResource("SphereShape3D_56r4w")
@@ -160,6 +120,7 @@ collision_mask = 8
 base_damage = 50.0
 knockback_force = 9.0
 knockback_angle = 50.0
+status_effects_to_apply = Array[ExtResource("6_kdt48")]([SubResource("Resource_aqdbj")])
 
 [editable path="fireball_head"]
 [editable path="AttackComponent"]

@@ -24,3 +24,5 @@ extends Resource
 @export var fire_resistance: float = 0.0
 @export var ice_resistance: float = 0.0
 @export var lightning_resistance: float = 0.0
+@export var action_speed: float = 1.0
+@export var damage_taken_multiplier: float = 0.0

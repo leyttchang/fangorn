@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://7atldbjtevqe"]
+
+[ext_resource type="Material" uid="uid://bjp26qe2dv6hn" path="res://scripts/status_effects/shock/shock_shader.tres" id="1_4b6b3"]
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_gqjw2"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_4b6b3"]
+
+[sub_resource type="Resource" id="Resource_ly833"]
+script = ExtResource("2_4b6b3")
+stat_name = "damage_taken_multiplier"
+value = 0.5
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_gqjw2")
+effect_id = "shock"
+stat_modifiers = Array[ExtResource("2_4b6b3")]([SubResource("Resource_ly833")])
+overlay_material = ExtResource("1_4b6b3")
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

@@ -24,14 +24,22 @@ func receive_hit(attack: AttackComponent) -> void:
 		var dmg_ice = attack.damage_ice
 		var dmg_lightning = attack.damage_lightning
 		
+		var damage_taken_mult = 1.0
+		
 		if health_component.stats_component != null:
 			var stats = health_component.stats_component
+			
+			# --- MULTIPLICATEUR DE DEGATS RECUS (Ex: Shock) ---
+			# Si la stat n'existe pas, elle renverra 0.0, donc on l'ajoute a 1.0
+			damage_taken_mult = max(0.0, 1.0 + stats.get_stat_value("damage_taken_multiplier"))
 			
 			# --- ARMURE (Sur le Physique Uniquement) ---
 			var armor = max(stats.get_stat_value("armor"), 0.0)
 			var armor_reduction = 0.0
 			if armor_curve != null:
-				var armor_x = min(armor / max_expected_armor, 1.0)
+				# La courbe de base X va de 0 a 5. Donc on divise par 100.
+				# (Ex: 50 armure = X:0.5 -> 30% reduction)
+				var armor_x = armor / 100.0
 				armor_reduction = armor_curve.sample(armor_x)
 			dmg_phys *= (1.0 - armor_reduction)
 			
@@ -44,8 +52,22 @@ func receive_hit(attack: AttackComponent) -> void:
 			dmg_ice *= (1.0 - max(0.0, res_ice))
 			dmg_lightning *= (1.0 - max(0.0, res_lightning))
 		
-		var total_damage = dmg_phys + dmg_fire + dmg_ice + dmg_lightning
+		var total_damage = (dmg_phys + dmg_fire + dmg_ice + dmg_lightning) * damage_taken_mult
 		health_component.take_damage(total_damage)
+
+	# 2. Application des Status Effects
+	if "status_effects_to_apply" in attack and attack.status_effects_to_apply.size() > 0:
+		var status_comp = null
+		for child in get_parent().get_children():
+			if child is StatusEffectComponent:
+				status_comp = child
+				break
+		
+		if status_comp != null and status_comp.has_method("apply_effect"):
+			for app in attack.status_effects_to_apply:
+				if randf() <= app.apply_chance:
+					status_comp.apply_effect(app.effect, app.duration)
+
 		
 	hit_received.emit(attack)
 	

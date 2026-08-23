@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_y8uti"]
 [ext_resource type="Shader" uid="uid://bhdxcc41b5ffu" path="res://scripts/abilities/casting_animation/lightning_ball_shader.gdshader" id="3_jfw0q"]
 [ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="3_q8awa"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="5_ccl8d"]
+[ext_resource type="Resource" uid="uid://7atldbjtevqe" path="res://scripts/status_effects/shock/shock.tres" id="6_lr3f2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jfw0q"]
 render_priority = 0
@@ -96,6 +98,12 @@ shader_parameter/distortionVertex = 0.08999999798832
 shader_parameter/speedVertex = 0.70999998413008
 shader_parameter/noiseVertex = SubResource("NoiseTexture2D_dhso1")
 
+[sub_resource type="Resource" id="Resource_et3qn"]
+script = ExtResource("5_ccl8d")
+effect = ExtResource("6_lr3f2")
+duration = 6.0
+metadata/_custom_type_script = "uid://f3s08057cvjq"
+
 [node name="chain_lightning" type="Node3D" unique_id=802024538]
 script = ExtResource("1_jxgql")
 line_duration = 1.0
@@ -110,6 +118,7 @@ bounce_collision_mask = 4278190344
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_y8uti")]
 base_damage = 100.0
 knockback_force = 1.0
+status_effects_to_apply = Array[ExtResource("5_ccl8d")]([SubResource("Resource_et3qn")])
 
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("3_q8awa")]
 attack_component = NodePath("../AttackComponent")

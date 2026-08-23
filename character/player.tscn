@@ -61,6 +61,7 @@
 [ext_resource type="Script" uid="uid://c8qhr0hxtdymv" path="res://components/skill_tree_component.gd" id="59_ay40t"]
 [ext_resource type="PackedScene" uid="uid://dnv6k8v44l8xw" path="res://passive_skill_tree/generator_test.tscn" id="60_ce8hk"]
 [ext_resource type="Script" uid="uid://v0dr1ndsmbrc" path="res://ui/ui_manager.gd" id="61_ay40t"]
+[ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="62_ce8hk"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ay40t"]
 properties/0/path = NodePath(".:rotation")
@@ -1016,7 +1017,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999773, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335453, -0.97336584, 0.22916505, 0.5, -0.9, -1)
+transform = Transform3D(0.99997723, -0.0061649964, 0.0014514602, 0, 0.22916958, 0.9733857, -0.0063335453, -0.97336584, 0.22916505, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1202,6 +1203,10 @@ skill_tree_comp = NodePath("../Skill_tree_comp")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8124057, -0.24893999)
 target_position = Vector3(0, 0, -1)
 collision_mask = 128
+
+[node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("62_ce8hk")]
+stats_component = NodePath("../StatsComponent")
+health_component = NodePath("../HealthComponent")
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

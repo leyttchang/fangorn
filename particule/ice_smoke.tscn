@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://dlm2jl4a6c4wf"]
+
+[ext_resource type="Texture2D" uid="uid://hpbjrjvttuj4" path="res://assets/LeLu's Noise Pack/T_smoke_b7.png" id="1_lviuf"]
+
+[sub_resource type="Gradient" id="Gradient_yn4rq"]
+offsets = PackedFloat32Array(0, 0.22077923, 0.6753247, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.429, 0.429, 0.66, 0.3254902, 0.462, 0.54413325, 0.77, 0.3764706, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_3bpsp"]
+gradient = SubResource("Gradient_yn4rq")
+
+[sub_resource type="Curve" id="Curve_tdgkn"]
+_data = [Vector2(0, 0.3510638), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_gm3e2"]
+curve = SubResource("Curve_tdgkn")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+emission_shape = 1
+emission_sphere_radius = 3.0
+angle_min = -179.99998
+angle_max = 180.00002
+gravity = Vector3(0, 0, 0)
+scale_min = 0.0
+scale_max = 0.0
+scale_curve = SubResource("CurveTexture_gm3e2")
+color_ramp = SubResource("GradientTexture1D_3bpsp")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dria3"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_lviuf")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+proximity_fade_enabled = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_as728"]
+lightmap_size_hint = Vector2i(7, 7)
+material = SubResource("StandardMaterial3D_dria3")
+
+[node name="smoke" type="GPUParticles3D" unique_id=92574342]
+amount = 5
+lifetime = 3.0
+preprocess = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_hlie2")
+draw_pass_1 = SubResource("QuadMesh_as728")

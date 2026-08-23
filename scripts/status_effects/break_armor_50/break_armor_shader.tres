@@ -1,0 +1,57 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://fkmh4l5dcssh"]
+
+[ext_resource type="Shader" uid="uid://dsih8htkctkl1" path="res://scripts/abilities/casting_animation/ice_shader.tres" id="1_uh06f"]
+[ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="2_hpwya"]
+
+[sub_resource type="Gradient" id="Gradient_rdrln"]
+offsets = PackedFloat32Array(0, 0.14909092, 0.29818183, 0.8545455, 1)
+colors = PackedColorArray(0.03, 0.0044999993, 0.0044999993, 0, 0.21, 0, 0, 1, 0, 0, 0, 1, 2.3827941, 0.49571812, 0, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1xjxg"]
+gradient = SubResource("Gradient_rdrln")
+use_hdr = true
+
+[sub_resource type="Gradient" id="Gradient_0veov"]
+offsets = PackedFloat32Array(0, 0.9843137)
+colors = PackedColorArray(0.3515629, 0.3515629, 0.35156286, 1, 0.35906908, 0.35906908, 0.35906908, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ivt21"]
+gradient = SubResource("Gradient_0veov")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_vwoun"]
+noise_type = 2
+fractal_octaves = 6
+fractal_weighted_strength = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_mssrf"]
+noise = SubResource("FastNoiseLite_vwoun")
+
+[sub_resource type="Gradient" id="Gradient_jlx5x"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_w3coy"]
+gradient = SubResource("Gradient_jlx5x")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_vf35x"]
+offsets = PackedFloat32Array(0, 0.99607843)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ao7x3"]
+gradient = SubResource("Gradient_vf35x")
+fill_to = Vector2(0, 1)
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_uh06f")
+shader_parameter/displacement_speed = Vector2(1, 1)
+shader_parameter/displacement_scale = Vector2(1, 1)
+shader_parameter/displacement = SubResource("NoiseTexture2D_mssrf")
+shader_parameter/displacement_intesity = 0.0
+shader_parameter/speed = Vector2(0.01, 0.01)
+shader_parameter/scale = Vector2(1, 1)
+shader_parameter/base_texture = ExtResource("2_hpwya")
+shader_parameter/texture_add = SubResource("GradientTexture2D_w3coy")
+shader_parameter/texture_substract = SubResource("GradientTexture2D_ao7x3")
+shader_parameter/color_palete = SubResource("GradientTexture1D_1xjxg")
+shader_parameter/disapear_texture = SubResource("GradientTexture2D_ivt21")
+shader_parameter/stepp = 0.882000041895

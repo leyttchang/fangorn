@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="4_is52v"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="5_y7n3t"]
 [ext_resource type="Resource" uid="uid://cr7en7aw23w0e" path="res://character/enemie/dumb/dumb_stats.tres" id="6_mb0d1"]
-[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="6_vkw15"]
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="7_it7g2"]
 [ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="10_452es"]
 [ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="11_3atj7"]
@@ -40,6 +39,7 @@
 [ext_resource type="AudioStream" uid="uid://ciu3mffcanmdx" path="res://assets/sound_effects/Human/belch_1.wav" id="38_g26vk"]
 [ext_resource type="AudioStream" uid="uid://lij60mhnigeg" path="res://assets/sound_effects/Human/belch_2.wav" id="39_vhgsy"]
 [ext_resource type="AudioStream" uid="uid://d28g7j4vbcf31" path="res://assets/sound_effects/Human/belch_3.wav" id="40_0x4wk"]
+[ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="40_holf7"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 radius = 0.37402344
@@ -158,7 +158,7 @@ bone_idx = 14
 [node name="AttackComponent" parent="Orc/Armature/Skeleton3D/BoneAttachment3D" unique_id=63324796 instance=ExtResource("3_is52v")]
 collision_layer = 16
 collision_mask = 2
-damage = 20.0
+base_damage = 25.0
 knockback_force = 30.0
 
 [node name="CollisionShape3D" parent="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent" index="0" unique_id=710296738]
@@ -191,7 +191,6 @@ starting_stats = ExtResource("6_mb0d1")
 [node name="HealthComponent" type="Node3D" parent="." unique_id=1864401734 node_paths=PackedStringArray("stats_component")]
 script = ExtResource("5_y7n3t")
 stats_component = NodePath("../StatsComponent")
-armor_curve = ExtResource("6_vkw15")
 
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("4_is52v")]
 stats_component = NodePath("../StatsComponent")
@@ -218,6 +217,10 @@ volume_db = -40.5
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=307709312]
 replication_config = SubResource("SceneReplicationConfig_holf7")
+
+[node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("40_holf7")]
+stats_component = NodePath("../StatsComponent")
+health_component = NodePath("../HealthComponent")
 
 [editable path="Orc"]
 [editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]

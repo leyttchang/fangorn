@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c76swiptbrjbq"]
+
+[ext_resource type="Script" uid="uid://8vqdlu0kfmfo" path="res://components/status_effect_componant.gd" id="1_b8krq"]
+
+[node name="status_effect_componant" type="Node3D" unique_id=344235016]
+script = ExtResource("1_b8krq")

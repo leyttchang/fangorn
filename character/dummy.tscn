@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://c6ffpu2048j4x" path="res://character/dummy_stats.tres" id="2_sjyxn"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="3_hw4ky"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="4_uij62"]
-[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="5_2vqka"]
+[ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="7_1cm6n"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="7_luoob"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
@@ -41,8 +41,6 @@ starting_stats = ExtResource("2_sjyxn")
 [node name="HealthComponent" type="Node3D" parent="." unique_id=1248471252 node_paths=PackedStringArray("stats_component")]
 script = ExtResource("3_hw4ky")
 stats_component = NodePath("../StatsComponent")
-armor_curve = ExtResource("5_2vqka")
-max_expected_armor = 200.0
 
 [node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("4_uij62")]
 collision_layer = 8
@@ -59,5 +57,9 @@ stats_component = NodePath("../StatsComponent")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1569781292]
 replication_config = SubResource("SceneReplicationConfig_luoob")
+
+[node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("7_1cm6n")]
+stats_component = NodePath("../StatsComponent")
+health_component = NodePath("../HealthComponent")
 
 [editable path="HitboxComponent"]

@@ -3,11 +3,18 @@
 [ext_resource type="Script" uid="uid://bpihgwu6d6hax" path="res://scripts/abilities/ice_nova/ice_nova.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="2_scaling"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_attack"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="4_ripjr"]
 [ext_resource type="Texture2D" uid="uid://hpbjrjvttuj4" path="res://assets/LeLu's Noise Pack/T_smoke_b7.png" id="4_upbfj"]
+[ext_resource type="Resource" uid="uid://c76v08u2uw0ke" path="res://scripts/status_effects/chill_freeze/chill_freeze.tres" id="5_ripjr"]
 [ext_resource type="Shader" uid="uid://d38u3ry78d5ro" path="res://assets/3D_models/VFX_spell/wave_impact.tres" id="6_0lfaf"]
 [ext_resource type="Texture2D" uid="uid://c6vermwacx4a4" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/Rotated/spark_06_rotated.png" id="6_movyf"]
 [ext_resource type="Texture2D" uid="uid://biff8ah2i3vrg" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/light_03.png" id="7_0lfaf"]
 [ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="8_6glf2"]
+
+[sub_resource type="Resource" id="Resource_it0gm"]
+script = ExtResource("4_ripjr")
+effect = ExtResource("5_ripjr")
+metadata/_custom_type_script = "uid://f3s08057cvjq"
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_ice_nova"]
 height = 3.0
@@ -381,6 +388,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.82263756, 0)
 collision_layer = 4
 collision_mask = 9
 base_damage = 60.0
+status_effects_to_apply = Array[ExtResource("4_ripjr")]([SubResource("Resource_it0gm")])
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 shape = SubResource("CylinderShape3D_ice_nova")

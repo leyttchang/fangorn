@@ -14,7 +14,6 @@
 [ext_resource type="Animation" uid="uid://ds25jehhr0llm" path="res://character/enemie/dumb_archer/standing_draw_arrow.res" id="9_advbo"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="10_ww05i"]
 [ext_resource type="Resource" uid="uid://dm4fbtmwvwdt4" path="res://character/enemie/dumb_archer/dumb_archer_stats.tres" id="11_0d6u8"]
-[ext_resource type="Curve" uid="uid://cjg5ean2g8f2m" path="res://components/stats/armor_curve.tres" id="11_advbo"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="12_3m0uy"]
 [ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="16_ieug1"]
 [ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="17_ryuhb"]
@@ -46,6 +45,7 @@
 [ext_resource type="AudioStream" uid="uid://ciu3mffcanmdx" path="res://assets/sound_effects/Human/belch_1.wav" id="44_d8ldn"]
 [ext_resource type="AudioStream" uid="uid://lij60mhnigeg" path="res://assets/sound_effects/Human/belch_2.wav" id="45_a3d8r"]
 [ext_resource type="AudioStream" uid="uid://d28g7j4vbcf31" path="res://assets/sound_effects/Human/belch_3.wav" id="46_hc4bk"]
+[ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="46_j6xfx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 
@@ -208,7 +208,6 @@ starting_stats = ExtResource("11_0d6u8")
 [node name="HealthComponent" type="Node3D" parent="." unique_id=191504435 node_paths=PackedStringArray("stats_component")]
 script = ExtResource("10_ww05i")
 stats_component = NodePath("../StatsComponent")
-armor_curve = ExtResource("11_advbo")
 
 [node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("12_3m0uy")]
 stats_component = NodePath("../StatsComponent")
@@ -236,6 +235,10 @@ pitch_max = 1.7000000000000002
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1935070138]
 replication_config = SubResource("SceneReplicationConfig_j6xfx")
+
+[node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("46_j6xfx")]
+stats_component = NodePath("../StatsComponent")
+health_component = NodePath("../HealthComponent")
 
 [editable path="Orc_obj"]
 [editable path="HitboxComponent"]

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://cwl1x2y7sug0o"]
+
+[ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="1_ly833"]
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="2_cgt30"]
+[ext_resource type="Material" uid="uid://cck1dcrxivlua" path="res://scripts/status_effects/burn/burn_shader.tres" id="2_ruqcr"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="3_ruqcr"]
+
+[resource]
+script = ExtResource("2_cgt30")
+effect_id = "burn"
+tick_damage = 10.0
+tick_interval = 2.0
+enemie_effect = ExtResource("1_ly833")
+overlay_material = ExtResource("2_ruqcr")
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"
