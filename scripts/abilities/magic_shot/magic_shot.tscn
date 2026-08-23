@@ -7,6 +7,9 @@
 [ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="3_pijyb"]
 [ext_resource type="PackedScene" uid="uid://3nja3oqtkxia" path="res://components/spell_componants/impact_spawner_component.tscn" id="4_0d483"]
 [ext_resource type="Resource" uid="uid://bnejg5v1r0i1w" path="res://scripts/status_effects/break_armor_50/break_armor_50.tres" id="4_pijyb"]
+[ext_resource type="Shader" uid="uid://bpooanoib8uib" path="res://scripts/abilities/fireball/fire_effect.tres" id="5_4gvs6"]
+[ext_resource type="Texture2D" uid="uid://c7vbxijlbcd27" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/dirt_03.png" id="6_n2gvo"]
+[ext_resource type="Texture2D" uid="uid://vakik7qg2lxv" path="res://assets/LeLu's Noise Pack/T_Cracks336.png" id="10_n2gvo"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 
@@ -19,6 +22,60 @@ metadata/_custom_type_script = "uid://f3s08057cvjq"
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
+[sub_resource type="Gradient" id="Gradient_lbd7v"]
+offsets = PackedFloat32Array(0, 0.16078432, 0.46666667, 0.9843137)
+colors = PackedColorArray(0.08959998, 0.072000004, 0.6, 0, 0, 0, 1.5895121, 0.35686275, 1.5147339, 0, 1.53993, 0.5921569, 1.4547673, 0.30992007, 1.3593638, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_xo0li"]
+gradient = SubResource("Gradient_lbd7v")
+use_hdr = true
+
+[sub_resource type="Gradient" id="Gradient_oemw2"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_v36gt"]
+gradient = SubResource("Gradient_oemw2")
+fill_to = Vector2(0.0042735045, 1)
+
+[sub_resource type="Gradient" id="Gradient_6sc7u"]
+offsets = PackedFloat32Array(0, 0.16470589, 0.4509804, 0.56078434, 0.78431374, 0.93333334)
+colors = PackedColorArray(0, 0, 0, 1, 0.92, 0.92, 0.92, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_qgnve"]
+gradient = SubResource("Gradient_6sc7u")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_i64jh"]
+offsets = PackedFloat32Array(0.16862746, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_id5gp"]
+gradient = SubResource("Gradient_i64jh")
+fill_from = Vector2(0.012820513, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_okf3j"]
+offsets = PackedFloat32Array(0, 0.32156864, 0.85490197, 0.96862745)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_6f7du"]
+gradient = SubResource("Gradient_okf3j")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0qqt7"]
+render_priority = 1
+shader = ExtResource("5_4gvs6")
+shader_parameter/displacement_speed = Vector2(1, 0.3)
+shader_parameter/displacement_scale = Vector2(1, 1)
+shader_parameter/displacement = SubResource("GradientTexture2D_qgnve")
+shader_parameter/displacement_intesity = 0.3
+shader_parameter/speed = Vector2(1, 1)
+shader_parameter/scale = Vector2(1, 1)
+shader_parameter/base_texture = ExtResource("6_n2gvo")
+shader_parameter/texture_add = SubResource("GradientTexture2D_id5gp")
+shader_parameter/texture_substract = SubResource("GradientTexture2D_6f7du")
+shader_parameter/color_palete = SubResource("GradientTexture1D_xo0li")
+shader_parameter/disapear_texture = SubResource("GradientTexture2D_v36gt")
+shader_parameter/stepp = 1.0
+
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yqkk6"]
 particle_flag_align_y = true
 direction = Vector3(0, 0, -1)
@@ -29,7 +86,15 @@ gravity = Vector3(0, 0, 0)
 scale_min = 0.03
 scale_max = 0.099999994
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_3bpsp"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_quk47"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(0.6166668, 0, 1, 1)
+albedo_texture = ExtResource("10_n2gvo")
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_8mkhg"]
+material = SubResource("StandardMaterial3D_quk47")
 
 [node name="magic_shot" type="RigidBody3D" unique_id=2061275323]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -57,6 +122,7 @@ shape = SubResource("CapsuleShape3D_yqkk6")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=233078867]
 transform = Transform3D(0.2, 0, 0, 0, -8.742278e-09, -0.2, 0, 0.2, -8.742278e-09, 0, 0, 0.2)
 mesh = SubResource("CapsuleMesh_hlie2")
+surface_material_override/0 = SubResource("ShaderMaterial_0qqt7")
 
 [node name="ProjectileMovementComponent" parent="." unique_id=810223984 instance=ExtResource("2_0d483")]
 projectile_speed = 50.0
@@ -70,7 +136,7 @@ scaling_component = NodePath("../SpellScalingComponent")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1469635849]
 process_material = SubResource("ParticleProcessMaterial_yqkk6")
-draw_pass_1 = SubResource("CapsuleMesh_3bpsp")
+draw_pass_1 = SubResource("CapsuleMesh_8mkhg")
 
 [editable path="AttackComponent"]
 [editable path="ProjectileMovementComponent"]

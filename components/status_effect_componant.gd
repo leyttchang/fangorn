@@ -12,7 +12,30 @@ class ActiveEffect:
 
 var _active_effects: Dictionary = {}
 
+# --- MULTIJOUEUR : APPLY ---
 func apply_effect(data: StatusEffectData, duration: float) -> void:
+	if data == null: return
+	if data.resource_path.is_empty():
+		push_error("StatusEffectData n'a pas de resource_path! (Sauvegarde-le en .tres)")
+		return
+		
+	if is_multiplayer_authority():
+		_apply_effect_broadcast.rpc(data.resource_path, duration)
+	else:
+		_request_apply_effect.rpc_id(1, data.resource_path, duration)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_apply_effect(effect_path: String, duration: float) -> void:
+	if not is_multiplayer_authority(): return
+	_apply_effect_broadcast.rpc(effect_path, duration)
+
+@rpc("authority", "call_local", "reliable")
+func _apply_effect_broadcast(effect_path: String, duration: float) -> void:
+	var data = load(effect_path) as StatusEffectData
+	if data != null:
+		_internal_apply_effect(data, duration)
+
+func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 	print("Tentative application status : " + str(data.effect_id))
 	if data == null: return
 	
@@ -57,7 +80,23 @@ func apply_effect(data: StatusEffectData, duration: float) -> void:
 	# Appel de la fonction custom
 	data.on_apply(get_parent(), self, false)
 
+# --- MULTIJOUEUR : REMOVE ---
 func remove_effect(effect_id: String) -> void:
+	if is_multiplayer_authority():
+		_remove_effect_broadcast.rpc(effect_id)
+	else:
+		_request_remove_effect.rpc_id(1, effect_id)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_remove_effect(effect_id: String) -> void:
+	if not is_multiplayer_authority(): return
+	_remove_effect_broadcast.rpc(effect_id)
+
+@rpc("authority", "call_local", "reliable")
+func _remove_effect_broadcast(effect_id: String) -> void:
+	_internal_remove_effect(effect_id)
+
+func _internal_remove_effect(effect_id: String) -> void:
 	if not _active_effects.has(effect_id): return
 	
 	var eff = _active_effects[effect_id]
@@ -96,14 +135,15 @@ func _process(delta: float) -> void:
 			eff.next_tick_time -= delta
 			if eff.next_tick_time <= 0.0:
 				eff.next_tick_time = eff.data.tick_interval
-				if health_component != null and health_component.has_method("take_damage"):
-					# Envoi en degats bruts pour eviter l'armure si on veut, ou normal
-					health_component.take_damage(eff.data.tick_damage)
+				if is_multiplayer_authority(): # ONLY HOST INFLIGE DEGATS
+					if health_component != null and health_component.has_method("take_damage"):
+						health_component.take_damage(eff.data.tick_damage)
 		
 		# Duree
 		eff.time_remaining -= delta
 		if eff.time_remaining <= 0.0:
-			remove_effect(key)
+			if is_multiplayer_authority(): # ONLY HOST DECIDE DE LA FIN
+				remove_effect(key)
 
 # --- FONCTIONS POUR SHADERS ---
 func _apply_overlay_material(node: Node, mat: Material) -> void:

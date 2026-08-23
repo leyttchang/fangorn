@@ -8,7 +8,7 @@ extends StatusEffectData
 func on_apply(target: Node, component: Node, is_refresh: bool) -> void:
 	# is_refresh est "vrai" si le monstre avait DEJA le statut Chill
 	
-	if is_refresh and freeze_effect != null:
+	if is_refresh and freeze_effect != null and component.is_multiplayer_authority():
 		# 1. On retire le chill car il va etre gelee
 		component.call_deferred("remove_effect", effect_id)
 		
