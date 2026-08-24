@@ -70,5 +70,6 @@ static func get_all_spells() -> Array[AbilityData]:
 			preload("res://scripts/abilities/ice_nova/IceNova.tres"),
 			preload("res://scripts/abilities/lightning_strike/LightningStrike.tres"),
 			preload("res://scripts/abilities/thunder_slash/thunder_slash.tres"),
+			preload("res://scripts/abilities/flaming_stab/flaming_stab.tres"),
 		]
 	return _all_spells

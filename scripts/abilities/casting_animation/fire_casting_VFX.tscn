@@ -90,7 +90,7 @@ _limits = [0.0, 2.0, 0.0, 1.0]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_tu2kx"]
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_782b3"]
 curve_x = SubResource("Curve_tu2kx")
 curve_y = SubResource("Curve_n6t6l")
 curve_z = SubResource("Curve_782b3")
@@ -99,7 +99,7 @@ curve_z = SubResource("Curve_782b3")
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.14441416, 0.8482759), 0.0, 0.0, 0, 0, Vector2(0.28337875, 0), 0.0, 0.0, 0, 0, Vector2(0.36239782, 1), 0.0, 0.0, 0, 0, Vector2(0.46321523, 0.79310346), 0.0, 0.0, 0, 0, Vector2(0.5667575, 0.24137932), 0.0, 0.0, 0, 0, Vector2(0.6948229, 0.006896615), 0.0, 0.0, 0, 0, Vector2(0.70844686, 1), 0.0, 0.0, 0, 0, Vector2(0.79564035, 0.027586222), 0.0, 0.0, 0, 0, Vector2(0.8610354, 0.7172414), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 11
 
-[sub_resource type="CurveTexture" id="CurveTexture_3bpsp"]
+[sub_resource type="CurveTexture" id="CurveTexture_5qjml"]
 curve = SubResource("Curve_05ub3")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_kbyi4"]
@@ -114,11 +114,11 @@ direction = Vector3(0, 1, 0)
 spread = 19.021
 initial_velocity_min = 0.5
 initial_velocity_max = 2.0
-orbit_velocity_curve = SubResource("CurveXYZTexture_tu2kx")
+orbit_velocity_curve = SubResource("CurveXYZTexture_782b3")
 gravity = Vector3(0, 1, 0)
 scale_min = 0.04
 scale_max = 0.089999996
-scale_curve = SubResource("CurveTexture_3bpsp")
+scale_curve = SubResource("CurveTexture_5qjml")
 color = Color(2.454227, 1.2515422, 0.5039273, 1)
 
 [sub_resource type="QuadMesh" id="QuadMesh_g0iqw"]

@@ -254,7 +254,7 @@ script = ExtResource("3_r8hqo")
 transform = Transform3D(0.98537594, 0, -0.17039366, 0, 1, 0, 0.17039366, 0, 0.98537594, 0.020226585, 0, -0.116969086)
 collision_layer = 4
 collision_mask = 8
-base_damage = 20.0
+base_damage = 25.0
 destroy_on_environment = true
 knockback_force = 0.5
 is_projectile = true
@@ -276,13 +276,13 @@ libraries/ = SubResource("AnimationLibrary_lkomj")
 [node name="trails" parent="slash_1" unique_id=1188745182 instance=ExtResource("7_m2uy2")]
 transform = Transform3D(0.14347751, -0.08774659, 0.9857558, -0.5632978, 0.81172913, 0.15424411, -0.8137011, -0.5774048, 0.067037426, -0.08724776, -0.22312418, 0.025591213)
 lifetime = 0.2
-trail_lifetime = 0.09999999999999999
+trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_4kqj5")
 
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("7_w7hp0")]
 attack_component = NodePath("../slash_1/AttackComponent")
 skill_type = 1
-base_weapon_multiplier = 0.2
+base_weapon_multiplier = 0.0
 phys_ratio = 0.5
 lightning_ratio = 0.5
 
@@ -297,7 +297,7 @@ script = ExtResource("3_r8hqo")
 transform = Transform3D(0.98537594, 0, -0.17039366, 0, 1, 0, 0.17039366, 0, 0.98537594, 0.020226585, 0, -0.116969086)
 collision_layer = 4
 collision_mask = 8
-base_damage = 20.0
+base_damage = 25.0
 destroy_on_environment = true
 knockback_force = 5.0
 is_projectile = true
@@ -314,7 +314,7 @@ libraries/ = SubResource("AnimationLibrary_lkomj")
 [node name="trails2" parent="slash_2" unique_id=794611560 instance=ExtResource("7_m2uy2")]
 transform = Transform3D(0.13203458, -0.09760083, 0.9864283, 0.5974501, 0.801906, -0.00062583707, -0.79096174, 0.5894242, 0.16419089, -0.053424295, -0.0957245, -0.19797182)
 lifetime = 0.2
-trail_lifetime = 0.09999999999999999
+trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_4kqj5")
 
 [node name="spraks2" parent="slash_2" unique_id=859132913 instance=ExtResource("7_4kqj5")]
@@ -325,7 +325,7 @@ process_material = SubResource("ParticleProcessMaterial_554yo")
 [node name="SpellScalingComponent2" parent="." unique_id=1585956164 node_paths=PackedStringArray("attack_component") instance=ExtResource("7_w7hp0")]
 attack_component = NodePath("../slash_2/AttackComponent")
 skill_type = 1
-base_weapon_multiplier = 0.2
+base_weapon_multiplier = 0.0
 phys_ratio = 0.5
 lightning_ratio = 0.5
 

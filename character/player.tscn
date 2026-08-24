@@ -739,6 +739,68 @@ tracks/3/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="Animation_2o2rg"]
+resource_name = "flaming_stab"
+length = 4.0
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1.2333333, 2.8, 3.5666666),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("%Camera3D/../SkillBarComponent")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1.7),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["stab"],
+"method": &"trigger_mid_cast_event"
+}]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1.2666667, 1.59, 2.55, 2.91, 3.5333333),
+"transitions": PackedFloat32Array(1, 0.18301095, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.9, -0.45008093), Vector3(0.5, -0.29538572, 0.15051264), Vector3(0.5, -0.29538572, 0.29870605), Vector3(0.20281982, -0.29538572, -2.0361328), Vector3(0.20281982, -0.29538572, -0.5424195), Vector3(0.5, -0.9, -0.45008093)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1.2666667, 1.59, 2.55, 2.91, 3.5),
+"transitions": PackedFloat32Array(1, 0.27739242, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-0.15533431, -1.9704767, 0.008726646), Vector3(-1.4827722, 0.09804434, 0), Vector3(-1.4827722, 0.09804435, 0), Vector3(-1.4827722, 0.09804435, 0), Vector3(-1.4827722, 0.09804435, 0), Vector3(-0.15533431, -1.9704767, 0.008726646)]
+}
+
 [sub_resource type="Animation" id="Animation_aayji"]
 resource_name = "idle_axe"
 length = 3.5000000000000004
@@ -910,6 +972,7 @@ _data = {
 &"attack_sword_2": SubResource("Animation_aw5rd"),
 &"attack_sword_3": SubResource("Animation_pn6xv"),
 &"attack_sword_4": SubResource("Animation_4vy5w"),
+&"flaming_stab": SubResource("Animation_2o2rg"),
 &"idle_axe": SubResource("Animation_aayji"),
 &"idle_spear": SubResource("Animation_e72n5"),
 &"idle_sword": SubResource("Animation_sexlj"),
@@ -1039,7 +1102,6 @@ graph_offset = Vector2(12.771133, 10.302292)
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_speed"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_combo"]
-graph_offset = Vector2(-384.7637, -42.347107)
 nodes/output/position = Vector2(340, 140)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_yqkk6")
 nodes/StateMachine/position = Vector2(-100, 140)
@@ -1090,7 +1152,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999777, -0.0061649983, 0.0014514605, 0, 0.22916964, 0.9733859, -0.006333548, -0.9733661, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.9999776, -0.0061649974, 0.0014514605, 0, 0.22916959, 0.9733859, -0.006333547, -0.9733659, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0

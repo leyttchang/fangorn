@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://bntvx6j1h4xpx"]
+
+[ext_resource type="PackedScene" uid="uid://b54djgi0wcm3v" path="res://scripts/abilities/flaming_stab/flaming_stab.tscn" id="1_5c7dr"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_q0y2k"]
+[ext_resource type="Texture2D" uid="uid://djq8y3ld04rpr" path="res://assets/icon/32x32/fb1329.png" id="2_30lj0"]
+
+[resource]
+script = ExtResource("1_q0y2k")
+ability_name = "Flaming stab"
+icon = ExtResource("2_30lj0")
+category = 1
+cooldown = 4.0
+mana_cost = 20.0
+weapon_damage_multiplier = 1.0
+weapon_speed_multiplier = 0.5
+target_mode = 5
+anim_name = "flaming_stab"
+ability_scene = ExtResource("1_5c7dr")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"
