@@ -81,6 +81,10 @@ func open_chest() -> void:
 	var interact = get_node_or_null("InteractionComponent")
 	if interact:
 		interact.queue_free()
+	
+	var static_body = get_node_or_null("StaticBody3D")
+	if static_body:
+		static_body.queue_free()
 
 func _get_spellbook_ui(player: Node) -> SpellBookUI:
 	if player == null: return null

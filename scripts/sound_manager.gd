@@ -15,9 +15,10 @@ static func play_hit_sound(node: Node, pos: Vector3, custom_stream: AudioStream 
 	if not is_instance_valid(node) or not node.is_inside_tree(): return
 	
 	var current_time = Time.get_ticks_msec()
-	if current_time - _last_hit_sound_time < 30:
-		return
-	_last_hit_sound_time = current_time
+	if custom_stream == null:
+		if current_time - _last_hit_sound_time < 30:
+			return
+		_last_hit_sound_time = current_time
 	
 	_init_sounds()
 	

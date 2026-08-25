@@ -213,7 +213,7 @@ max_distance = 50.0
 [node name="hurt_sound" parent="." unique_id=1503784435 node_paths=PackedStringArray("health_component") instance=ExtResource("37_holf7")]
 health_component = NodePath("../HealthComponent")
 hurt_sounds = Array[AudioStream]([ExtResource("38_g26vk"), ExtResource("39_vhgsy"), ExtResource("40_0x4wk")])
-volume_db = -40.5
+volume_db = -40.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=307709312]
 replication_config = SubResource("SceneReplicationConfig_holf7")
