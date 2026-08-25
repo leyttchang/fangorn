@@ -3,7 +3,9 @@
 [ext_resource type="Script" uid="uid://b65n8707qbb8k" path="res://scripts/abilities/Warcry/warcry.gd" id="1_plqu0"]
 [ext_resource type="Resource" uid="uid://b64ko0m1bms44" path="res://scripts/status_effects/Warcry/Warcry_effect.tres" id="2_gdapc"]
 [ext_resource type="Texture2D" uid="uid://4e68uwieehnw" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/circle_05.png" id="3_pqmkj"]
-[ext_resource type="Material" uid="uid://bjp26qe2dv6hn" path="res://scripts/status_effects/shock/shock_shader.tres" id="4_pqmkj"]
+[ext_resource type="Shader" uid="uid://bhdxcc41b5ffu" path="res://scripts/abilities/casting_animation/lightning_ball_shader.gdshader" id="4_cs3lj"]
+[ext_resource type="Texture2D" uid="uid://d0d1f60sntoga" path="res://assets/LeLu's Noise Pack/T_CloudNoise_Tiled.png" id="5_d30oi"]
+[ext_resource type="Texture2D" uid="uid://ct64e4jse07mh" path="res://assets/LeLu's Noise Pack/T_Noise_HU85k.png" id="6_qpcib"]
 
 [sub_resource type="Animation" id="Animation_mhrfp"]
 length = 0.001
@@ -201,9 +203,28 @@ particles_anim_loop = false
 [sub_resource type="QuadMesh" id="QuadMesh_yqkk6"]
 material = SubResource("StandardMaterial3D_as728")
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_poreu"]
+noise_type = 0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_blbn4"]
+noise = SubResource("FastNoiseLite_poreu")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n3gh2"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("4_cs3lj")
+shader_parameter/lightningNoise1 = ExtResource("5_d30oi")
+shader_parameter/lightningNoise2 = ExtResource("6_qpcib")
+shader_parameter/tint = Color(3.1542144, 1.7339985, 0, 1)
+shader_parameter/disapear = 1.0
+shader_parameter/distortionVertex = 0.05999999865888
+shader_parameter/speedVertex = 0.999999977648
+shader_parameter/noiseVertex = SubResource("NoiseTexture2D_blbn4")
+
 [sub_resource type="TorusMesh" id="TorusMesh_mhrfp"]
 resource_local_to_scene = true
-material = ExtResource("4_pqmkj")
+material = SubResource("ShaderMaterial_n3gh2")
 
 [node name="warcry" type="Node3D" unique_id=831750466]
 script = ExtResource("1_plqu0")

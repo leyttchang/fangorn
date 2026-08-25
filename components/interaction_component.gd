@@ -23,6 +23,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if player_in_range != null and player_in_range.is_multiplayer_authority():
 		if event is InputEventKey and event.physical_keycode == interaction_key and event.pressed:
 			_trigger_parent_use()
+			get_viewport().set_input_as_handled()
 
 func _trigger_parent_use() -> void:
 	var parent = get_parent()

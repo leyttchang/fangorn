@@ -69,20 +69,22 @@ func _process(delta: float) -> void:
 
 	match current_state:
 		State.IDLE:
-			_handle_inputs()
+			pass
 		State.TARGETING:
 			_handle_targeting()
 		State.SELECTED:
 			_handle_selected()
-			_handle_inputs()
 		State.CASTING:
 			_handle_casting(delta)
 		State.AUTO_CASTING:
 			_handle_auto_casting(delta)
 
-func _handle_inputs() -> void:
+func _unhandled_input(event: InputEvent) -> void:
+	if not get_parent().is_multiplayer_authority(): return
+	if current_state != State.IDLE and current_state != State.SELECTED: return
+	
 	for action in slots.keys():
-		if Input.is_action_just_pressed(action):
+		if event.is_action_pressed(action):
 			var ability: AbilityData = slots[action]
 			if ability != null:
 				if not can_cast_spells and ability.category == AbilityData.AbilityCategory.MAGIC:
