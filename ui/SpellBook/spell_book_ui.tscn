@@ -17,7 +17,7 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="inventaire" type="ColorRect" parent="MainPanel" unique_id=327391410]
+[node name="inventaire" type="Panel" parent="MainPanel" unique_id=1678709805]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -28,7 +28,6 @@ offset_right = -277.0
 offset_bottom = -184.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.148935, 0.148935, 0.148935, 1)
 metadata/_edit_use_anchors_ = true
 
 [node name="inv_grid" type="GridContainer" parent="MainPanel/inventaire" unique_id=1964638]
@@ -104,7 +103,7 @@ layout_mode = 2
 [node name="Spell_U_Slot20" parent="MainPanel/inventaire/inv_grid" unique_id=1672116855 instance=ExtResource("2_5xpyw")]
 layout_mode = 2
 
-[node name="equipe" type="ColorRect" parent="MainPanel" unique_id=1349708289]
+[node name="equipe" type="Panel" parent="MainPanel" unique_id=1697275540]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -115,7 +114,6 @@ offset_right = -831.0
 offset_bottom = -141.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.148935, 0.148935, 0.148935, 1)
 metadata/_edit_use_anchors_ = true
 
 [node name="UnlockAllButton" type="Button" parent="MainPanel/equipe" unique_id=987654321]

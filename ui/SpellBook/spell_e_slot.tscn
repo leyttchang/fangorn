@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://cej2xjh3uvh3y"]
 
+[ext_resource type="Theme" uid="uid://yb2xk2ca6itq" path="res://ui/themes/neutral.tres" id="1_1tg24"]
 [ext_resource type="Script" uid="uid://c1vafqyvwa2w2" path="res://ui/SpellBook/spell_e_slot.gd" id="1_bowq7"]
 
 [node name="Spell_E_Slot" type="Panel" unique_id=178112762]
 custom_minimum_size = Vector2(64, 64)
 offset_right = 64.0
 offset_bottom = 64.0
+theme = ExtResource("1_1tg24")
 script = ExtResource("1_bowq7")
 
 [node name="Icon" type="TextureRect" parent="." unique_id=718359562]

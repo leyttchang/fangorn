@@ -11,7 +11,7 @@ extends CanvasLayer
 @onready var stats_container: VBoxContainer = %StatsContainer # <-- NOUVEAU
 
 var stat_labels: Dictionary = {}
-@onready var loot_panel: ColorRect = %LootPanel
+@onready var loot_panel: Panel = %LootPanel
 @onready var loot_grid: GridContainer = %LootGrid
 @onready var loot_all_btn: Button = %LootPanel.get_node_or_null("HBoxContainer/loot_all")
 var current_chest_inventory: InventoryComponent = null

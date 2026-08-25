@@ -3,6 +3,13 @@
 [ext_resource type="PackedScene" uid="uid://cm1s4kb4n2s8d" path="res://ui/SpellBook/spell_b_slot.tscn" id="1_jgo48"]
 [ext_resource type="Script" uid="uid://b4gs88bp8ida8" path="res://ui/SpellBook/spell_bar.gd" id="1_p6csa"]
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_p6csa"]
+texture_margin_left = 50.0
+texture_margin_top = 50.0
+texture_margin_right = 50.0
+texture_margin_bottom = 50.0
+region_rect = Rect2(9.762806, 14.7692375, 605.0376, 404.60632)
+
 [node name="Spell_bar" type="CanvasLayer" unique_id=243740632]
 script = ExtResource("1_p6csa")
 
@@ -16,7 +23,7 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="inventaire" type="ColorRect" parent="MainPanel" unique_id=1824694739]
+[node name="inventaire" type="Panel" parent="MainPanel" unique_id=1251645797]
 custom_minimum_size = Vector2(400, 50)
 layout_mode = 1
 anchors_preset = 7
@@ -25,12 +32,12 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -200.0
-offset_top = -62.940002
+offset_top = -82.0
 offset_right = 200.0
 offset_bottom = -12.940002
 grow_horizontal = 2
 grow_vertical = 0
-color = Color(0.148935, 0.148935, 0.148935, 1)
+theme_override_styles/panel = SubResource("StyleBoxTexture_p6csa")
 
 [node name="inv_grid" type="GridContainer" parent="MainPanel/inventaire" unique_id=468804349]
 unique_name_in_owner = true

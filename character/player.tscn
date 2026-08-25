@@ -1152,7 +1152,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999776, -0.0061649974, 0.0014514605, 0, 0.22916959, 0.9733859, -0.006333547, -0.9733659, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.9999774, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335462, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1238,13 +1238,13 @@ inventory_component = NodePath("../InventoryComponent")
 equipment_component = NodePath("../EquipmentComponent")
 stats_component = NodePath("../StatsComponent")
 
-[node name="equipe" parent="InventoryUI/MainPanel" parent_id_path=PackedInt32Array(1946714399, 2104048239) index="2" unique_id=1349708289]
-offset_left = 43.0
-offset_top = 90.0
-offset_right = -819.0
-offset_bottom = -41.0
+[node name="equipe" parent="InventoryUI/MainPanel" parent_id_path=PackedInt32Array(1946714399, 2104048239) index="1" unique_id=1441282182]
+offset_top = -1.3120012
+offset_bottom = -325.0
 
 [node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+grow_horizontal = 2
+grow_vertical = 2
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
@@ -1253,6 +1253,8 @@ equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
 [node name="equipment_slot3" parent="InventoryUI/MainPanel/equipe" index="2" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+grow_horizontal = 2
+grow_vertical = 2
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 

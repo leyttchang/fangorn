@@ -159,7 +159,7 @@ bone_idx = 14
 collision_layer = 16
 collision_mask = 2
 base_damage = 25.0
-knockback_force = 30.0
+knockback_angle = 10.0
 
 [node name="CollisionShape3D" parent="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 8.940697e-08, 0, -2.9802322e-08, 1, 0, 2.9802322e-08, 0, 1, 1.1920929e-07, 0.036377013, 8.940697e-08)

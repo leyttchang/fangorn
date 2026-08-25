@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://b0wrst7mamwji"]
 
+[ext_resource type="Theme" uid="uid://yb2xk2ca6itq" path="res://ui/themes/neutral.tres" id="1_2kjtr"]
 [ext_resource type="Script" uid="uid://2vek0etmmb14" path="res://ui/inventaire/equipment_slot.gd" id="1_u6l05"]
 
 [node name="equipment_slot" type="Panel" unique_id=178112762]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(32, 32)
 offset_right = 64.0
 offset_bottom = 64.0
+theme = ExtResource("1_2kjtr")
 script = ExtResource("1_u6l05")
 
 [node name="Icon" type="TextureRect" parent="." unique_id=718359562]

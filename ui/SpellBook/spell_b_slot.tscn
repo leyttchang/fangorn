@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://cm1s4kb4n2s8d"]
 
+[ext_resource type="Theme" uid="uid://yb2xk2ca6itq" path="res://ui/themes/neutral.tres" id="1_30o70"]
 [ext_resource type="Script" uid="uid://2vek0etmmb14" path="res://ui/inventaire/equipment_slot.gd" id="1_qtt4o"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlie2"]
@@ -8,6 +9,7 @@
 custom_minimum_size = Vector2(64, 64)
 offset_right = 64.0
 offset_bottom = 64.0
+theme = ExtResource("1_30o70")
 script = ExtResource("1_qtt4o")
 
 [node name="Icon" type="TextureRect" parent="." unique_id=718359562]

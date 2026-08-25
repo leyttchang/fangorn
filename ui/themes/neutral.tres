@@ -1,0 +1,14 @@
+[gd_resource type="Theme" format=3 uid="uid://yb2xk2ca6itq"]
+
+[ext_resource type="Texture2D" uid="uid://dc7i06vmplibt" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Button.png" id="1_wtsv4"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1km2u"]
+texture = ExtResource("1_wtsv4")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+region_rect = Rect2(9.057472, 8.816809, 74.202866, 72.93599)
+
+[resource]
+Panel/styles/panel = SubResource("StyleBoxTexture_1km2u")

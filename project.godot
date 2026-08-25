@@ -40,6 +40,7 @@ Enemie=""
 [gui]
 
 timers/tooltip_delay_sec=0.1
+theme/custom="uid://uxyod61ial22"
 
 [input]
 

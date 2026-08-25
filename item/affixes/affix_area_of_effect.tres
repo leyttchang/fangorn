@@ -7,4 +7,4 @@ script = ExtResource("1_affix")
 affix_name = "de l'amplificateur"
 stat_name = "area_of_effect"
 min_roll = 0.05
-max_roll = 0.7
+max_roll = 0.1

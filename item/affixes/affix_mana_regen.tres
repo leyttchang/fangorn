@@ -6,3 +6,5 @@
 script = ExtResource("1_affix")
 affix_name = "de clarté"
 stat_name = "mana_regen"
+min_roll = 0.1
+max_roll = 0.5
