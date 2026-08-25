@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://1k4ihmc4d7mi"]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_f0e63"]
+[ext_resource type="PackedScene" uid="uid://bbv5mf11ajagf" path="res://scripts/abilities/thunder_aspect/thunder_aspect.tscn" id="1_joaxw"]
+[ext_resource type="PackedScene" uid="uid://djtioufafqhx8" path="res://scripts/abilities/casting_animation/lightning_casting_vfx.tscn" id="2_clu0p"]
+[ext_resource type="Texture2D" uid="uid://cxy535tqwpuht" path="res://assets/icon/32x32/fb1081.png" id="3_onhlx"]
+
+[resource]
+script = ExtResource("1_f0e63")
+ability_name = "Thunder aspect"
+icon = ExtResource("3_onhlx")
+cooldown = 15.0
+mana_cost = 20.0
+cast_time = 1.0
+cast_vfx_scene = ExtResource("2_clu0p")
+ability_scene = ExtResource("1_joaxw")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

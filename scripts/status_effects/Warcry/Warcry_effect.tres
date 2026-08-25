@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://b64ko0m1bms44"]
+
+[ext_resource type="PackedScene" uid="uid://cof3tijrcov2r" path="res://scripts/status_effects/Warcry/warcry_particule.tscn" id="1_2mfdh"]
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_67n26"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_2mfdh"]
+[ext_resource type="PackedScene" uid="uid://g7dp7h31suxj" path="res://scripts/status_effects/Warcry/warcry_screen_effect.tscn" id="2_k6ixs"]
+
+[sub_resource type="Resource" id="Resource_k6ixs"]
+script = ExtResource("2_2mfdh")
+value = 30.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_cbi1q"]
+script = ExtResource("2_2mfdh")
+stat_name = "physical_damage"
+value = 0.3
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_kto6x"]
+script = ExtResource("2_2mfdh")
+stat_name = "flat_physical_damage"
+value = 5.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_67n26")
+effect_id = "Warcry"
+is_buff = true
+stat_modifiers = Array[ExtResource("2_2mfdh")]([SubResource("Resource_k6ixs"), SubResource("Resource_cbi1q"), SubResource("Resource_kto6x")])
+enemie_effect = ExtResource("1_2mfdh")
+player_effect = ExtResource("2_k6ixs")
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

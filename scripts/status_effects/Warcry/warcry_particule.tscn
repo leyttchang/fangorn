@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://cof3tijrcov2r"]
+
+[ext_resource type="Texture2D" uid="uid://cp7s2ti2tno0l" path="res://assets/LeLu's Noise Pack/T_texr41.png" id="1_hcswv"]
+
+[sub_resource type="Curve" id="Curve_gmc53"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.0929368, 1), 0.0, 0.0, 0, 0, Vector2(0.6171004, 0.7000001), -1.1412122, -1.1412122, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_8pegv"]
+curve = SubResource("Curve_gmc53")
+
+[sub_resource type="Gradient" id="Gradient_hu3pq"]
+offsets = PackedFloat32Array(0, 0.19341564, 0.6131687)
+colors = PackedColorArray(0.4812734, 1.0949746e-06, 2.4065375e-07, 1, 2.3133948, 0, 0, 1, 10.178017, 2.6560218, 0.46218294, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ces26"]
+gradient = SubResource("Gradient_hu3pq")
+use_hdr = true
+
+[sub_resource type="Curve" id="Curve_hwdfp"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_r85b6"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_w15mb"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_ye7aw"]
+curve_x = SubResource("Curve_hwdfp")
+curve_y = SubResource("Curve_r85b6")
+curve_z = SubResource("Curve_w15mb")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_as728"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 2.0
+emission_ring_radius = 3.0
+emission_ring_inner_radius = 2.0
+emission_ring_cone_angle = 90.0
+orbit_velocity_min = 1.0000001
+orbit_velocity_max = 2.0000002
+orbit_velocity_curve = SubResource("CurveXYZTexture_ye7aw")
+radial_velocity_min = -1.0000223
+radial_velocity_max = -1.0000223
+gravity = Vector3(0, 3, 0)
+scale_min = 0.099999994
+color = Color(1.6197081, 1.6197081, 1.6197081, 1)
+color_ramp = SubResource("GradientTexture1D_ces26")
+alpha_curve = SubResource("CurveTexture_8pegv")
+turbulence_noise_strength = 1.4
+turbulence_noise_scale = 0.0
+turbulence_noise_speed_random = 0.0
+turbulence_influence_max = 0.2
+turbulence_initial_displacement_min = 1.0000015
+turbulence_initial_displacement_max = 10.000002
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3bpsp"]
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_hcswv")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_dria3"]
+material = SubResource("StandardMaterial3D_3bpsp")
+
+[node name="warcry_particule" type="Node3D" unique_id=1530128154]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=633377578]
+amount = 30
+lifetime = 3.0
+process_material = SubResource("ParticleProcessMaterial_as728")
+draw_pass_1 = SubResource("QuadMesh_dria3")

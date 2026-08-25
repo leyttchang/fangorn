@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://g7dp7h31suxj"]
+
+[ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="2_0ct84"]
+[ext_resource type="Shader" uid="uid://kqjvi1847yd7" path="res://scripts/status_effects/Warcry/shader_speed_fullscreen_3d.tres" id="2_edunh"]
+[ext_resource type="Script" uid="uid://ctyt8v8lyihwd" path="res://scripts/status_effects/Warcry/warcry_screen_effect.gd" id="2_script"]
+
+[sub_resource type="Gradient" id="Gradient_kh5vw"]
+offsets = PackedFloat32Array(0.46666667, 0.90588236)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_tgijp"]
+gradient = SubResource("Gradient_kh5vw")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 1)
+
+[sub_resource type="Gradient" id="Gradient_0qudi"]
+offsets = PackedFloat32Array(0, 0.25726143, 0.34117648)
+colors = PackedColorArray(0, 0, 0, 0, 1.8541882, 0.5389697, 0, 0.05882353, 0.62, 0, 0, 0.1882353)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_bqtxy"]
+gradient = SubResource("Gradient_0qudi")
+
+[sub_resource type="Gradient" id="Gradient_kx7st"]
+offsets = PackedFloat32Array(0.65882355)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_3pue8"]
+gradient = SubResource("Gradient_kx7st")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
+render_priority = 0
+shader = ExtResource("2_edunh")
+shader_parameter/zoom_strength = -1.41
+shader_parameter/repeat_circle = 9.495
+shader_parameter/offset = Vector2(-1.39, 0)
+shader_parameter/base_texture = ExtResource("2_0ct84")
+shader_parameter/Mask_texture = SubResource("GradientTexture2D_tgijp")
+shader_parameter/extra_texture = SubResource("GradientTexture2D_3pue8")
+shader_parameter/color_gradiant = SubResource("GradientTexture1D_bqtxy")
+shader_parameter/visibility = 1.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_hlie2"]
+
+[node name="warcry_screenEffect" type="Node3D" unique_id=1391122572]
+script = ExtResource("2_script")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1133891702]
+material_override = SubResource("ShaderMaterial_yqkk6")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_hlie2")

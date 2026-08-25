@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://dijrh6t674pcm"]
+
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_54tsc"]
+[ext_resource type="PackedScene" uid="uid://bupuux1pg7pcj" path="res://particule/lightning/lightning_particle_around.tscn" id="1_i11no"]
+[ext_resource type="PackedScene" uid="uid://dfxowg6yskab4" path="res://scripts/status_effects/thunder_aspect_effect/thunder_aspect_screen_effect.tscn" id="2_e883o"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_i11no"]
+
+[sub_resource type="Resource" id="Resource_e883o"]
+script = ExtResource("2_i11no")
+stat_name = "attack_speed"
+value = 0.5
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_02yb2"]
+script = ExtResource("2_i11no")
+stat_name = "movement_speed"
+value = 0.8
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_83ov6"]
+script = ExtResource("2_i11no")
+stat_name = "lightning_damage"
+value = 0.3
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_54tsc")
+effect_id = "thunder_aspect"
+is_buff = true
+stat_modifiers = Array[ExtResource("2_i11no")]([SubResource("Resource_e883o"), SubResource("Resource_02yb2"), SubResource("Resource_83ov6")])
+enemie_effect = ExtResource("1_i11no")
+player_effect = ExtResource("2_e883o")
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

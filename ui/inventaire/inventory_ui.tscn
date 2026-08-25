@@ -200,6 +200,7 @@ layout_mode = 2
 [node name="OffenseBtn" type="Button" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=2072828052]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0, 0, 1)
 text = "Offense"
 flat = true
 alignment = 0
@@ -215,7 +216,8 @@ layout_mode = 2
 [node name="DefenseBtn" type="Button" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=1515644298]
 unique_name_in_owner = true
 layout_mode = 2
-text = "defense"
+theme_override_colors/font_color = Color(0, 0.3079999, 0.88, 1)
+text = "Defense"
 flat = true
 alignment = 0
 

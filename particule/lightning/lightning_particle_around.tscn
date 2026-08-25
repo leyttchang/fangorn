@@ -85,5 +85,6 @@ amount = 15
 lifetime = 0.4
 speed_scale = 1.0
 explosiveness = 0.0
+fixed_fps = 120
 trail_lifetime = 0.05
 process_material = SubResource("ParticleProcessMaterial_1akgj")

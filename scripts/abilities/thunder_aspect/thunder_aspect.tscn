@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bbv5mf11ajagf"]
+
+[ext_resource type="Script" uid="uid://b4pcb83qy073" path="res://scripts/abilities/thunder_aspect/thunder_aspect.gd" id="1_d20an"]
+[ext_resource type="Material" uid="uid://bjp26qe2dv6hn" path="res://scripts/status_effects/shock/shock_shader.tres" id="2_qsow5"]
+[ext_resource type="Resource" uid="uid://dijrh6t674pcm" path="res://scripts/status_effects/thunder_aspect_effect/thunder_aspect_effect.tres" id="3_s56xg"]
+
+[sub_resource type="Animation" id="Animation_8m455"]
+resource_name = "buff_duration"
+length = 5.0
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(4.9333334),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qsow5"]
+_data = {
+&"buff_duration": SubResource("Animation_8m455")
+}
+
+[node name="thunder_aspect" type="Node3D" unique_id=136026625]
+script = ExtResource("1_d20an")
+weapon_material = ExtResource("2_qsow5")
+buff_data = ExtResource("3_s56xg")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1342850014]
+libraries/ = SubResource("AnimationLibrary_qsow5")
