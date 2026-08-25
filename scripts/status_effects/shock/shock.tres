@@ -2,6 +2,7 @@
 
 [ext_resource type="Shader" uid="uid://bhdxcc41b5ffu" path="res://scripts/abilities/casting_animation/lightning_ball_shader.gdshader" id="1_d5qtw"]
 [ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_gqjw2"]
+[ext_resource type="PackedScene" uid="uid://bupuux1pg7pcj" path="res://particule/lightning/lightning_particle_around.tscn" id="1_mqfpg"]
 [ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_4b6b3"]
 [ext_resource type="Texture2D" uid="uid://bplw0wn3cot0f" path="res://scripts/abilities/chain_lightning/lighting_ball_noise_texture.tres" id="2_mqfpg"]
 
@@ -51,5 +52,6 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 script = ExtResource("1_gqjw2")
 effect_id = "shock"
 stat_modifiers = Array[ExtResource("2_4b6b3")]([SubResource("Resource_ly833")])
+enemie_effect = ExtResource("1_mqfpg")
 overlay_material = SubResource("ShaderMaterial_0ifye")
 metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://bupuux1pg7pcj"]
+
+[ext_resource type="PackedScene" uid="uid://b864y5lmf88we" path="res://particule/lightning/lightning_trails.tscn" id="1_6prix"]
+
+[sub_resource type="Curve" id="Curve_pb1bm"]
+_data = [Vector2(0, 0.8300001), 0.0, 0.0, 0, 0, Vector2(0.1658986, 1), 0.0, 0.0, 0, 0, Vector2(0.57249075, 0.35000008), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_m2uy2"]
+curve = SubResource("Curve_pb1bm")
+
+[sub_resource type="Curve" id="Curve_dria3"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_3bpsp"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_ye7aw"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_as728"]
+curve_x = SubResource("Curve_dria3")
+curve_y = SubResource("Curve_3bpsp")
+curve_z = SubResource("Curve_ye7aw")
+
+[sub_resource type="Curve" id="Curve_6pvet"]
+_limits = [-2.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 2), 0.0, 0.0, 0, 0, Vector2(1, 2), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_wed7q"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_njagq"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_yqkk6"]
+curve_x = SubResource("Curve_6pvet")
+curve_y = SubResource("Curve_wed7q")
+curve_z = SubResource("Curve_njagq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1akgj"]
+particle_flag_align_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(1, 0, 0)
+emission_ring_height = 3.0
+emission_ring_radius = 2.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 90.0
+directional_velocity_min = 4.999984
+directional_velocity_max = 9.999984
+directional_velocity_curve = SubResource("CurveXYZTexture_as728")
+orbit_velocity_min = 1.7070001
+orbit_velocity_max = 1.8240002
+orbit_velocity_curve = SubResource("CurveXYZTexture_yqkk6")
+gravity = Vector3(0, 0, 0)
+scale_min = 0.099999994
+scale_max = 0.39999998
+color = Color(1.3521297, 1.6549777, 2.503, 1)
+alpha_curve = SubResource("CurveTexture_m2uy2")
+turbulence_enabled = true
+turbulence_noise_strength = 0.0
+turbulence_noise_scale = 0.0
+turbulence_noise_speed = Vector3(1, 0, 0)
+turbulence_noise_speed_random = 4.0
+turbulence_influence_min = 0.0
+turbulence_influence_max = 0.70000005
+turbulence_initial_displacement_min = 1.3000015
+turbulence_initial_displacement_max = 7.0000014
+
+[node name="lightning_particle_around" type="Node3D" unique_id=2070511518]
+
+[node name="trails2" parent="." unique_id=1188745182 instance=ExtResource("1_6prix")]
+transform = Transform3D(-2.1855694e-08, -0.5, 0, 0.5, -2.1855694e-08, 0, 0, 0, 0.5, -0.053424295, -0.0957245, -0.071561456)
+amount = 15
+lifetime = 0.4
+speed_scale = 1.0
+explosiveness = 0.0
+trail_lifetime = 0.05
+process_material = SubResource("ParticleProcessMaterial_1akgj")

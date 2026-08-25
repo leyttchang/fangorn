@@ -1,6 +1,7 @@
 extends SceneTree
 func _init():
-    var file = FileAccess.open("res://test_out.txt", FileAccess.WRITE)
-    file.store_line("Hello")
-    file.close()
+    var anim = ResourceLoader.load("res://character/enemie/dumb_archer/aim_recoil.res") as Animation
+    if anim:
+        ResourceSaver.save(anim, "res://character/enemie/dumb_archer/aim_recoil.tres")
+        print("Saved")
     quit()
