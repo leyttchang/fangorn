@@ -63,27 +63,73 @@ func _on_kill_all_pressed() -> void:
 			kill_count += 1
 	print("Bouton magique utilisé : ", kill_count, " monstres tués !")
 
-func _build_stats_ui() -> void:
-	# On supprime les vieux labels si existants
-	for child in stats_container.get_children():
-		if child is Label:
-			child.queue_free()
-			
-	# Ajout du Niveau en haut de la liste
-	if level_component != null:
-		var lvl_label = Label.new()
-		lvl_label.text = "Level : " + str(level_component.current_level)
-		lvl_label.add_theme_color_override("font_color", Color.GOLD) # En doré pour que ça ressorte !
-		stats_container.add_child(lvl_label)
-		stat_labels["current_level"] = lvl_label
-			
-	# On crée un label pour chaque stat
-	for stat_name in stats_component._stats.keys():
-		var label = Label.new()
-		label.text = _format_stat(stat_name, stats_component.get_stat_value(stat_name))
-		stats_container.add_child(label)
-		stat_labels[stat_name] = label
 
+
+var stat_categories = {
+	"Offense": ["physical_damage", "magic_damage", "fire_damage", "ice_damage", "lightning_damage", "attack_speed", "casting_speed", "area_of_effect", "knockback_power", "flat_physical_damage"],
+	"Defense": ["max_health", "armor", "physical_resistance", "fire_resistance", "ice_resistance", "lightning_resistance", "knockback_resistance"],
+	"Misc": ["max_mana", "mana_regen", "movement_speed", "cd_red", "luck"]
+}
+
+@onready var offense_vbox: VBoxContainer = get_node_or_null("%OffenseVBox")
+@onready var defense_vbox: VBoxContainer = get_node_or_null("%DefenseVBox")
+@onready var misc_vbox: VBoxContainer = get_node_or_null("%MiscVBox")
+@onready var level_label: Label = get_node_or_null("%LevelLabel")
+
+func _build_stats_ui() -> void:
+	# Nettoyage des anciennes stats
+	if offense_vbox:
+		for c in offense_vbox.get_children(): c.queue_free()
+	if defense_vbox:
+		for c in defense_vbox.get_children(): c.queue_free()
+	if misc_vbox:
+		for c in misc_vbox.get_children(): c.queue_free()
+		
+	# Mise à jour du niveau (si le label existe dans la scène)
+	if level_label != null and level_component != null:
+		level_label.text = "Level : " + str(level_component.current_level)
+		stat_labels["current_level"] = level_label
+
+	var stats_added = []
+
+	# Connexion automatique des boutons pour déplier/replier (s'ils existent)
+	var off_btn = get_node_or_null("%OffenseBtn")
+	if off_btn and offense_vbox and not off_btn.pressed.is_connected(offense_vbox.set_visible):
+		off_btn.pressed.connect(func(): offense_vbox.visible = not offense_vbox.visible)
+		
+	var def_btn = get_node_or_null("%DefenseBtn")
+	if def_btn and defense_vbox and not def_btn.pressed.is_connected(defense_vbox.set_visible):
+		def_btn.pressed.connect(func(): defense_vbox.visible = not defense_vbox.visible)
+		
+	var misc_btn = get_node_or_null("%MiscBtn")
+	if misc_btn and misc_vbox and not misc_btn.pressed.is_connected(misc_vbox.set_visible):
+		misc_btn.pressed.connect(func(): misc_vbox.visible = not misc_vbox.visible)
+
+	# Remplissage par catégorie
+	for category_name in stat_categories.keys():
+		var target_vbox: VBoxContainer = null
+		if category_name == "Offense": target_vbox = offense_vbox
+		elif category_name == "Defense": target_vbox = defense_vbox
+		elif category_name == "Misc": target_vbox = misc_vbox
+		
+		if target_vbox == null: continue
+		
+		for stat_name in stat_categories[category_name]:
+			if stats_component._stats.has(stat_name):
+				stats_added.append(stat_name)
+				var label = Label.new()
+				label.text = _format_stat(stat_name, stats_component.get_stat_value(stat_name))
+				target_vbox.add_child(label)
+				stat_labels[stat_name] = label
+
+	# Les stats restantes (non classées) vont dans Misc par défaut (ou StatsContainer si Misc n'existe pas)
+	var fallback_vbox = misc_vbox if misc_vbox else stats_container
+	for stat_name in stats_component._stats.keys():
+		if not stats_added.has(stat_name):
+			var label = Label.new()
+			label.text = _format_stat(stat_name, stats_component.get_stat_value(stat_name))
+			if fallback_vbox: fallback_vbox.add_child(label)
+			stat_labels[stat_name] = label
 func _on_stat_changed(stat_name: String, new_value: float) -> void:
 	if stat_labels.has(stat_name):
 		stat_labels[stat_name].text = _format_stat(stat_name, new_value)
