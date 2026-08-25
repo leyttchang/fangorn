@@ -172,7 +172,38 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		if current_item != null:
-			_show_context_menu()
+			if Input.is_key_pressed(KEY_SHIFT):
+				_try_equip_item()
+			else:
+				_show_context_menu()
+
+func _try_equip_item() -> void:
+	if target_inventory == null or current_item == null: return
+	
+	if current_item is EquipmentItem:
+		# 1. On cherche le composant d'equipement du joueur
+		var current_node = get_parent()
+		var equip_comp = null
+		while current_node != null:
+			if current_node is InventoryUI:
+				equip_comp = current_node.equipment_component
+				break
+			current_node = current_node.get_parent()
+			
+		# 2. On s'en sert pour equiper l'objet
+		if equip_comp != null:
+			var slot_name = ItemData.ItemType.keys()[current_item.item_type]
+			var qty = target_inventory.slots[slot_index]["quantity"]
+			
+			# On enleve de la case actuelle (inventaire ou coffre)
+			target_inventory.remove_item_at_slot(slot_index, qty)
+			
+			# On tente d'equiper
+			var success = equip_comp.equip_item(current_item, slot_name)
+			
+			# Si ca rate (ex: inventaire plein au moment de desequiper l'ancien), on annule
+			if not success:
+				target_inventory.set_item_at_slot(slot_index, current_item, qty)
 
 func _show_context_menu() -> void:
 	# Créer un petit menu déroulant

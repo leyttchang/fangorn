@@ -22,7 +22,7 @@ func apply_effect(data: StatusEffectData, duration: float) -> void:
 	if is_multiplayer_authority():
 		_apply_effect_broadcast.rpc(data.resource_path, duration)
 	else:
-		_request_apply_effect.rpc_id(1, data.resource_path, duration)
+		_request_apply_effect.rpc_id(get_multiplayer_authority(), data.resource_path, duration)
 
 @rpc("any_peer", "call_remote", "reliable")
 func _request_apply_effect(effect_path: String, duration: float) -> void:
@@ -85,7 +85,7 @@ func remove_effect(effect_id: String) -> void:
 	if is_multiplayer_authority():
 		_remove_effect_broadcast.rpc(effect_id)
 	else:
-		_request_remove_effect.rpc_id(1, effect_id)
+		_request_remove_effect.rpc_id(get_multiplayer_authority(), effect_id)
 
 @rpc("any_peer", "call_remote", "reliable")
 func _request_remove_effect(effect_id: String) -> void:
