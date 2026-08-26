@@ -33,10 +33,10 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	if not is_multiplayer_authority():
-		# Cacher toute l'UI du joueur si ce n'est pas NOTRE joueur !
-		for child in get_children():
-			if child is CanvasLayer:
-				child.visible = false
+		# Cacher TOUTE l'UI du joueur (mme celles dans des composants) si ce n'est pas NOTRE joueur !
+		var canvas_layers = find_children("*", "CanvasLayer", true, false)
+		for canvas in canvas_layers:
+			canvas.visible = false
 	if is_multiplayer_authority():
 		camera.current = true
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -129,7 +129,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
-	if event is InputEventKey and event.keycode == KEY_F11 and event.pressed:
+	var is_f11 = event is InputEventKey and event.keycode == KEY_F11 and event.pressed
+	var is_alt_enter = event is InputEventKey and event.keycode == KEY_ENTER and event.alt_pressed and event.pressed
+	
+	if is_f11 or is_alt_enter:
 		var current_mode = DisplayServer.window_get_mode()
 		if current_mode == DisplayServer.WINDOW_MODE_FULLSCREEN or current_mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
