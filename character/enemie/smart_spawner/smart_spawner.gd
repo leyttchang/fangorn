@@ -104,6 +104,16 @@ func _spawn_single_enemy() -> void:
 	var enemy_instance: Node3D = enemy_scene.instantiate() as Node3D
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
 	
+	# ===== SCALING DE VAGUE (Buff des monstres) =====
+	var stats = enemy_instance.get_node_or_null("StatsComponent")
+	if stats != null and current_wave > 1:
+		# +10% de vie maximum (additionnel) par vague, on ne touche pas aux dgts
+		var bonus_percent_hp = (current_wave - 1) * 0.10 
+		
+		# Type 1 = PERCENT dans StatModifier
+		stats.add_modifier("max_health", 1, bonus_percent_hp, "wave_scaling")
+	# ================================================
+	
 	# Position aléatoire dans le rayon autour du spawner
 	var random_angle: float = randf_range(0, TAU)
 	var random_dist: float = sqrt(randf()) * spawn_radius
