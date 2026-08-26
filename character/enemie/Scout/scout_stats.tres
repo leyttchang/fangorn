@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EntityStats" format=3 uid="uid://rtl21jwcv1io"]
+
+[ext_resource type="Script" uid="uid://dpiksbl0a1f5" path="res://scripts/stats/entity_stats.gd" id="1_0ef6d"]
+
+[resource]
+script = ExtResource("1_0ef6d")
+max_health = 300.0
+xp_reward = 50.0
+metadata/_custom_type_script = "uid://dpiksbl0a1f5"

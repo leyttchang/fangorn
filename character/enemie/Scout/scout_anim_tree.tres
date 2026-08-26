@@ -1,0 +1,35 @@
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://b64cc8se8khml"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_attaque"]
+animation = &"anim/attaque"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_run"]
+animation = &"anim/run"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_downward"]
+animation = &"anim/standing_mele_downward"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_start_run"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_attaque"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_attaque_run"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_downward"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_downward_run"]
+switch_mode = 2
+advance_mode = 2
+
+[resource]
+states/attaque/node = SubResource("AnimationNodeAnimation_attaque")
+states/attaque/position = Vector2(500, 50)
+states/run/node = SubResource("AnimationNodeAnimation_run")
+states/run/position = Vector2(300, 100)
+states/standing_mele_downward/node = SubResource("AnimationNodeAnimation_downward")
+states/standing_mele_downward/position = Vector2(500, 150)
+transitions = ["Start", "run", SubResource("Transition_start_run"), "run", "attaque", SubResource("Transition_run_attaque"), "attaque", "run", SubResource("Transition_attaque_run"), "run", "standing_mele_downward", SubResource("Transition_run_downward"), "standing_mele_downward", "run", SubResource("Transition_downward_run")]
+graph_offset = Vector2(57, -37)

@@ -159,7 +159,7 @@ func _spawn_beacon() -> void:
 	
 	if beacon_scene != null and beacon_spawn_point != null:
 		var beacon = beacon_scene.instantiate() as Node3D
-		get_tree().current_scene.get_node("NetworkObjects").add_child(beacon)
+		get_tree().current_scene.get_node("NetworkObjects").add_child(beacon, true)
 		beacon.global_position = beacon_spawn_point.global_position
 		
 		# Connecter un signal si le beacon a un signal "interacted" (optionnel, selon ce que tu feras)

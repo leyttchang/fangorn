@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://cekr3wmhu571c" path="res://objet/chest/Skill_chest.tscn" id="15_apj7j"]
 [ext_resource type="PackedScene" uid="uid://bgl8ep1qhsou4" path="res://character/enemie/smart_spawner/start_beacon.tscn" id="16_ssq7y"]
 [ext_resource type="PackedScene" uid="uid://b2i01iy66mw4o" path="res://ui/Pause_menu/pause_menu.tscn" id="19_2g21l"]
+[ext_resource type="PackedScene" uid="uid://m4c6gegw2sgd" path="res://character/enemie/Scout/scout.tscn" id="19_bqr07"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_6i2mx"]
 density = 0.4
@@ -67,7 +68,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26, 2)
 [node name="NetworkObjects" type="Node3D" parent="." unique_id=1188869520]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="NetworkObjects" unique_id=990877686]
-_spawnable_scenes = PackedStringArray("uid://bh02yc666r2ee", "uid://5wrdcmpkd7se", "uid://dw8bplvo56b74", "uid://cekr3wmhu571c", "uid://uwqnpr24nibv", "uid://bgl8ep1qhsou4")
+_spawnable_scenes = PackedStringArray("uid://bh02yc666r2ee", "uid://5wrdcmpkd7se", "uid://dw8bplvo56b74", "uid://cekr3wmhu571c", "uid://uwqnpr24nibv", "uid://bgl8ep1qhsou4", "uid://m4c6gegw2sgd")
 spawn_path = NodePath("..")
 
 [node name="Dummy" parent="." unique_id=922894006 instance=ExtResource("3_7mfpx")]
@@ -148,7 +149,7 @@ start_spawn_time = 1.0
 
 [node name="SmartSpawner" parent="spawner" unique_id=1089854815 node_paths=PackedStringArray("beacon_spawn_point") instance=ExtResource("10_6i2mx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.60695, -20.34161)
-monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17")])
+monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("11_2ho30"), ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("9_1eb17"), ExtResource("9_1eb17"), ExtResource("11_2ho30"), ExtResource("19_bqr07")])
 initial_wave_count = 1
 delay_between_waves = 10.0
 time_between_spawns = 0.2

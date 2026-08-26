@@ -31,7 +31,6 @@ func on_mid_cast_event(event_name: String) -> void:
 		if slash_anim != null:
 			slash_anim.stop()
 			slash_anim.play("cast") 
-			print("Thunderslash : Animation du slash_1 declenchee !")
 			$slash_1.visible = true
 			
 			# On calcule les degats AVANT d'activer la hitbox !
@@ -62,7 +61,6 @@ func on_mid_cast_event(event_name: String) -> void:
 		if slash_anim != null:
 			slash_anim.stop()
 			slash_anim.play("cast") 
-			print("Thunderslash : Animation du slash_2 declenchee !")
 			$slash_2.visible = true
 			
 			# On calcule les degats AVANT d'activer la hitbox !
@@ -76,7 +74,6 @@ func on_mid_cast_event(event_name: String) -> void:
 				attack_comp.set_deferred("monitorable", true)
 
 func execute(player: Node3D, target_data: Dictionary) -> void:
-	print("Thunderslash : Fin du cast !")
 	# On attend assez longtemps pour laisser les eclairs voyager (ex: 5 secondes)
 	await get_tree().create_timer(5.0).timeout
 	queue_free()

@@ -14,6 +14,12 @@ func _ready() -> void:
 	
 	if nav_agent == null:
 		push_error("EnemyNavigationComponent sur " + get_parent().name + " : NavigationAgent3D manquant !")
+	else:
+		# TRÈS IMPORTANT : On augmente la distance pour valider un point de passage.
+		# Comme le sol (NavMesh) est à 1.6m sous les pieds du Scout, l'agent bloquait 
+		# indéfiniment en essayant d'atteindre ce point sous terre.
+		nav_agent.path_desired_distance = 3.0
+		nav_agent.target_desired_distance = 3.0
 
 # L'IA appelle juste cette fonction, le composant fait le reste !
 func get_direction_to_target(target_position: Vector3) -> Vector3:
@@ -27,4 +33,13 @@ func get_direction_to_target(target_position: Vector3) -> Vector3:
 		next_path_update_frame = randi_range(20, 40)
 		
 	var next_path_pos = nav_agent.get_next_path_position()
-	return (next_path_pos - _parent_body.global_position).normalized()
+	
+	# On ignore la diffrence de hauteur (axe Y) pour la direction, 
+	# sinon si le NavMesh est lgrement plus bas que le monstre, 
+	# la direction pointe vers le bas et sa vitesse horizontale devient 0 !
+	var direction = (next_path_pos - _parent_body.global_position)
+	direction.y = 0.0
+	
+	if direction.length_squared() > 0.001:
+		return direction.normalized()
+	return Vector3.ZERO
