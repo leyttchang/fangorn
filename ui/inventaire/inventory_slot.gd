@@ -173,9 +173,9 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		if current_item != null:
 			if Input.is_key_pressed(KEY_SHIFT):
-				_try_equip_item()
-			else:
 				_show_context_menu()
+			else:
+				_try_equip_item()
 
 func _try_equip_item() -> void:
 	if target_inventory == null or current_item == null: return

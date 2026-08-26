@@ -2,6 +2,52 @@
 
 [ext_resource type="Script" uid="uid://c5srngllwttxc" path="res://lvl/starting_menu.gd" id="1_f8y02"]
 [ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="1_x1u6o"]
+[ext_resource type="Texture2D" uid="uid://cip23v0f10g0j" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Decline_Button_Normal_fixed.png" id="2_3ldtj"]
+[ext_resource type="Texture2D" uid="uid://d200647gay1b2" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Decline_Button_Dark_fixed.png" id="3_kgx3v"]
+[ext_resource type="Texture2D" uid="uid://da735xqiq26u8" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Decline_Button_Light_fixed.png" id="4_w7sub"]
+[ext_resource type="Texture2D" uid="uid://17vaqfwxb44j" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Text_zone.png" id="5_kgx3v"]
+[ext_resource type="Texture2D" uid="uid://con2xlyc4lg6u" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/title_zone.png" id="5_w7sub"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_eqfjj"]
+texture = ExtResource("2_3ldtj")
+texture_margin_left = 15.0
+texture_margin_top = 15.0
+texture_margin_right = 15.0
+texture_margin_bottom = 15.0
+region_rect = Rect2(3.5, 3.5, 193, 45)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_04lvy"]
+texture = ExtResource("3_kgx3v")
+texture_margin_left = 15.0
+texture_margin_top = 15.0
+texture_margin_right = 15.0
+texture_margin_bottom = 15.0
+region_rect = Rect2(3.5, 3.5, 193, 45)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_kmgpc"]
+texture = ExtResource("4_w7sub")
+texture_margin_left = 15.0
+texture_margin_top = 15.0
+texture_margin_right = 15.0
+texture_margin_bottom = 15.0
+region_rect = Rect2(3.5, 3.5, 193, 45)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hlie2"]
+content_margin_top = 10.0
+texture = ExtResource("5_w7sub")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 10.0
+region_rect = Rect2(0, -0.29930353, 243.28586, 40.299305)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vof52"]
+texture = ExtResource("5_kgx3v")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 7.0
+region_rect = Rect2(91.925964, 258.9077, 339.0313, 70.49985)
 
 [sub_resource type="Animation" id="Animation_f8y02"]
 length = 0.001
@@ -28,6 +74,34 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CanvasLayer/Host_menu:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(476.75, 180.5)]
+}
+
+[sub_resource type="Animation" id="Animation_w7sub"]
+resource_name = "multi_open"
+length = 0.56666666
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CanvasLayer/Host_menu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.4, 0.46666667),
+"transitions": PackedFloat32Array(0.3789287, 1, 1, 1),
+"update": 0,
+"values": [Vector2(476.75, -420.505), Vector2(476.75, 180.5), Vector2(476.75, 202.83), Vector2(476.75, 180.5)]
 }
 
 [sub_resource type="Animation" id="Animation_4kshr"]
@@ -61,6 +135,7 @@ tracks/1/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_jfofm"]
 _data = {
 &"RESET": SubResource("Animation_f8y02"),
+&"multi_open": SubResource("Animation_w7sub"),
 &"open": SubResource("Animation_4kshr")
 }
 
@@ -83,11 +158,17 @@ theme_override_constants/separation = 15
 
 [node name="singleplayer" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=422003846]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Singleplayer
 "
 
 [node name="multiplayer" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=917636291]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Multiplayer
 "
 
@@ -99,27 +180,53 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -99.25
-offset_top = -125.0
+offset_top = -143.5
 offset_right = 99.25
-offset_bottom = 125.0
+offset_bottom = 143.50021
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 20
 
-[node name="btnHost" type="Button" parent="CanvasLayer/Host_menu" unique_id=599028656]
+[node name="Host" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=394108431]
 layout_mode = 2
+
+[node name="btnHost" type="Button" parent="CanvasLayer/Host_menu/Host" unique_id=599028656]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Host"
 
-[node name="IPInput" type="LineEdit" parent="CanvasLayer/Host_menu" unique_id=77109580]
+[node name="Join" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=342560752]
 layout_mode = 2
-text = "127.0.0.1"
 
-[node name="btnJoin" type="Button" parent="CanvasLayer/Host_menu" unique_id=525293759]
+[node name="btnJoin" type="Button" parent="CanvasLayer/Host_menu/Join" unique_id=525293759]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Join
 "
 
-[node name="btnBack" type="Button" parent="CanvasLayer/Host_menu" unique_id=2136746037]
+[node name="Label" type="Label" parent="CanvasLayer/Host_menu/Join" unique_id=2066600058]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "IP adress"
+horizontal_alignment = 1
+
+[node name="IPInput" type="LineEdit" parent="CanvasLayer/Host_menu/Join" unique_id=77109580]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_vof52")
+text = "127.0.0.1"
+
+[node name="Back" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=137096090]
+layout_mode = 2
+
+[node name="btnBack" type="Button" parent="CanvasLayer/Host_menu/Back" unique_id=2136746037]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Back"
 
 [node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("1_x1u6o")]

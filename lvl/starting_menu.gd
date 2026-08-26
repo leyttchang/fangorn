@@ -7,10 +7,10 @@ extends Node3D
 @onready var btn_multiplayer: Button = $CanvasLayer/VBoxContainer/multiplayer
 
 @onready var multiplayer_panel = $CanvasLayer/Host_menu
-@onready var btn_host: Button = $CanvasLayer/Host_menu/btnHost
-@onready var btn_join: Button = $CanvasLayer/Host_menu/btnJoin
-@onready var btn_back: Button = $CanvasLayer/Host_menu/btnBack
-@onready var ip_input: LineEdit = $CanvasLayer/Host_menu/IPInput
+@onready var btn_host: Button = $CanvasLayer/Host_menu.find_child("btnHost", true, false)
+@onready var btn_join: Button = $CanvasLayer/Host_menu.find_child("btnJoin", true, false)
+@onready var btn_back: Button = $CanvasLayer/Host_menu.find_child("btnBack", true, false)
+@onready var ip_input: LineEdit = $CanvasLayer/Host_menu.find_child("IPInput", true, false)
 
 const PORT = 8910
 
@@ -34,10 +34,15 @@ func _on_multiplayer_pressed() -> void:
 	# Cache le menu principal, affiche le menu multijoueur
 	main_menu.hide()
 	multiplayer_panel.show()
+	anim_player.play("multi_open")
 
 # --- MENU MULTIJOUEUR ---
 
 func _on_back_pressed() -> void:
+	# Joue l'animation à l'envers et attend qu'elle se termine
+	anim_player.play_backwards("multi_open")
+	await anim_player.animation_finished
+	
 	# Retour au menu principal
 	multiplayer_panel.hide()
 	main_menu.show()
