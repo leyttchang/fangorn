@@ -129,37 +129,18 @@ func set_attack_speed(speed: float) -> void:
 
 func change_state(new_state: State) -> void:
 	if is_multiplayer_authority():
-		rpc("_rpc_apply_state", new_state)
-
-@rpc("authority", "call_local", "reliable")
-func _rpc_apply_state(new_state: int) -> void:
-	if current_state == State.DEAD or current_state == new_state:
-		return 
+		var sync_anim = ""
+		var sync_float = 0.0
 		
-	current_state = new_state
-	
-	match current_state:
-		State.IDLE:
-			anim_playback.travel("idle")
-		State.CHASE:
-			_chase_timer = 0.0
-			_chase_limit = randf_range(anti_kite_min_time, anti_kite_max_time)
-			anim_playback.travel("run")
-		State.STRAFE:
-			_tension_timer = randf_range(tension_min_time, tension_max_time)
-			_strafe_dir = 1.0 if randf() < 0.5 else -1.0
-			anim_tree.set("parameters/strafe/TimeScale/scale", _strafe_dir)
-			anim_playback.travel("strafe")
-		State.ATTACK:
-			_is_rotation_locked = false 
-			anim_tree.set("parameters/attaque/TimeScale/scale", 1.0)
-			anim_tree.set("parameters/heavy_weapon_swing/TimeScale/scale", 1.0)
+		if new_state == State.STRAFE:
+			sync_float = 1.0 if randf() < 0.5 else -1.0
 			
+		elif new_state == State.ATTACK:
 			if _is_enraged:
 				if randf() < 0.5:
-					_current_attack_anim = "heavy_weapon_swing"
+					sync_anim = "heavy_weapon_swing"
 				else:
-					_current_attack_anim = "standing_mele_downward" 
+					sync_anim = "standing_mele_downward" 
 			else:
 				var dist = 999.0
 				if not _recent_distances.is_empty():
@@ -170,20 +151,48 @@ func _rpc_apply_state(new_state: int) -> void:
 					dist = pos_2d.distance_to(target_2d)
 					
 				var rand_val = randf()
-				
 				if dist <= heavy_attack_close_distance:
-					_current_attack_anim = "attaque"
+					sync_anim = "attaque"
 				elif dist > heavy_attack_far_distance:
 					if rand_val < heavy_attack_far_probability:
-						_current_attack_anim = "attaque"
+						sync_anim = "attaque"
 					else:
-						_current_attack_anim = "standing_mele_downward"
+						sync_anim = "standing_mele_downward"
 				else:
 					if rand_val < heavy_attack_mid_probability:
-						_current_attack_anim = "attaque"
+						sync_anim = "attaque"
 					else:
-						_current_attack_anim = "standing_mele_downward"
-						
+						sync_anim = "standing_mele_downward"
+
+		rpc("_rpc_apply_state", new_state, sync_anim, sync_float)
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_apply_state(new_state: int, sync_anim: String = "", sync_float: float = 0.0) -> void:
+	if current_state == State.DEAD or current_state == new_state:
+		return 
+		
+	current_state = new_state
+	
+	match current_state:
+		State.IDLE:
+			anim_playback.travel("idle")
+		State.CHASE:
+			if is_multiplayer_authority():
+				_chase_timer = 0.0
+				_chase_limit = randf_range(anti_kite_min_time, anti_kite_max_time)
+			anim_playback.travel("run")
+		State.STRAFE:
+			if is_multiplayer_authority():
+				_tension_timer = randf_range(tension_min_time, tension_max_time)
+			_strafe_dir = sync_float if sync_float != 0.0 else 1.0
+			anim_tree.set("parameters/strafe/TimeScale/scale", _strafe_dir)
+			anim_playback.travel("strafe")
+		State.ATTACK:
+			_is_rotation_locked = false 
+			anim_tree.set("parameters/attaque/TimeScale/scale", 1.0)
+			anim_tree.set("parameters/heavy_weapon_swing/TimeScale/scale", 1.0)
+			_current_attack_anim = sync_anim
+			if _current_attack_anim == "": _current_attack_anim = "standing_mele_downward"
 			anim_playback.travel(_current_attack_anim)
 			_attack_anim_started = false 
 		State.DEAD:
