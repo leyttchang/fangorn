@@ -53,6 +53,7 @@ var _strafe_dir: float = 1.0
 var _is_rotation_locked: bool = false
 
 var _last_hitbox_disabled: bool = true
+var _recent_distances: Array[float] = []
 
 func _ready() -> void:
 	if behavior == null:
@@ -160,8 +161,10 @@ func _rpc_apply_state(new_state: int) -> void:
 				else:
 					_current_attack_anim = "standing_mele_downward" 
 			else:
-				var dist = 0.0
-				if target != null:
+				var dist = 999.0
+				if not _recent_distances.is_empty():
+					dist = _recent_distances.min()
+				elif target != null and is_instance_valid(target):
 					var pos_2d = Vector2(global_position.x, global_position.z)
 					var target_2d = Vector2(target.global_position.x, target.global_position.z)
 					dist = pos_2d.distance_to(target_2d)
@@ -224,6 +227,13 @@ func _physics_process(delta: float) -> void:
 	if _target_update_timer > 15.0 or target == null or not is_instance_valid(target):
 		_target_update_timer = 0.0
 		_update_closest_target()
+
+	if target != null and is_instance_valid(target):
+		var pos_2d = Vector2(global_position.x, global_position.z)
+		var target_2d = Vector2(target.global_position.x, target.global_position.z)
+		_recent_distances.append(pos_2d.distance_to(target_2d))
+		if _recent_distances.size() > 18:
+			_recent_distances.pop_front()
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta
