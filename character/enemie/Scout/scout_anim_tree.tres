@@ -1,10 +1,33 @@
-[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://b64cc8se8khml"]
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://d0cco7ilvtp1c"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_attaque"]
 animation = &"anim/attaque"
 
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_attaque"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_attaque"]
+nodes/output/position = Vector2(240, 140)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_attaque")
+nodes/Animation/position = Vector2(-180, 120)
+nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_attaque")
+nodes/TimeScale/position = Vector2(40, 100)
+node_connections = [&"output", 0, &"TimeScale", &"TimeScale", 0, &"Animation"]
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_heavy"]
 animation = &"anim/heavy_weapon_swing"
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_heavy"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_heavy"]
+nodes/output/position = Vector2(240, 140)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_heavy")
+nodes/Animation/position = Vector2(-180, 120)
+nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_heavy")
+nodes/TimeScale/position = Vector2(40, 100)
+node_connections = [&"output", 0, &"TimeScale", &"TimeScale", 0, &"Animation"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_vnkgs"]
+animation = &"anim/idle"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_run"]
 animation = &"anim/run"
@@ -12,35 +35,92 @@ animation = &"anim/run"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_downward"]
 animation = &"anim/standing_mele_downward"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_start_run"]
-advance_mode = 2
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_strafe"]
+animation = &"anim/strafe"
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_strafe"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_strafe"]
+graph_offset = Vector2(-282, 45)
+nodes/output/position = Vector2(240, 140)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_strafe")
+nodes/Animation/position = Vector2(-180, 120)
+nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_strafe")
+nodes/TimeScale/position = Vector2(40, 100)
+node_connections = [&"output", 0, &"TimeScale", &"TimeScale", 0, &"Animation"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_walk"]
+animation = &"anim/walk"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_attaque"]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_attaque_run"]
-switch_mode = 2
-advance_mode = 2
+xfade_time = 0.05
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_downward"]
+xfade_time = 0.05
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_downward_run"]
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_heavy"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_strafe"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_strafe_run"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_strafe_attaque"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_j1lm7"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jccox"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_dxdq6"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_gkdwj"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nvqo7"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_racia"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2cche"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_yv4py"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0k6j3"]
+xfade_time = 0.1
 switch_mode = 2
 advance_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_run_heavy"]
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qvlrt"]
+xfade_time = 0.1
+switch_mode = 2
+advance_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_heavy_run"]
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_xse0i"]
+xfade_time = 0.1
 switch_mode = 2
 advance_mode = 2
 
 [resource]
-states/attaque/node = SubResource("AnimationNodeAnimation_attaque")
+states/attaque/node = SubResource("AnimationNodeBlendTree_attaque")
 states/attaque/position = Vector2(500, 50)
-states/heavy_weapon_swing/node = SubResource("AnimationNodeAnimation_heavy")
+states/heavy_weapon_swing/node = SubResource("AnimationNodeBlendTree_heavy")
 states/heavy_weapon_swing/position = Vector2(500, 250)
+states/idle/node = SubResource("AnimationNodeAnimation_vnkgs")
+states/idle/position = Vector2(100, 100)
 states/run/node = SubResource("AnimationNodeAnimation_run")
 states/run/position = Vector2(300, 100)
 states/standing_mele_downward/node = SubResource("AnimationNodeAnimation_downward")
 states/standing_mele_downward/position = Vector2(500, 150)
-transitions = ["Start", "run", SubResource("Transition_start_run"), "run", "attaque", SubResource("Transition_run_attaque"), "attaque", "run", SubResource("Transition_attaque_run"), "run", "standing_mele_downward", SubResource("Transition_run_downward"), "standing_mele_downward", "run", SubResource("Transition_downward_run"), "run", "heavy_weapon_swing", SubResource("Transition_run_heavy"), "heavy_weapon_swing", "run", SubResource("Transition_heavy_run")]
+states/strafe/node = SubResource("AnimationNodeBlendTree_strafe")
+states/strafe/position = Vector2(300, 250)
+states/walk/node = SubResource("AnimationNodeAnimation_walk")
+states/walk/position = Vector2(300, 350)
+transitions = ["run", "attaque", SubResource("Transition_run_attaque"), "run", "standing_mele_downward", SubResource("Transition_run_downward"), "run", "heavy_weapon_swing", SubResource("Transition_run_heavy"), "run", "strafe", SubResource("Transition_run_strafe"), "strafe", "run", SubResource("Transition_strafe_run"), "strafe", "attaque", SubResource("Transition_strafe_attaque"), "Start", "idle", SubResource("AnimationNodeStateMachineTransition_j1lm7"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_jccox"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_dxdq6"), "idle", "strafe", SubResource("AnimationNodeStateMachineTransition_gkdwj"), "strafe", "idle", SubResource("AnimationNodeStateMachineTransition_nvqo7"), "idle", "attaque", SubResource("AnimationNodeStateMachineTransition_racia"), "idle", "standing_mele_downward", SubResource("AnimationNodeStateMachineTransition_2cche"), "idle", "heavy_weapon_swing", SubResource("AnimationNodeStateMachineTransition_yv4py"), "attaque", "idle", SubResource("AnimationNodeStateMachineTransition_0k6j3"), "standing_mele_downward", "idle", SubResource("AnimationNodeStateMachineTransition_qvlrt"), "heavy_weapon_swing", "idle", SubResource("AnimationNodeStateMachineTransition_xse0i")]
 graph_offset = Vector2(57, -37)

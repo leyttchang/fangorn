@@ -6,7 +6,7 @@
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_bw62r"]
 height = 1.34375
-radius = 1.137207
+radius = 1.8496094
 
 [sub_resource type="Animation" id="Animation_4o3px"]
 length = 0.001

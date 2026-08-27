@@ -40,7 +40,7 @@ func _ready() -> void:
 	add_to_group("SmartSpawner")
 	if auto_start:
 		if is_inside_tree():
-			get_tree().create_timer(1.0).timeout.connect(start_next_wave)
+			get_tree().create_timer(1.0).timeout.connect(_spawn_beacon)
 
 func toggle_pause() -> void:
 	is_paused = not is_paused
@@ -176,7 +176,8 @@ func _spawn_beacon() -> void:
 		if beacon.has_signal("interacted"):
 			beacon.interacted.connect(trigger_beacon)
 	else:
-		push_warning("SmartSpawner : Pas de beacon_scene ou de beacon_spawn_point configuré !")
+		push_warning("SmartSpawner : Pas de beacon_scene ou de beacon_spawn_point configuré ! Lancement immédiat de la vague.")
+		trigger_beacon()
 
 func trigger_beacon() -> void:
 	if _waiting_for_beacon:

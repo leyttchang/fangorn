@@ -1,0 +1,342 @@
+Created At: 2026-08-27T14:20:52+02:00
+Completed At: 2026-08-27T14:20:52+02:00
+File Path: `file:///Y:/Fangorn/fangorn/character/enemie/Scout/scout.gd`
+Total Lines: 334
+Total Bytes: 12084
+Showing lines 1 to 334
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: extends CharacterBody3D
+2: 
+3: @onready var health_component: HealthComponent = $HealthComponent
+4: @onready var stats_component: StatsComponent = $StatsComponent
+5: @onready var knockback_componant = $knockback_componant
+6: @onready var movement_comp: EnemyMovementComponent = $EnemyMovementComponent
+7: @onready var navigation_comp: EnemyNavigationComponent = $EnemyNavigationComponent
+8: 
+9: # --- DONNEES DE COMPORTEMENT (Le Profil) ---
+10: @export var base_movement_speed: float = 4.5
+11: @export var behavior: EnemyBehaviorData
+12: 
+13: @export var slam_scene: PackedScene
+14: @onready var attack_shape: CollisionShape3D = get_node_or_null("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
+15: 
+16: # --- ANIMATION TREE ---
+17: @onready var anim_tree: AnimationTree = $AnimationTree
+18: @onready var anim_playback: AnimationNodeStateMachinePlayback = anim_tree.get("parameters/playback")
+19: 
+20: # --- ETATS ---
+21: enum State { IDLE, CHASE, ATTACK, DEAD }
+22: var current_state: State = State.IDLE
+23: 
+24: var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+25: var target: Node3D = null
+26: 
+27: # Securite pour l'AnimationTree
+28: var _attack_anim_started: bool = false
+29: var _attack_counter: int = 0
+30: var _current_attack_anim: String = ""
+31: var _is_enraged: bool = false # <-- NOUVEAU
+32: 
+33: func _ready() -> void:
+34: 	if behavior == null:
+35: 		push_error("Scout (" + name + ") : Fichier EnemyBehaviorData manquant dans l'inspecteur !")
+36: 		
+37: 	anim_tree.active = true
+38: 	health_component.died.connect(_on_died)
+39: 	health_component.health_changed.connect(_on_health_changed) # <-- NOUVEAU
+40: 	
+41: 	# =====================================================================
+42: 	# CORRECTION MAGIQUE : On detruit la piste vicieuse dans l'animation RESET
+43: 	# =====================================================================
+44: 	var anim_player: AnimationPlayer = get_node_or_null("Great Sword Run/AnimationPlayer")
+45: 	if anim_player and anim_player.has_animation("RESET"):
+46: 		var reset_anim = anim_player.get_animation("RESET")
+47: 		for i in range(reset_anim.get_track_count() - 1, -1, -1):
+48: 			var path_str = str(reset_anim.track_get_path(i))
+49: 			if "disabled" in path_str or "CollisionShape3D" in path_str:
+50: 				reset_anim.remove_track(i)
+51: 				print("[SCOUT FIX] Piste 'disabled' supprimee de l'animation RESET !")
+52: 	# =====================================================================
+53: 	
+54: 	if attack_shape != null:
+55: 		attack_shape.disabled = true
+56: 	
+57: 	call_deferred("actor_setup")
+58: 
+59: func actor_setup() -> void:
+60: 	await get_tree().physics_frame
+61: 	_update_closest_target()
+62: 	change_state(State.IDLE)
+63: 	
+64: 	var hitbox = find_child("HitboxComponent*", true, false)
+65: 	if hitbox != null:
+66: 		hitbox.aggro_requested.connect(_on_aggro_requested)
+67: 
+68: var _pending_attacker: Node3D = null
+69: var _is_waiting_for_aggro: bool = false
+70: 
+71: func _on_aggro_requested(attacker: Node3D) -> void:
+72: 	if not is_multiplayer_authority() or current_state == State.DEAD: return
+73: 	
+74: 	_pending_attacker = attacker
+75: 	if not _is_waiting_for_aggro:
+76: 		_is_waiting_for_aggro = true
+77: 		await get_tree().create_timer(1.0).timeout
+78: 		if not is_instance_valid(self) or current_state == State.DEAD: return
+79: 		target = _pending_attacker
+80: 		_target_update_timer = 0.0
+81: 		_is_waiting_for_aggro = false
+82: 
+83: var _target_update_timer: float = 0.0
+84: 
+85: func _update_closest_target() -> void:
+86: 	var players = get_tree().get_nodes_in_group("Player")
+87: 	if players.is_empty():
+88: 		target = null
+89: 		return
+90: 		
+91: 	var closest = null
+92: 	var min_dist = 999999.0
+93: 	for p in players:
+94: 		var d = global_position.distance_squared_to(p.global_position)
+95: 		if d < min_dist:
+96: 			min_dist = d
+97: 			closest = p
+98: 			
+99: 	target = closest
+100: 
+101: func change_state(new_state: State) -> void:
+102: 	if is_multiplayer_authority():
+103: 		rpc("_rpc_apply_state", new_state)
+104: 
+105: @rpc("authority", "call_local", "reliable")
+106: func _rpc_apply_state(new_state: int) -> void:
+107: 	if current_state == State.DEAD or current_state == new_state:
+108: 		return 
+109: 		
+110: 	current_state = new_state
+111: 	
+112: 	match current_state:
+113: 		State.IDLE:
+114: 			anim_playback.travel("run") # Remplacer par "idle" quand l'animation existera
+115: 		State.CHASE:
+116: 			anim_playback.travel("run")
+117: 		State.ATTACK:
+118: 			if _is_enraged:
+119: 				# En phase 2: 1 chance sur 2 de faire le gros slam
+120: 				if randf() < 0.5:
+121: 					_current_attack_anim = "heavy_weapon_swing"
+122: 				else:
+123: 					_current_attack_anim = "standing_mele_downward"
+124: 			else:
+125: 				# En phase 1: Combo normal 3 coups
+126: 				_attack_counter += 1
+127: 				if _attack_counter % 3 == 0:
+128: 					_current_attack_anim = "attaque"
+129: 				else:
+130: 					_current_attack_anim = "standing_mele_downward"
+131: 				
+132: 			anim_playback.travel(_current_attack_anim)
+133: 			_attack_anim_started = false 
+134: 		State.DEAD:
+135: 			pass # Pas d'animation de mort pour le moment
+136: 
+137: func _process(delta: float) -> void:
+138: 	if current_state == State.DEAD: return
+139: 	
+140: 	# Le client et le serveur partagent cette logique pour pauser/reprendre l'animation
+141: 	# selon le action_speed (qui est synchronis).
+142: 	if stats_component != null and anim_tree != null:
+143: 		var action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
+144: 		if action_speed <= 0.0:
+145: 			if anim_tree.active: anim_tree.active = false
+146: 		else:
+147: 			if not anim_tree.active: anim_tree.active = true
+148: 
+149: func _physics_process(delta: float) -> void:
+150: 	if not is_multiplayer_authority(): return
+151: 	if current_state == State.DEAD: return # Arrête de faire tomber le corps parent !
+152: 	
+153: 	var action_speed = 1.0
+154: 	if stats_component != null:
+155: 		action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
+156: 		
+157: 	if action_speed <= 0.0:
+158: 		if not is_on_floor():
+159: 			velocity.y -= gravity * delta
+160: 		velocity.x = move_toward(velocity.x, 0, 10.0 * delta)
+161: 		velocity.z = move_toward(velocity.z, 0, 10.0 * delta)
+162: 		move_and_slide()
+163: 		
+164: 		if attack_shape != null and not attack_shape.disabled:
+165: 			attack_shape.disabled = true
+166: 		return
+167: 
+168: 	_target_update_timer += delta
+169: 	if _target_update_timer > 15.0 or target == null or not is_instance_valid(target):
+170: 		_target_update_timer = 0.0
+171: 		_update_closest_target()
+172: 
+173: 	if not is_on_floor():
+174: 		velocity.y -= gravity * delta
+175: 		
+176: 	if current_state == State.ATTACK:
+177: 		if anim_playback:
+178: 			var current_anim = anim_playback.get_current_node()
+179: 			if current_anim == _current_attack_anim:
+180: 				_attack_anim_started = true
+181: 			elif _attack_anim_started and (current_anim == "run" or current_anim == ""):
+182: 				change_state(State.IDLE)
+183: 			
+184: 	if attack_shape != null:
+185: 		if current_state != State.ATTACK and not attack_shape.disabled:
+186: 			attack_shape.disabled = true
+187: 
+188: 	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed") * action_speed
+189: 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
+190: 
+191: 	match current_state:
+192: 		State.DEAD:
+193: 			vitesse_horizontale = movement_comp.apply_friction(vitesse_horizontale, behavior, delta)
+194: 		State.IDLE:
+195: 			vitesse_horizontale = _process_idle_state(vitesse_horizontale, delta)
+196: 		State.CHASE:
+197: 			vitesse_horizontale = _process_chase_state(vitesse_horizontale, delta, current_speed)
+198: 		State.ATTACK:
+199: 			vitesse_horizontale = _process_attack_state(vitesse_horizontale, delta)
+200: 
+201: 	velocity.x = vitesse_horizontale.x
+202: 	velocity.z = vitesse_horizontale.y
+203: 	
+204: 	var old_pos = global_position
+205: 	move_and_slide()
+206: 	
+207: 	if Engine.get_frames_drawn() % 30 == 0 and current_state == State.CHASE:
+208: 		var moved_dist = old_pos.distance_to(global_position)
+209: 		if moved_dist < 0.01 and vitesse_horizontale.length() > 0.5:
+210: 			print("--- SCOUT COINCE ---")
+211: 			print("Il essaie d'avancer avec une vitesse de: ", vitesse_horizontale)
+212: 			for i in get_slide_collision_count():
+213: 				var col = get_slide_collision(i)
+214: 				var collider = col.get_collider()
+215: 				if collider:
+216: 					print("Bloque par: ", collider.name, " (Type: ", collider.get_class(), ")")
+217: 
+218: func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
+219: 	if target != null:
+220: 		var distance = global_position.distance_to(target.global_position)
+221: 		if distance <= behavior.attack_range:
+222: 			change_state(State.ATTACK)
+223: 		else:
+224: 			change_state(State.CHASE)
+225: 			
+226: 	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+227: 
+228: func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) -> Vector2:
+229: 	if target == null:
+230: 		change_state(State.IDLE)
+231: 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+232: 		
+233: 	var distance_to_target = global_position.distance_to(target.global_position)
+234: 	if distance_to_target <= behavior.attack_range:
+235: 		change_state(State.ATTACK)
+236: 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+237: 		
+238: 	var direction = navigation_comp.get_direction_to_target(target.global_position)
+239: 	
+240: 	if Engine.get_frames_drawn() % 30 == 0:
+241: 		var nav = navigation_comp.nav_agent
+242: 		print("--- DEBUG NAV ---")
+243: 		print("Agent cible: ", nav.target_position)
+244: 		print("Chemin atteignable ? ", nav.is_target_reachable())
+245: 		print("Distance au chemin: ", nav.distance_to_target())
+246: 		print("Direction finale: ", direction)
+247: 		print("Scout pos: ", global_position, " | Next path pos: ", nav.get_next_path_position())
+248: 
+249: 	movement_comp.rotate_towards_direction(direction, behavior, delta)
+250: 	return movement_comp.accelerate_to_direction(vitesse_horiz, direction, speed, behavior, delta)
+251: 
+252: func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
+253: 	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+254: 
+255: # =========================================================================
+256: # GESTION DES ATTAQUES SPÉCIALES (Appelé par l'AnimationPlayer)
+257: # =========================================================================
+258: func spawn_slam_attack() -> void:
+259: 	if not is_multiplayer_authority():
+260: 		return
+261: 		
+262: 	if slam_scene == null:
+263: 		push_warning("Scout : Aucune scene de Slam assignée !")
+264: 		return
+265: 		
+266: 	var slam = slam_scene.instantiate() as Node3D
+267: 	
+268: 	# On cherche le Marker3D "slam_position"
+269: 	var slam_marker = find_child("slam_position", true, false)
+270: 	var spawn_pos: Vector3
+271: 	
+272: 	if slam_marker != null:
+273: 		spawn_pos = slam_marker.global_position
+274: 	else:
+275: 		# Fallback au cas ou le marqueur n'est pas trouv
+276: 		var forward_direction = -global_transform.basis.z.normalized()
+277: 		spawn_pos = global_position + (forward_direction * 2.5)
+278: 	
+279: 	get_tree().current_scene.get_node("NetworkObjects").add_child(slam, true)
+280: 	
+281: 	# On force la position sur le Serveur d'abord
+282: 	slam.global_position = spawn_pos
+283: 	
+284: 	# Puis on demande au client de synchroniser si la fonction existe
+285: 	if slam.has_method("rpc_set_position"):
+286: 		slam.rpc("rpc_set_position", spawn_pos)
+287: # =========================================================================
+288: 
+289: func _on_died() -> void:
+290: 	if is_multiplayer_authority():
+291: 		get_tree().call_group("ScoreManager", "add_kill_point")
+292: 		rpc("_rpc_trigger_death")
+293: 
+294: func _on_health_changed(current_hp: float, max_hp: float) -> void:
+295: 	if not is_multiplayer_authority(): return
+296: 	
+297: 	# Si on passe sous 50% de vie et qu'on n'est pas encore enrage
+298: 	if current_hp <= max_hp * 0.5 and not _is_enraged:
+299: 		_is_enraged = true
+300: 		
+301: 		# On augmente sa vitesse de deplacement de +50% (+0.50 en type PERCENT)
+302: 		if stats_component != null:
+303: 			stats_component.add_modifier("movement_speed", 1, 0.5, "enrage_buff")
+304: 			# Optionnel: on peut aussi augmenter son action_speed si on veut qu'il tape plus vite !
+305: 			# stats_component.add_modifier("action_speed", 1, 0.2, "enrage_buff")
+306: 
+307: @rpc("authority", "call_local", "reliable")
+308: func _rpc_trigger_death() -> void:
+309: 	print("Le Scout est mort ! Activation du Ragdoll (Serveur + Client)...")
+310: 	remove_from_group("Enemie")
+311: 	current_state = State.DEAD
+312: 	
+313: 	if has_node("HitboxComponent/CollisionShape3D"):
+314: 		$HitboxComponent/CollisionShape3D.set_deferred("disabled", true)
+315: 	
+316: 	if has_node("CollisionShape3D"):
+317: 		$CollisionShape3D.set_deferred("disabled", true)
+318: 		
+319: 	# --- RAGDOLL ---
+320: 	if anim_tree and anim_tree.active:
+321: 		anim_tree.active = false # Coupe les animations
+322: 		
+323: 	var simulator = get_node_or_null("Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D")
+324: 	var skeleton: Skeleton3D = get_node_or_null("Great Sword Run/Skeleton3D")
+325: 	
+326: 	if simulator != null:
+327: 		simulator.physical_bones_start_simulation()
+328: 	elif skeleton != null and skeleton.has_method("physical_bones_start_simulation"):
+329: 		skeleton.physical_bones_start_simulation()
+330: 		
+331: 	if is_multiplayer_authority():
+332: 		await get_tree().create_timer(4.0).timeout
+333: 		queue_free()
+334: 
+The above content shows the entire, complete file contents of the requested file.
