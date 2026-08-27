@@ -28,6 +28,7 @@ extends CharacterBody3D
 
 @export var slam_scene: PackedScene
 @export var attack_shape: CollisionShape3D
+@export var ragdoll_knockback_multiplier: float = 10.0
 
 # --- ANIMATION TREE ---
 @onready var anim_tree: AnimationTree = $AnimationTree
@@ -394,7 +395,7 @@ func spawn_slam_attack() -> void:
 func _on_died() -> void:
 	if is_multiplayer_authority():
 		get_tree().call_group("ScoreManager", "add_kill_point")
-		rpc("_rpc_trigger_death")
+		rpc("_rpc_trigger_death", velocity)
 
 func _on_health_changed(current_hp: float, max_hp: float) -> void:
 	if not is_multiplayer_authority(): return
@@ -402,10 +403,11 @@ func _on_health_changed(current_hp: float, max_hp: float) -> void:
 	if current_hp <= max_hp * 0.5 and not _is_enraged:
 		_is_enraged = true
 		if stats_component != null:
+			stats_component.add_modifier("attack_speed", 1, 0.5, "enrage_buff")
 			stats_component.add_modifier("movement_speed", 1, 0.5, "enrage_buff")
 
 @rpc("authority", "call_local", "reliable")
-func _rpc_trigger_death() -> void:
+func _rpc_trigger_death(fatal_velocity: Vector3 = Vector3.ZERO) -> void:
 	remove_from_group("Enemie")
 	current_state = State.DEAD
 	
@@ -423,6 +425,21 @@ func _rpc_trigger_death() -> void:
 	
 	if simulator != null:
 		simulator.physical_bones_start_simulation()
+		var hips = simulator.get_node_or_null("Physical Bone mixamorig_Hips")
+		var spine = simulator.get_node_or_null("Physical Bone mixamorig_Spine")
+		
+		# Transfert de l'inertie du dernier coup (le knockback)
+		var death_impulse = fatal_velocity * ragdoll_knockback_multiplier 
+		
+		# On applique l'impulsion a TOUS les os proportionnellement a leur masse
+		# Cela evite que le corps s'etire (spaghettification)
+		for child in simulator.get_children():
+			if child is PhysicalBone3D:
+				# Impulse = changement de velocite * masse (pour que tous partent a la meme vitesse)
+				child.apply_central_impulse(death_impulse * child.mass)
+		
+		if hips and hips is PhysicalBone3D:
+			hips.apply_central_impulse(Vector3(0, 4.0 * hips.mass, 0)) # Bond + Recul
 	elif skeleton != null and skeleton.has_method("physical_bones_start_simulation"):
 		skeleton.physical_bones_start_simulation()
 		

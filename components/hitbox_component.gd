@@ -17,7 +17,27 @@ func _ready() -> void:
 
 # MODIFI : On reoit l'attaque en entier (AttackComponent) au lieu d'un simple chiffre
 func receive_hit(attack: AttackComponent) -> void:
-	# 1. Calculs de reduction d'Armure et Resistances
+	# 1. On calcule et applique d'abord le recul (pour que l'impulsion de mort puisse le recuperer)
+	if knockback_component != null:
+		var push_dir: Vector3
+		if attack.is_projectile:
+			push_dir = -attack.global_transform.basis.z
+		else:
+			push_dir = global_position - attack.global_position
+			
+		push_dir.y = 0
+		if push_dir.length_squared() > 0.001:
+			push_dir = push_dir.normalized()
+		else:
+			push_dir = Vector3.FORWARD
+			
+		var angle_rad = deg_to_rad(attack.knockback_angle)
+		push_dir = push_dir * cos(angle_rad)
+		push_dir.y = sin(angle_rad)
+			
+		knockback_component.apply_knockback(push_dir, attack.knockback_force)
+
+	# 2. Calculs de reduction d'Armure et Resistances
 	if health_component != null:
 		var dmg_phys = attack.damage_physical
 		var dmg_fire = attack.damage_fire
@@ -28,22 +48,15 @@ func receive_hit(attack: AttackComponent) -> void:
 		
 		if health_component.stats_component != null:
 			var stats = health_component.stats_component
-			
-			# --- MULTIPLICATEUR DE DEGATS RECUS (Ex: Shock) ---
-			# Si la stat n'existe pas, elle renverra 0.0, donc on l'ajoute a 1.0
 			damage_taken_mult = max(0.0, 1.0 + stats.get_stat_value("damage_taken_multiplier"))
 			
-			# --- ARMURE (Sur le Physique Uniquement) ---
 			var armor = max(stats.get_stat_value("armor"), 0.0)
 			var armor_reduction = 0.0
 			if armor_curve != null:
-				# La courbe de base X va de 0 a 5. Donc on divise par 100.
-				# (Ex: 50 armure = X:0.5 -> 30% reduction)
 				var armor_x = armor / 100.0
 				armor_reduction = armor_curve.sample(armor_x)
 			dmg_phys *= (1.0 - armor_reduction)
 			
-			# --- RESISTANCES ELEMENTAIRES (Capees a 75%) ---
 			var res_fire = min(stats.get_stat_value("fire_resistance"), 0.75)
 			var res_ice = min(stats.get_stat_value("ice_resistance"), 0.75)
 			var res_lightning = min(stats.get_stat_value("lightning_resistance"), 0.75)
@@ -55,7 +68,7 @@ func receive_hit(attack: AttackComponent) -> void:
 		var total_damage = (dmg_phys + dmg_fire + dmg_ice + dmg_lightning) * damage_taken_mult
 		health_component.take_damage(total_damage)
 
-	# 2. Application des Status Effects
+	# 3. Application des Status Effects
 	if "status_effects_to_apply" in attack and attack.status_effects_to_apply.size() > 0:
 		var status_comp = null
 		for child in get_parent().get_children():
@@ -71,7 +84,7 @@ func receive_hit(attack: AttackComponent) -> void:
 		
 	hit_received.emit(attack)
 	
-	# NOUVEAU : On gre l'aggro en rseau
+	# 4. On gere l'aggro en reseau
 	var attacker_id = 0
 	var p = attack.get_parent()
 	while p != null:
@@ -88,32 +101,6 @@ func receive_hit(attack: AttackComponent) -> void:
 			_apply_aggro(attacker_id)
 		else:
 			rpc_id(get_parent().get_multiplayer_authority(), "_rpc_notify_aggro", attacker_id)
-		
-	# 2. On calcule et applique le recul
-	if knockback_component != null:
-		var push_dir: Vector3
-		
-		if attack.is_projectile:
-			# MAGIE : Si c'est un sort, on utilise sa direction de vol horizontale
-			push_dir = -attack.global_transform.basis.z
-		else:
-			# Si c'est une pe, on garde l'ancien calcul bas sur les positions
-			push_dir = global_position - attack.global_position
-			
-		# 1. On l'aplatit pour avoir une direction horizontale pure
-		push_dir.y = 0
-		if push_dir.length_squared() > 0.001:
-			push_dir = push_dir.normalized()
-		else:
-			push_dir = Vector3.FORWARD
-			
-		# 2. On applique le fameux angle d'lvation
-		var angle_rad = deg_to_rad(attack.knockback_angle)
-		push_dir = push_dir * cos(angle_rad)
-		push_dir.y = sin(angle_rad)
-			
-		# On envoie directement la direction calcule au composant de recul
-		knockback_component.apply_knockback(push_dir, attack.knockback_force)
 
 
 func _apply_aggro(attacker_id: int) -> void:
