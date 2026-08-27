@@ -10,6 +10,7 @@ extends CharacterBody3D
 @export var base_movement_speed: float = 4.5
 @export var behavior: EnemyBehaviorData
 
+@export var slam_scene: PackedScene
 @onready var attack_shape: CollisionShape3D = get_node_or_null("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
 
 # --- ANIMATION TREE ---
@@ -27,6 +28,7 @@ var target: Node3D = null
 var _attack_anim_started: bool = false
 var _attack_counter: int = 0
 var _current_attack_anim: String = ""
+var _is_enraged: bool = false # <-- NOUVEAU
 
 func _ready() -> void:
 	if behavior == null:
@@ -34,6 +36,7 @@ func _ready() -> void:
 		
 	anim_tree.active = true
 	health_component.died.connect(_on_died)
+	health_component.health_changed.connect(_on_health_changed) # <-- NOUVEAU
 	
 	# =====================================================================
 	# CORRECTION MAGIQUE : On detruit la piste vicieuse dans l'animation RESET
@@ -112,11 +115,19 @@ func _rpc_apply_state(new_state: int) -> void:
 		State.CHASE:
 			anim_playback.travel("run")
 		State.ATTACK:
-			_attack_counter += 1
-			if _attack_counter % 3 == 0:
-				_current_attack_anim = "attaque"
+			if _is_enraged:
+				# En phase 2: 1 chance sur 2 de faire le gros slam
+				if randf() < 0.5:
+					_current_attack_anim = "heavy_weapon_swing"
+				else:
+					_current_attack_anim = "standing_mele_downward"
 			else:
-				_current_attack_anim = "standing_mele_downward"
+				# En phase 1: Combo normal 3 coups
+				_attack_counter += 1
+				if _attack_counter % 3 == 0:
+					_current_attack_anim = "attaque"
+				else:
+					_current_attack_anim = "standing_mele_downward"
 				
 			anim_playback.travel(_current_attack_anim)
 			_attack_anim_started = false 
@@ -241,10 +252,57 @@ func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) ->
 func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 
+# =========================================================================
+# GESTION DES ATTAQUES SPÉCIALES (Appelé par l'AnimationPlayer)
+# =========================================================================
+func spawn_slam_attack() -> void:
+	if not is_multiplayer_authority():
+		return
+		
+	if slam_scene == null:
+		push_warning("Scout : Aucune scene de Slam assignée !")
+		return
+		
+	var slam = slam_scene.instantiate() as Node3D
+	
+	# On cherche le Marker3D "slam_position"
+	var slam_marker = find_child("slam_position", true, false)
+	var spawn_pos: Vector3
+	
+	if slam_marker != null:
+		spawn_pos = slam_marker.global_position
+	else:
+		# Fallback au cas ou le marqueur n'est pas trouv
+		var forward_direction = -global_transform.basis.z.normalized()
+		spawn_pos = global_position + (forward_direction * 2.5)
+	
+	get_tree().current_scene.get_node("NetworkObjects").add_child(slam, true)
+	
+	# On force la position sur le Serveur d'abord
+	slam.global_position = spawn_pos
+	
+	# Puis on demande au client de synchroniser si la fonction existe
+	if slam.has_method("rpc_set_position"):
+		slam.rpc("rpc_set_position", spawn_pos)
+# =========================================================================
+
 func _on_died() -> void:
 	if is_multiplayer_authority():
 		get_tree().call_group("ScoreManager", "add_kill_point")
 		rpc("_rpc_trigger_death")
+
+func _on_health_changed(current_hp: float, max_hp: float) -> void:
+	if not is_multiplayer_authority(): return
+	
+	# Si on passe sous 50% de vie et qu'on n'est pas encore enrage
+	if current_hp <= max_hp * 0.5 and not _is_enraged:
+		_is_enraged = true
+		
+		# On augmente sa vitesse de deplacement de +50% (+0.50 en type PERCENT)
+		if stats_component != null:
+			stats_component.add_modifier("movement_speed", 1, 0.5, "enrage_buff")
+			# Optionnel: on peut aussi augmenter son action_speed si on veut qu'il tape plus vite !
+			# stats_component.add_modifier("action_speed", 1, 0.2, "enrage_buff")
 
 @rpc("authority", "call_local", "reliable")
 func _rpc_trigger_death() -> void:

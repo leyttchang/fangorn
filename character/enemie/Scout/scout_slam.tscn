@@ -1,0 +1,195 @@
+[gd_scene format=4 uid="uid://c616syg183bcn"]
+
+[ext_resource type="Texture2D" uid="uid://bnv7axehaxeju" path="res://assets/LeLu's Noise Pack/T_Cracks336_transparent.png" id="1_4o3px"]
+[ext_resource type="Script" uid="uid://bks7nwa2hrln8" path="res://character/enemie/Scout/scout_slam.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_whv0q"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bw62r"]
+height = 1.34375
+radius = 1.137207
+
+[sub_resource type="Animation" id="Animation_4o3px"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("rock_chunk:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Decal:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.34, 0.22439998, 0.1088, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AttackComponent/CollisionShape3D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_whv0q"]
+resource_name = "slam"
+length = 5.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("rock_chunk:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Decal:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 3.01, 4.96),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1.525, 1.0625999, 0.6002, 1), Color(0.34, 0.22439998, 0.1088, 1), Color(0.34, 0.22439998, 0.1088, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AttackComponent/CollisionShape3D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bw62r"]
+_data = {
+&"RESET": SubResource("Animation_4o3px"),
+&"slam": SubResource("Animation_whv0q")
+}
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.5
+emission_ring_radius = 1.0
+emission_ring_inner_radius = 0.5
+emission_ring_cone_angle = 90.0
+angle_min = -219.7
+angle_max = 140.30002
+use_rotation_3d = true
+rotation_3d_min = Vector3(0, 0, 0)
+rotation_3d_max = Vector3(360, 360, 360)
+direction = Vector3(0, 1, 0)
+spread = 90.0
+initial_velocity_min = 5.0
+initial_velocity_max = 5.0
+scale_min = 0.099999994
+scale_max = 0.5
+color = Color(0.4, 0.20666666, 0, 1)
+collision_mode = 1
+collision_friction = 0.0
+collision_bounce = 0.09
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eec2p"]
+resource_name = "rock"
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
+roughness = 0.5
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ngmdi"]
+_surfaces = [{
+"aabb": AABB(-0.49497473, -0.3963893, -0.49497473, 0.9969584, 0.694816, 1.0085931),
+"format": 34896613377,
+"index_count": 66,
+"index_data": PackedByteArray("AAABAAIAAQADAAIABAAAAAIAAwAEAAIAAAAFAAEAAQAGAAMAAQAFAAYAAAAHAAUABAAHAAAAAwAIAAQABAAIAAcAAwAGAAgABwAJAAUABgAKAAgACAALAAcABwALAAkACAAKAAsABQAJAAwABQAMAAYADAAJAAsABgAMAAoADAALAAoA"),
+"name": "rock",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 13,
+"vertex_data": PackedByteArray("Mv7vNaF9AAAZf+81AAAAAAFiAABrwwAAAADvNaF9AAAZf+81Q/sAADL+C5IAAAAAAAALkgAAAAD//+eurdMAAJU0e7L//wAAvcXT4c43AACYMWv6IrgAAGSw//9brgAAmjrc5Ow5AAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_xb2uu"]
+resource_name = "rock_chunck_Gem"
+_surfaces = [{
+"aabb": AABB(-0.49497473, -0.3963893, -0.49497473, 0.9969584, 0.694816, 1.0085931),
+"attribute_data": PackedByteArray("jKW4+MKEddiNus3S/39z+qu+oqVRqsa8UaokiFbG///U7u7x//+X/yfOuOxWxgndjKW4+I26zdLAtf//Uaq6l1GqvrP/f26SUaq+s1mDNKn/f26Sdp3GvFbGyp7f0WbBVsbHsm7fesBWxsqe8tf/f27fesDy1/9/gOzKrm7fesCC6waQwoR12IylxryNus3S/3+Bvrv9TaKA7GbBgOw0g///l/8t7uXP//9mwdTu7vEt7uXPJ8647K7Lrs3U7u7x"),
+"format": 34896613399,
+"index_count": 66,
+"index_data": PackedByteArray("AAABAAIAAAADAAEABAAFAAYABwAIAAkABwAKAAgACwAMAA0ACwAOAAwADwAQABEAEgATABQAEgAVABMAFgAXABgAFgAZABcAGgAbABwAHQAeAB8AHQAgAB4AIQAiACMAIQAkACIAJQAmACcAKAApACoAKAArACkALAAtAC4ALAAvAC0A"),
+"material": SubResource("StandardMaterial3D_eec2p"),
+"name": "rock",
+"primitive": 3,
+"uv_scale": Vector4(1.8229803, 2, 0, 0),
+"vertex_count": 48,
+"vertex_data": PackedByteArray("Mv7vNaF9P+MZf+81AAA/4wFiAABrwz/jMv4LkgAAP+My/u81oX0Q2P//566t0xDYMv4LkgAAENj//+eurdPwyL3F0+HON77IMv4LkgAAm8hksP//W64iyRl/7zVD+0zbMv7vNaF9N9oBYgAAa8Nb3P//566t02HZGX/vNUP7H+OVNHuy//8f4///566t0x/jlTR7sv//0NxksP//W66D3f//566t0/LdmDFr+iK4MNwAAO81oX2F3Rl/7zVD+37dAWIAAGvDMdyVNHuy//8x3gAA7zWhfYHKAAALkgAAgcqVNHuy//+BygAAC5IAAMLKmDFr+iK4Y8qVNHuy//9Hypo63OTsOQfLGX/vNQAAKdUAAO81oX2b1QFiAABrw4fWAAALkgAANNQZf+81AAD//zL+C5IAAP//AAALkgAA//8y/guSAABd6Zo63OTsOV3pAAALkgAAXem9xdPhzjdd6Zo63OTsOSzZZLD//1uuLNmYMWv6Irgs2b3F0+HONyzZyScoz8knKM/JJyjPyScoz7Orplezq6ZXs6umV8+9GyHtvZohAr71IbK9nyAVE8nWkRIp1pQTZNcpEqvVy47ZgsuO2YLLjtmCTZZ2n/KVm5+7lbKfnZZVn6fZbvCj2XHwBNkD8fjZI/CR3YHNkd2BzZHdgc3M31nGMd+CxgTfjsY74DzGLzdD0qU3SdOSOFTVIDbtz/8//7//P/+//z//vz/LKTU/yyk1P8spNT/LKTWn09ksp9PZLKfT2Syn09ks")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_ngmdi")
+
+[node name="Scout_slam" type="Node3D" unique_id=1350223791]
+script = ExtResource("1_script")
+
+[node name="Decal" type="Decal" parent="." unique_id=1129212880]
+size = Vector3(6, 1, 6)
+texture_albedo = ExtResource("1_4o3px")
+modulate = Color(0.34, 0.22439998, 0.1088, 1)
+upper_fade = 4.7999973
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_whv0q")]
+collision_layer = 16
+collision_mask = 2
+base_damage = 50.0
+knockback_angle = 60.0
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.328125, 0)
+shape = SubResource("CylinderShape3D_bw62r")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1150126878]
+libraries/ = SubResource("AnimationLibrary_bw62r")
+autoplay = &"slam"
+
+[node name="rock_chunk" type="GPUParticles3D" parent="." unique_id=1890708729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26600718, 0)
+emitting = false
+amount = 20
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_hlie2")
+draw_pass_1 = SubResource("ArrayMesh_xb2uu")
+
+[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="." unique_id=2105175591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04454148, 0)
+size = Vector3(7, 0.1, 7)
+
+[editable path="AttackComponent"]
