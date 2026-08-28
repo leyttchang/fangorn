@@ -1153,7 +1153,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.99997735, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333546, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.9999773, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335453, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1353,6 +1353,11 @@ collision_mask = 128
 [node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("62_ce8hk")]
 stats_component = NodePath("../StatsComponent")
 health_component = NodePath("../HealthComponent")
+
+[node name="PseudoLabel" type="Label3D" parent="." unique_id=218803030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5185547, 0)
+billboard = 1
+no_depth_test = true
 
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

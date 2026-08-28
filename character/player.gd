@@ -32,6 +32,20 @@ func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 
 func _ready() -> void:
+	# -- Affichage du Pseudo --
+	var pseudo_label = get_node_or_null("PseudoLabel")
+	if pseudo_label != null:
+		var my_id = name.to_int()
+		if GameData.player_pseudos.has(my_id):
+			pseudo_label.text = GameData.player_pseudos[my_id]
+		else:
+			pseudo_label.text = "Joueur " + str(my_id)
+			
+		# Si c'est nous-meme, on peut cacher le pseudo pour pas l'avoir devant la camera (optionnel)
+		if is_multiplayer_authority():
+			pseudo_label.visible = false
+	# --------------------------
+
 	if not is_multiplayer_authority():
 		# Cacher TOUTE l'UI du joueur (mme celles dans des composants) si ce n'est pas NOTRE joueur !
 		var canvas_layers = find_children("*", "CanvasLayer", true, false)

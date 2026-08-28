@@ -32,6 +32,14 @@ texture_margin_right = 15.0
 texture_margin_bottom = 15.0
 region_rect = Rect2(3.5, 3.5, 193, 45)
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vof52"]
+texture = ExtResource("5_kgx3v")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 7.0
+region_rect = Rect2(91.925964, 258.9077, 339.0313, 70.49985)
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hlie2"]
 content_margin_top = 10.0
 texture = ExtResource("5_w7sub")
@@ -41,13 +49,14 @@ texture_margin_right = 20.0
 texture_margin_bottom = 10.0
 region_rect = Rect2(0, -0.29930353, 243.28586, 40.299305)
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vof52"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_w7sub"]
+content_margin_top = 10.0
 texture = ExtResource("5_kgx3v")
-texture_margin_left = 7.0
-texture_margin_top = 7.0
-texture_margin_right = 7.0
-texture_margin_bottom = 7.0
-region_rect = Rect2(91.925964, 258.9077, 339.0313, 70.49985)
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 10.0
+region_rect = Rect2(91.692055, 258.63617, 339.65182, 70.72635)
 
 [sub_resource type="Animation" id="Animation_f8y02"]
 length = 0.001
@@ -139,8 +148,13 @@ _data = {
 &"open": SubResource("Animation_4kshr")
 }
 
-[node name="starting_menu" type="Node3D" unique_id=1895280778]
+[node name="starting_menu" type="Node3D" unique_id=1895280778 node_paths=PackedStringArray("pseudo_input", "lobby_panel", "btn_launch", "btn_leave", "player_labels")]
 script = ExtResource("1_f8y02")
+pseudo_input = NodePath("CanvasLayer/Host_menu/Pseudo/Pseudo_name")
+lobby_panel = NodePath("CanvasLayer/lobby")
+btn_launch = NodePath("CanvasLayer/lobby/btnlaunch")
+btn_leave = NodePath("CanvasLayer/lobby/btnQuit")
+player_labels = [NodePath("CanvasLayer/lobby/PlayerList/Player1"), NodePath("CanvasLayer/lobby/PlayerList/Player2"), NodePath("CanvasLayer/lobby/PlayerList/Player3"), NodePath("CanvasLayer/lobby/PlayerList/Player4"), NodePath("CanvasLayer/lobby/PlayerList/Player5"), NodePath("CanvasLayer/lobby/PlayerList/Player6"), NodePath("CanvasLayer/lobby/PlayerList/Player7")]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1201820351]
 
@@ -182,10 +196,18 @@ anchor_bottom = 0.5
 offset_left = -99.25
 offset_top = -143.5
 offset_right = 99.25
-offset_bottom = 143.50021
+offset_bottom = 200.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
+
+[node name="Pseudo" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=336119136]
+layout_mode = 2
+
+[node name="Pseudo_name" type="LineEdit" parent="CanvasLayer/Host_menu/Pseudo" unique_id=1167233997]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_vof52")
+text = "Player"
 
 [node name="Host" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=394108431]
 layout_mode = 2
@@ -228,6 +250,98 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
 theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Back"
+
+[node name="lobby" type="Control" parent="CanvasLayer" unique_id=763914152]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerList" type="VBoxContainer" parent="CanvasLayer/lobby" unique_id=1722011667]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 465.0
+offset_top = -200.0
+offset_right = 629.0
+offset_bottom = 162.0
+grow_vertical = 2
+theme_override_constants/separation = 11
+
+[node name="title" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=1218017706]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "Player list :"
+horizontal_alignment = 1
+
+[node name="Player1" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=1755331042]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="Player2" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=899754524]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="Player3" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=1426685558]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="Player4" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=483612497]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="Player5" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=424588072]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="Player6" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=961052450]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="Player7" type="Label" parent="CanvasLayer/lobby/PlayerList" unique_id=346750155]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_w7sub")
+text = "empty"
+horizontal_alignment = 1
+
+[node name="btnlaunch" type="Button" parent="CanvasLayer/lobby" unique_id=335950892]
+layout_mode = 0
+offset_left = 671.0
+offset_top = 262.0
+offset_right = 805.0
+offset_bottom = 315.0
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
+text = "Launch game
+"
+
+[node name="btnQuit" type="Button" parent="CanvasLayer/lobby" unique_id=934881627]
+layout_mode = 0
+offset_left = 665.0
+offset_top = 332.0
+offset_right = 803.0
+offset_bottom = 390.0
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
+text = "Quit"
 
 [node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("1_x1u6o")]
 

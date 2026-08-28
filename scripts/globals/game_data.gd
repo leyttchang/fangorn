@@ -1,6 +1,8 @@
 class_name GameData
 extends RefCounted
 
+static var player_pseudos: Dictionary = {}
+
 const PERCENT_STATS: Array[String] = [
 	"attack_speed",
 	"cd_red",
