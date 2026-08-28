@@ -1,0 +1,26 @@
+﻿Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+ERROR: 1 RID allocations of type '10NavAgent3D' were leaked at exit.
+ERROR: 2 RID allocations of type 'P11JoltShape3D' were leaked at exit.
+ERROR: 1 RID allocations of type 'P10JoltBody3D' were leaked at exit.
+ERROR: 1 RID allocations of type 'P10JoltArea3D' were leaked at exit.
+ERROR: 1 RID allocations of type 'N13RendererDummy15MaterialStorage13DummyMaterialE' were leaked at exit.
+ERROR: 1 RID allocations of type 'N13RendererDummy15MaterialStorage11DummyShaderE' were leaked at exit.
+ERROR: 1 RID allocations of type 'N13RendererDummy9DummyMeshE' were leaked at exit.
+ERROR: 1 RID allocations of type 'N17RendererSceneCull8InstanceE' were leaked at exit.
+Godot_v4.7-stable_win64.exe : ERROR: Pages in use exist at exit in PagedAllocator: 
+N20RasterizerSceneDummy21GeometryInstanceDummyE
+Au caractère Ligne:1 : 1
++ & "C:\Users\ley-a\Desktop\godot 4.7\Godot_v4.7-stable_win64.exe" --he ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: Pages in...yInstanceDummyE:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: 117 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2535)
+ERROR: 86 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

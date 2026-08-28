@@ -1,0 +1,3 @@
+--- LISTE DES ANIMATIONS DU CREEP ---
+Bibliotheque: 
+  - mixamo_com

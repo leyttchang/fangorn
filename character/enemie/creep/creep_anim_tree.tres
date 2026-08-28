@@ -1,0 +1,55 @@
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://b8y4g2v6qj5m2"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_crouch"]
+animation = &"crouching_walk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_death"]
+animation = &"death"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_run"]
+animation = &"run_fast"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_stab"]
+animation = &"stab"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_tired"]
+animation = &"tired_walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_start"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_1"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_3"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_5"]
+xfade_time = 0.2
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_tired"]
+xfade_time = 0.3
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_untired"]
+xfade_time = 0.3
+
+[resource]
+states/crouching_walk/node = SubResource("AnimationNodeAnimation_crouch")
+states/crouching_walk/position = Vector2(200, 100)
+states/death/node = SubResource("AnimationNodeAnimation_death")
+states/death/position = Vector2(400, -50)
+states/run_fast/node = SubResource("AnimationNodeAnimation_run")
+states/run_fast/position = Vector2(400, 100)
+states/stab/node = SubResource("AnimationNodeAnimation_stab")
+states/stab/position = Vector2(400, 250)
+states/tired_walk/node = SubResource("AnimationNodeAnimation_tired")
+states/tired_walk/position = Vector2(600, 100)
+transitions = ["Start", "crouching_walk", SubResource("AnimationNodeStateMachineTransition_start"), "crouching_walk", "run_fast", SubResource("AnimationNodeStateMachineTransition_1"), "run_fast", "crouching_walk", SubResource("AnimationNodeStateMachineTransition_2"), "crouching_walk", "stab", SubResource("AnimationNodeStateMachineTransition_3"), "run_fast", "stab", SubResource("AnimationNodeStateMachineTransition_4"), "stab", "crouching_walk", SubResource("AnimationNodeStateMachineTransition_5"), "run_fast", "tired_walk", SubResource("AnimationNodeStateMachineTransition_tired"), "tired_walk", "crouching_walk", SubResource("AnimationNodeStateMachineTransition_untired")]
