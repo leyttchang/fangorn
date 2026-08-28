@@ -45,10 +45,16 @@ func _ready() -> void:
 	if lobby_panel != null:
 		lobby_panel.hide()
 
+	# Si on revient d'une partie et qu'on est deja en reseau, on ouvre le lobby direct !
+	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer is ENetMultiplayerPeer:
+		if multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_DISCONNECTED:
+			call_deferred("_open_lobby")
+
 # --- GESTION DU LOBBY ---
 
 func _open_lobby() -> void:
 	multiplayer_panel.hide()
+	main_menu.hide() # On cache le menu principal (boutons solo/multi)
 	if lobby_panel != null:
 		lobby_panel.show()
 		

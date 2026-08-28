@@ -11,6 +11,8 @@ extends CanvasLayer
 @onready var create_items_btn: Button = $Panel/VBoxContainer/Button6
 @onready var god_mode_btn: Button = $Panel/VBoxContainer/Button7
 
+@export var return_lobby_btn: Button
+
 func _ready() -> void:
 	# Très important : le menu de pause doit pouvoir tourner même quand le jeu est en pause
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -21,6 +23,11 @@ func _ready() -> void:
 	debug_btn.pressed.connect(_on_debug_pressed)
 	create_items_btn.pressed.connect(_on_create_items_pressed)
 	god_mode_btn.pressed.connect(_on_god_mode_pressed)
+	
+	if return_lobby_btn != null:
+		return_lobby_btn.pressed.connect(_on_return_lobby_pressed)
+		# Seul le serveur peut décider de ramener tout le monde au lobby
+		return_lobby_btn.visible = multiplayer.is_server()
 	
 	visible = false
 
@@ -54,6 +61,17 @@ func _on_spawn_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()
+
+func _on_return_lobby_pressed() -> void:
+	if multiplayer.is_server():
+		rpc("rpc_return_to_lobby")
+
+@rpc("authority", "call_local", "reliable")
+func rpc_return_to_lobby() -> void:
+	# Enlever la pause si on l'avait mise
+	get_tree().paused = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	get_tree().change_scene_to_file("res://lvl/starting_menu.tscn")
 
 func _on_debug_pressed() -> void:
 	if debug_spawners.is_empty():

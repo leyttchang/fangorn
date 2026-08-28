@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://cp7n6y1770o7d" path="res://ui/Pause_menu/pause_menu.gd" id="1_script"]
 
-[node name="Pause_menu" type="CanvasLayer" unique_id=533859901]
+[node name="Pause_menu" type="CanvasLayer" unique_id=533859901 node_paths=PackedStringArray("return_lobby_btn")]
 script = ExtResource("1_script")
+return_lobby_btn = NodePath("Panel/VBoxContainer/return_to_lobby")
 
 [node name="Panel" type="Panel" parent="." unique_id=1240144176]
 anchors_preset = 8
@@ -46,10 +47,10 @@ layout_mode = 2
 text = "Resume
 "
 
-[node name="Button2" type="Button" parent="Panel/VBoxContainer" unique_id=584564550]
+[node name="return_to_lobby" type="Button" parent="Panel/VBoxContainer" unique_id=584564550]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
-text = "Option"
+text = "return to lobby"
 
 [node name="Button3" type="Button" parent="Panel/VBoxContainer" unique_id=1782004856]
 custom_minimum_size = Vector2(200, 50)
@@ -66,7 +67,7 @@ custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Create 10 items"
 
-[node name="Button7" type="Button" parent="Panel/VBoxContainer"]
+[node name="Button7" type="Button" parent="Panel/VBoxContainer" unique_id=1718713418]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "God Mode"
