@@ -3,6 +3,7 @@ extends Resource
 
 # --- IDENTITÉ ---
 @export var id: String = "item_id_unique"
+@export var original_base_path: String = "" # Pour le multijoueur
 @export var item_name: String = "Nouvel Objet"
 @export_multiline var description: String = "Description de l'objet."
 @export var icon: Texture2D

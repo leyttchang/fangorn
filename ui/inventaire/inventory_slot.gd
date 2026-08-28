@@ -208,7 +208,8 @@ func _try_equip_item() -> void:
 func _show_context_menu() -> void:
 	# Créer un petit menu déroulant
 	var popup = PopupMenu.new()
-	popup.add_item("Throw (Delete)")
+	popup.add_item("Throw") # index 0
+	popup.add_item("Destroy") # index 1
 	popup.id_pressed.connect(_on_context_menu_id_pressed.bind(popup))
 	
 	# Très important : Si on clique à côté, ça ferme le menu et on le supprime
@@ -220,7 +221,19 @@ func _show_context_menu() -> void:
 	popup.popup(Rect2(get_global_mouse_position(), Vector2(120, 30)))
 
 func _on_context_menu_id_pressed(id: int, popup: PopupMenu) -> void:
-	if id == 0: # Si on a cliqué sur "Throw (Delete)"
+	if id == 0: # Si on a cliqué sur "Throw"
+		if target_inventory != null and current_item != null:
+			var qty = target_inventory.slots[slot_index]["quantity"]
+			
+			# 1. On recupere les donnees de l'objet de facon securisee
+			var item_dict = target_inventory.pack_item(current_item)
+			
+			# 2. On demande au serveur de faire apparaitre le sac dans le monde
+			target_inventory.rpc_id(1, "_rpc_spawn_bag", item_dict, qty)
+			
+			# 3. On supprime l'objet localement de notre inventaire
+			target_inventory.remove_item_at_slot(slot_index, qty)
+	elif id == 1: # Si on a cliqué sur "Destroy"
 		if target_inventory != null:
 			# On supprime 999 quantités pour être sûr de vider toute la pile
 			target_inventory.remove_item_at_slot(slot_index, 999)

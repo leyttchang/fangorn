@@ -8,6 +8,9 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
 size = Vector3(1.2149, 0.9249, 0.7678)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_j0hct"]
+size = Vector3(2.3206787, 1.7149658, 1.7115479)
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_j0hct"]
 properties/0/path = NodePath(".:rotation")
 properties/0/spawn = true
@@ -28,7 +31,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
 shape = SubResource("BoxShape3D_solid")
 
 [node name="InteractionComponent" parent="." unique_id=123456790 instance=ExtResource("3_interact")]
+collision_mask = 512
 prompt_text = "Press E to open Skill Chest"
+
+[node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.054382324, 0.8574829, -0.059265137)
+shape = SubResource("BoxShape3D_j0hct")
 
 [node name="chest_particule" parent="." unique_id=288196329 instance=ExtResource("2_isn6a")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -36,3 +44,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=870459558]
 replication_interval = 5.0
 replication_config = SubResource("SceneReplicationConfig_j0hct")
+
+[editable path="InteractionComponent"]

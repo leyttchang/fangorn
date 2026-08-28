@@ -46,13 +46,17 @@ func _ready() -> void:
 	var equip_comp = $EquipmentComponent 
 	if equip_comp != null and starting_equipped_weapon != null:
 		# On Ã©quipe l'arme telle qu'elle est dÃ©finie dans l'inspecteur
-		equip_comp.equip_item(starting_equipped_weapon.duplicate(true), "main_hand")
+		var w = starting_equipped_weapon.duplicate(true)
+		w.original_base_path = starting_equipped_weapon.resource_path
+		equip_comp.equip_item(w, "main_hand")
 		
 	var inv_comp = $InventoryComponent
 	if inv_comp != null:
 		for item in starting_inventory_items:
 			if item != null:
-				inv_comp.add_item(item.duplicate(true), 1)
+				var new_item = item.duplicate(true)
+				new_item.original_base_path = item.resource_path
+				inv_comp.add_item(new_item, 1)
 	# ========================================
 	
 func _physics_process(delta: float) -> void:

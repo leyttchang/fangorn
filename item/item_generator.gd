@@ -5,6 +5,7 @@ extends RefCounted
 static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.Rarity, all_possible_affixes: Array[AffixData]) -> EquipmentItem:
 	# 1. Dupliquer la base pour avoir une instance unique
 	var new_item: EquipmentItem = base.duplicate(true)
+	new_item.original_base_path = base.resource_path
 	new_item.stat_bonuses = base.stat_bonuses.duplicate(true) # Sécurité pour les Dictionnaires
 	new_item.innate_stats = {}
 	new_item.affix_stats = {}

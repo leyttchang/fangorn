@@ -36,11 +36,19 @@ var _waiting_for_next_wave: bool = false
 var _waiting_for_beacon: bool = false
 
 func _ready() -> void:
-	if not multiplayer.is_server(): return
 	add_to_group("SmartSpawner")
+	if not multiplayer.is_server(): return
 	if auto_start:
 		if is_inside_tree():
 			get_tree().create_timer(1.0).timeout.connect(_spawn_beacon)
+
+@rpc("authority", "call_local", "reliable")
+func rpc_wave_started(wave_number: int, total_enemies: int) -> void:
+	wave_started.emit(wave_number, total_enemies)
+
+@rpc("authority", "call_local", "reliable")
+func rpc_wave_completed(wave_number: int) -> void:
+	wave_completed.emit(wave_number)
 
 func toggle_pause() -> void:
 	is_paused = not is_paused
@@ -65,7 +73,7 @@ func start_next_wave() -> void:
 	# Calcul du nombre d'ennemis pour cette vague
 	enemies_left_to_spawn = initial_wave_count + (current_wave - 1) * enemies_increase_per_wave
 	
-	wave_started.emit(current_wave, enemies_left_to_spawn)
+	rpc("rpc_wave_started", current_wave, enemies_left_to_spawn)
 	print("--- DÉBUT DE LA VAGUE " + str(current_wave) + " (" + str(enemies_left_to_spawn) + " ennemis) ---")
 	
 	_spawn_next_enemy_in_wave()
@@ -142,7 +150,7 @@ func _check_wave_completion() -> void:
 	# Si la vague a fini de spawner ET qu'il n'y a plus d'ennemi actif dans cette vague
 	if not is_spawning_wave and enemies_left_to_spawn <= 0 and active_enemies.is_empty():
 		print("--- VAGUE " + str(current_wave) + " TERMINÉE ! ---")
-		wave_completed.emit(current_wave)
+		rpc("rpc_wave_completed", current_wave)
 		
 		# Récompense de score pour la vague réussie
 		var score_managers = get_tree().get_nodes_in_group("ScoreManager")

@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
 [ext_resource type="PackedScene" uid="uid://cly4pui7duo3p" path="res://particule/screen_vfx/damage_screen_effect.tscn" id="13_r5ovt"]
 [ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
+[ext_resource type="Script" uid="uid://bld6nuxn07jod" path="res://character/loot_cast.gd" id="15_2o2rg"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
@@ -1152,7 +1153,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999774, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335462, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.99997735, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333546, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1191,6 +1192,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43797755, -0.25453138, -1.
 transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 0, -0.26244128, -0.23148656)
 mesh = SubResource("CylinderMesh_hlie2")
 metadata/_edit_group_ = true
+
+[node name="loot_cast" type="RayCast3D" parent="Camera3D" unique_id=1984343279]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0022087097, 0.075296044, 0.2528488)
+target_position = Vector3(0, 0, -4)
+collision_mask = 32
+collide_with_areas = true
+collide_with_bodies = false
+script = ExtResource("15_2o2rg")
 
 [node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712]
 unique_name_in_owner = true

@@ -129,7 +129,12 @@ _data = {
 }
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wnu14"]
-size = Vector3(4, 2, 4)
+size = Vector3(2, 4, 2)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_wnu14"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
 
 [node name="start_beacon" type="Node3D" unique_id=2055968604]
 script = ExtResource("1_cj4yf")
@@ -161,13 +166,18 @@ omni_attenuation = 2.0
 libraries/ = SubResource("AnimationLibrary_mvp0p")
 
 [node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("5_wnu14")]
+collision_mask = 512
 prompt_text = "Appuyez sur E pour lancer la vague suivante"
 
 [node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 shape = SubResource("BoxShape3D_wnu14")
 
 [node name="Label3D" parent="InteractionComponent" index="1" unique_id=987654323]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=928370448]
+replication_config = SubResource("SceneReplicationConfig_wnu14")
 
 [editable path="chest_particule"]
 [editable path="InteractionComponent"]

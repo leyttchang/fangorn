@@ -16,6 +16,9 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
 size = Vector3(1.2149, 0.9249, 0.7678)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_n3aon"]
+size = Vector3(2.0025635, 1.6446533, 1.2818604)
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_n3aon"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -40,7 +43,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
 shape = SubResource("BoxShape3D_solid")
 
 [node name="InteractionComponent" parent="." unique_id=123456789 instance=ExtResource("10_interact")]
+collision_mask = 512
 prompt_text = "Press E to open chest"
+
+[node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.039367676, 0.82232666, 0.04425049)
+shape = SubResource("BoxShape3D_n3aon")
 
 [node name="InventoryComponent" parent="." unique_id=53472195 instance=ExtResource("11_inv_comp")]
 max_slots = 4

@@ -141,6 +141,7 @@ toggle_passive_tree={
 3d_physics/layer_6="interactable"
 3d_physics/layer_8="tree"
 3d_physics/layer_9="enemie"
+3d_physics/layer_10="loot_cast"
 
 [physics]
 
