@@ -60,6 +60,17 @@ func _ready() -> void:
 	if behavior == null:
 		push_error("Scout (" + name + ") : Fichier EnemyBehaviorData manquant dans l'inspecteur !")
 		
+	# OPTIMISATION MAJEURE : On desactive la physique des os pendant que le monstre est vivant
+	var simulator = get_node_or_null("Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D")
+	if simulator != null:
+		for child in simulator.get_children():
+			if child is PhysicalBone3D:
+				# On sauvegarde les layers originaux (1024, 1025) dans des variables metadonnees
+				child.set_meta("orig_layer", child.collision_layer)
+				child.set_meta("orig_mask", child.collision_mask)
+				child.collision_layer = 0
+				child.collision_mask = 0
+		
 	anim_tree.active = true
 	health_component.died.connect(_on_died)
 	health_component.health_changed.connect(_on_health_changed)
@@ -424,6 +435,16 @@ func _rpc_trigger_death(fatal_velocity: Vector3 = Vector3.ZERO) -> void:
 	var skeleton: Skeleton3D = get_node_or_null("Great Sword Run/Skeleton3D")
 	
 	if simulator != null:
+		# OPTIMISATION : On reactive la physique des os juste pour la mort
+		for child in simulator.get_children():
+			if child is PhysicalBone3D:
+				if child.has_meta("orig_layer"):
+					child.collision_layer = child.get_meta("orig_layer")
+					child.collision_mask = child.get_meta("orig_mask")
+				else:
+					child.collision_layer = 1024
+					child.collision_mask = 1025
+					
 		simulator.physical_bones_start_simulation()
 		var hips = simulator.get_node_or_null("Physical Bone mixamorig_Hips")
 		var spine = simulator.get_node_or_null("Physical Bone mixamorig_Spine")

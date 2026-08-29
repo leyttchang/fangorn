@@ -180,6 +180,9 @@ visible = false
 mob_spawner = NodePath("../spawner/SmartSpawner")
 debug_spawners = [NodePath("../spawner/dumb_spawner6"), NodePath("../spawner/dumb_spawner5"), NodePath("../spawner/dumb_spawner4"), NodePath("../spawner/dumb_spawner3"), NodePath("../spawner/dumb_spawner2"), NodePath("../spawner/dumb_spawner")]
 
+[node name="Scout" parent="." unique_id=1082760754 instance=ExtResource("19_bqr07")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 22, -1)
+
 [editable path="Map1T3d"]
 [editable path="Map1T3d/island_tree/island_tree19"]
 [editable path="Map1T3d/island_tree/island_tree19/Tree Type6 04"]
