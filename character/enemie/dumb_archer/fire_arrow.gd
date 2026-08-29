@@ -59,15 +59,10 @@ func _on_attack_landed(target: Node) -> void:
 			attack_col.set_deferred("disabled", true)
 
 	if is_character:
-		# On cache la fleche pour qu'elle ne flotte pas dans l'air
-		if visual_mesh != null:
-			visual_mesh.hide()
-			
-		# Jouer l'animation "hit"
-		if anim_player != null and anim_player.has_animation("hit"):
-			anim_player.play("hit")
-			
-		# On attend la fin de l'animation de sang (ex: 1 seconde) avant de dtruire la flche
+		# On previent tous les clients de jouer le sang et cacher la fleche
+		rpc("_rpc_play_character_impact")
+		
+		# On attend la fin de l'animation de sang (ex: 1 seconde) avant de dtruire la flche (serveur)
 		await get_tree().create_timer(1.0).timeout 
 		if is_inside_tree() and multiplayer.is_server():
 			queue_free()
@@ -78,3 +73,11 @@ func _on_attack_landed(target: Node) -> void:
 	if is_instance_valid(self):
 		if is_inside_tree() and multiplayer.is_server():
 			queue_free()
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_play_character_impact() -> void:
+	if visual_mesh != null:
+		visual_mesh.hide()
+	
+	if anim_player != null and anim_player.has_animation("hit"):
+		anim_player.play("hit")

@@ -1115,7 +1115,7 @@ node_connections = [&"output", 0, &"TimeScale", &"TimeScale", 0, &"StateMachine"
 [sub_resource type="CylinderMesh" id="CylinderMesh_hlie2"]
 top_radius = 0.15
 bottom_radius = 0.05
-height = 0.4
+height = 0.680957
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qe16m"]
 
@@ -1156,7 +1156,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.99997723, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335453, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.9999772, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333545, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1198,8 +1198,8 @@ health_component = NodePath("../../HealthComponent")
 [node name="MainGauche" type="Marker3D" parent="Camera3D" unique_id=1530092582]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43797755, -0.25453138, -1.0913506)
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Camera3D" unique_id=1688824659]
-transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 0, -0.26244128, -0.23148656)
+[node name="nez" type="MeshInstance3D" parent="Camera3D" unique_id=1688824659]
+transform = Transform3D(1.9106855e-15, 4.371139e-08, 1, 1, -4.371139e-08, 0, 4.371139e-08, 1, -4.371139e-08, 6.1405108e-09, -0.26244128, -0.09100807)
 mesh = SubResource("CylinderMesh_hlie2")
 metadata/_edit_group_ = true
 

@@ -103,6 +103,17 @@ func _on_attack_landed(target: Node) -> void:
 	_pending_impacts[target] = MAX_WAIT_TIME
 
 func _spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
+	# On s'assure de ne l'appeler que si on est le joueur qui donne le coup
+	if not is_multiplayer_authority():
+		return
+	
+	# call_local = on l'execute sur NOUS (le tireur) ET sur tous les autres joueurs
+	rpc("_rpc_spawn_blood", impact_point, impact_normal)
+
+@rpc("authority", "call_local", "unreliable")
+func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
+	if blood_particles_scene == null: return
+	
 	var blood = blood_particles_scene.instantiate()
 	get_tree().current_scene.add_child(blood)
 	blood.global_position = impact_point
