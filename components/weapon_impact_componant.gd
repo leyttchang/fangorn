@@ -67,6 +67,27 @@ func _process(delta: float) -> void:
 						hit_target = target
 						impact_point = raycast.get_collision_point()
 						impact_normal = raycast.get_collision_normal()
+						
+						# --- NOUVEAU : DEEP PENETRATION (Pour coller au Mesh/RigidBody) ---
+						var ray_start = raycast.global_position
+						var ray_end = raycast.to_global(raycast.target_position)
+						var ray_dir = (ray_end - ray_start).normalized()
+						
+						var space_state = get_world_3d().direct_space_state
+						var query = PhysicsRayQueryParameters3D.create(
+							impact_point + ray_dir * 0.01, # On decale pour traverser la hitbox
+							impact_point + ray_dir * 2.0   # On cherche plus profond a l'interieur
+						)
+						query.collision_mask = 0xFFFFFFFF # Scan toutes les couches pour trouver le vrai corps
+						query.exclude = [collider.get_rid()]
+						
+						var deep_hit = space_state.intersect_ray(query)
+						if deep_hit and deep_hit.collider != null:
+							# Si le corps interne appartient bien a ce meme monstre
+							if deep_hit.collider == target.owner or deep_hit.collider.owner == target.owner or deep_hit.collider == target.get_parent() or deep_hit.collider.get_parent() == target.owner:
+								impact_point = deep_hit.position
+								impact_normal = deep_hit.normal
+						# -----------------------------------------------------------------
 						break
 		else:
 			print("[WeaponImpact] Pendant l'attente, Raycast ne touche RIEN.")
@@ -112,10 +133,21 @@ func _spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
 
 @rpc("authority", "call_local", "unreliable")
 func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
-	if blood_particles_scene == null: return
-	
-	var blood = blood_particles_scene.instantiate()
-	get_tree().current_scene.add_child(blood)
+	# OPTIMISATION MAJEURE : On utilise le nouveau systeme de Pooling !
+	var pool = get_tree().root.get_node_or_null("VFXPool")
+	if pool == null:
+		# Fallback au cas ou l'autoload n'est pas charge
+		if blood_particles_scene == null: return
+		var fallback_blood = blood_particles_scene.instantiate()
+		get_tree().current_scene.add_child(fallback_blood)
+		fallback_blood.global_position = impact_point
+		if fallback_blood.has_method("play_effect"): fallback_blood.play_effect()
+		return
+		
+	var blood = pool.get_blood()
+	if blood == null:
+		return
+		
 	blood.global_position = impact_point
 	
 	if impact_normal.length_squared() > 0.001:
@@ -123,3 +155,9 @@ func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
 		if abs(impact_normal.dot(Vector3.UP)) > 0.99:
 			up_dir = Vector3.RIGHT
 		blood.look_at(impact_point + impact_normal, up_dir)
+		
+	print("[DEBUG] Blood particle script: ", blood.get_script())
+	if blood.has_method("play_effect"):
+		blood.play_effect()
+	else:
+		print("[ERROR] Blood particle does NOT have play_effect method!")

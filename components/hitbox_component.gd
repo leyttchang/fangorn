@@ -83,7 +83,8 @@ func receive_hit(attack: AttackComponent) -> void:
 	# 3. Application des Status Effects
 	if "status_effects_to_apply" in attack and attack.status_effects_to_apply.size() > 0:
 		var status_comp = null
-		for child in get_parent().get_children():
+		var entity = self.owner if self.owner != null else get_parent()
+		for child in entity.get_children():
 			if child is StatusEffectComponent:
 				status_comp = child
 				break
@@ -92,6 +93,8 @@ func receive_hit(attack: AttackComponent) -> void:
 			for app in attack.status_effects_to_apply:
 				if randf() <= app.apply_chance:
 					status_comp.apply_effect(app.effect, app.duration)
+		else:
+			print("[HitboxComponent] Attention: Aucun StatusEffectComponent trouve sur l'entite ", entity.name)
 
 		
 	hit_received.emit(attack)

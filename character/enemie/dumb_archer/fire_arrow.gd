@@ -79,5 +79,26 @@ func _rpc_play_character_impact() -> void:
 	if visual_mesh != null:
 		visual_mesh.hide()
 	
+	var pool = get_tree().root.get_node_or_null("VFXPool")
+	if pool != null:
+		var blood = pool.get_blood()
+		if blood != null:
+			blood.global_position = global_position
+			
+			# L'orientation de la tache de sang :
+			# La normale doit pointer vers l'exterieur du monstre (donc a l'oppose de la direction de la fleche)
+			# Dans Godot, l'avant est -Z, donc l'arriere est +Z (basis.z)
+			var impact_normal = global_transform.basis.z.normalized()
+			
+			if impact_normal.length_squared() > 0.001:
+				var up_dir = Vector3.UP
+				if abs(impact_normal.dot(Vector3.UP)) > 0.99:
+					up_dir = Vector3.RIGHT
+				blood.look_at(global_position + impact_normal, up_dir)
+				
+			if blood.has_method("play_effect"):
+				blood.play_effect()
+	
+	# Optionnel : si tu avais d'autres choses dans l'anim "hit" (son, etc)
 	if anim_player != null and anim_player.has_animation("hit"):
 		anim_player.play("hit")
