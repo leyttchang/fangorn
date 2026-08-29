@@ -1,0 +1,33 @@
+[gd_resource type="VisualShader" format=3 uid="uid://dawci0j6jgc5j"]
+
+[sub_resource type="VisualShaderNodeFresnel" id="VisualShaderNodeFresnel_6ci3n"]
+
+[sub_resource type="VisualShaderNodeMultiplyAdd" id="VisualShaderNodeMultiplyAdd_6o4gu"]
+default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0, 0, 0)]
+op_type = 2
+
+[sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_v346m"]
+parameter_name = "color"
+default_value_enabled = true
+default_value = Color(1, 0, 0, 1)
+
+[sub_resource type="VisualShaderNodeBooleanParameter" id="VisualShaderNodeBooleanParameter_s4sgc"]
+parameter_name = "invert"
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_1dmqx"]
+parameter_name = "power"
+
+[resource]
+modes/blend = 1
+flags/unshaded = true
+nodes/fragment/2/node = SubResource("VisualShaderNodeFresnel_6ci3n")
+nodes/fragment/2/position = Vector2(-380, 200)
+nodes/fragment/3/node = SubResource("VisualShaderNodeMultiplyAdd_6o4gu")
+nodes/fragment/3/position = Vector2(160, 40)
+nodes/fragment/4/node = SubResource("VisualShaderNodeColorParameter_v346m")
+nodes/fragment/4/position = Vector2(-420, -80)
+nodes/fragment/5/node = SubResource("VisualShaderNodeBooleanParameter_s4sgc")
+nodes/fragment/5/position = Vector2(-820, 240)
+nodes/fragment/6/node = SubResource("VisualShaderNodeFloatParameter_1dmqx")
+nodes/fragment/6/position = Vector2(-603.3072, 553.3518)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 1, 3, 0, 0, 0, 4, 0, 3, 0, 2, 0, 3, 1, 5, 0, 2, 2, 6, 0, 2, 3)

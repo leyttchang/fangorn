@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c6b6apwu11ov8"]
+
+[ext_resource type="Shader" uid="uid://dawci0j6jgc5j" path="res://particule/hit_effect/hit_material_overlay_shaderr.tres" id="1_6ktim"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_6ktim")
+shader_parameter/color = Color(1, 0, 0, 0.7254902)
+shader_parameter/invert = true
+shader_parameter/power = 1.96

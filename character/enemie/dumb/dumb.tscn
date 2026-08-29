@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="7_it7g2"]
 [ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="10_452es"]
 [ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="11_3atj7"]
+[ext_resource type="Material" uid="uid://c6b6apwu11ov8" path="res://particule/hit_effect/hit_material_overlay_shader.tres" id="12_g26vk"]
 [ext_resource type="PackedScene" uid="uid://bnq7s2tgri30i" path="res://components/EnemyMovementComponent.tscn" id="12_xfsm0"]
 [ext_resource type="PackedScene" uid="uid://mnnj3o8ilins" path="res://components/enemy_navigation_component.tscn" id="13_pta2e"]
 [ext_resource type="PackedScene" uid="uid://wefscg5hf58q" path="res://components/foot_step_component.tscn" id="15_qbcfw"]
@@ -198,6 +199,7 @@ stats_component = NodePath("../StatsComponent")
 [node name="CombatFeedbackComponent" parent="." unique_id=2086975508 node_paths=PackedStringArray("health_component") instance=ExtResource("10_452es")]
 damage_text_scene = ExtResource("11_3atj7")
 health_component = NodePath("../HealthComponent")
+flash_material = ExtResource("12_g26vk")
 
 [node name="EnemyMovementComponent" parent="." unique_id=280066399 instance=ExtResource("12_xfsm0")]
 

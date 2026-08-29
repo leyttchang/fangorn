@@ -148,13 +148,26 @@ func _process(delta: float) -> void:
 # --- FONCTIONS POUR SHADERS ---
 func _apply_overlay_material(node: Node, mat: Material) -> void:
 	if node is MeshInstance3D:
-		node.material_overlay = mat
+		if node.material_overlay != null and node.material_overlay.resource_name == "HitFlash":
+			node.material_overlay.next_pass = mat
+		else:
+			node.material_overlay = mat
 	for child in node.get_children():
 		_apply_overlay_material(child, mat)
 
 func _remove_overlay_material(node: Node, mat: Material) -> void:
 	if node is MeshInstance3D:
-		if node.material_overlay == mat:
+		if node.material_overlay != null and node.material_overlay.resource_name == "HitFlash":
+			if node.material_overlay.next_pass == mat:
+				node.material_overlay.next_pass = null
+		elif node.material_overlay == mat:
 			node.material_overlay = null
 	for child in node.get_children():
 		_remove_overlay_material(child, mat)
+
+func get_current_overlay_material() -> Material:
+	for key in _active_effects:
+		var eff = _active_effects[key]
+		if eff.data.overlay_material != null:
+			return eff.data.overlay_material
+	return null

@@ -30,6 +30,7 @@
 [ext_resource type="AudioStream" uid="uid://cw04xi6t0uk2w" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-002.ogg" id="22_5uqop"]
 [ext_resource type="AudioStream" uid="uid://dhi3ne5ow4hki" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-003.ogg" id="23_5ajus"]
 [ext_resource type="AudioStream" uid="uid://d2hetsn2xc84m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-004.ogg" id="24_iu44k"]
+[ext_resource type="Material" uid="uid://c2fyusb1d2w2o" path="res://particule/hit_effect/hit_material_overlay.tres" id="25_4rbck"]
 [ext_resource type="AudioStream" uid="uid://7he0i6bcgtf" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-005.ogg" id="25_f3suu"]
 [ext_resource type="AudioStream" uid="uid://cpm0u8qk8hp5x" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-006.ogg" id="26_sksjj"]
 [ext_resource type="AudioStream" uid="uid://bf3wi3aisq6nj" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-007.ogg" id="27_xnvjd"]
@@ -483,11 +484,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_upi66")
 
 [node name="Physical Bone mixamorig_Spine" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=212904648]
-transform = Transform3D(0.7711275, -0.5920109, 0.23427652, -0.16735141, -0.54349643, -0.82256013, 0.614293, 0.59509224, -0.51817894, 0.002807742, 1.6877943, 0.05181171)
+transform = Transform3D(0.7711275, -0.5920109, 0.23427653, -0.16735141, -0.54349643, -0.82256013, 0.614293, 0.59509224, -0.5181789, 0.002807742, 1.6877943, 0.05181171)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00018631225, 0.0004824714, 0.094232336)
-body_offset = Transform3D(1, 6.893277e-05, -0.00012636185, -0.00012639165, -0.00072953105, -0.99999976, -6.902218e-05, 0.9999999, -0.00072950125, -0.00017443812, 0.094232686, -0.00041371584)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00018632348, 0.00048247701, 0.094232336)
+body_offset = Transform3D(1, 6.893277e-05, -0.00012648106, -0.00012639165, -0.00072953105, -0.99999976, -6.902218e-05, 0.9999999, -0.00072956085, -0.00017443812, 0.094232686, -0.00041371584)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -546,11 +547,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_k7in8")
 
 [node name="Physical Bone mixamorig_Neck" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1749838595]
-transform = Transform3D(-0.85987365, 0.47113428, 0.19659555, 0.03338125, 0.43616393, -0.8992479, -0.5094144, -0.76667696, -0.3907729, -0.15553737, 2.1436946, 0.37057957)
+transform = Transform3D(-0.85987365, 0.47113428, 0.19659556, 0.03338125, 0.43616393, -0.89924794, -0.5094144, -0.76667696, -0.39077294, -0.15553737, 2.1436946, 0.37057957)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5483307e-05, -0.0007041767, 0.03335814)
-body_offset = Transform3D(-0.99999994, 0.00017258525, -1.32620335e-05, 6.213039e-05, 0.28590718, -0.95825756, -0.0001616478, -0.95825756, -0.2859072, 2.604723e-05, 0.032167017, 0.008862555)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5483307e-05, -0.00070417393, 0.03335814)
+body_offset = Transform3D(-0.99999994, 0.00017258525, -1.32620335e-05, 6.213039e-05, 0.28590718, -0.95825756, -0.0001616478, -0.95825756, -0.28590715, 2.604723e-05, 0.032167017, 0.008862555)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -619,7 +620,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_LeftArm"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -640,7 +641,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_LeftForeArm"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -672,11 +673,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_ob4i0")
 
 [node name="Physical Bone mixamorig_LeftHandThumb1" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1161887661]
-transform = Transform3D(0.064394034, -0.7266542, 0.68397886, 0.9773927, -0.092393845, -0.19017638, 0.20138791, 0.6807621, 0.7042768, -0.6654507, 1.6996989, 0.6329522)
+transform = Transform3D(0.064394034, -0.7266542, 0.68397886, 0.9773927, -0.092393845, -0.19017638, 0.20138791, 0.6807621, 0.7042768, -0.66530305, 1.6996989, 0.63279665)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00041777754, 0.0029475624, 0.03151104)
-body_offset = Transform3D(-0.0012073666, 0.9976754, 0.06813848, -0.002359271, 0.06813541, -0.9976733, -0.99999666, -0.0013652593, 0.002271548, -0.0050883293, 0.031235904, -0.00048533082)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00039593564, 0.0031607621, 0.031519663)
+body_offset = Transform3D(-0.0012073666, 0.9976754, 0.06813848, -0.002359271, 0.06813541, -0.9976733, -0.99999666, -0.0013652593, 0.002271548, -0.0053015947, 0.031230032, -0.0004632175)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -777,11 +778,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_5uqop")
 
 [node name="Physical Bone mixamorig_LeftHandIndex3" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1675324453]
-transform = Transform3D(0.13652816, -0.4055748, -0.9038082, -0.13208742, -0.91165775, 0.3891442, -0.9817907, 0.06625256, -0.17803827, -0.65600526, 1.5528777, 0.6434246)
+transform = Transform3D(0.13652816, -0.4055748, -0.9038082, -0.13208742, -0.91165775, 0.3891442, -0.9817907, 0.06625256, -0.17803827, -0.655874, 1.5528777, 0.6432605)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.010350791, -0.0030715014, 0.046927076)
-body_offset = Transform3D(0.00025888905, 0.9993167, 0.036965407, -0.0011221915, 0.03696567, -0.999316, -0.99999964, 0.00021740794, 0.0011311918, 0.0013320446, 0.047020137, 0.010298371)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.010171793, -0.0030073633, 0.047016498)
+body_offset = Transform3D(0.00025888905, 0.9993167, 0.036965407, -0.0011221915, 0.03696567, -0.999316, -0.99999964, 0.00021740794, 0.0011311918, 0.0012646914, 0.04710692, 0.010119259)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -829,7 +830,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_RightArm"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -850,7 +851,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_RightForeArm"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -861,11 +862,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_sksjj")
 
 [node name="Physical Bone mixamorig_RightHand" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1916776795]
-transform = Transform3D(0.45077688, -0.53484464, -0.7146618, -0.68153554, 0.31081924, -0.66249585, 0.5764629, 0.7857052, -0.2244055, -0.7974662, 1.7684128, 0.2960112)
+transform = Transform3D(0.45077688, -0.53484464, -0.7146618, -0.68153554, 0.31081924, -0.66249585, 0.5764629, 0.7857052, -0.2244055, -0.7972873, 1.7684128, 0.29585138)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0006125674, 0.0025224807, 0.036947347)
-body_offset = Transform3D(0.00024063885, -0.676592, -0.736358, -0.0004030168, 0.736358, -0.6765921, 1.0000001, 0.00045976043, -9.5397234e-05, 0.028913021, 0.023141086, -0.00061020255)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00062403776, 0.0027437534, 0.037039325)
+body_offset = Transform3D(0.00024063885, -0.676592, -0.736358, -0.0004030168, 0.736358, -0.6765921, 1.0000001, 0.00045976043, -9.5397234e-05, 0.029130459, 0.023040384, -0.00062176585)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -903,11 +904,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_ngp36")
 
 [node name="Physical Bone mixamorig_RightHandThumb2" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=284695711]
-transform = Transform3D(0.56550413, -0.7840807, -0.25577843, -0.62923926, -0.20969194, -0.74838984, 0.5331633, 0.5841633, -0.611956, -0.7152001, 1.8636637, 0.34337485)
+transform = Transform3D(0.56550413, -0.7840807, -0.25577846, -0.62923926, -0.20969194, -0.74838984, 0.5331633, 0.5841633, -0.61195594, -0.7152001, 1.8636637, 0.34337485)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0034403664, 0.006883088, 0.03909138)
-body_offset = Transform3D(0.0005055368, -0.99328226, -0.11571476, 0.00022855401, 0.11571497, -0.9932825, 1, 0.0004759729, 0.00028553605, 0.011358559, 0.03803152, -0.0034548044)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0034403675, 0.0068830918, 0.03909138)
+body_offset = Transform3D(0.0005055368, -0.99328226, -0.11571467, 0.00022855401, 0.11571497, -0.99328256, 1, 0.0004759729, 0.00028550625, 0.011358559, 0.03803152, -0.0034548044)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -966,11 +967,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_61phf")
 
 [node name="Physical Bone mixamorig_RightHandIndex2" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=980345816]
-transform = Transform3D(-0.9624503, 0.19614415, -0.18766157, -0.26707625, -0.5604937, 0.7839114, 0.0485765, 0.80459577, 0.59183276, -0.7152817, 1.7798047, 0.40398788)
+transform = Transform3D(-0.9624503, 0.19614415, -0.18766157, -0.26707625, -0.5604937, 0.7839114, 0.0485765, 0.80459577, 0.59183276, -0.71499807, 1.7798047, 0.4038715)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00042934786, 0.0040140916, 0.050671868)
-body_offset = Transform3D(-0.00059429184, -0.9963349, -0.08553818, -0.00032166578, 0.08553827, -0.99633473, 0.9999996, -0.00056446716, -0.00037138537, 0.008333504, 0.050142646, 0.0004504323)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00015068884, 0.00405208, 0.050793972)
+body_offset = Transform3D(-0.00059429184, -0.9963349, -0.08553818, -0.00032166578, 0.08553827, -0.99633473, 0.9999996, -0.00056446716, -0.00037138537, 0.008381963, 0.05026114, 0.00017184019)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -1018,7 +1019,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_LeftLeg"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -1050,11 +1051,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_sjd32")
 
 [node name="Physical Bone mixamorig_LeftFoot" type="PhysicalBone3D" parent="Great Sword Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1841026667]
-transform = Transform3D(-0.93108565, -0.24113964, -0.27373564, -0.020368792, -0.71483517, 0.69899625, -0.36423156, 0.6564011, 0.66066104, 0.24755332, 0.5042102, -0.42797363)
+transform = Transform3D(-0.93108565, -0.24108206, -0.2737863, -0.020368792, -0.71498215, 0.6988459, -0.36423156, 0.6562621, 0.66079915, 0.24755332, 0.5042102, -0.42797363)
 collision_layer = 256
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0003420647, 0.0009058247, 0.1577904)
-body_offset = Transform3D(1.0000001, -7.852912e-06, 0.00013896823, 0.00013892353, -0.0022674203, -0.9999975, 8.21054e-06, 0.99999774, -0.0022676587, 0.000320144, 0.15779209, -0.0005480051)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00034206972, 0.0008726343, 0.15779056)
+body_offset = Transform3D(1.0000001, -7.852912e-06, 0.00013899803, 0.00013892353, -0.0020571053, -0.999998, 8.21054e-06, 0.9999981, -0.002057314, 0.000320144, 0.15779209, -0.0005480051)
 linear_damp_mode = 1
 linear_damp = 2.0
 angular_damp_mode = 1
@@ -1081,7 +1082,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_RightUpLeg"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -1123,7 +1124,7 @@ linear_damp = 2.0
 angular_damp_mode = 1
 angular_damp = 10.0
 bone_name = "mixamorig_RightLeg"
-joint_constraints/swing_span = 0.78539795
+joint_constraints/swing_span = 0.7853979
 joint_constraints/twist_span = 0.17453288
 joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
@@ -1215,6 +1216,7 @@ stats_component = NodePath("../StatsComponent")
 [node name="CombatFeedbackComponent" parent="." unique_id=2086975508 node_paths=PackedStringArray("health_component") instance=ExtResource("16_d5rth")]
 damage_text_scene = ExtResource("17_ob4i0")
 health_component = NodePath("../HealthComponent")
+flash_material = ExtResource("25_4rbck")
 
 [node name="EnemyMovementComponent" parent="." unique_id=280066399 instance=ExtResource("18_q4x8c")]
 
