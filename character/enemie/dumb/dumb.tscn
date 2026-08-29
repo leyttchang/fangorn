@@ -11,7 +11,6 @@
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="7_it7g2"]
 [ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="10_452es"]
 [ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="11_3atj7"]
-[ext_resource type="Material" uid="uid://c6b6apwu11ov8" path="res://particule/hit_effect/hit_material_overlay_shader.tres" id="12_g26vk"]
 [ext_resource type="PackedScene" uid="uid://bnq7s2tgri30i" path="res://components/EnemyMovementComponent.tscn" id="12_xfsm0"]
 [ext_resource type="PackedScene" uid="uid://mnnj3o8ilins" path="res://components/enemy_navigation_component.tscn" id="13_pta2e"]
 [ext_resource type="PackedScene" uid="uid://wefscg5hf58q" path="res://components/foot_step_component.tscn" id="15_qbcfw"]
@@ -51,6 +50,12 @@ height = 0.87939453
 radius = 0.16894531
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yqkk6"]
+radius = 0.2866211
+height = 0.5732422
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_holf7"]
+radius = 0.50097656
+height = 1.7110596
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_is52v"]
 animation = &"Death"
@@ -167,17 +172,38 @@ transform = Transform3D(1, 8.940697e-08, 0, -2.9802322e-08, 1, 0, 2.9802322e-08,
 shape = SubResource("CylinderShape3D_y7n3t")
 disabled = true
 
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=636485674]
+[node name="BoneAttachment3D2" type="BoneAttachment3D" parent="Orc/Armature/Skeleton3D" index="11" unique_id=367758779]
+transform = Transform3D(0.96741647, -0.07925345, -0.24046677, 0.25043085, 0.15968105, 0.95487493, -0.0372791, -0.98398215, 0.17432557, -0.13796373, 0.12846221, -1.6126665)
+bone_name = "mixamorig_Head"
+bone_idx = 5
 
-[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("3_lsk58")]
-collision_layer = 8
+[node name="HitboxComponent_head" parent="Orc/Armature/Skeleton3D/BoneAttachment3D2" unique_id=397696970 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("3_lsk58")]
+transform = Transform3D(0.9674165, 0.037279066, 0.25043097, -0.07925338, 0.98398215, 0.15968142, -0.24046673, -0.17432597, 0.9548751, 0.04117864, -1.6182822, 0.12528804)
 collision_mask = 0
-health_component = NodePath("../HealthComponent")
-knockback_component = NodePath("../knockback_componant")
+health_component = NodePath("../../../../../HealthComponent")
+knockback_component = NodePath("../../../../../knockback_componant")
+body_part_multiplier = 2.0
 
-[node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1151068, 0)
+[node name="CollisionShape3D" parent="Orc/Armature/Skeleton3D/BoneAttachment3D2/HitboxComponent_head" index="0" unique_id=1270273544]
+transform = Transform3D(1, 2.220446e-16, 0, 0, 1, 0, 0, 0, 1, -0.12970257, 1.7013352, 0.22917747)
 shape = SubResource("CapsuleShape3D_yqkk6")
+
+[node name="BoneAttachment3D3" type="BoneAttachment3D" parent="Orc/Armature/Skeleton3D" index="12" unique_id=2103603982]
+transform = Transform3D(0.5846369, -0.12328264, -0.8018735, 0.8112292, 0.10142231, 0.57586515, 0.010333717, -0.9871752, 0.15930569, -0.004756896, -0.004249974, -0.75108576)
+bone_name = "mixamorig_Hips"
+bone_idx = 0
+
+[node name="HitboxComponent" parent="Orc/Armature/Skeleton3D/BoneAttachment3D3" unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("3_lsk58")]
+transform = Transform3D(0.5846369, -0.01033398, 0.8112294, -0.12328262, 0.98717535, 0.10142269, -0.8018735, -0.15930595, 0.57586515, 0.013990248, -0.74160874, 0.118285246)
+collision_mask = 0
+health_component = NodePath("../../../../../HealthComponent")
+knockback_component = NodePath("../../../../../knockback_componant")
+
+[node name="CollisionShape3D" parent="Orc/Armature/Skeleton3D/BoneAttachment3D3/HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.01904869, 0.7766669, 0.1266371)
+shape = SubResource("CapsuleShape3D_holf7")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=636485674]
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=286116125]
 active = false
@@ -199,7 +225,6 @@ stats_component = NodePath("../StatsComponent")
 [node name="CombatFeedbackComponent" parent="." unique_id=2086975508 node_paths=PackedStringArray("health_component") instance=ExtResource("10_452es")]
 damage_text_scene = ExtResource("11_3atj7")
 health_component = NodePath("../HealthComponent")
-flash_material = ExtResource("12_g26vk")
 
 [node name="EnemyMovementComponent" parent="." unique_id=280066399 instance=ExtResource("12_xfsm0")]
 
@@ -226,4 +251,5 @@ health_component = NodePath("../HealthComponent")
 
 [editable path="Orc"]
 [editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]
-[editable path="HitboxComponent"]
+[editable path="Orc/Armature/Skeleton3D/BoneAttachment3D2/HitboxComponent_head"]
+[editable path="Orc/Armature/Skeleton3D/BoneAttachment3D3/HitboxComponent"]

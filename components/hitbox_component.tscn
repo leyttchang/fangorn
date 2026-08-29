@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://b8rqyj3g6sflt" path="res://components/hitbox_component.gd" id="1_4kxk5"]
 
 [node name="HitboxComponent" type="Area3D" unique_id=1957871218]
+collision_layer = 8
+collision_mask = 4
 script = ExtResource("1_4kxk5")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1270273544]

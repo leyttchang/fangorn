@@ -9,7 +9,7 @@ func _ready() -> void:
 	else:
 		push_warning("DamageScreenEffect: Aucun HealthComponent assigné dans l'inspecteur !")
 
-func _on_damage_taken(_amount: float) -> void:
+func _on_damage_taken(_amount: float, _is_critical: bool = false) -> void:
 	# On relance l'animation depuis le début si le joueur se prend un nouveau coup pendant qu'elle joue
 	animation_player.stop()
 	animation_player.play("hurt")

@@ -32,7 +32,7 @@ func _ready() -> void:
 	else:
 		push_warning("HurtSoundComponent sur " + get_parent().name + " : Aucun HealthComponent trouvé !")
 
-func _on_damage_taken(_amount: float) -> void:
+func _on_damage_taken(_amount: float, _is_critical: bool = false) -> void:
 	if hurt_sounds.is_empty():
 		return
 

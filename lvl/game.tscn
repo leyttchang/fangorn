@@ -169,6 +169,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 20, -9)
 chest_scene = ExtResource("15_apj7j")
 spawn_chance = 33.0
 
+[node name="dumb" parent="spawner" unique_id=888204308 instance=ExtResource("11_2ho30")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 23, -1)
+
 [node name="wave_display" parent="." unique_id=114584502 node_paths=PackedStringArray("smart_spawner") instance=ExtResource("12_2ho30")]
 smart_spawner = NodePath("../spawner/SmartSpawner")
 

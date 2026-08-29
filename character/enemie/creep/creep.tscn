@@ -190,14 +190,17 @@ bind/33/pose = Transform3D(0.2704164, 0.66304165, 0.6980335, 0.16076551, -0.7459
 height = 0.4567871
 radius = 0.10595703
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pebsk"]
+radius = 0.19140625
+height = 0.691864
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_gpqa7"]
+radius = 0.1458173
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_7d6k8"]
 _data = {
 &"mixamo_com": ExtResource("4_iqf77")
 }
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pebsk"]
-radius = 0.34814453
-height = 0.9960327
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xhm4c"]
 properties/0/path = NodePath("HealthComponent:current_health")
@@ -310,6 +313,35 @@ transform = Transform3D(1, 0, 2.3692846e-06, 0, 1, 4.917383e-07, 7.450581e-09, -
 shape = SubResource("CylinderShape3D_0vvj6")
 disabled = true
 
+[node name="BoneAttachment3D2" type="BoneAttachment3D" parent="goblin/Skeleton3D" index="2" unique_id=349476710]
+transform = Transform3D(0.49952292, 0.09058226, -0.86155194, -0.007723339, 0.9949445, 0.100129, 0.8662663, -0.04336267, 0.49769717, 0.00014677644, 0.014536142, -0.00025467202)
+bone_name = "mixamorig_Hips"
+bone_idx = 0
+
+[node name="HitboxComponent" parent="goblin/Skeleton3D/BoneAttachment3D2" unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("7_kqj36")]
+transform = Transform3D(0.4995229, -0.0077233417, 0.8662662, 0.09058225, 0.99494445, -0.04336267, -0.8615519, 0.10012899, 0.49769714, -0.00033893465, 0.06261332, 0.00655692)
+collision_mask = 0
+health_component = NodePath("../../../../HealthComponent")
+knockback_component = NodePath("../../../../knockback_componant")
+
+[node name="CollisionShape3D" parent="goblin/Skeleton3D/BoneAttachment3D2/HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03248211, 0)
+shape = SubResource("CapsuleShape3D_pebsk")
+
+[node name="BoneAttachment3D3" type="BoneAttachment3D" parent="goblin/Skeleton3D" index="3" unique_id=97568024]
+transform = Transform3D(0.9553312, -0.017904505, -0.29499468, -0.04568973, 0.9772149, -0.2072762, 0.29198447, 0.21149568, 0.9327458, 0.0043019727, 0.33611, 0.014487833)
+bone_name = "mixamorig_Head"
+bone_idx = 5
+
+[node name="HitboxComponent" parent="goblin/Skeleton3D/BoneAttachment3D3" unique_id=2116933697 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("7_kqj36")]
+health_component = NodePath("../../../../HealthComponent")
+knockback_component = NodePath("../../../../knockback_componant")
+body_part_multiplier = 2.0
+
+[node name="CollisionShape3D" parent="goblin/Skeleton3D/BoneAttachment3D3/HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1, 0, 0, 0, 1, 7.4505806e-08, 0, 1.4901161e-08, 1, 0.023009596, 0.16784394, 0.064328715)
+shape = SubResource("SphereShape3D_gpqa7")
+
 [node name="AnimationPlayer" parent="goblin" index="1" unique_id=1295641825]
 libraries/ = SubResource("AnimationLibrary_7d6k8")
 
@@ -320,17 +352,6 @@ tree_root = ExtResource("6_6beev")
 anim_player = NodePath("../CreepAnimPlayer")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1344602596]
-
-[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("7_kqj36")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07749208, 0)
-collision_layer = 8
-collision_mask = 0
-health_component = NodePath("../HealthComponent")
-knockback_component = NodePath("../knockback_componant")
-
-[node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11960224, 0)
-shape = SubResource("CapsuleShape3D_pebsk")
 
 [node name="StatsComponent" type="Node3D" parent="." unique_id=74326260]
 script = ExtResource("8_7rjk6")
@@ -376,4 +397,5 @@ libraries/ = SubResource("AnimationLibrary_eghwk")
 
 [editable path="goblin"]
 [editable path="goblin/Skeleton3D/BoneAttachment3D/daguer_pose/AttackComponent"]
-[editable path="HitboxComponent"]
+[editable path="goblin/Skeleton3D/BoneAttachment3D2/HitboxComponent"]
+[editable path="goblin/Skeleton3D/BoneAttachment3D3/HitboxComponent"]

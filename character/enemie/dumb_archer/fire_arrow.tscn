@@ -136,7 +136,7 @@ mesh = SubResource("CylinderMesh_hlie2")
 
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_xvqqq")]
 collision_layer = 16
-collision_mask = 138
+collision_mask = 139
 base_damage = 20.0
 destroy_on_environment = true
 is_projectile = true

@@ -114,6 +114,7 @@ destroy_on_environment = true
 knockback_force = 2.0
 is_projectile = true
 status_effects_to_apply = Array[ExtResource("3_pijyb")]([SubResource("Resource_0ifye")])
+can_headshot = true
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(0.3, 0, 0, 0, -1.3113417e-08, -0.3, 0, 0.3, -1.3113417e-08, 0, 0, 0.2)

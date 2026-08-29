@@ -18,10 +18,22 @@ var damage_lightning: float = 0.0
 
 @export_group("Status Effects")
 @export var status_effects_to_apply: Array[StatusEffectApplication] = []
+
+@export_group("Headshots")
+@export var can_headshot: bool = false # Faux par defaut (sorts/explosions). A cocher pour armes/fleches.
+
+@export_group("Friendly Fire")
+@export var ignore_caster: bool = true # Vrai pour que la fleche ne blesse pas le tireur
+
 signal attack_landed(target)
 
-var hit_entities: Array[Area3D] = []
+# MODIFIE : On utilise Array[Node] au lieu de Area3D pour pouvoir stocker le monstre et pas juste sa hitbox
+var hit_entities: Array[Node] = []
 var is_active_for_network: bool = true
+var caster: Node3D = null # Reference a l'entite qui a lance cette attaque
+
+func on_execute(in_caster: Node3D, target_data: Dictionary) -> void:
+	caster = in_caster
 
 func _ready() -> void:
 	# Par dfaut (sans SpellScalingComponent), 100% des dgts sont physiques
@@ -54,10 +66,18 @@ func _ready() -> void:
 func _on_area_entered(area: Area3D) -> void:
 	if not is_active_for_network: return
 	if area is HitboxComponent:
-		if hit_entities.has(area):
+		# On cherche le monstre entier (le parent ou le owner)
+		var entity = area.owner if area.owner != null else area.get_parent()
+		
+		# On evite que le tireur se blesse lui-meme avec sa propre fleche/sort
+		if ignore_caster and caster != null and entity == caster:
+			return
+		
+		# Si on a deja frappe ce monstre (peu importe sur quelle Hitbox), on annule !
+		if hit_entities.has(entity):
 			return
 			
-		hit_entities.append(area)
+		hit_entities.append(entity)
 		if area.has_method("receive_hit"):
 			area.receive_hit(self)
 			

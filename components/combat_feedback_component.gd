@@ -41,8 +41,8 @@ func _ready() -> void:
 	else:
 		push_warning("CombatFeedbackComponent sur " + get_parent().name + " : Pas de HealthComponent assigné !")
 
-func _on_damage_taken(amount: float) -> void:
-	# Joue le son d'impact 3D uniquement si activé
+func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
+	# Joue le son d'impact 3D uniquement si active
 	if play_impact_sound and get_parent() is Node3D:
 		var sound_to_play: AudioStream = null
 		if not hit_sounds.is_empty():
@@ -55,7 +55,7 @@ func _on_damage_taken(amount: float) -> void:
 	if damage_text_scene != null:
 		if is_instance_valid(_active_text):
 			var pos = get_parent().global_position + Vector3(0, spawn_height, 0)
-			_active_text.add_damage(amount, pos)
+			_active_text.add_damage(amount, pos, is_critical)
 		else:
 			if CombatFeedbackComponent._texts_spawned_this_frame < 5:
 				CombatFeedbackComponent._texts_spawned_this_frame += 1
@@ -63,7 +63,7 @@ func _on_damage_taken(amount: float) -> void:
 				_active_text = damage_text_scene.instantiate()
 				get_tree().root.add_child(_active_text)
 				_active_text.global_position = get_parent().global_position + Vector3(0, spawn_height, 0)
-				_active_text.start_animation(amount)
+				_active_text.start_animation(amount, is_critical)
 				
 				if not CombatFeedbackComponent._frame_reset_active and get_tree() != null:
 					CombatFeedbackComponent._reset_counter_next_frame(get_tree())

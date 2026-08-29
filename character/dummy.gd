@@ -54,16 +54,15 @@ func _physics_process(delta: float) -> void:
 	# velocity.z = lerp(velocity.z, 0.0, 5.0 * delta)
 
 
-func _on_damage_taken(amount: float) -> void:
+func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
 	if is_instance_valid(_active_text):
 		var pos = global_position
-		pos.y += 1.0
-		_active_text.add_damage(amount, pos)
+		_active_text.add_damage(amount, pos, is_critical)
 	else:
 		_active_text = damage_text_scene.instantiate()
 		add_child(_active_text)
 		_active_text.position.y = 1.0 
-		_active_text.start_animation(amount)
+		_active_text.start_animation(amount, is_critical)
 	
 	total_damage_taken += amount
 	

@@ -16,6 +16,7 @@ script = ExtResource("1_gn7bg")
 collision_layer = 4
 collision_mask = 8
 knockback_force = 10.0
+can_headshot = true
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

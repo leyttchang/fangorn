@@ -170,5 +170,5 @@ func _on_died() -> void:
 	# get_tree().quit()
 
 
-func _on_damage_taken(amount: float) -> void:
+func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")

@@ -4,6 +4,9 @@ extends Area3D
 @export var health_component: HealthComponent
 @export var knockback_component: KnockbackComponent # NOUVEAU
 
+@export_group("Headshots & Body Parts")
+@export var body_part_multiplier: float = 1.0 # 1.0 pour le corps, 2.0 pour la tete, etc.
+
 @export_group("Mitigation (Armure & Resistances)")
 @export var armor_curve: Curve = preload("res://components/stats/armor_curve.tres")
 @export var max_expected_armor: float = 500.0
@@ -66,7 +69,16 @@ func receive_hit(attack: AttackComponent) -> void:
 			dmg_lightning *= (1.0 - max(0.0, res_lightning))
 		
 		var total_damage = (dmg_phys + dmg_fire + dmg_ice + dmg_lightning) * damage_taken_mult
-		health_component.take_damage(total_damage)
+		
+		var is_headshot = false
+		# NOUVEAU : Application du multiplicateur de Headshot
+		if attack.get("can_headshot") != false:
+			total_damage *= body_part_multiplier
+			if body_part_multiplier > 1.0:
+				is_headshot = true
+				print("HEADSHOT ! Degats multiplies par ", body_part_multiplier)
+				
+		health_component.take_damage(total_damage, is_headshot)
 
 	# 3. Application des Status Effects
 	if "status_effects_to_apply" in attack and attack.status_effects_to_apply.size() > 0:

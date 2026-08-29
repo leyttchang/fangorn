@@ -4,7 +4,7 @@ extends Node
 # --- SIGNAUX ---
 signal health_changed(current_health: float, max_health: float)
 signal died
-signal damage_taken(amount: float)
+signal damage_taken(amount: float, is_critical: bool)
 
 # --- DPENDANCES ---
 @export var stats_component: StatsComponent
@@ -31,11 +31,11 @@ func _ready() -> void:
 	stats_component.stat_changed.connect(_on_stat_changed)
 
 # Fonction appele quand une arme ou un sort touche ce personnage
-func take_damage(raw_damage: float) -> void:
+func take_damage(raw_damage: float, is_critical: bool = false) -> void:
 
 	if not owner.is_multiplayer_authority():
 		# Ce n'est pas mon entite ! Je demande au proprietaire d'appliquer les degats
-		rpc_id(owner.get_multiplayer_authority(), "_rpc_take_damage", raw_damage)
+		rpc_id(owner.get_multiplayer_authority(), "_rpc_take_damage", raw_damage, is_critical)
 		return
 	if current_health <= 0:
 		return
@@ -45,8 +45,8 @@ func take_damage(raw_damage: float) -> void:
 	
 	# 4. On applique les dgts
 	current_health -= final_damage
-	damage_taken.emit(final_damage)
-	rpc("_rpc_broadcast_damage", final_damage)
+	damage_taken.emit(final_damage, is_critical)
+	rpc("_rpc_broadcast_damage", final_damage, is_critical)
 	
 	# On s'assure que la vie ne descend pas en dessous de zro
 	# --- MCANIQUE CHEAT DEATH (Ignore Death) ---
@@ -117,10 +117,10 @@ func heal(amount: float) -> void:
 
 
 @rpc("authority", "call_remote", "reliable")
-func _rpc_broadcast_damage(final_damage: float) -> void:
-	damage_taken.emit(final_damage)
+func _rpc_broadcast_damage(final_damage: float, is_critical: bool = false) -> void:
+	damage_taken.emit(final_damage, is_critical)
 
 @rpc("any_peer", "call_local", "reliable")
-func _rpc_take_damage(raw_damage: float) -> void:
+func _rpc_take_damage(raw_damage: float, is_critical: bool = false) -> void:
 	if owner.is_multiplayer_authority():
-		take_damage(raw_damage)
+		take_damage(raw_damage, is_critical)
