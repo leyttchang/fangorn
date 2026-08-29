@@ -79,21 +79,21 @@ func take_damage(raw_damage: float) -> void:
 # =========================================================
 func _on_stat_changed(stat_name: String, new_value: float) -> void:
 	if stat_name == "max_health":
-		# On calcule combien de vie max on vient de gagner (ou perdre)
-		var difference = new_value - _known_max_health
-		
-		# Si on gagne de la vie max (ex: on quipe l'armure de 10 000 PV)
-		if difference > 0:
-			current_health += difference # On soigne le joueur du montant gagn
+		if _known_max_health > 0:
+			# Pour viter l'exploit d'equipement/desequipement en boucle,
+			# on garde le meme POURCENTAGE de vie !
+			var health_percent = current_health / _known_max_health
+			current_health = new_value * health_percent
+		else:
+			current_health = new_value
 			
-		# Si on perd de la vie max (ex: on retire l'armure)
-		# On s'assure juste que la vie actuelle ne dpasse pas le nouveau plafond
+		# On s'assure juste que la vie actuelle ne dpasse pas le nouveau plafond (securite)
 		current_health = min(current_health, new_value)
 		
-		# On met  jour notre mmoire pour la prochaine fois
+		# On met a jour notre mmoire pour la prochaine fois
 		_known_max_health = new_value
 		
-		# On met  jour l'interface !
+		# On met a jour l'interface !
 		health_changed.emit(current_health, new_value)
 
 # --- FONCTIONS POUR LE BLOOD MAGIC (RENOUNCEMENT) ---
