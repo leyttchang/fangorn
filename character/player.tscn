@@ -21,8 +21,10 @@
 [ext_resource type="PackedScene" uid="uid://xrakqsxxmvxk" path="res://components/inventory_component.tscn" id="13_ps75u"]
 [ext_resource type="PackedScene" uid="uid://cly4pui7duo3p" path="res://particule/screen_vfx/damage_screen_effect.tscn" id="13_r5ovt"]
 [ext_resource type="PackedScene" uid="uid://3fxtotgty5mn" path="res://components/equipment_component.tscn" id="14_3u2u7"]
+[ext_resource type="PackedScene" uid="uid://vo8biim8gcvc" path="res://components/weapon_impact_componant.tscn" id="14_jekax"]
 [ext_resource type="Script" uid="uid://bld6nuxn07jod" path="res://character/loot_cast.gd" id="15_2o2rg"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
+[ext_resource type="PackedScene" uid="uid://bs0k0q7fq1bbi" path="res://particule/blood/blood_particule.tscn" id="15_uy1o2"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
 [ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="21_ynykn"]
@@ -1154,12 +1156,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999773, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335453, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.99997723, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335453, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
 
 [node name="TestSword" parent="Camera3D/MainDroite" unique_id=2020783524 instance=ExtResource("12_pn6xv")]
+
+[node name="weapon_impact_componant" parent="Camera3D/MainDroite" unique_id=226347209 node_paths=PackedStringArray("raycast", "main_droite") instance=ExtResource("14_jekax")]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+raycast = NodePath("RayCast3D")
+blood_particles_scene = ExtResource("15_uy1o2")
+main_droite = NodePath("..")
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=729055229]
 target_position = Vector3(0, 0, -50)
@@ -1360,5 +1368,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5185547, 0)
 billboard = 1
 no_depth_test = true
 
+[editable path="Camera3D/MainDroite/weapon_impact_componant"]
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

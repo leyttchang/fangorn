@@ -110,9 +110,15 @@ func get_current_attack_speed() -> float:
 			
 	return max(final_speed, 0.1)
 
+func _get_actual_weapon() -> Node3D:
+	for child in get_children():
+		if child.name != "weapon_impact_componant" and not child is WeaponImpactComponent:
+			return child
+	return null
+
 func start_attack():
-	if get_child_count() == 0: return
-	current_weapon = get_child(0)
+	current_weapon = _get_actual_weapon()
+	if current_weapon == null: return
 	var attack_shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
 	if attack_shape == null: return
 		
@@ -120,10 +126,12 @@ func start_attack():
 	last_click_time = 0
 	combo_step = 1
 	
-	current_weapon.attack_component.reset_hit_entities() 
-	current_weapon.update_damage_from_stats(player_stats, combo_step)
+	if "attack_component" in current_weapon and current_weapon.attack_component != null:
+		current_weapon.attack_component.reset_hit_entities() 
+	if current_weapon.has_method("update_damage_from_stats"):
+		current_weapon.update_damage_from_stats(player_stats, combo_step)
 	
-	var equipped_item = equipment.equipped_items["main_hand"] as WeaponItem
+	var equipped_item = equipment.equipped_items.get("main_hand") as WeaponItem
 	if equipped_item == null: return
 	var style_string = WeaponItem.WeaponStyle.keys()[equipped_item.weapon_style].to_lower()
 	var anim_name = "attack_" + style_string + "_1"
@@ -132,37 +140,40 @@ func start_attack():
 	anim_tree.set("parameters/TimeScale/scale", get_current_attack_speed())
 	anim_playback.travel(anim_name)
 
-# Fonction appelÃ©e par le SkillBarComponent
+# Fonction appelee par le SkillBarComponent
 func start_heavy_attack():
-	if get_child_count() == 0: return
-	current_weapon = get_child(0)
+	current_weapon = _get_actual_weapon()
+	if current_weapon == null: return
 	var attack_shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
 	if attack_shape == null: return
 		
 	is_attacking = true
 	last_click_time = 0
 	combo_step = 1
-	current_weapon.attack_component.reset_hit_entities() 
-	current_weapon.update_damage_from_stats(player_stats, combo_step)
 	
-	var equipped_item = equipment.equipped_items["main_hand"] as WeaponItem
+	if "attack_component" in current_weapon and current_weapon.attack_component != null:
+		current_weapon.attack_component.reset_hit_entities() 
+	if current_weapon.has_method("update_damage_from_stats"):
+		current_weapon.update_damage_from_stats(player_stats, combo_step)
+	
+	var equipped_item = equipment.equipped_items.get("main_hand") as WeaponItem
 	if equipped_item == null: return
 	var style_string = WeaponItem.WeaponStyle.keys()[equipped_item.weapon_style].to_lower()
 	var anim_name = "heavy_slam_" + style_string
-	
 	anim_tree.set("parameters/TimeScale/scale", get_current_attack_speed())
 	anim_playback.travel(anim_name)
 
 func enable_current_hitbox():
 	# Si l'arme n'est pas encore liee, on le fait maintenant
-	if current_weapon == null and get_child_count() > 0:
-		current_weapon = get_child(0)
+	if current_weapon == null:
+		current_weapon = _get_actual_weapon()
 		
 	if is_instance_valid(current_weapon):
 		# On recalcule les degats systematiquement (comme ca, meme lance via un sort, ca tape juste !)
-		current_weapon.update_damage_from_stats(player_stats, combo_step)
+		if current_weapon.has_method("update_damage_from_stats"):
+			current_weapon.update_damage_from_stats(player_stats, combo_step)
 		
-		var ac = current_weapon.attack_component
+		var ac = current_weapon.get("attack_component")
 		if ac != null and not ac.attack_landed.is_connected(_on_weapon_hit):
 			ac.attack_landed.connect(_on_weapon_hit)
 		var shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")

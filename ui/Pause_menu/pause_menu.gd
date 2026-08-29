@@ -4,7 +4,6 @@ extends CanvasLayer
 @export var debug_spawners: Array[Node] = []
 
 @onready var resume_btn: Button = $Panel/VBoxContainer/Button
-@onready var options_btn: Button = $Panel/VBoxContainer/Button2
 @onready var spawn_btn: Button = $Panel/VBoxContainer/Button3
 @onready var quit_btn: Button = $Panel/VBoxContainer/Button4
 @onready var debug_btn: Button = $Panel/VBoxContainer/Button5

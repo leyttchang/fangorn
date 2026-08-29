@@ -4,6 +4,7 @@ extends RigidBody3D
 @export var stick_duration: float = 10.0
 
 @onready var attack_component: AttackComponent = $AttackComponent
+@export var visual_mesh: Node3D
 
 var _has_impacted: bool = false
 
@@ -24,6 +25,8 @@ func execute(caster: Node3D, target_data: Dictionary) -> void:
 		if child.has_method("on_execute"):
 			child.on_execute(caster, target_data)
 
+@onready var anim_player = get_node_or_null("AnimationPlayer")
+
 func _on_attack_landed(target: Node) -> void:
 	if _has_impacted:
 		return
@@ -36,13 +39,7 @@ func _on_attack_landed(target: Node) -> void:
 	elif target is CharacterBody3D:
 		is_character = true
 
-	if is_character:
-		# Si on touche un personnage (joueur ou autre), la flche se dtruit immdiatement
-		if is_inside_tree() and multiplayer.is_server():
-			queue_free()
-		return
-
-	# 1. Stopper la physique et dsactiver la collision principale du projectile (si on touche le dcor)
+	# 1. On stoppe la flèche dans tous les cas
 	freeze = true
 	sleeping = true
 	linear_velocity = Vector3.ZERO
@@ -53,13 +50,28 @@ func _on_attack_landed(target: Node) -> void:
 	if col != null:
 		col.set_deferred("disabled", true)
 
-	# 2. Dsactiver la Hurtbox / AttackComponent pour viter d'infliger des dgts  nouveau
+	# 2. Dsactiver la Hurtbox / AttackComponent pour viter d'infliger des dgts a nouveau
 	if attack_component != null:
 		attack_component.set_deferred("monitoring", false)
 		attack_component.set_deferred("monitorable", false)
 		var attack_col = attack_component.get_node_or_null("CollisionShape3D") as CollisionShape3D
 		if attack_col != null:
 			attack_col.set_deferred("disabled", true)
+
+	if is_character:
+		# On cache la fleche pour qu'elle ne flotte pas dans l'air
+		if visual_mesh != null:
+			visual_mesh.hide()
+			
+		# Jouer l'animation "hit"
+		if anim_player != null and anim_player.has_animation("hit"):
+			anim_player.play("hit")
+			
+		# On attend la fin de l'animation de sang (ex: 1 seconde) avant de dtruire la flche
+		await get_tree().create_timer(1.0).timeout 
+		if is_inside_tree() and multiplayer.is_server():
+			queue_free()
+		return
 
 	# 3. Faire disparatre la flche aprs 10 secondes (si elle est dans un mur)
 	await get_tree().create_timer(stick_duration).timeout

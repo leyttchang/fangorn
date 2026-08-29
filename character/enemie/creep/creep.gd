@@ -210,7 +210,11 @@ func _am_i_behind_player() -> bool:
 # A APPELER DEPUIS L'ANIMATION "stab" AVEC UN CALL METHOD TRACK :
 
 func enable_hitbox() -> void:
-	if attack_shape: attack_shape.disabled = false
+	if attack_shape: 
+		attack_shape.disabled = false
+		var attack_comp = attack_shape.get_parent()
+		if attack_comp.has_method("reset_hit_entities"):
+			attack_comp.reset_hit_entities()
 	
 func disable_hitbox() -> void:
 	if attack_shape: attack_shape.disabled = true

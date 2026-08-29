@@ -32,7 +32,8 @@ func _on_equipment_changed(slot_name: String, item: ItemData) -> void:
 		
 		# 1. On detruit l'ancienne arme (s'il y en a une)
 		for child in main_droite.get_children():
-			child.queue_free()
+			if not child is WeaponImpactComponent and child.name != "weapon_impact_componant":
+				child.queue_free()
 			
 		# 2. Si on a juste desequipe (mains nues), on s'arrete la
 		if item == null or item.get("weapon_scene") == null:
@@ -56,7 +57,8 @@ func _on_equipment_changed(slot_name: String, item: ItemData) -> void:
 func _rpc_update_visual_weapon(resource_path: String) -> void:
 	# 1. On detruit l'ancienne arme
 	for child in main_droite.get_children():
-		child.queue_free()
+		if not child is WeaponImpactComponent and child.name != "weapon_impact_componant":
+			child.queue_free()
 		
 	# 2. Si mains nues
 	if resource_path == "":
