@@ -153,8 +153,8 @@ start_spawn_time = 1.0
 
 [node name="SmartSpawner" parent="spawner" unique_id=1089854815 node_paths=PackedStringArray("beacon_spawn_point") instance=ExtResource("10_6i2mx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.60695, -20.34161)
-monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("11_2ho30"), ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("9_1eb17"), ExtResource("9_1eb17"), ExtResource("11_2ho30"), ExtResource("19_bqr07"), ExtResource("8_bqr07")])
-initial_wave_count = 1
+monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("19_bqr07"), ExtResource("8_bqr07")])
+monster_costs = Array[int]([5, 8, 25, 30])
 delay_between_waves = 10.0
 time_between_spawns = 0.2
 spawn_radius = 70.0

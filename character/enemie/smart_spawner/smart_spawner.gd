@@ -8,11 +8,13 @@ signal enemy_spawned(enemy: Node3D)
 
 # --- TYPES D'ENNEMIS ---
 @export var monster_types: Array[PackedScene] = []
+## Les couts des monstres (doit etre dans le meme ordre que monster_types). Par defaut = 10
+@export var monster_costs: Array[int] = []
 
 # --- CONFIGURATION DES VAGUES ---
 @export_group("Configuration Vagues")
-@export var initial_wave_count: int = 5
-@export var enemies_increase_per_wave: int = 2
+@export var initial_wave_credits: int = 50
+@export var credits_increase_per_wave: int = 20
 @export var delay_between_waves: float = 3.0
 @export var time_between_spawns: float = 0.3
 @export var spawn_radius: float = 10.0
@@ -28,7 +30,7 @@ signal enemy_spawned(enemy: Node3D)
 var current_wave: int = 0
 var active_enemies: Array[Node3D] = []
 var is_spawning_wave: bool = false
-var enemies_left_to_spawn: int = 0
+var credits_left_to_spawn: int = 0
 
 var is_paused: bool = false
 var _waiting_to_spawn: bool = false
@@ -43,8 +45,8 @@ func _ready() -> void:
 			get_tree().create_timer(1.0).timeout.connect(_spawn_beacon)
 
 @rpc("authority", "call_local", "reliable")
-func rpc_wave_started(wave_number: int, total_enemies: int) -> void:
-	wave_started.emit(wave_number, total_enemies)
+func rpc_wave_started(wave_number: int, total_credits: int) -> void:
+	wave_started.emit(wave_number, total_credits)
 
 @rpc("authority", "call_local", "reliable")
 func rpc_wave_completed(wave_number: int) -> void:
@@ -70,13 +72,25 @@ func start_next_wave() -> void:
 	active_enemies.clear()
 	is_spawning_wave = true
 	
-	# Calcul du nombre d'ennemis pour cette vague
-	enemies_left_to_spawn = initial_wave_count + (current_wave - 1) * enemies_increase_per_wave
+	# Calcul des credits pour cette vague
+	credits_left_to_spawn = initial_wave_credits + (current_wave - 1) * credits_increase_per_wave
 	
-	rpc("rpc_wave_started", current_wave, enemies_left_to_spawn)
-	print("--- DÉBUT DE LA VAGUE " + str(current_wave) + " (" + str(enemies_left_to_spawn) + " ennemis) ---")
+	rpc("rpc_wave_started", current_wave, credits_left_to_spawn)
+	print("--- DÉBUT DE LA VAGUE " + str(current_wave) + " (" + str(credits_left_to_spawn) + " crédits restants) ---")
 	
 	_spawn_next_enemy_in_wave()
+
+func _get_affordable_monsters() -> Array:
+	var affordable = []
+	for i in range(monster_types.size()):
+		if monster_types[i] == null: continue
+		var cost = 10
+		if i < monster_costs.size():
+			cost = monster_costs[i]
+		
+		if cost <= credits_left_to_spawn:
+			affordable.append({"scene": monster_types[i], "cost": cost})
+	return affordable
 
 func _spawn_next_enemy_in_wave() -> void:
 	if not is_inside_tree(): return
@@ -85,29 +99,28 @@ func _spawn_next_enemy_in_wave() -> void:
 		_waiting_to_spawn = true
 		return
 	
-	if enemies_left_to_spawn <= 0:
+	var affordable = _get_affordable_monsters()
+	
+	# S'il n'y a plus de credits ou qu'on ne peut plus rien acheter
+	if credits_left_to_spawn <= 0 or affordable.is_empty():
 		is_spawning_wave = false
 		_check_wave_completion()
 		return
 		
-	_spawn_single_enemy()
-	enemies_left_to_spawn -= 1
+	# On achete un monstre aleatoire parmi ceux qu'on a les moyens de s'offrir
+	var choice = affordable.pick_random()
+	_spawn_single_enemy(choice.scene)
 	
-	if enemies_left_to_spawn > 0:
-		var tree = get_tree()
-		if tree != null:
-			tree.create_timer(time_between_spawns).timeout.connect(_spawn_next_enemy_in_wave)
-	else:
-		is_spawning_wave = false
-		_check_wave_completion()
+	credits_left_to_spawn -= choice.cost
+	print("Achat d'un monstre pour ", choice.cost, " crédits. Reste: ", credits_left_to_spawn)
+	
+	# On attend et on lance le prochain achat
+	var tree = get_tree()
+	if tree != null:
+		tree.create_timer(time_between_spawns).timeout.connect(_spawn_next_enemy_in_wave)
 
-func _spawn_single_enemy() -> void:
-	if not is_inside_tree(): return
-	if monster_types.is_empty(): return
-	
-	# Tirage au sort du type d'ennemi
-	var enemy_scene: PackedScene = monster_types.pick_random()
-	if enemy_scene == null: return
+func _spawn_single_enemy(enemy_scene: PackedScene) -> void:
+	if not is_inside_tree() or enemy_scene == null: return
 	
 	var enemy_instance: Node3D = enemy_scene.instantiate() as Node3D
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
@@ -148,7 +161,7 @@ func _check_wave_completion() -> void:
 	active_enemies = active_enemies.filter(func(e): return is_instance_valid(e) and e.is_inside_tree())
 	
 	# Si la vague a fini de spawner ET qu'il n'y a plus d'ennemi actif dans cette vague
-	if not is_spawning_wave and enemies_left_to_spawn <= 0 and active_enemies.is_empty():
+	if not is_spawning_wave and active_enemies.is_empty():
 		print("--- VAGUE " + str(current_wave) + " TERMINÉE ! ---")
 		rpc("rpc_wave_completed", current_wave)
 		
