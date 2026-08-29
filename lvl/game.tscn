@@ -151,10 +151,10 @@ start_spawn_time = 1.0
 [node name="SmartSpawner" parent="spawner" unique_id=1089854815 node_paths=PackedStringArray("beacon_spawn_point") instance=ExtResource("10_6i2mx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.60695, -20.34161)
 monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("19_bqr07"), ExtResource("8_bqr07")])
-monster_costs = Array[int]([5, 8, 25, 30])
+monster_costs = Array[int]([5, 10, 25, 30])
 delay_between_waves = 10.0
 time_between_spawns = 0.2
-spawn_radius = 70.0
+spawn_radius = 60.0
 beacon_scene = ExtResource("16_ssq7y")
 beacon_spawn_point = NodePath("start_beacon")
 
@@ -179,9 +179,6 @@ process_mode = 3
 visible = false
 mob_spawner = NodePath("../spawner/SmartSpawner")
 debug_spawners = [NodePath("../spawner/dumb_spawner6"), NodePath("../spawner/dumb_spawner5"), NodePath("../spawner/dumb_spawner4"), NodePath("../spawner/dumb_spawner3"), NodePath("../spawner/dumb_spawner2"), NodePath("../spawner/dumb_spawner")]
-
-[node name="Scout" parent="." unique_id=1082760754 instance=ExtResource("19_bqr07")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 22, -1)
 
 [editable path="Map1T3d"]
 [editable path="Map1T3d/island_tree/island_tree19"]

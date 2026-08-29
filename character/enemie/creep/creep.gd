@@ -56,6 +56,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= gravity * delta
 
 	if current_state == State.DEAD:
+		_stop_movement(delta)
 		move_and_slide()
 		return
 		
