@@ -35,6 +35,7 @@ static func get_all_affixes() -> Array[AffixData]:
 			preload("res://item/affixes/affix_area_of_effect.tres"),
 			preload("res://item/affixes/affix_knockback_resistance.tres"),
 			preload("res://item/affixes/affix_casting_speed.tres"),
+			preload("res://item/affixes/affix_knockback_power.tres"),
 			preload("res://item/affixes/affix_max_mana.tres"),
 			preload("res://item/affixes/affix_mana_regen.tres")
 		]
@@ -51,10 +52,15 @@ static func get_all_bases() -> Array[EquipmentItem]:
 			preload("res://item/armes/starting_sword.tres"),
 			#preload("res://item/armures/chest_armor.tres"),
 			preload("res://item/armures/chest/heavy_armor.tres"),
+			preload("res://item/armures/chest/hunter_chest_armor.tres"),
 			preload("res://item/armures/feet/heavy_boots.tres"),
+			preload("res://item/armures/feet/hunter_boots.tres"),
 			preload("res://item/armures/head/heavy_helmet.tres"),
+			preload("res://item/armures/head/hunter_helmet.tres"),
 			preload("res://item/armures/legs/heavy_pants.tres"),
-			preload("res://item/armures/gloves/heavy_gloves.tres")
+			preload("res://item/armures/legs/hunter_pants.tres"),
+			preload("res://item/armures/gloves/heavy_gloves.tres"),
+			preload("res://item/armures/gloves/hunter_gloves.tres")
 		]
 	return _all_bases
 

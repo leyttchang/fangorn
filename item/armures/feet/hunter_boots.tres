@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://d3h3x4y506a7b"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_i0w75"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_drkvl"]
+[ext_resource type="Resource" uid="uid://dag3t06rnv3nc" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
+[ext_resource type="Resource" uid="uid://boq6jv60rpvh4" path="res://item/affixes/affix_movement_speed.tres" id="3_wbad7"]
+[ext_resource type="Texture2D" uid="uid://cp5auvodww7vo" path="res://assets/icon/rpg_icon/Icon222.png" id="4_ucki4"]
+
+[resource]
+script = ExtResource("2_drkvl")
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(1, 4),
+"attack_speed": Vector2(0, 0),
+"casting_speed": Vector2(0, 0),
+"cd_red": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(0, 0),
+"movement_speed": Vector2(0.07, 0.17),
+"physical_damage": Vector2(0.02, 0.05)
+}
+excluded_affixes = Array[ExtResource("1_i0w75")]([ExtResource("2_o6cl8"), ExtResource("3_wbad7")])
+id = "hunters_boots"
+item_name = "Hunter's Boots"
+description = ""
+icon = ExtResource("4_ucki4")
+item_type = 3
+metadata/_custom_type_script = "uid://b6114jo5bnldt"
