@@ -14,7 +14,7 @@ enum Rarity { COMMON, MAGIC, RARE, LEGENDARY }
 @export var ilvl: int = 1
 
 # --- CATÉGORISATION ---
-enum ItemType { main_hand, chest, legs, feet, head }
+enum ItemType { main_hand, chest, legs, feet, head, hands }
 @export var item_type: ItemType = ItemType.main_hand
 
 # 2. Catégorisation du style de l'arme (pour l'AnimationPlayer)

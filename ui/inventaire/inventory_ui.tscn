@@ -55,7 +55,7 @@ offset_bottom = -327.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="equipment_slot" parent="MainPanel/equipe" unique_id=178112762 instance=ExtResource("3_sitvp")]
+[node name="equipment_weapon_1" parent="MainPanel/equipe" unique_id=178112762 instance=ExtResource("3_sitvp")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,8 +64,23 @@ offset_left = 80.0
 offset_top = 66.0
 offset_right = -356.0
 offset_bottom = -77.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="equipment_slot2" parent="MainPanel/equipe" unique_id=206346114 instance=ExtResource("3_sitvp")]
+[node name="equipment_weapon_2" parent="MainPanel/equipe" unique_id=1527176722 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 378.0
+offset_top = 66.0
+offset_right = -58.0
+offset_bottom = -77.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "second_weapon"
+
+[node name="equipment_slot_head" parent="MainPanel/equipe" unique_id=206346114 instance=ExtResource("3_sitvp")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -78,7 +93,7 @@ grow_horizontal = 2
 grow_vertical = 2
 slot_name = "head"
 
-[node name="equipment_slot3" parent="MainPanel/equipe" unique_id=1961633882 instance=ExtResource("3_sitvp")]
+[node name="equipment_slot_chest" parent="MainPanel/equipe" unique_id=1961633882 instance=ExtResource("3_sitvp")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -87,9 +102,11 @@ offset_left = 207.0
 offset_top = 86.0
 offset_right = -209.0
 offset_bottom = -133.0
+grow_horizontal = 2
+grow_vertical = 2
 slot_name = "chest"
 
-[node name="equipment_slot4" parent="MainPanel/equipe" unique_id=1693178314 instance=ExtResource("3_sitvp")]
+[node name="equipment_slot_legs" parent="MainPanel/equipe" unique_id=1693178314 instance=ExtResource("3_sitvp")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -102,7 +119,7 @@ grow_horizontal = 2
 grow_vertical = 2
 slot_name = "legs"
 
-[node name="equipment_slot5" parent="MainPanel/equipe" unique_id=2093880661 instance=ExtResource("3_sitvp")]
+[node name="equipment_slot_boots" parent="MainPanel/equipe" unique_id=2093880661 instance=ExtResource("3_sitvp")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -114,6 +131,19 @@ offset_bottom = -61.0
 grow_horizontal = 2
 grow_vertical = 2
 slot_name = "feet"
+
+[node name="equipment_slot_gloves" parent="MainPanel/equipe" unique_id=322234812 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 142.0
+offset_top = 188.0
+offset_right = -294.0
+offset_bottom = -63.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "hands"
 
 [node name="LootPanel" type="Panel" parent="MainPanel" unique_id=629860001]
 unique_name_in_owner = true

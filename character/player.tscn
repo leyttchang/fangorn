@@ -1156,7 +1156,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999772, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333545, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.9999771, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335444, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1168,6 +1168,9 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0
 raycast = NodePath("RayCast3D")
 blood_particles_scene = ExtResource("15_uy1o2")
 main_droite = NodePath("..")
+
+[node name="RayCast3D" parent="Camera3D/MainDroite/weapon_impact_componant" index="0" unique_id=607664755]
+hit_from_inside = true
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=729055229]
 target_position = Vector3(0, 0, -50)

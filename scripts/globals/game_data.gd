@@ -53,7 +53,8 @@ static func get_all_bases() -> Array[EquipmentItem]:
 			preload("res://item/armures/chest/heavy_armor.tres"),
 			preload("res://item/armures/feet/heavy_boots.tres"),
 			preload("res://item/armures/head/heavy_helmet.tres"),
-			preload("res://item/armures/legs/heavy_pants.tres")
+			preload("res://item/armures/legs/heavy_pants.tres"),
+			preload("res://item/armures/gloves/heavy_gloves.tres")
 		]
 	return _all_bases
 

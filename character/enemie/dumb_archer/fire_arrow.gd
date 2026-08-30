@@ -60,7 +60,12 @@ func _on_attack_landed(target: Node) -> void:
 
 	if is_character:
 		# On previent tous les clients de jouer le sang et cacher la fleche
-		rpc("_rpc_play_character_impact")
+		var target_path = NodePath("")
+		if is_instance_valid(target):
+			var entity = target.owner if target.owner != null else target.get_parent()
+			target_path = entity.get_path() if is_instance_valid(entity) else target.get_path()
+			
+		rpc("_rpc_play_character_impact", target_path)
 		
 		# On attend la fin de l'animation de sang (ex: 1 seconde) avant de dtruire la flche (serveur)
 		await get_tree().create_timer(1.0).timeout 
@@ -75,7 +80,7 @@ func _on_attack_landed(target: Node) -> void:
 			queue_free()
 
 @rpc("authority", "call_local", "reliable")
-func _rpc_play_character_impact() -> void:
+func _rpc_play_character_impact(target_path: NodePath = NodePath("")) -> void:
 	if visual_mesh != null:
 		visual_mesh.hide()
 	
@@ -95,6 +100,10 @@ func _rpc_play_character_impact() -> void:
 				if abs(impact_normal.dot(Vector3.UP)) > 0.99:
 					up_dir = Vector3.RIGHT
 				blood.look_at(global_position + impact_normal, up_dir)
+				
+			if blood.has_method("set_follow_target") and not target_path.is_empty():
+				var target_node = get_node_or_null(target_path)
+				blood.set_follow_target(target_node)
 				
 			if blood.has_method("play_effect"):
 				blood.play_effect()

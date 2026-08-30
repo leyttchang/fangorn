@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://bm217git5k8x1"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_0ylu3"]
+[ext_resource type="Texture2D" uid="uid://ocj6au1mvawo" path="res://assets/icon/rpg_icon/Icon205.png" id="2_31bnw"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_t42dl"]
+
+[resource]
+script = ExtResource("2_t42dl")
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(3, 8),
+"attack_speed": Vector2(0, 0),
+"casting_speed": Vector2(0, 0),
+"cd_red": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(0, 0),
+"movement_speed": Vector2(0, 0),
+"physical_damage": Vector2(0, 0)
+}
+id = "heavy_gloves"
+item_name = "Heavy Gloves"
+icon = ExtResource("2_31bnw")
+item_type = 5
+metadata/_custom_type_script = "uid://b6114jo5bnldt"

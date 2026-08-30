@@ -8,6 +8,18 @@ extends Panel
 @onready var icon_rect: TextureRect = $Icon
 
 func _ready() -> void:
+	# Auto-découverte des composants si on a oublié de les assigner dans l'éditeur
+	if equipment_component == null or inventory_component == null:
+		var current_node = get_parent()
+		while current_node != null:
+			if current_node is InventoryUI:
+				if equipment_component == null:
+					equipment_component = current_node.equipment_component
+				if inventory_component == null:
+					inventory_component = current_node.inventory_component
+				break
+			current_node = current_node.get_parent()
+
 	if equipment_component != null:
 		equipment_component.equipment_changed.connect(_on_equipment_changed)
 		var starting_item = equipment_component.equipped_items.get(slot_name)
@@ -50,6 +62,10 @@ func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 		var item_type_string = ItemData.ItemType.keys()[item.item_type]
 		
 		if item_type_string == slot_name:
+			return true
+		
+		# Autoriser les armes principales dans le 2ème slot d'arme
+		if slot_name == "second_weapon" and item_type_string == "main_hand":
 			return true
 			
 	return false 

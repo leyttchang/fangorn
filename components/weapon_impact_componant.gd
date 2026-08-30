@@ -95,7 +95,8 @@ func _process(delta: float) -> void:
 		# Si on a vu le raycast toucher notre cible !
 		if hit_target != null:
 			print("[WeaponImpact] SUCCESS ! Le Raycast a bien trouvé la cible : ", hit_target.name, ". Spawn du sang !")
-			_spawn_blood(impact_point, impact_normal)
+			var target_path = hit_target.get_path() if is_instance_valid(hit_target) else NodePath("")
+			_spawn_blood(impact_point, impact_normal, target_path)
 			_pending_impacts.erase(hit_target)
 			
 		# Diminuer le temps des cibles et nettoyer celles qui ont expire (raycast a rate)
@@ -123,16 +124,16 @@ func _on_attack_landed(target: Node) -> void:
 	# On met l'ennemi dans la file d'attente (le raycast a 0.15s pour le toucher physiquement)
 	_pending_impacts[target] = MAX_WAIT_TIME
 
-func _spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
+func _spawn_blood(impact_point: Vector3, impact_normal: Vector3, target_path: NodePath) -> void:
 	# On s'assure de ne l'appeler que si on est le joueur qui donne le coup
 	if not is_multiplayer_authority():
 		return
 	
 	# call_local = on l'execute sur NOUS (le tireur) ET sur tous les autres joueurs
-	rpc("_rpc_spawn_blood", impact_point, impact_normal)
+	rpc("_rpc_spawn_blood", impact_point, impact_normal, target_path)
 
 @rpc("authority", "call_local", "unreliable")
-func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
+func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3, target_path: NodePath = NodePath("")) -> void:
 	# OPTIMISATION MAJEURE : On utilise le nouveau systeme de Pooling !
 	var pool = get_tree().root.get_node_or_null("VFXPool")
 	if pool == null:
@@ -156,7 +157,10 @@ func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3) -> void:
 			up_dir = Vector3.RIGHT
 		blood.look_at(impact_point + impact_normal, up_dir)
 		
-	print("[DEBUG] Blood particle script: ", blood.get_script())
+	if blood.has_method("set_follow_target") and not target_path.is_empty():
+		var target_node = get_node_or_null(target_path)
+		blood.set_follow_target(target_node)
+		
 	if blood.has_method("play_effect"):
 		blood.play_effect()
 	else:

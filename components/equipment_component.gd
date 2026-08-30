@@ -14,8 +14,9 @@ var equipped_items: Dictionary = {
 	"chest": null,
 	"legs": null,
 	"feet": null,
+	"hands": null,
 	"main_hand": null,
-	"off_hand": null,
+	"second_weapon": null,
 	"ring_1": null,
 	"ring_2": null
 }

@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://bs0k0q7fq1bbi"]
 
-[ext_resource type="Script" uid="uid://bco7glg7f4hdn" path="res://particule/blood/blood_particule.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://vaf8h8a5i0ab" path="res://assets/LeLu's Noise Pack/T_blood_stain_mask.png" id="1_t8vxh"]
 [ext_resource type="Texture2D" uid="uid://vg334al3d61o" path="res://assets/LeLu's Noise Pack/T_blood_stain_normal_map.png" id="2_wbvup"]
 
@@ -35,7 +34,6 @@ angle_min = -179.99998
 angle_max = 180.00002
 direction = Vector3(0, 1, 0)
 spread = 10.0
-initial_velocity_min = -0.5
 initial_velocity_max = 3.0
 radial_velocity_min = -2.2351742e-05
 radial_velocity_max = 0.39997762
@@ -95,20 +93,20 @@ tracks/0/keys = {
 "values": [true]
 }
 
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_jt66o"]
 _data = {
 &"RESET": SubResource("Animation_t8vxh"),
 &"pft": SubResource("Animation_wbvup")
 }
 
-[node name="blood_particule" type="Node3D" script=ExtResource("1_script")]
+[node name="blood_particule" type="Node3D" unique_id=1595680196]
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1984446200]
 emitting = false
 amount = 15
 one_shot = true
-explosiveness = 0.8
+preprocess = 0.2
+explosiveness = 1.0
 fixed_fps = 60
 process_material = SubResource("ParticleProcessMaterial_hlie2")
 draw_pass_1 = SubResource("QuadMesh_yqkk6")
