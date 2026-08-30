@@ -153,10 +153,10 @@ func _format_stat(stat_name: String, value: float) -> String:
 	var percent_stats = GameData.PERCENT_STATS
 	
 	if stat_name in percent_stats:
-		var pct = round(value * 100.0)
+		var pct = int(round(value * 100.0))
 		return clean_name + " : " + str(pct) + "%"
 	else:
-		return clean_name + " : " + str(round(value))
+		return clean_name + " : " + str(int(round(value)))
 
 
 func open_inventory() -> void:

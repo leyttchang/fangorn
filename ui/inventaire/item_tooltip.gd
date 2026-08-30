@@ -58,16 +58,16 @@ func _ready() -> void:
 	
 	if _item is WeaponItem:
 		var weapon = _item as WeaponItem
-		stats_text += "[color=white]Dégâts : " + str(weapon.base_damage) + "[/color]\n"
-		stats_text += "[color=white]Vitesse d'attaque : " + str(weapon.base_attack_speed) + "[/color]\n"
+		stats_text += "[color=white]Dégâts : " + str(int(round(weapon.base_damage))) + "[/color]\n"
+		stats_text += "[color=white]Vitesse d'attaque : " + ("%.2f" % weapon.base_attack_speed) + "[/color]\n"
 		
 	var percent_stats = GameData.PERCENT_STATS
 	var get_formatted_val = func(k, v):
 		if k in percent_stats:
-			var pct = round(v * 100.0)
+			var pct = int(round(v * 100.0))
 			return ("+" if pct > 0 else "") + str(pct) + "%"
 		else:
-			return ("+" if v > 0 else "") + str(round(v))
+			return ("+" if v > 0 else "") + str(int(round(v)))
 			
 	if _item is EquipmentItem:
 		var equip = _item as EquipmentItem
