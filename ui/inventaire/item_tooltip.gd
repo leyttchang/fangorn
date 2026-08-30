@@ -1,9 +1,14 @@
 class_name ItemTooltip
 extends PanelContainer
 
-@onready var name_label: Label = $MarginContainer/VBoxContainer/NameLabel
-@onready var desc_label: Label = $MarginContainer/VBoxContainer/DescLabel
-@onready var stats_label: RichTextLabel = $MarginContainer/VBoxContainer/StatsLabel
+@export var normal_nameplate: Texture2D
+@export var magic_nameplate: Texture2D
+@export var rare_nameplate: Texture2D
+@export var legendary_nameplate: Texture2D
+
+@onready var name_label: Label = $VBoxContainer/NameLabel
+@onready var desc_label: Label = $VBoxContainer/MarginContainer/InnerVBox/DescLabel
+@onready var stats_label: RichTextLabel = $VBoxContainer/MarginContainer/InnerVBox/StatsLabel
 
 var _item: ItemData
 var _is_equipped: bool = false
@@ -25,6 +30,20 @@ func _ready() -> void:
 		ItemData.Rarity.LEGENDARY: Color(1.0, 0.5, 0.0) # Orange
 	}
 	name_label.add_theme_color_override("font_color", rarity_colors[_item.rarity])
+	
+	var rarity_textures = {
+		ItemData.Rarity.COMMON: normal_nameplate,
+		ItemData.Rarity.MAGIC: magic_nameplate,
+		ItemData.Rarity.RARE: rare_nameplate,
+		ItemData.Rarity.LEGENDARY: legendary_nameplate
+	}
+	
+	# Mise à jour dynamique de la texture d'arrière-plan du nom !
+	var style = name_label.get_theme_stylebox("normal")
+	if style is StyleBoxTexture and rarity_textures[_item.rarity] != null:
+		var new_style = style.duplicate() # On le duplique pour ne modifier QUE ce tooltip-ci
+		new_style.texture = rarity_textures[_item.rarity]
+		name_label.add_theme_stylebox_override("normal", new_style)
 	
 	if _is_equipped:
 		name_label.text += "\n(Équipé)"
@@ -75,4 +94,4 @@ func _ready() -> void:
 		stats_label.visible = false
 	else:
 		stats_label.visible = true
-		stats_label.text = stats_text
+		stats_label.text = "[center]" + stats_text + "[/center]"

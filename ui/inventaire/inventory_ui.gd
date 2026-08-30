@@ -19,6 +19,16 @@ var current_chest_inventory: InventoryComponent = null
 signal inventory_closed
 
 func _ready() -> void:
+	# Suppression du fond gris moche des tooltips par défaut de Godot
+	var main_panel = $MainPanel
+	if main_panel != null:
+		var clean_theme = main_panel.theme
+		if clean_theme == null:
+			clean_theme = Theme.new()
+		var empty_style = StyleBoxEmpty.new()
+		clean_theme.set_stylebox("panel", "TooltipPanel", empty_style)
+		main_panel.theme = clean_theme
+
 	visible = false
 	if inventory_component != null:
 		inventory_component.inventory_changed.connect(update_ui)

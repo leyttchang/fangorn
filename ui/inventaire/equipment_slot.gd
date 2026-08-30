@@ -54,7 +54,15 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 	var tooltip_scene = preload("res://ui/inventaire/item_tooltip.tscn")
 	var tooltip = tooltip_scene.instantiate()
 	tooltip.set_item(current_item)
-	return tooltip
+	tooltip.set_equipped()
+	
+	# Wrappé dans un HBoxContainer pour forcer Godot à calculer la hauteur correctement (bug Godot 4)
+	var hbox = HBoxContainer.new()
+	hbox.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	hbox.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	hbox.add_child(tooltip)
+	
+	return hbox
 
 func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	if typeof(data) == TYPE_DICTIONARY and data.has("type") and data["type"] == "inventory_item":

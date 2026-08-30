@@ -46,6 +46,8 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 	# Le conteneur principal qui va mettre les tooltips côte à côte
 	var hbox = HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 10)
+	hbox.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	hbox.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	
 	# 1. Préparer le tooltip de l'objet de l'inventaire
 	var hovered_tooltip = tooltip_scene.instantiate()

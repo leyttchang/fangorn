@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_i0w75"]
 [ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_drkvl"]
 [ext_resource type="Resource" uid="uid://dag3t06rnv3nc" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
-[ext_resource type="Texture2D" uid="uid://bc62u387718mp" path="res://assets/icon/rpg_icon/Icon185.png" id="3_o6cl8"]
+[ext_resource type="Texture2D" uid="uid://bc62u387718mp" path="res://assets/icon/rpg_icon/Icon182.png" id="3_o6cl8"]
 
 [resource]
 script = ExtResource("2_drkvl")
