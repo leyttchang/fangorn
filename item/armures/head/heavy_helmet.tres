@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://mc4sdnt76hbf"]
 
-[ext_resource type="Script" path="res://item/affix_data.gd" id="1_1nh1g"]
-[ext_resource type="Script" path="res://item/equipment_item.gd" id="2_5bbsx"]
-[ext_resource type="Resource" path="res://item/affixes/affix_armor.tres" id="2_ae2ym"]
-[ext_resource type="Resource" path="res://item/affixes/affix_physical_damage.tres" id="3_gieb7"]
-[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb24.png" id="4_gieb7"]
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_1nh1g"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_5bbsx"]
+[ext_resource type="Resource" uid="uid://cygmvghryt5uv" path="res://item/affixes/affix_armor.tres" id="2_ae2ym"]
+[ext_resource type="Resource" uid="uid://cpdgb0al1p025" path="res://item/affixes/affix_physical_damage.tres" id="3_gieb7"]
+[ext_resource type="Texture2D" uid="uid://cqrf2i3hkjhmg" path="res://assets/icon/32x32/fb24.png" id="4_gieb7"]
 
 [resource]
 script = ExtResource("2_5bbsx")

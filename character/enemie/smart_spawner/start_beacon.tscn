@@ -9,7 +9,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ph6fu"]
 render_priority = 0
 shader = ExtResource("2_cj4yf")
-shader_parameter/Main_color = Color(0.73341733, 0.29630345, 2.68056, 1)
+shader_parameter/Main_color = Color(0.42704085, 0.15929909, 1.6197081, 1)
 shader_parameter/BlinkingSpeed = 4.0
 shader_parameter/Transparancy_texture = ExtResource("4_wnu14")
 shader_parameter/fading_param = 1.0

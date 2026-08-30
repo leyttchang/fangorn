@@ -34,27 +34,36 @@ sky_material = SubResource("PanoramaSkyMaterial_yqkk6")
 
 [sub_resource type="Environment" id="Environment_gf3dy"]
 background_mode = 2
+background_color = Color(1, 1, 1, 1)
+background_energy_multiplier = 0.59
 sky = SubResource("Sky_hlie2")
-ambient_light_color = Color(0.7117184, 0.63087815, 0.23003373, 1)
-ambient_light_energy = 1.21
-tonemap_mode = 2
+ambient_light_source = 2
+ambient_light_color = Color(0.26064485, 0.37135845, 0.52897114, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 0.9
+tonemap_mode = 4
+tonemap_exposure = 1.1
 ssao_enabled = true
 ssao_radius = 1.69
 ssil_enabled = true
-ssil_intensity = 0.76
 glow_enabled = true
+glow_levels/1 = 0.21
 glow_intensity = 0.86
 glow_bloom = 0.15
-glow_blend_mode = 2
+glow_blend_mode = 0
 fog_light_color = Color(0.52402234, 0.5345653, 0.6961012, 1)
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.1626
-volumetric_fog_albedo = Color(0.2901966, 0.28847882, 0.20427796, 1)
+volumetric_fog_density = 0.03
+volumetric_fog_albedo = Color(0.015, 0.02625, 0.06, 1)
 volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
 volumetric_fog_emission_energy = 5.0
 volumetric_fog_anisotropy = 0.75
 volumetric_fog_length = 152.09
 volumetric_fog_sky_affect = 0.95
+adjustment_enabled = true
+adjustment_brightness = 1.1
+adjustment_contrast = 1.1
+adjustment_saturation = 0.8
 
 [node name="game" type="Node3D" unique_id=1242181288]
 script = ExtResource("1_2nma1")
@@ -110,6 +119,11 @@ environment = SubResource("Environment_gf3dy")
 [node name="DirectionalLight3D" parent="Map1T3d" index="1" unique_id=210805582]
 light_color = Color(0.76, 0.82, 1, 1)
 light_energy = 1.0
+light_volumetric_fog_energy = 15.0
+shadow_blur = 1.0
+
+[node name="NavigationRegion3D" parent="Map1T3d" index="4" unique_id=796499253]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2519016, -0.6890011, -6.9567914)
 
 [node name="enemies_coutner" parent="." unique_id=1160664613 instance=ExtResource("8_gf3dy")]
 

@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dad6pbsu7b6s5"]
 
 [ext_resource type="Script" uid="uid://6e61gbw6gugj" path="res://character/player.gd" id="1_2orxn"]
-[ext_resource type="Resource" uid="uid://dhcijrbw4kphg" path="res://item/armes/starting_sword.tres" id="2_2tvps"]
+[ext_resource type="Resource" uid="uid://bhrtfvy3m3jpg" path="res://item/armes/starting_sword.tres" id="2_2tvps"]
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="2_aypkh"]
 [ext_resource type="Script" uid="uid://4lgdql2xgv6l" path="res://character/main_droite.gd" id="2_dkowc"]
-[ext_resource type="Resource" uid="uid://db2pyarlsbrbb" path="res://item/armes/test_axe.tres" id="2_j51ly"]
+[ext_resource type="Resource" uid="uid://beufax1pm7sv5" path="res://item/armes/test_axe.tres" id="2_j51ly"]
 [ext_resource type="Script" uid="uid://51rh523r8oxe" path="res://item/item_data.gd" id="3_45wte"]
 [ext_resource type="Resource" uid="uid://3ts10m6vmiwm" path="res://character/player_stats.tres" id="3_hhoun"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_hhoun"]
@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
 [ext_resource type="PackedScene" uid="uid://bs0k0q7fq1bbi" path="res://particule/blood/blood_particule.tscn" id="15_uy1o2"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
+[ext_resource type="PackedScene" uid="uid://bh8emqqgp4pi1" path="res://ui/global_shader/global_shader.tscn" id="18_uy1o2"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
 [ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="21_ynykn"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="21_yr573"]
@@ -65,6 +66,7 @@
 [ext_resource type="PackedScene" uid="uid://dnv6k8v44l8xw" path="res://passive_skill_tree/generator_test.tscn" id="60_ce8hk"]
 [ext_resource type="Script" uid="uid://v0dr1ndsmbrc" path="res://ui/ui_manager.gd" id="61_ay40t"]
 [ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="62_ce8hk"]
+[ext_resource type="PackedScene" uid="uid://desweaab8m7pq" path="res://character/lanterne.tscn" id="67_g1p3m"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ay40t"]
 properties/0/path = NodePath(".:rotation")
@@ -1156,7 +1158,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.9999771, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335444, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.999977, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335435, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1214,6 +1216,9 @@ collide_with_areas = true
 collide_with_bodies = false
 script = ExtResource("15_2o2rg")
 
+[node name="global_shader" parent="Camera3D" unique_id=1960734188 instance=ExtResource("18_uy1o2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.59115607)
+
 [node name="StatsComponent" type="Node3D" parent="." unique_id=1723118712]
 unique_name_in_owner = true
 script = ExtResource("2_aypkh")
@@ -1264,27 +1269,23 @@ stats_component = NodePath("../StatsComponent")
 offset_top = -1.3120012
 offset_bottom = -325.0
 
-[node name="equipment_slot" parent="InventoryUI/MainPanel/equipe" index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-grow_horizontal = 2
-grow_vertical = 2
+[node name="equipment_weapon_1" parent="InventoryUI/MainPanel/equipe" index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot2" parent="InventoryUI/MainPanel/equipe" index="1" unique_id=206346114 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot_head" parent="InventoryUI/MainPanel/equipe" index="2" unique_id=206346114 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot3" parent="InventoryUI/MainPanel/equipe" index="2" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-grow_horizontal = 2
-grow_vertical = 2
+[node name="equipment_slot_chest" parent="InventoryUI/MainPanel/equipe" index="3" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot4" parent="InventoryUI/MainPanel/equipe" index="3" unique_id=1693178314 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot_legs" parent="InventoryUI/MainPanel/equipe" index="4" unique_id=1693178314 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
-[node name="equipment_slot5" parent="InventoryUI/MainPanel/equipe" index="4" unique_id=2093880661 node_paths=PackedStringArray("equipment_component", "inventory_component")]
+[node name="equipment_slot_boots" parent="InventoryUI/MainPanel/equipe" index="5" unique_id=2093880661 node_paths=PackedStringArray("equipment_component", "inventory_component")]
 equipment_component = NodePath("../../../../EquipmentComponent")
 inventory_component = NodePath("../../../../InventoryComponent")
 
@@ -1371,6 +1372,9 @@ health_component = NodePath("../HealthComponent")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5185547, 0)
 billboard = 1
 no_depth_test = true
+
+[node name="lanterne" parent="." unique_id=1064551459 instance=ExtResource("67_g1p3m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66503906, 0, -0.21276855)
 
 [editable path="Camera3D/MainDroite/weapon_impact_componant"]
 [editable path="HitboxComponent"]

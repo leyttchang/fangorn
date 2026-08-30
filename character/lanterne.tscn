@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://desweaab8m7pq"]
+
+[sub_resource type="Animation" id="Animation_mvvdm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("OmniLight3D:light_energy")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_q7ts0"]
+resource_name = "glow"
+length = 4.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("OmniLight3D:light_energy")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.03, 2.01, 3.02, 3.64),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [1.0, 0.628, 1.992, 1.372, 0.876]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ba7l3"]
+_data = {
+&"RESET": SubResource("Animation_mvvdm"),
+&"glow": SubResource("Animation_q7ts0")
+}
+
+[node name="lanterne" type="Node3D" unique_id=1064551459]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=2057001498]
+light_color = Color(1, 0.78933334, 0.20999998, 1)
+omni_range = 25.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=623218755]
+libraries/ = SubResource("AnimationLibrary_ba7l3")
+autoplay = &"glow"

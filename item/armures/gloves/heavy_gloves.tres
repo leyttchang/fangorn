@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://cd1fuewn8uv0v"]
 
-[ext_resource type="Script" path="res://item/affix_data.gd" id="1_0ylu3"]
-[ext_resource type="Texture2D" path="res://assets/icon/rpg_icon/Icon205.png" id="2_31bnw"]
-[ext_resource type="Script" path="res://item/equipment_item.gd" id="2_t42dl"]
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_0ylu3"]
+[ext_resource type="Texture2D" uid="uid://ocj6au1mvawo" path="res://assets/icon/rpg_icon/Icon205.png" id="2_31bnw"]
+[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_t42dl"]
 
 [resource]
 script = ExtResource("2_t42dl")

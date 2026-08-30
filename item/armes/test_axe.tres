@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="WeaponItem" format=3]
+[gd_resource type="Resource" script_class="WeaponItem" format=3 uid="uid://beufax1pm7sv5"]
 
-[ext_resource type="Texture2D" path="res://assets/icon/fc126.png" id="1_imlsj"]
-[ext_resource type="Script" path="res://item/affix_data.gd" id="1_w65v3"]
-[ext_resource type="Script" path="res://item/armes/weapon_item.gd" id="2_imlsj"]
-[ext_resource type="PackedScene" path="res://item/armes/test_axe.tscn" id="3_imlsj"]
+[ext_resource type="Texture2D" uid="uid://bhgw0w3m2d6bs" path="res://assets/icon/fc126.png" id="1_imlsj"]
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_w65v3"]
+[ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="2_imlsj"]
+[ext_resource type="PackedScene" uid="uid://bkcrhf14uynjl" path="res://item/armes/test_axe.tscn" id="3_imlsj"]
 
 [resource]
 script = ExtResource("2_imlsj")

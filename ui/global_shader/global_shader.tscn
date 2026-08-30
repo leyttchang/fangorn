@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bh8emqqgp4pi1"]
+
+[ext_resource type="Script" path="res://ui/global_shader/global_shader.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://b4dwgbg6c0mqq" path="res://ui/global_shader/global_shader.gdshader" id="1_e7gaw"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
+render_priority = -1
+shader = ExtResource("1_e7gaw")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_thickness = 1.5
+shader_parameter/depth_threshold = 0.02
+shader_parameter/normal_threshold = 2.0
+shader_parameter/enable_posterization = true
+shader_parameter/posterize_steps = 32.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_l1x8o"]
+
+[node name="global_shader" type="Node3D" unique_id=1960734188]
+script = ExtResource("1_script")
+
+[node name="quad_mesh" type="MeshInstance3D" parent="." unique_id=505763465]
+material_override = SubResource("ShaderMaterial_yqkk6")
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_l1x8o")
