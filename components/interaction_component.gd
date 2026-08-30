@@ -2,7 +2,7 @@ class_name InteractionComponent
 extends Area3D
 
 ## Le texte d'interaction affiche au dessus de l'objet
-@export var prompt_text: String = "Appuyez sur E pour interagir"
+@export var prompt_text: String = "Press E to interact"
 
 ## La touche d'interaction
 @export var interaction_key: Key = KEY_E

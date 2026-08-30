@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://d3h3x4y506a7b"]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
 
-[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_i0w75"]
-[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_drkvl"]
-[ext_resource type="Resource" uid="uid://dag3t06rnv3nc" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
-[ext_resource type="Resource" uid="uid://boq6jv60rpvh4" path="res://item/affixes/affix_movement_speed.tres" id="3_wbad7"]
-[ext_resource type="Texture2D" uid="uid://cp5auvodww7vo" path="res://assets/icon/rpg_icon/Icon222.png" id="4_ucki4"]
+[ext_resource type="Script" path="res://item/affix_data.gd" id="1_i0w75"]
+[ext_resource type="Script" path="res://item/equipment_item.gd" id="2_drkvl"]
+[ext_resource type="Resource" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
+[ext_resource type="Resource" path="res://item/affixes/affix_movement_speed.tres" id="3_wbad7"]
+[ext_resource type="Texture2D" path="res://assets/icon/rpg_icon/Icon222.png" id="4_ucki4"]
 
 [resource]
 script = ExtResource("2_drkvl")
@@ -23,8 +23,8 @@ base_stat_ranges = {
 }
 excluded_affixes = Array[ExtResource("1_i0w75")]([ExtResource("2_o6cl8"), ExtResource("3_wbad7")])
 id = "hunters_boots"
-item_name = "Hunter's Boots"
-description = ""
+item_name = "Hunter Boots"
+description = "Light leather boots."
 icon = ExtResource("4_ucki4")
 item_type = 3
 metadata/_custom_type_script = "uid://b6114jo5bnldt"

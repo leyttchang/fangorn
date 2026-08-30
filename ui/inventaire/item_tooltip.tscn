@@ -33,7 +33,7 @@ custom_minimum_size = Vector2(411, 58)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxTexture_3u4dq")
-text = "Nom de l'objet"
+text = "Item Name"
 horizontal_alignment = 1
 vertical_alignment = 1
 

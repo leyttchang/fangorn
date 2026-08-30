@@ -46,7 +46,7 @@ func _ready() -> void:
 		name_label.add_theme_stylebox_override("normal", new_style)
 	
 	if _is_equipped:
-		name_label.text += "\n(Équipé)"
+		name_label.text += "\n(Equipped)"
 	
 	desc_label.text = _item.description
 	
@@ -58,8 +58,8 @@ func _ready() -> void:
 	
 	if _item is WeaponItem:
 		var weapon = _item as WeaponItem
-		stats_text += "[color=white]Dégâts : " + str(int(round(weapon.base_damage))) + "[/color]\n"
-		stats_text += "[color=white]Vitesse d'attaque : " + ("%.2f" % weapon.base_attack_speed) + "[/color]\n"
+		stats_text += "[color=white]Damage : " + str(int(round(weapon.base_damage))) + "[/color]\n"
+		stats_text += "[color=white]Attack Speed : " + ("%.2f" % weapon.base_attack_speed) + "[/color]\n"
 		
 	var percent_stats = GameData.PERCENT_STATS
 	var get_formatted_val = func(k, v):

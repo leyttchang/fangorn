@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://7rw2qgxn8hyh"]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
 
-[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_i0w75"]
-[ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_drkvl"]
-[ext_resource type="Resource" uid="uid://dag3t06rnv3nc" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
-[ext_resource type="Texture2D" uid="uid://bc62u387718mp" path="res://assets/icon/rpg_icon/Icon182.png" id="3_o6cl8"]
+[ext_resource type="Script" path="res://item/affix_data.gd" id="1_i0w75"]
+[ext_resource type="Script" path="res://item/equipment_item.gd" id="2_drkvl"]
+[ext_resource type="Resource" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
+[ext_resource type="Texture2D" path="res://assets/icon/rpg_icon/Icon182.png" id="3_o6cl8"]
 
 [resource]
 script = ExtResource("2_drkvl")
@@ -22,8 +22,8 @@ base_stat_ranges = {
 }
 excluded_affixes = Array[ExtResource("1_i0w75")]([ExtResource("2_o6cl8")])
 id = "hunters_chest"
-item_name = "hunter's chest armor"
-description = ""
+item_name = "Hunter Chest Armor"
+description = "A sturdy leather armor."
 icon = ExtResource("3_o6cl8")
 item_type = 1
 metadata/_custom_type_script = "uid://b6114jo5bnldt"
