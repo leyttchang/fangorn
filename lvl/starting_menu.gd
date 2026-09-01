@@ -5,6 +5,9 @@ extends Node3D
 
 @onready var btn_singleplayer: Button = $CanvasLayer/VBoxContainer/singleplayer
 @onready var btn_multiplayer: Button = $CanvasLayer/VBoxContainer/multiplayer
+@onready var btn_option: Button = $CanvasLayer/VBoxContainer/option
+
+@onready var option_panel: MarginContainer = $CanvasLayer/option
 
 @onready var multiplayer_panel = $CanvasLayer/Host_menu
 @onready var btn_host: Button = $CanvasLayer/Host_menu.find_child("btnHost", true, false)
@@ -25,17 +28,25 @@ func _ready() -> void:
 	# Connexion des boutons du menu principal
 	btn_singleplayer.pressed.connect(_on_singleplayer_pressed)
 	btn_multiplayer.pressed.connect(_on_multiplayer_pressed)
+	btn_option.pressed.connect(_on_option_pressed)
 	
 	# Connexion des boutons du menu multijoueur
-	btn_host.pressed.connect(_on_host_pressed)
-	btn_join.pressed.connect(_on_join_pressed)
-	btn_back.pressed.connect(_on_back_pressed)
+	if btn_host: btn_host.pressed.connect(_on_host_pressed)
+	if btn_join: btn_join.pressed.connect(_on_join_pressed)
+	if btn_back: btn_back.pressed.connect(_on_back_pressed)
 	
 	# Boutons du lobby
 	if btn_launch != null:
 		btn_launch.pressed.connect(_on_launch_pressed)
 	if btn_leave != null:
 		btn_leave.pressed.connect(_on_leave_lobby_pressed)
+		
+	# Options
+	var btn_fs = option_panel.find_child("Button", true, false)
+	if btn_fs: btn_fs.pressed.connect(_on_fullscreen_pressed)
+	
+	var btn_ret = option_panel.find_child("return", true, false)
+	if btn_ret: btn_ret.pressed.connect(_on_option_return_pressed)
 		
 	# Reseau
 	multiplayer.peer_connected.connect(_on_peer_connected)
@@ -191,3 +202,18 @@ func _on_join_pressed() -> void:
 		_open_lobby()
 	else:
 		print("Erreur lors de la connexion : ", error)
+
+func _on_option_pressed() -> void:
+	option_panel.visible = true
+	anim_player.play("option_open")
+
+func _on_option_return_pressed() -> void:
+	anim_player.play_backwards("option_open")
+	await anim_player.animation_finished
+	option_panel.visible = false
+
+func _on_fullscreen_pressed() -> void:
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)

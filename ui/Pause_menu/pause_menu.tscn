@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b2i01iy66mw4o"]
 
 [ext_resource type="Script" uid="uid://cp7n6y1770o7d" path="res://ui/Pause_menu/pause_menu.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://b2fwoqmmnb12p" path="res://ui/Pause_menu/option.tscn" id="2_4to8s"]
 
 [node name="Pause_menu" type="CanvasLayer" unique_id=533859901 node_paths=PackedStringArray("return_lobby_btn")]
 script = ExtResource("1_script")
@@ -13,7 +14,7 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -176.5
-offset_top = -245.25
+offset_top = -449.0
 offset_right = 176.5
 offset_bottom = 245.25
 grow_horizontal = 2
@@ -52,6 +53,12 @@ custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "return to lobby"
 
+[node name="option" type="Button" parent="Panel/VBoxContainer" unique_id=866085518]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Option"
+
 [node name="Button3" type="Button" parent="Panel/VBoxContainer" unique_id=1782004856]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
@@ -76,3 +83,5 @@ text = "God Mode"
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Quit"
+
+[node name="option" parent="." unique_id=1114594140 instance=ExtResource("2_4to8s")]

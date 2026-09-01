@@ -27,12 +27,21 @@ var _footstep_distance: float = 0.0
 var last_weapon_switch_time: int = 0
 
 const JUMP_VELOCITY = 4.5
-const mouse_sensitivity = 0.002
+var mouse_sensitivity = 0.002
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 
 func _ready() -> void:
+	if Engine.has_singleton("SettingsManager"):
+		var settings = Engine.get_singleton("SettingsManager")
+		mouse_sensitivity = settings.mouse_sensitivity
+		settings.mouse_sensitivity_changed.connect(func(val): mouse_sensitivity = val)
+	elif get_tree().root.has_node("SettingsManager"):
+		var settings = get_tree().root.get_node("SettingsManager")
+		mouse_sensitivity = settings.mouse_sensitivity
+		settings.mouse_sensitivity_changed.connect(func(val): mouse_sensitivity = val)
+
 	# -- Affichage du Pseudo --
 	var pseudo_label = get_node_or_null("PseudoLabel")
 	if pseudo_label != null:

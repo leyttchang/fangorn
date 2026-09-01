@@ -10,6 +10,11 @@ extends CanvasLayer
 @onready var create_items_btn: Button = $Panel/VBoxContainer/Button6
 @onready var god_mode_btn: Button = $Panel/VBoxContainer/Button7
 
+@onready var main_panel: Panel = $Panel
+@onready var options_panel: Panel = $option
+
+@onready var options_menu_btn: Button = %option
+
 @export var return_lobby_btn: Button
 
 func _ready() -> void:
@@ -17,11 +22,21 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	resume_btn.pressed.connect(_on_resume_pressed)
+	options_menu_btn.pressed.connect(_on_options_menu_pressed)
 	spawn_btn.pressed.connect(_on_spawn_pressed)
 	quit_btn.pressed.connect(_on_quit_pressed)
 	debug_btn.pressed.connect(_on_debug_pressed)
 	create_items_btn.pressed.connect(_on_create_items_pressed)
 	god_mode_btn.pressed.connect(_on_god_mode_pressed)
+	
+	var fullscreen_btn = options_panel.find_child("Button", true, false)
+	if fullscreen_btn: fullscreen_btn.pressed.connect(_on_fullscreen_pressed)
+	
+	var back_btn = options_panel.find_child("return", true, false)
+	if back_btn: back_btn.pressed.connect(_on_back_pressed)
+	
+	options_panel.visible = false
+	main_panel.visible = true
 	
 	if return_lobby_btn != null:
 		return_lobby_btn.pressed.connect(_on_return_lobby_pressed)
@@ -32,7 +47,10 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		toggle_pause()
+		if options_panel.visible:
+			_on_back_pressed()
+		else:
+			toggle_pause()
 
 func toggle_pause() -> void:
 	var new_pause_state = not get_tree().paused
@@ -41,11 +59,27 @@ func toggle_pause() -> void:
 	
 	if new_pause_state:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		main_panel.visible = true
+		options_panel.visible = false
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _on_resume_pressed() -> void:
 	toggle_pause()
+
+func _on_options_menu_pressed() -> void:
+	main_panel.visible = false
+	options_panel.visible = true
+
+func _on_fullscreen_pressed() -> void:
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
+func _on_back_pressed() -> void:
+	main_panel.visible = true
+	options_panel.visible = false
 
 func _on_spawn_pressed() -> void:
 	if mob_spawner != null:

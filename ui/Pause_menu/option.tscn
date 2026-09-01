@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://b2fwoqmmnb12p"]
+
+[ext_resource type="Texture2D" uid="uid://17vaqfwxb44j" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Text_zone.png" id="1_b57jb"]
+[ext_resource type="Script" uid="uid://21yv0amk5xc4" path="res://ui/Pause_menu/option.gd" id="2_script"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hlie2"]
+texture = ExtResource("1_b57jb")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+region_rect = Rect2(91.701294, 258.60623, 339.7114, 70.86368)
+
+[node name="option" type="Panel" unique_id=1114594140]
+custom_minimum_size = Vector2(500, 500)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=206167134]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 100
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=424013911]
+layout_mode = 2
+
+[node name="screen_option" type="OptionButton" parent="MarginContainer/VBoxContainer" unique_id=1270024636]
+unique_name_in_owner = true
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "Fullscreen"
+popup/item_0/id = 0
+popup/item_1/text = "Windowed"
+popup/item_1/id = 1
+popup/item_2/text = "Borderless"
+popup/item_2/id = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer" unique_id=33904893]
+layout_mode = 2
+text = "Sensitivity"
+horizontal_alignment = 1
+
+[node name="sensitivity" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=533426938]
+layout_mode = 2
+
+[node name="Sensitivity_slider" type="HSlider" parent="MarginContainer/VBoxContainer/sensitivity" unique_id=601940212]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="sensitivity_text" type="Label" parent="MarginContainer/VBoxContainer/sensitivity" unique_id=1477098326]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="return" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2146650173]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Return
+"

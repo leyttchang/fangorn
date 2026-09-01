@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://da735xqiq26u8" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Decline_Button_Light_fixed.png" id="4_w7sub"]
 [ext_resource type="Texture2D" uid="uid://17vaqfwxb44j" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Text_zone.png" id="5_kgx3v"]
 [ext_resource type="Texture2D" uid="uid://con2xlyc4lg6u" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/title_zone.png" id="5_w7sub"]
+[ext_resource type="PackedScene" uid="uid://b2fwoqmmnb12p" path="res://ui/Pause_menu/option.tscn" id="7_vof52"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_eqfjj"]
 texture = ExtResource("2_3ldtj")
@@ -96,6 +97,18 @@ tracks/2/keys = {
 "update": 0,
 "values": [Vector2(476.75, 180.5)]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CanvasLayer/option:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(710, -660.64)]
+}
 
 [sub_resource type="Animation" id="Animation_w7sub"]
 resource_name = "multi_open"
@@ -115,7 +128,7 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_4kshr"]
 resource_name = "open"
-length = 2.0
+length = 2.2333333
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -141,11 +154,27 @@ tracks/1/keys = {
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_vof52"]
+resource_name = "option_open"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CanvasLayer/option:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.73, 0.82, 0.95),
+"transitions": PackedFloat32Array(1.2745618, 1, 1, 1),
+"update": 0,
+"values": [Vector2(710, -660.64), Vector2(710, 354.595), Vector2(710, 209.43), Vector2(710, 272.24)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_jfofm"]
 _data = {
 &"RESET": SubResource("Animation_f8y02"),
 &"multi_open": SubResource("Animation_w7sub"),
-&"open": SubResource("Animation_4kshr")
+&"open": SubResource("Animation_4kshr"),
+&"option_open": SubResource("Animation_vof52")
 }
 
 [node name="starting_menu" type="Node3D" unique_id=1895280778 node_paths=PackedStringArray("pseudo_input", "lobby_panel", "btn_launch", "btn_leave", "player_labels")]
@@ -186,6 +215,14 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Multiplayer
 "
 
+[node name="option" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=1457657174]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
+text = "Option 
+"
+
 [node name="Host_menu" type="VBoxContainer" parent="CanvasLayer" unique_id=1219959799]
 visible = false
 anchors_preset = 8
@@ -193,10 +230,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -99.25
-offset_top = -143.5
-offset_right = 99.25
-offset_bottom = 200.5
+offset_left = -483.25
+offset_top = -359.5
+offset_right = -284.75
+offset_bottom = -15.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
@@ -342,6 +379,24 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
 theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Quit"
+
+[node name="option" type="MarginContainer" parent="CanvasLayer" unique_id=1870764764]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -1200.64
+offset_right = 250.0
+offset_bottom = -700.64
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="option" parent="CanvasLayer/option" unique_id=1114594140 instance=ExtResource("7_vof52")]
+visible = true
+layout_mode = 2
 
 [node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("1_x1u6o")]
 

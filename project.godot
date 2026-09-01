@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+SettingsManager="*res://scripts/globals/settings_manager.gd"
 VFXPool="*res://scripts/vfx_pool.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
