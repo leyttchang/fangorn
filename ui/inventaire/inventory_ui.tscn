@@ -17,146 +17,37 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="inventaire" type="Panel" parent="MainPanel" unique_id=1002197058]
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel" unique_id=2141247342]
 layout_mode = 1
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 640.0
-offset_top = 325.0
-offset_right = -12.0
-offset_bottom = -23.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
-[node name="inv_grid" type="GridContainer" parent="MainPanel/inventaire" unique_id=1964638]
+[node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/MarginContainer" unique_id=983847490]
+layout_mode = 2
+theme_override_constants/separation = 100
+
+[node name="grp_gauche" type="Control" parent="MainPanel/MarginContainer/HBoxContainer" unique_id=1517405640]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+
+[node name="LootPanel" type="Panel" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche" unique_id=629860001]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-columns = 5
-
-[node name="equipe" type="Panel" parent="MainPanel" unique_id=1441282182]
-custom_minimum_size = Vector2(500, 300)
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.019000001
-anchor_right = 0.99000007
-anchor_bottom = 1.0
-offset_left = 640.0
-offset_top = -3.3120012
-offset_right = -0.48010254
-offset_bottom = -327.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="equipment_weapon_1" parent="MainPanel/equipe" unique_id=178112762 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 80.0
-offset_top = 66.0
-offset_right = -356.0
-offset_bottom = -77.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="equipment_weapon_2" parent="MainPanel/equipe" unique_id=1527176722 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 378.0
-offset_top = 66.0
-offset_right = -58.0
-offset_bottom = -77.0
-grow_horizontal = 2
-grow_vertical = 2
-slot_name = "second_weapon"
-
-[node name="equipment_slot_head" parent="MainPanel/equipe" unique_id=206346114 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 221.0
-offset_top = 15.0
-offset_right = -224.0
-offset_bottom = -235.0
-grow_horizontal = 2
-grow_vertical = 2
-slot_name = "head"
-
-[node name="equipment_slot_chest" parent="MainPanel/equipe" unique_id=1961633882 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 207.0
-offset_top = 86.0
-offset_right = -209.0
-offset_bottom = -133.0
-grow_horizontal = 2
-grow_vertical = 2
-slot_name = "chest"
-
-[node name="equipment_slot_legs" parent="MainPanel/equipe" unique_id=1693178314 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 210.0
-offset_top = 185.0
-offset_right = -211.0
-offset_bottom = -57.0
-grow_horizontal = 2
-grow_vertical = 2
-slot_name = "legs"
-
-[node name="equipment_slot_boots" parent="MainPanel/equipe" unique_id=2093880661 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 303.0
-offset_top = 190.0
-offset_right = -133.0
-offset_bottom = -61.0
-grow_horizontal = 2
-grow_vertical = 2
-slot_name = "feet"
-
-[node name="equipment_slot_gloves" parent="MainPanel/equipe" unique_id=322234812 instance=ExtResource("3_sitvp")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 142.0
-offset_top = 188.0
-offset_right = -294.0
-offset_bottom = -63.0
-grow_horizontal = 2
-grow_vertical = 2
-slot_name = "hands"
-
-[node name="LootPanel" type="Panel" parent="MainPanel" unique_id=629860001]
-unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 0)
+custom_maximum_size = Vector2(500, -1)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 96.0
-offset_top = 21.0
-offset_right = -556.0
-offset_bottom = 141.0
+offset_bottom = 120.0
 grow_horizontal = 2
 
-[node name="Title" type="Label" parent="MainPanel/LootPanel" unique_id=789456123]
+[node name="Title" type="Label" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/LootPanel" unique_id=789456123]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -165,7 +56,7 @@ grow_horizontal = 2
 text = "Coffre"
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/LootPanel" unique_id=530185518]
+[node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/LootPanel" unique_id=530185518]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -179,55 +70,63 @@ offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="LootGrid" type="GridContainer" parent="MainPanel/LootPanel/HBoxContainer" unique_id=159753468]
+[node name="LootGrid" type="GridContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/LootPanel/HBoxContainer" unique_id=159753468]
 unique_name_in_owner = true
 layout_mode = 2
 columns = 5
 
-[node name="loot_all" type="Button" parent="MainPanel/LootPanel/HBoxContainer" unique_id=1762427803]
+[node name="loot_all" type="Button" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/LootPanel/HBoxContainer" unique_id=1762427803]
 layout_mode = 2
 text = "Loot all"
 icon = ExtResource("4_alhav")
 
-[node name="stats_panel" type="Panel" parent="MainPanel" unique_id=1615342338]
+[node name="stats_panel" type="Panel" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche" unique_id=1615342338]
+custom_minimum_size = Vector2(600, 600)
 layout_mode = 0
-offset_left = 11.0
-offset_top = 147.0
-offset_right = 430.0
-offset_bottom = 559.0
+offset_top = 200.0
+offset_right = 419.0
+offset_bottom = 612.0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel/stats_panel" unique_id=1130619656]
-layout_mode = 0
-offset_left = 57.0
-offset_top = 28.0
-offset_right = 368.0
-offset_bottom = 353.0
+[node name="MarginContainer2" type="MarginContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel" unique_id=1253771309]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
 
-[node name="MarginContainer" type="MarginContainer" parent="MainPanel/stats_panel/ScrollContainer" unique_id=1532962852]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2" unique_id=1130619656]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer" unique_id=1532962852]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="StatsContainer" type="VBoxContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer" unique_id=187728943]
+[node name="StatsContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer" unique_id=187728943]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Title" type="Label" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=575102720]
+[node name="Title" type="Label" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=575102720]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0, 1)
 theme_override_font_sizes/font_size = 20
 text = "Statistics"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=621564697]
+[node name="HSeparator" type="HSeparator" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=621564697]
 layout_mode = 2
 
-[node name="LevelLabel" type="Label" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=1250127557]
+[node name="LevelLabel" type="Label" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=1250127557]
 layout_mode = 2
 
-[node name="OffenseBtn" type="Button" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=2072828052]
+[node name="OffenseBtn" type="Button" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=2072828052]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.88, 0, 0, 1)
@@ -235,15 +134,15 @@ text = "Offense"
 flat = true
 alignment = 0
 
-[node name="MarginContainer2" type="MarginContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=2083469202]
+[node name="MarginContainer2" type="MarginContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=2083469202]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 
-[node name="OffenseVBox" type="VBoxContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer/MarginContainer2" unique_id=1070972645]
+[node name="OffenseVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer/MarginContainer2" unique_id=1070972645]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="DefenseBtn" type="Button" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=1515644298]
+[node name="DefenseBtn" type="Button" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=1515644298]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.3079999, 0.88, 1)
@@ -251,25 +150,158 @@ text = "Defense"
 flat = true
 alignment = 0
 
-[node name="MarginContainer3" type="MarginContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=719190977]
+[node name="MarginContainer3" type="MarginContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=719190977]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 
-[node name="DefenseVBox" type="VBoxContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer/MarginContainer3" unique_id=938264245]
+[node name="DefenseVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer/MarginContainer3" unique_id=938264245]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="MiscBtn" type="Button" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=1110683468]
+[node name="MiscBtn" type="Button" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=1110683468]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Misc"
 flat = true
 alignment = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer" unique_id=1494519315]
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer" unique_id=1494519315]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 
-[node name="MiscVBox" type="VBoxContainer" parent="MainPanel/stats_panel/ScrollContainer/MarginContainer/StatsContainer/MarginContainer" unique_id=792324902]
+[node name="MiscVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/stats_panel/MarginContainer2/ScrollContainer/MarginContainer/StatsContainer/MarginContainer" unique_id=792324902]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="Control" type="Control" parent="MainPanel/MarginContainer/HBoxContainer" unique_id=1801896699]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="inv_equ" type="VBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer" unique_id=484365757]
+custom_minimum_size = Vector2(500, 300)
+layout_mode = 2
+alignment = 1
+
+[node name="equipe" type="Panel" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ" unique_id=1441282182]
+custom_minimum_size = Vector2(800, 500)
+layout_mode = 2
+
+[node name="equipment_weapon_1" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=178112762 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -189.0
+offset_top = -174.0
+offset_right = -119.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="equipment_weapon_2" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=1527176722 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 143.0
+offset_top = -180.0
+offset_right = 214.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "second_weapon"
+
+[node name="equipment_slot_head" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=206346114 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_top = -181.0
+offset_right = 34.0
+offset_bottom = -107.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "head"
+
+[node name="equipment_slot_chest" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=1961633882 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = -97.0
+offset_right = 41.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "chest"
+
+[node name="equipment_slot_legs" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=1693178314 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -31.0
+offset_top = 34.0
+offset_right = 39.0
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "legs"
+
+[node name="equipment_slot_boots" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=2093880661 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 49.0
+offset_top = 55.0
+offset_right = 142.0
+offset_bottom = 136.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "feet"
+
+[node name="equipment_slot_gloves" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/equipe" unique_id=322234812 instance=ExtResource("3_sitvp")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -152.0
+offset_top = 57.0
+offset_right = -44.0
+offset_bottom = 143.0
+grow_horizontal = 2
+grow_vertical = 2
+slot_name = "hands"
+
+[node name="inventaire" type="Panel" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ" unique_id=1002197058]
+custom_minimum_size = Vector2(800, 500)
+layout_mode = 2
+
+[node name="inv_grid" type="GridContainer" parent="MainPanel/MarginContainer/HBoxContainer/inv_equ/inventaire" unique_id=1964638]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+columns = 5

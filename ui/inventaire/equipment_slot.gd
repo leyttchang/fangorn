@@ -7,7 +7,20 @@ extends Panel
 
 @onready var icon_rect: TextureRect = $Icon
 
+var glow_outline: ReferenceRect
+var glow_tween: Tween
+
 func _ready() -> void:
+	# Création d'une bordure de surbrillance dédiée au drag and drop
+	glow_outline = ReferenceRect.new()
+	glow_outline.border_color = Color(1.0, 0.9, 0.5, 1.0)
+	glow_outline.border_width = 3.0
+	glow_outline.editor_only = false
+	glow_outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glow_outline.set_anchors_preset(Control.PRESET_FULL_RECT)
+	glow_outline.visible = false
+	add_child(glow_outline)
+
 	# Auto-découverte des composants si on a oublié de les assigner dans l'éditeur
 	if equipment_component == null or inventory_component == null:
 		var current_node = get_parent()
@@ -100,3 +113,30 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 	if not success:
 		# Sécurité : Si l'équipement échoue, on remet l'objet là d'où il vient !
 		source_inventory.set_item_at_slot(source_index, item_to_equip, quantity)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_DRAG_BEGIN:
+		var drag_data = get_viewport().gui_get_drag_data()
+		if _can_drop_data(Vector2.ZERO, drag_data):
+			_start_glow()
+	elif what == NOTIFICATION_DRAG_END:
+		_stop_glow()
+
+func _start_glow() -> void:
+	if glow_outline == null: return
+	glow_outline.visible = true
+	glow_outline.modulate.a = 0.0
+	
+	if glow_tween:
+		glow_tween.kill()
+		
+	glow_tween = create_tween().set_loops()
+	glow_tween.tween_property(glow_outline, "modulate:a", 1.0, 0.6).set_trans(Tween.TRANS_SINE)
+	glow_tween.tween_property(glow_outline, "modulate:a", 0.0, 0.6).set_trans(Tween.TRANS_SINE)
+
+func _stop_glow() -> void:
+	if glow_tween:
+		glow_tween.kill()
+		glow_tween = null
+	if glow_outline:
+		glow_outline.visible = false

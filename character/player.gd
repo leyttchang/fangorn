@@ -24,6 +24,7 @@ signal player_hit_enemy
 @export var step_interval: float = 2.8 # Distance en mÃ¨tres entre deux bruits de pas
 
 var _footstep_distance: float = 0.0
+var last_weapon_switch_time: int = 0
 
 const JUMP_VELOCITY = 4.5
 const mouse_sensitivity = 0.002
@@ -156,6 +157,22 @@ func _unhandled_input(event: InputEvent) -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+			
+	if event.is_action_pressed("switch_weapons"):
+		# Ne pas switch pendant qu'on attaque
+		if main_droite != null and main_droite.is_attacking:
+			return
+			
+		# Cooldown de 1 seconde (1000 millisecondes)
+		var current_time = Time.get_ticks_msec()
+		if current_time - last_weapon_switch_time < 1000:
+			return
+			
+		last_weapon_switch_time = current_time
+		
+		var equip_comp = $EquipmentComponent
+		if equip_comp:
+			equip_comp.swap_weapons()
 
 func _on_died() -> void:
 	print("mort")

@@ -481,7 +481,7 @@ func _draw():
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.8, 0.8, 0.8, 0.1))
 		
 	# On centre par rapport à l'écran, peu importe la taille ou la position décalée du Control
-	var center_offset = get_viewport_rect().size / 2.0 - position
+	var center_offset = Vector2(3960, 3540)
 	
 	# Dessiner la texture de bruit en arrière-plan
 	if show_noise_background and noise_texture != null:
@@ -535,7 +535,7 @@ func _build_interactive_tree():
 		return
 		
 	# On centre par rapport à l'écran
-	var center_offset = get_viewport_rect().size / 2.0 - position
+	var center_offset = Vector2(3960, 3540)
 	
 	# 1. Créer les lignes visuelles (Line2D)
 	edge_lines.clear()

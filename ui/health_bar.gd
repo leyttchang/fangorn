@@ -24,12 +24,12 @@ func _on_health_changed(current_health: float, max_health: float) -> void:
 	# On met à jour le maximum au cas où le perso gagne un niveau ou un bonus de vie max
 	progress_bar.max_value = max_health
 	
-	# AU CHOIX :
-	
-	# Option A : Changement instantané (classique)
-	# progress_bar.value = current_health 
-	
-	# Option B : Changement fluide avec une animation (beaucoup plus satisfaisant)
-	var tween = get_tree().create_tween()
+	# Sécurité : Si le jeu est en train de se fermer ou qu'on change de scène, l'arbre n'existe plus
+	if not is_inside_tree():
+		progress_bar.value = current_health
+		return
+		
+	# Changement fluide avec une animation (beaucoup plus satisfaisant)
+	var tween = create_tween()
 	# La barre va mettre 0.2 secondes à rejoindre sa nouvelle valeur
 	tween.tween_property(progress_bar, "value", current_health, 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

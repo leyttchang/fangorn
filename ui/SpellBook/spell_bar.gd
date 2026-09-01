@@ -5,7 +5,7 @@ extends CanvasLayer
 @export var skill_bar: SkillBarComponent
 
 # Chemin exact vers la grille contenant les slots
-@onready var grid: Control = $MainPanel/inventaire/inv_grid
+@onready var grid: Control = %inv_grid
 
 func _ready() -> void:
 	if skill_bar == null:
@@ -82,6 +82,10 @@ func update_all_slots() -> void:
 	for i in range(slot_nodes.size()):
 		var slot_key: String = "slot_" + str(i + 1)
 		var slot_node: Node = slot_nodes[i]
+		
+		# --- INJECTION DES DONNEES POUR LE DRAG AND DROP ---
+		slot_node.set("slot_name", slot_key)
+		slot_node.set("skill_bar", skill_bar)
 		
 		# Mise à jour du Label de touche (Hotkey)
 		var hotkey_label: Label = slot_node.get_node_or_null("Hotkey")

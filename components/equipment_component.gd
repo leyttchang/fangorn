@@ -38,7 +38,9 @@ func equip_item(item: ItemData, slot_name: String) -> bool:
 	equipped_items[slot_name] = item
 
 	# 3. On applique les bonus de l'objet sur le joueur
-	_apply_item_stats(item)
+	# Sauf si c'est la 2ème arme (arme de réserve)
+	if slot_name != "second_weapon":
+		_apply_item_stats(item)
 
 	# 4. On prévient le reste du jeu
 	equipment_changed.emit(slot_name, item)
@@ -59,13 +61,36 @@ func unequip_item(slot_name: String) -> bool:
 			return false
 
 	# 2. On retire les bonus de cet objet du StatsComponent
-	_remove_item_stats(item_to_remove)
+	# Sauf si c'est la 2ème arme (elle ne donnait pas de stats)
+	if slot_name != "second_weapon":
+		_remove_item_stats(item_to_remove)
 
 	# 3. On vide le slot
 	equipped_items[slot_name] = null
 	equipment_changed.emit(slot_name, null)
 	
 	return true
+
+# --- INTERVERTIR LES DEUX ARMES ---
+func swap_weapons() -> void:
+	var w1 = equipped_items["main_hand"]
+	var w2 = equipped_items["second_weapon"]
+	
+	# 1. Retrait des stats de l'arme actuelle
+	if w1 != null:
+		_remove_item_stats(w1)
+		
+	# 2. Echange dans les données
+	equipped_items["main_hand"] = w2
+	equipped_items["second_weapon"] = w1
+	
+	# 3. Application des stats de la nouvelle arme principale
+	if w2 != null:
+		_apply_item_stats(w2)
+		
+	# 4. Rafraîchissement de l'interface
+	equipment_changed.emit("main_hand", w2)
+	equipment_changed.emit("second_weapon", w1)
 
 # --- GESTION DES STATS (Le pont avec ton StatsComponent) ---
 func _apply_item_stats(item: ItemData) -> void:

@@ -5,8 +5,7 @@ extends CanvasLayer
 # La liste de tous les sorts que le joueur a débloqués (à remplir dans l'inspecteur)
 @export var unlocked_spells: Array[AbilityData] 
 
-@onready var u_grid = $MainPanel/inventaire/inv_grid
-@onready var e_grid = $MainPanel/equipe/inv_grid
+@onready var u_grid = %inv_grid
 @onready var unlock_btn: Button = find_child("UnlockAllButton", true, false)
 
 func _ready() -> void:
@@ -16,11 +15,6 @@ func _ready() -> void:
 		return
 		
 	_setup_inventory_slots()
-	_setup_equipment_slots()
-	
-	# On écoute les changements pour rafraîchir l'affichage instantanément
-	skill_bar.spells_updated.connect(_refresh_equipment_visuals)
-	_refresh_equipment_visuals()
 
 	if unlock_btn != null:
 		if not unlock_btn.pressed.is_connected(unlock_all_spells):
@@ -63,23 +57,6 @@ func _rpc_unlock_spell(ability_path: String) -> void:
 			
 	unlocked_spells.append(ability)
 	_setup_inventory_slots()
-
-
-# Prépare les 6 cases de gauche (assignation des noms et du lien vers le joueur)
-func _setup_equipment_slots() -> void:
-	var e_slots = e_grid.get_children()
-	for i in range(e_slots.size()):
-		var slot_key = "slot_" + str(i + 1)
-		e_slots[i].slot_name = slot_key
-		e_slots[i].skill_bar = skill_bar
-
-# Met à jour les images de gauche quand un sort est équipé/déséquipé
-func _refresh_equipment_visuals() -> void:
-	var e_slots = e_grid.get_children()
-	for i in range(e_slots.size()):
-		var slot_key = "slot_" + str(i + 1)
-		if skill_bar.slots.has(slot_key):
-			e_slots[i].set_ability(skill_bar.slots[slot_key])
 
 func open_spellbook() -> void:
 	visible = true
