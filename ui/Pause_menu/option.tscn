@@ -48,7 +48,7 @@ popup/item_1/id = 1
 popup/item_2/text = "Borderless"
 popup/item_2/id = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer" unique_id=33904893]
+[node name="sensitivityLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=33904893]
 layout_mode = 2
 text = "Sensitivity"
 horizontal_alignment = 1
@@ -68,6 +68,81 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="RenderScaleLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1552731518]
+layout_mode = 2
+text = "Render scale"
+horizontal_alignment = 1
+
+[node name="RenderScale" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=902356131]
+layout_mode = 2
+
+[node name="RenderScale_slider" type="HSlider" parent="MarginContainer/VBoxContainer/RenderScale" unique_id=1388151942]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="RenderScale_text" type="Label" parent="MarginContainer/VBoxContainer/RenderScale" unique_id=1285398810]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="fsr_option" type="OptionButton" parent="MarginContainer/VBoxContainer/RenderScale" unique_id=1622101815]
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "Bilinear"
+popup/item_0/id = 0
+popup/item_1/text = "Fsr 1.0"
+popup/item_1/id = 1
+popup/item_2/text = "FSR 2.0"
+popup/item_2/id = 2
+
+[node name="FPs" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1423695865]
+layout_mode = 2
+alignment = 1
+
+[node name="fps_cap" type="Label" parent="MarginContainer/VBoxContainer/FPs" unique_id=1580491478]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "FPS cap:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="fps_cap_text" type="LineEdit" parent="MarginContainer/VBoxContainer/FPs" unique_id=401354234]
+layout_mode = 2
+
+[node name="vsync" type="Label" parent="MarginContainer/VBoxContainer/FPs" unique_id=1224640734]
+layout_mode = 2
+text = "Vsync :"
+
+[node name="Vsyinc_buton" type="CheckButton" parent="MarginContainer/VBoxContainer/FPs" unique_id=2102138559]
+layout_mode = 2
+
+[node name="Shadow" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=292569579]
+layout_mode = 2
+alignment = 1
+
+[node name="shadow" type="Label" parent="MarginContainer/VBoxContainer/Shadow" unique_id=1057188111]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "shadow :"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Shadow_selection" type="OptionButton" parent="MarginContainer/VBoxContainer/Shadow" unique_id=1549630038]
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "High"
+popup/item_0/id = 0
+popup/item_1/text = "Low"
+popup/item_1/id = 1
+popup/item_2/text = "Off"
+popup/item_2/id = 2
 
 [node name="return" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2146650173]
 unique_name_in_owner = true
