@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://d0hkp12x53v44" path="res://assets/3D_models/grass/grass2.glb" id="1_lo57j"]
 [ext_resource type="Texture2D" uid="uid://cicdfuy5wi2w2" path="res://assets/texture/grass_05/Grass005_alb_ht.dds" id="1_msgbt"]
+[ext_resource type="Script" uid="uid://bbvybbfhe7h07" path="res://map/map/map_optimize.gd" id="1_y18du"]
 [ext_resource type="Shader" uid="uid://dquohcow0genx" path="res://assets/3D_models/grass/grass.gdshader" id="1_yc432"]
 [ext_resource type="Texture2D" uid="uid://bffpi2xeyh5hn" path="res://assets/texture/grass_05/Grass005_nrm_rgh.dds" id="2_f3olj"]
 [ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="2_gs0fi"]
@@ -22,6 +23,10 @@ glow_enabled = true
 glow_intensity = 0.86
 glow_bloom = 0.15
 glow_blend_mode = 2
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.0186, 0.036540005, 0.06, 1)
+fog_density = 1.0
 volumetric_fog_enabled = true
 volumetric_fog_albedo = Color(0.2901966, 0.28847882, 0.20427796, 1)
 volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
@@ -118,6 +123,7 @@ mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_gs0fi")])
 texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_iu3m6"), SubResource("Terrain3DTextureAsset_wcxlr")])
 
 [node name="Map1T3d" type="Node3D" unique_id=1167371297]
+script = ExtResource("1_y18du")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=834492024]
 environment = SubResource("Environment_hlie2")

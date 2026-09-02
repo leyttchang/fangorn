@@ -144,6 +144,24 @@ popup/item_1/id = 1
 popup/item_2/text = "Off"
 popup/item_2/id = 2
 
+[node name="render_distance" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=925910224]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/render_distance" unique_id=1949723632]
+layout_mode = 2
+text = "Render distance"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/render_distance" unique_id=1994656819]
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "Far"
+popup/item_0/id = 0
+popup/item_1/text = "Mid"
+popup/item_1/id = 1
+popup/item_2/text = "Close"
+popup/item_2/id = 2
+
 [node name="return" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2146650173]
 unique_name_in_owner = true
 layout_mode = 2

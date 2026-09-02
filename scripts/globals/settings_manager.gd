@@ -1,6 +1,9 @@
 extends Node
 
 signal mouse_sensitivity_changed(new_value: float)
+signal shadow_quality_changed(quality: int)
+signal render_distance_changed(distance: int)
+signal vfog_changed(enabled: bool)
 
 var mouse_sensitivity: float = 0.002:
 	set(value):
@@ -32,6 +35,16 @@ var vsync: bool = true:
 		vsync = value
 		_apply_vsync()
 
+var volumetric_fog_enabled: bool = true:
+	set(value):
+		volumetric_fog_enabled = value
+		vfog_changed.emit(volumetric_fog_enabled)
+
+var render_distance: int = 1:
+	set(value):
+		render_distance = value
+		render_distance_changed.emit(render_distance)
+
 var shadow_quality: int = 0: # 0 = High, 1 = Low, 2 = Off
 	set(value):
 		shadow_quality = value
@@ -56,12 +69,13 @@ func _apply_vsync() -> void:
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 
 func _apply_shadow_quality() -> void:
+	shadow_quality_changed.emit(shadow_quality)
 	match shadow_quality:
 		0: # High
 			RenderingServer.directional_shadow_atlas_set_size(4096, true)
 			RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_SOFT_HIGH)
 		1: # Low
-			RenderingServer.directional_shadow_atlas_set_size(1024, true)
+			RenderingServer.directional_shadow_atlas_set_size(2048, true)
 			RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_HARD)
 		2: # Off (Minimum size to avoid D3D12/Vulkan crash, effectively disables them visually)
 			RenderingServer.directional_shadow_atlas_set_size(256, true)
@@ -87,6 +101,8 @@ func save_settings() -> void:
 	config.set_value("Video", "fps_cap", fps_cap)
 	config.set_value("Video", "vsync", vsync)
 	config.set_value("Video", "shadow_quality", shadow_quality)
+	config.set_value("Video", "render_distance", render_distance)
+	config.set_value("Video", "volumetric_fog", volumetric_fog_enabled)
 	config.save(SETTINGS_FILE)
 
 func load_settings() -> void:
@@ -103,3 +119,5 @@ func load_settings() -> void:
 	fps_cap = config.get_value("Video", "fps_cap", 0)
 	vsync = config.get_value("Video", "vsync", true)
 	shadow_quality = config.get_value("Video", "shadow_quality", 0)
+	render_distance = config.get_value("Video", "render_distance", 1)
+	volumetric_fog_enabled = config.get_value("Video", "volumetric_fog", true)
