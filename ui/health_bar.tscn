@@ -1,23 +1,65 @@
 [gd_scene format=3 uid="uid://bk1064mxurpec"]
 
 [ext_resource type="Script" uid="uid://2m21r57usn56" path="res://ui/health_bar.gd" id="1_rwxrv"]
+[ext_resource type="Shader" uid="uid://dsxa5017yrm8h" path="res://ui/health_bar_shader.tres" id="2_prk0l"]
+[ext_resource type="Texture2D" uid="uid://d1cg7loqk4vfy" path="res://assets/UI/health_abr/orb_background.png" id="3_fbv3k"]
+[ext_resource type="Texture2D" uid="uid://dwe18t02dl0s1" path="res://assets/UI/health_abr/orb_mask.png" id="4_mc7qp"]
+[ext_resource type="Texture2D" uid="uid://o52nhibumb25" path="res://assets/LeLu's Noise Pack/T_NKQ443.png" id="5_fbv3k"]
+[ext_resource type="Texture2D" uid="uid://basv4y1vmx48a" path="res://assets/UI/health_abr/liquide.png" id="6_3710l"]
+[ext_resource type="Texture2D" uid="uid://dpn32wa87uqg3" path="res://assets/UI/health_abr/orb_frame.png" id="7_lfoab"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlie2"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
+shader = ExtResource("2_prk0l")
+shader_parameter/liquide_color = Color(0.3, 0.008999992, 0.008999992, 1)
+shader_parameter/text_1_speed = 0.5
+shader_parameter/texture_1_add = ExtResource("5_fbv3k")
+shader_parameter/health_percent = 0.667
+shader_parameter/wave_frequency = 10.0
+shader_parameter/wave_speed = 5.0
+shader_parameter/wave_amplitude = 0.01
 
 [node name="health_bar" type="CanvasLayer" unique_id=427302170]
 script = ExtResource("1_rwxrv")
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=1597248502]
-custom_minimum_size = Vector2(200, 30)
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1528769839]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -42.0
-offset_right = 210.0
-offset_bottom = -12.0
+offset_left = 321.09
+offset_top = -296.03497
+offset_right = 361.09
+offset_bottom = -256.03497
 grow_vertical = 0
-step = 0.1
-nine_patch_stretch = true
-texture_progress = SubResource("PlaceholderTexture2D_hlie2")
-tint_progress = Color(1.6197081, 0.030314302, 0.030314302, 1)
+scale = Vector2(0.3, 0.3)
+
+[node name="Health_bar" type="Control" parent="MarginContainer" unique_id=851709097]
+layout_mode = 2
+
+[node name="background" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=693152589]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_fbv3k")
+
+[node name="mask" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=44227863]
+clip_children = 1
+layout_mode = 0
+offset_right = 1024.0
+offset_bottom = 1024.0
+texture = ExtResource("4_mc7qp")
+
+[node name="liquid" type="TextureRect" parent="MarginContainer/Health_bar/mask" unique_id=417102526]
+material = SubResource("ShaderMaterial_yqkk6")
+layout_mode = 0
+offset_left = 193.0
+offset_top = 17.0
+offset_right = 822.0
+offset_bottom = 574.0
+texture = ExtResource("6_3710l")
+expand_mode = 1
+
+[node name="frame" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=949715135]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("7_lfoab")

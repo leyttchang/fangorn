@@ -11,7 +11,6 @@ extends Panel
 @onready var vsync_btn: CheckButton = $MarginContainer/VBoxContainer/FPs/Vsyinc_buton
 @onready var shadow_btn: OptionButton = $MarginContainer/VBoxContainer/Shadow/Shadow_selection
 @onready var render_distance_btn: OptionButton = $MarginContainer/VBoxContainer/render_distance/OptionButton
-@onready var vfog_btn: CheckButton = $MarginContainer/VBoxContainer/Volumetric_fog/VFog_buton
 
 func _ready() -> void:
 	# Configure the sliders bounds
@@ -38,7 +37,6 @@ func _ready() -> void:
 		vsync_btn.button_pressed = settings.vsync
 		shadow_btn.select(settings.shadow_quality)
 		render_distance_btn.select(settings.render_distance)
-		vfog_btn.button_pressed = settings.volumetric_fog_enabled
 		
 		sensitivity_slider.value_changed.connect(_on_sensitivity_changed)
 		window_mode_btn.item_selected.connect(_on_window_mode_selected)
@@ -48,7 +46,6 @@ func _ready() -> void:
 		vsync_btn.toggled.connect(_on_vsync_toggled)
 		shadow_btn.item_selected.connect(_on_shadow_quality_selected)
 		render_distance_btn.item_selected.connect(_on_render_distance_selected)
-		vfog_btn.toggled.connect(_on_vfog_toggled)
 		
 	elif get_tree().root.has_node("SettingsManager"):
 		var settings = get_tree().root.get_node("SettingsManager")
@@ -64,7 +61,7 @@ func _ready() -> void:
 		vsync_btn.button_pressed = settings.vsync
 		shadow_btn.select(settings.shadow_quality)
 		render_distance_btn.select(settings.render_distance)
-		vfog_btn.button_pressed = settings.volumetric_fog_enabled
+		
 		
 		sensitivity_slider.value_changed.connect(_on_sensitivity_changed)
 		window_mode_btn.item_selected.connect(_on_window_mode_selected)
@@ -74,7 +71,7 @@ func _ready() -> void:
 		vsync_btn.toggled.connect(_on_vsync_toggled)
 		shadow_btn.item_selected.connect(_on_shadow_quality_selected)
 		render_distance_btn.item_selected.connect(_on_render_distance_selected)
-		vfog_btn.toggled.connect(_on_vfog_toggled)
+		
 
 func _update_fps_input(cap: int) -> void:
 	if cap <= 0:
@@ -176,11 +173,8 @@ func _on_render_distance_selected(index: int) -> void:
 		settings.render_distance = index
 		settings.save_settings()
 
-func _on_vfog_toggled(toggled_on: bool) -> void:
 	if Engine.has_singleton("SettingsManager"):
-		Engine.get_singleton("SettingsManager").volumetric_fog_enabled = toggled_on
 		Engine.get_singleton("SettingsManager").save_settings()
 	elif get_tree().root.has_node("SettingsManager"):
 		var settings = get_tree().root.get_node("SettingsManager")
-		settings.volumetric_fog_enabled = toggled_on
 		settings.save_settings()

@@ -5,10 +5,8 @@ func _ready() -> void:
 		var settings = get_tree().root.get_node("SettingsManager")
 		settings.shadow_quality_changed.connect(_on_shadow_quality_changed)
 		settings.render_distance_changed.connect(_on_render_distance_changed)
-		settings.vfog_changed.connect(_on_vfog_changed)
 		_on_shadow_quality_changed(settings.shadow_quality)
 		_on_render_distance_changed(settings.render_distance)
-		_on_vfog_changed(settings.volumetric_fog_enabled)
 
 func _on_shadow_quality_changed(quality: int) -> void:
 	var herbe_doit_projeter_ombre = (quality == 0)
@@ -39,18 +37,3 @@ func _on_render_distance_changed(distance_mode: int) -> void:
 	var cameras = get_tree().root.find_children("*", "Camera3D", true, false)
 	for cam in cameras:
 		cam.far = far_distance
-		
-	var environnements = get_tree().root.find_children("*", "WorldEnvironment", true, false)
-	for env in environnements:
-		if env.environment:
-			env.environment.fog_enabled = true
-			env.environment.fog_mode = Environment.FOG_MODE_DEPTH
-			env.environment.fog_depth_begin = far_distance * 0.4
-			env.environment.fog_depth_end = far_distance
-			env.environment.fog_sky_affect = 0.0
-
-func _on_vfog_changed(enabled: bool) -> void:
-	var environnements = get_tree().root.find_children("*", "WorldEnvironment", true, false)
-	for env in environnements:
-		if env.environment:
-			env.environment.volumetric_fog_enabled = enabled

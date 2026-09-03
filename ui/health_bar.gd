@@ -1,35 +1,35 @@
-extends CanvasLayer
+﻿extends CanvasLayer
 
-# On exporte la variable pour pouvoir glisser le HealthComponent du joueur (ou du monstre) dans l'inspecteur
 @export var health_component: HealthComponent
 
-# On récupère ton TextureProgressBar vu dans image_0c87c2.png
-@onready var progress_bar: TextureProgressBar = $TextureProgressBar
+@onready var liquide: TextureRect = $MarginContainer/Health_bar/mask/liquid
 
 func _ready() -> void:
 	if health_component != null:
-		# 1. On initialise la barre au lancement du jeu avec les bonnes valeurs
+		# Initialise la barre
 		var max_hp = health_component.stats_component.get_stat_value("max_health")
-		progress_bar.max_value = max_hp
-		progress_bar.value = health_component.current_health
+		var health_percent = health_component.current_health / max_hp
+		liquide.material.set_shader_parameter("health_percent", health_percent)
 		
-		# 2. On connecte le signal de ton HealthComponent à notre fonction de mise à jour
+		# Connecte le signal
 		health_component.health_changed.connect(_on_health_changed)
 	else:
-		push_warning("Attention : Aucun HealthComponent n'est assigné à la barre de vie " + name)
+		push_warning("Attention : Aucun HealthComponent n'est assigne a la barre de vie " + name)
 
 
-# Fonction appelée automatiquement à chaque fois que le signal 'health_changed' est émis
 func _on_health_changed(current_health: float, max_health: float) -> void:
-	# On met à jour le maximum au cas où le perso gagne un niveau ou un bonus de vie max
-	progress_bar.max_value = max_health
-	
-	# Sécurité : Si le jeu est en train de se fermer ou qu'on change de scène, l'arbre n'existe plus
 	if not is_inside_tree():
-		progress_bar.value = current_health
 		return
 		
-	# Changement fluide avec une animation (beaucoup plus satisfaisant)
+	var target_percent = current_health / max_health
+	
+	# Animation fluide du shader parameter (tween_method est parfait pour ca)
 	var tween = create_tween()
-	# La barre va mettre 0.2 secondes à rejoindre sa nouvelle valeur
-	tween.tween_property(progress_bar, "value", current_health, 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	var current_percent = liquide.material.get_shader_parameter("health_percent")
+	
+	tween.tween_method(
+		func(val: float): liquide.material.set_shader_parameter("health_percent", val),
+		current_percent,
+		target_percent,
+		0.2
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
