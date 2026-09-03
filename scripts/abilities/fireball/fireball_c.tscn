@@ -13,6 +13,10 @@
 [ext_resource type="Resource" uid="uid://cwl1x2y7sug0o" path="res://scripts/status_effects/burn/burn.tres" id="7_lbd7v"]
 [ext_resource type="PackedScene" uid="uid://bkf8u24x228xv" path="res://components/spell_componants/area_damage_after_hit.tscn" id="8_x5wq2"]
 [ext_resource type="Script" uid="uid://754224kx8r1s" path="res://components/spell_componants/explosion-after_hit_after_hit.gd" id="9_o14cw"]
+[ext_resource type="PackedScene" uid="uid://obnykqx07k8f" path="res://particule/explosion_VFX/explosion_slash.tscn" id="14_okf3j"]
+[ext_resource type="PackedScene" uid="uid://lgrpojpfsvc0" path="res://particule/explosion_VFX/explosion_vfx.tscn" id="15_bhy7e"]
+[ext_resource type="Texture2D" uid="uid://b1m87caab8flo" path="res://assets/LeLu's Noise Pack/T_Noise_Wf4.png" id="16_p53ir"]
+[ext_resource type="Texture2D" uid="uid://o52nhibumb25" path="res://assets/LeLu's Noise Pack/T_NKQ443.png" id="17_cphnw"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_46tu8"]
 
@@ -64,6 +68,236 @@ effect = ExtResource("7_lbd7v")
 apply_chance = 0.33
 metadata/_custom_type_script = "uid://f3s08057cvjq"
 
+[sub_resource type="VisualShaderNodeSmoothStep" id="VisualShaderNodeSmoothStep_ytxnn"]
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_vk84u"]
+source = 5
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_nuq60"]
+parameter_name = "disapearing_texture"
+
+[sub_resource type="VisualShaderNodeSmoothStep" id="VisualShaderNodeSmoothStep_le4cf"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_glvee"]
+expanded_output_ports = [0]
+input_name = "color"
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_lar7g"]
+expanded_output_ports = [0]
+input_name = "color"
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_wtlk5"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeProximityFade" id="VisualShaderNodeProximityFade_oqopu"]
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_d2frj"]
+parameter_name = "color"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_a202f"]
+expanded_output_ports = [0]
+source = 5
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_m5jb2"]
+parameter_name = "grad_1d"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_bn2bc"]
+source = 5
+
+[sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_d4d45"]
+parameter_name = "explosion_color"
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_8sek5"]
+parameter_name = "color_texture"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_anpby"]
+source = 5
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_vjo7y"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_q7hyk"]
+parameter_name = "deformation_scale"
+default_value_enabled = true
+default_value = 1.0
+
+[sub_resource type="VisualShaderNodeUVFunc" id="VisualShaderNodeUVFunc_xd068"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_v5mst"]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeMultiplyAdd" id="VisualShaderNodeMultiplyAdd_x8fp5"]
+default_input_values = [0, Vector2(0, 0), 1, Vector2(1, 1), 2, Vector2(0, 0)]
+op_type = 1
+
+[sub_resource type="VisualShaderNodeVec2Parameter" id="VisualShaderNodeVec2Parameter_wob45"]
+expanded_output_ports = [0]
+parameter_name = "movment_speed"
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_6blde"]
+input_name = "vertex"
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_s7nkw"]
+input_name = "normal"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_qb2ib"]
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_dwig8"]
+parameter_name = "deformation_texture"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_p1jpr"]
+expanded_output_ports = [0]
+source = 5
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_uprh0"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_0d6mb"]
+operator = 2
+
+[sub_resource type="VisualShader" id="VisualShader_y46gf"]
+nodes/vertex/0/position = Vector2(560, 64)
+nodes/vertex/2/node = SubResource("VisualShaderNodeInput_6blde")
+nodes/vertex/2/position = Vector2(-272, 80)
+nodes/vertex/3/node = SubResource("VisualShaderNodeInput_s7nkw")
+nodes/vertex/3/position = Vector2(-288, 272)
+nodes/vertex/4/node = SubResource("VisualShaderNodeVectorOp_qb2ib")
+nodes/vertex/4/position = Vector2(267.41498, 157.06757)
+nodes/vertex/6/node = SubResource("VisualShaderNodeTexture2DParameter_dwig8")
+nodes/vertex/6/position = Vector2(-592, 768)
+nodes/vertex/7/node = SubResource("VisualShaderNodeTexture_p1jpr")
+nodes/vertex/7/position = Vector2(-528, 496)
+nodes/vertex/8/node = SubResource("VisualShaderNodeVectorOp_uprh0")
+nodes/vertex/8/position = Vector2(185.07956, 571.97076)
+nodes/vertex/9/node = SubResource("VisualShaderNodeFloatOp_0d6mb")
+nodes/vertex/9/position = Vector2(-68.75261, 771.6038)
+nodes/vertex/10/node = SubResource("VisualShaderNodeFloatParameter_q7hyk")
+nodes/vertex/10/position = Vector2(-41.696026, 1040.8812)
+nodes/vertex/11/node = SubResource("VisualShaderNodeUVFunc_xd068")
+nodes/vertex/11/position = Vector2(-1072, 624)
+nodes/vertex/12/node = SubResource("VisualShaderNodeInput_v5mst")
+nodes/vertex/12/position = Vector2(-1680, 720)
+nodes/vertex/13/node = SubResource("VisualShaderNodeMultiplyAdd_x8fp5")
+nodes/vertex/13/position = Vector2(-1312, 800)
+nodes/vertex/14/node = SubResource("VisualShaderNodeVec2Parameter_wob45")
+nodes/vertex/14/position = Vector2(-1824, 1024)
+nodes/vertex/connections = PackedInt32Array(2, 0, 4, 0, 6, 0, 7, 2, 3, 0, 8, 0, 8, 0, 4, 1, 4, 0, 0, 0, 7, 1, 9, 0, 9, 0, 8, 1, 10, 0, 9, 1, 11, 0, 7, 0, 12, 0, 13, 0, 13, 0, 11, 2, 14, 0, 13, 1)
+nodes/fragment/2/node = SubResource("VisualShaderNodeTexture2DParameter_d2frj")
+nodes/fragment/2/position = Vector2(-864, -96)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture_a202f")
+nodes/fragment/3/position = Vector2(-864, -304)
+nodes/fragment/4/node = SubResource("VisualShaderNodeTexture2DParameter_m5jb2")
+nodes/fragment/4/position = Vector2(-416, -80)
+nodes/fragment/5/node = SubResource("VisualShaderNodeTexture_bn2bc")
+nodes/fragment/5/position = Vector2(-416, -288)
+nodes/fragment/6/node = SubResource("VisualShaderNodeColorParameter_d4d45")
+nodes/fragment/6/position = Vector2(-784, 1072)
+nodes/fragment/7/node = SubResource("VisualShaderNodeTexture2DParameter_8sek5")
+nodes/fragment/7/position = Vector2(-368, 1408)
+nodes/fragment/8/node = SubResource("VisualShaderNodeTexture_anpby")
+nodes/fragment/8/position = Vector2(-368, 1200)
+nodes/fragment/9/node = SubResource("VisualShaderNodeVectorOp_vjo7y")
+nodes/fragment/9/position = Vector2(41.044094, 998.9884)
+nodes/fragment/10/node = SubResource("VisualShaderNodeSmoothStep_ytxnn")
+nodes/fragment/10/position = Vector2(384, 1312)
+nodes/fragment/12/node = SubResource("VisualShaderNodeTexture_vk84u")
+nodes/fragment/12/position = Vector2(-1152, 304)
+nodes/fragment/13/node = SubResource("VisualShaderNodeTexture2DParameter_nuq60")
+nodes/fragment/13/position = Vector2(-1152, 512)
+nodes/fragment/14/node = SubResource("VisualShaderNodeSmoothStep_le4cf")
+nodes/fragment/14/position = Vector2(-438.8087, 446.7404)
+nodes/fragment/16/node = SubResource("VisualShaderNodeInput_glvee")
+nodes/fragment/16/position = Vector2(144, 1664)
+nodes/fragment/17/node = SubResource("VisualShaderNodeInput_lar7g")
+nodes/fragment/17/position = Vector2(-720, 688)
+nodes/fragment/18/node = SubResource("VisualShaderNodeFloatOp_wtlk5")
+nodes/fragment/18/position = Vector2(-145.39162, 677.9464)
+nodes/fragment/19/node = SubResource("VisualShaderNodeProximityFade_oqopu")
+nodes/fragment/19/position = Vector2(-257.44135, 899.9709)
+nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 2, 3, 1, 5, 0, 5, 0, 0, 0, 7, 0, 8, 2, 6, 0, 9, 0, 9, 0, 0, 5, 8, 0, 10, 2, 10, 0, 9, 1, 13, 0, 12, 2, 12, 0, 14, 2, 16, 1, 10, 0, 17, 4, 14, 0, 14, 0, 18, 0, 19, 0, 18, 1, 18, 0, 0, 1)
+
+[sub_resource type="Gradient" id="Gradient_vj0ga"]
+offsets = PackedFloat32Array(0.0016393443, 1)
+colors = PackedColorArray(0.28, 0.17066002, 0.0812, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_b5rwf"]
+gradient = SubResource("Gradient_vj0ga")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e2sv2"]
+render_priority = 0
+shader = SubResource("VisualShader_y46gf")
+shader_parameter/movment_speed = Vector2(0.07, 0.845)
+shader_parameter/deformation_texture = ExtResource("17_cphnw")
+shader_parameter/deformation_scale = 0.538
+shader_parameter/color = ExtResource("16_p53ir")
+shader_parameter/grad_1d = SubResource("GradientTexture1D_b5rwf")
+shader_parameter/disapearing_texture = ExtResource("17_cphnw")
+shader_parameter/explosion_color = Color(3.8439248, 1.9960932, 0, 1)
+shader_parameter/color_texture = ExtResource("16_p53ir")
+
+[sub_resource type="SphereMesh" id="SphereMesh_vavt8"]
+material = SubResource("ShaderMaterial_e2sv2")
+
+[sub_resource type="Animation" id="Animation_688hy"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("explosion_VFX/cloud:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("explosion_slash:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_spacb"]
+resource_name = "explode"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("explosion_VFX/cloud:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("explosion_slash:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fb6nd"]
+_data = {
+&"RESET": SubResource("Animation_688hy"),
+&"explode": SubResource("Animation_spacb")
+}
+
 [node name="fireball" type="RigidBody3D" unique_id=247738793]
 collision_layer = 0
 script = ExtResource("1_i3gd7")
@@ -103,6 +337,8 @@ phys_ratio = 0.0
 fire_ratio = 1.0
 
 [node name="ImpactSpawnerComponent" parent="." unique_id=19574901 node_paths=PackedStringArray("attack_component", "scaling_component") instance=ExtResource("6_0x40h")]
+destroy_parent_on_impact = false
+delay_before_spawn = 0.2
 impact_scene = ExtResource("2_24oj3")
 attack_component = NodePath("../AttackComponent")
 scaling_component = NodePath("../SpellScalingComponent")
@@ -122,8 +358,27 @@ knockback_force = 9.0
 knockback_angle = 50.0
 status_effects_to_apply = Array[ExtResource("6_kdt48")]([SubResource("Resource_aqdbj")])
 
+[node name="explosion_vfx" type="Node3D" parent="." unique_id=468635528]
+
+[node name="explosion_slash" parent="explosion_vfx" unique_id=885436822 instance=ExtResource("14_okf3j")]
+emitting = false
+one_shot = true
+
+[node name="explosion_VFX" parent="explosion_vfx" unique_id=1837234248 instance=ExtResource("15_bhy7e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+
+[node name="cloud" parent="explosion_vfx/explosion_VFX" index="0" unique_id=336506080]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+emitting = false
+one_shot = true
+draw_pass_1 = SubResource("SphereMesh_vavt8")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="explosion_vfx" unique_id=1350429737]
+libraries/ = SubResource("AnimationLibrary_fb6nd")
+
 [editable path="fireball_head"]
 [editable path="AttackComponent"]
 [editable path="fire_paricles"]
 [editable path="explosion_after_hit"]
 [editable path="explosion_after_hit/explosion"]
+[editable path="explosion_vfx/explosion_VFX"]

@@ -33,8 +33,25 @@ func _on_attack_landed(_target: Node) -> void:
 		if explosion_area.shape is SphereShape3D:
 			explosion_area.shape.radius = radius
 			print("--- 2. Rayon de l'explosion mis  jour : ", radius, " ---")
-	else:
-		push_warning("ATTENTION : Pas de scaling_component assign.")
+	# --- VFX ET ANIMATION ---
+	var explosion_vfx = get_parent().get_node_or_null("explosion_vfx")
+	if explosion_vfx != null:
+		var scale_factor = radius / 4.0 # 4.0 est le radius par dfaut
+		explosion_vfx.scale = Vector3(scale_factor, scale_factor, scale_factor)
+		
+		var anim_player = explosion_vfx.get_node_or_null("AnimationPlayer")
+		if anim_player != null and anim_player.has_animation("explode"):
+			anim_player.play("explode")
+			
+	# On arrte la boule de feu et on cache le projectile (pour ne garder que l'explosion visible)
+	var parent_body = get_parent() as RigidBody3D
+	if parent_body != null:
+		parent_body.freeze = true # Stop la physique (plus de rebonds)
+		var head = parent_body.get_node_or_null("fireball_head")
+		if head: head.visible = false
+		var fire_p = parent_body.get_node_or_null("fire_paricles")
+		if fire_p: fire_p.visible = false
+	# ------------------------
 
 	if attack_component != null and explosion != null:
 		explosion.base_damage = attack_component.base_damage * ratio_degat
@@ -54,3 +71,8 @@ func _on_attack_landed(_target: Node) -> void:
 		if is_instance_valid(explosion_area):
 			explosion_area.set_deferred("disabled", true)
 			print("--- 5. Hitbox de l'explosion dsactive. Fin de l'explosion. ---")
+			
+		# On attend 2 secondes pour laisser l'animation de particules se finir, puis on supprime la boule de feu
+		await get_tree().create_timer(2.0).timeout
+		if is_instance_valid(get_parent()):
+			get_parent().queue_free()

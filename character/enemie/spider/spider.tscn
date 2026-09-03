@@ -1,129 +1,213 @@
 [gd_scene format=3 uid="uid://be6hnf0fy02s"]
 
-[ext_resource type="PackedScene" uid="uid://bqkwhb3qu1o25" path="res://assets/3D_models/body/spider/spider_deciamate.glb" id="1_5rtk6"]
+[ext_resource type="PackedScene" uid="uid://c7wnoqpix0sfy" path="res://assets/3D_models/body/spider/low_poly_spider_rigged.glb" id="1_5rtk6"]
+[ext_resource type="Script" uid="uid://2jgj66jdl8sd" path="res://character/enemie/spider/r_1.gd" id="2_8i6e1"]
+[ext_resource type="Script" uid="uid://5a3li3aq5r8t" path="res://character/enemie/spider/IKtarget.gd" id="3_24dvt"]
+[ext_resource type="Script" uid="uid://bka72yatm4jem" path="res://character/enemie/spider/step_ray.gd" id="3_ae8y7"]
+[ext_resource type="Script" uid="uid://0eox54r5tf38" path="res://character/enemie/spider/step_target_container.gd" id="4_vlvqd"]
 
 [node name="spider" type="Node3D" unique_id=1015881093]
 
-[node name="spider_deciamate" parent="." unique_id=584519014 instance=ExtResource("1_5rtk6")]
-transform = Transform3D(1, 0, 0, 0, 0.091735505, -0.9957834, 0, 0.9957834, 0.091735505, 0, 0, 0)
+[node name="Sketchfab_Scene" parent="." unique_id=2083286687 instance=ExtResource("1_5rtk6")]
 
-[node name="Skeleton3D" parent="spider_deciamate/Sketchfab_model/model_fbx/Object_2/RootNode/Armature/Object_6" parent_id_path=PackedInt32Array(584519014, 857076546) index="1" unique_id=1103644447]
-bones/1/position = Vector3(-5.195351e-17, 0.43944165, -1.5612104e-15)
-bones/1/rotation = Quaternion(-1.6174886e-15, 1.8150904e-23, 1.1102224e-16, 1)
-bones/2/position = Vector3(1.1400742e-17, -0.18264905, -1.1455088e-13)
-bones/2/rotation = Quaternion(1.6174886e-15, 1.8150904e-23, 4.6766177e-23, 1)
-bones/2/scale = Vector3(0.70900184, 0.70898724, 0.7090271)
-bones/3/position = Vector3(0.19968794, 2.068625, 0.46278825)
-bones/3/rotation = Quaternion(-0.030894583, 0.8163203, 0.22984909, 0.5289954)
-bones/5/position = Vector3(-0.2175173, 1.6771564, -0.4225015)
-bones/5/rotation = Quaternion(-0.2125367, 0.8346248, 0.11600463, 0.4947449)
-bones/7/position = Vector3(0.4420601, 1.4279591, 0.93537045)
-bones/7/rotation = Quaternion(0.22823825, 0.7445354, 0.34023964, 0.52707815)
-bones/9/position = Vector3(-0.52862394, 1.7808976, -1.0096527)
-bones/9/rotation = Quaternion(-0.3654773, 0.8133097, -0.025608512, 0.45199332)
-bones/11/position = Vector3(0.61939013, 0.9366414, 1.2694788)
-bones/11/rotation = Quaternion(0.29251888, 0.7167901, 0.36537567, 0.516861)
-bones/13/position = Vector3(-0.56325847, 0.34586182, -1.1929586)
-bones/13/rotation = Quaternion(-0.71017665, 0.5827373, -0.3132698, 0.24068324)
-bones/15/position = Vector3(-0.33061826, -0.67684495, -0.8895688)
-bones/15/rotation = Quaternion(-0.7885902, 0.42735103, -0.41421834, 0.15466021)
-bones/17/position = Vector3(0.50437963, -1.1402222, 0.76909214)
-bones/17/rotation = Quaternion(0.829274, 0.0418925, 0.53664905, 0.15019156)
-bones/19/position = Vector3(0.002281487, -0.47758865, 0.25143552)
-bones/19/rotation = Quaternion(0.6349204, 0.101319164, 0.101319596, 0.7591738)
-bones/20/rotation = Quaternion(0.9114372, 0.03240618, 0.17425354, -0.37130558)
-bones/24/position = Vector3(-0.0011800367, 0.0024240548, -0.5028724)
-bones/24/rotation = Quaternion(0.014143363, -0.13769366, 0.48944083, 0.860981)
-bones/26/position = Vector3(-0.0011800367, 0.0024240548, -0.5028724)
-bones/26/rotation = Quaternion(0.012787984, 0.13736741, -0.48655158, 0.8626902)
-bones/29/rotation = Quaternion(-0.17400089, 0.69877785, 0.66967815, -0.18156111)
-bones/30/rotation = Quaternion(0.0155807035, 0.2605891, 0.9381841, -0.2272916)
-bones/32/position = Vector3(0.024529302, -0.14674798, -0.36018863)
-bones/32/rotation = Quaternion(-0.26130456, 0.046332628, 0.35646877, 0.89582545)
-bones/34/position = Vector3(0.024529302, -0.14674798, -0.36018863)
-bones/34/rotation = Quaternion(-0.2342247, -0.11245856, -0.37680116, 0.8891079)
-bones/43/rotation = Quaternion(-0.6853491, 0.018320218, -0.03257317, 0.72725517)
-bones/44/rotation = Quaternion(-0.00027882488, 0.75616926, -0.65427595, 0.011445763)
-bones/45/rotation = Quaternion(0.16999577, -0.0051272376, 0.011536973, 0.9853639)
-bones/50/rotation = Quaternion(-0.6853492, -0.018319607, 0.032574046, 0.7272549)
-bones/51/rotation = Quaternion(0.00027885506, 0.7561692, -0.65427595, -0.011445744)
-bones/52/rotation = Quaternion(0.16999567, 0.0051272954, -0.011536901, 0.985364)
-bones/54/rotation = Quaternion(0.4104645, 0.91025615, 0.05353508, -0.0093076)
-bones/55/rotation = Quaternion(-0.4476103, 0.24066943, -0.32134107, 0.799039)
-bones/63/rotation = Quaternion(-0.044016544, 0.14156878, 0.959604, -0.2391254)
-bones/68/rotation = Quaternion(-0.44415638, -0.24472876, 0.33285, 0.7950118)
-bones/81/rotation = Quaternion(0.5445401, -0.054496042, -0.18514998, 0.8162266)
-bones/82/rotation = Quaternion(0.4028324, -0.25711045, -0.37813312, 0.7928656)
-bones/83/rotation = Quaternion(-0.45504302, -0.06243882, -0.085694216, 0.8841344)
-bones/83/scale = Vector3(1, 0.9999926, 1.0000085)
-bones/84/rotation = Quaternion(-0.42489493, -0.023923913, 0.008783431, 0.9048839)
-bones/84/scale = Vector3(1.0000001, 0.9999964, 1.0000051)
-bones/85/rotation = Quaternion(-0.45730534, 0.013786066, -0.039170466, 0.8883397)
-bones/86/rotation = Quaternion(0.5030343, -0.0066569475, 0.04114601, 0.86326087)
-bones/91/rotation = Quaternion(0.5713422, 0.11896649, 0.17460145, 0.7930507)
-bones/92/rotation = Quaternion(0.4245792, 0.28658977, 0.36382094, 0.7779674)
-bones/93/rotation = Quaternion(-0.5049186, 0.07789973, 0.09039606, 0.85487866)
-bones/93/scale = Vector3(1, 0.9999946, 1.0000066)
-bones/94/rotation = Quaternion(-0.5270263, 0.03387559, 0.004792851, 0.84916013)
-bones/95/rotation = Quaternion(-0.5538304, -0.011056504, 0.050559033, 0.8310196)
-bones/96/rotation = Quaternion(0.6515222, 0.0030157696, -0.06260907, 0.75603557)
-bones/97/rotation = Quaternion(-0.09072468, 0.55416083, 0.8252508, -0.060299102)
-bones/98/rotation = Quaternion(-0.6166812, 0.047366142, 0.6754072, -0.4016041)
-bones/100/rotation = Quaternion(0.64411896, 0.65100384, 0.3150322, 0.24911743)
-bones/101/position = Vector3(3.424458e-07, 0.18006033, 5.9642866e-06)
-bones/101/rotation = Quaternion(0.5524556, -0.061633058, -0.074387, 0.8279257)
-bones/102/rotation = Quaternion(0.41444057, -0.101066835, -0.19105755, 0.884037)
-bones/103/rotation = Quaternion(-0.4762343, -0.055208024, -0.12336154, 0.8688699)
-bones/104/rotation = Quaternion(-0.51735395, -0.036669794, 0.067841046, 0.85228974)
-bones/105/rotation = Quaternion(-0.40998167, -0.011850136, 0.023875164, 0.9117043)
-bones/106/rotation = Quaternion(0.61889404, 0.030340424, -0.07259786, 0.7815237)
-bones/106/scale = Vector3(1.000001, 0.9999954, 1.0000036)
-bones/108/position = Vector3(-1.8221573e-07, 0.18006024, 5.9540007e-06)
-bones/108/rotation = Quaternion(0.59876966, 0.16449971, 0.7042685, 0.34412307)
-bones/110/rotation = Quaternion(-0.64395785, 0.6535227, 0.3151601, -0.24269432)
-bones/111/rotation = Quaternion(0.51184815, 0.04933912, 0.10528939, 0.8511705)
-bones/112/rotation = Quaternion(0.39046246, 0.1163235, 0.2112312, 0.88847584)
-bones/113/rotation = Quaternion(-0.43138862, 0.07424206, 0.13249351, 0.8892905)
-bones/113/scale = Vector3(0.9999996, 0.9999938, 1.0000079)
-bones/114/rotation = Quaternion(-0.45221114, 0.045797404, -0.050737716, 0.88928825)
-bones/115/rotation = Quaternion(-0.3546438, 0.015477618, -0.007807334, 0.93484086)
-bones/116/rotation = Quaternion(0.5165045, -0.04337615, 0.0062623164, 0.85516226)
-bones/117/rotation = Quaternion(-0.31568503, 0.53750145, 0.748348, -0.22673877)
-bones/118/rotation = Quaternion(-0.5936823, 0.16596977, 0.7063117, -0.34802198)
-bones/120/rotation = Quaternion(0.6770843, 0.61298704, 0.3360224, 0.2299841)
-bones/121/rotation = Quaternion(0.45574477, -0.0054244404, -0.005197817, 0.8900789)
-bones/122/rotation = Quaternion(0.51414233, 0.01982849, 0.1425342, 0.84554625)
-bones/123/rotation = Quaternion(-0.44110075, -0.06444187, -0.16183218, 0.88039064)
-bones/124/position = Vector3(-8.6563986e-08, 0.2098422, -0.01679829)
-bones/124/rotation = Quaternion(-0.40906122, 0.0052949544, -0.1535055, 0.899487)
-bones/125/rotation = Quaternion(-0.3204138, -0.009184994, -0.041498374, 0.9463237)
-bones/126/rotation = Quaternion(0.42102534, 0.12934187, -0.036420934, 0.8970406)
-bones/126/scale = Vector3(1.0000014, 0.9999973, 1.0000008)
-bones/128/rotation = Quaternion(0.6238205, 0.14649802, 0.6781571, 0.35984623)
-bones/131/rotation = Quaternion(0.47449318, 0.011188601, -0.06459172, 0.87781495)
-bones/132/rotation = Quaternion(0.5304965, -0.061962023, -0.18431742, 0.8250826)
-bones/133/rotation = Quaternion(-0.45552367, 0.014055306, 0.14577067, 0.87809545)
-bones/134/position = Vector3(-1.0559238e-07, 0.20864734, 0.02796854)
-bones/134/rotation = Quaternion(-0.44432706, -0.031204049, 0.12119926, 0.8870798)
-bones/135/rotation = Quaternion(-0.35364118, 0.003564334, 0.019823212, 0.9351643)
-bones/136/rotation = Quaternion(0.48591828, 0.0735399, -0.028895618, 0.87042546)
-bones/137/rotation = Quaternion(-0.5345211, 0.44208148, 0.60521525, -0.39059654)
-bones/138/rotation = Quaternion(-0.6190369, 0.14815216, 0.68035966, -0.36325622)
-bones/141/rotation = Quaternion(0.6425933, -0.35911426, -0.035785597, 0.6758922)
-bones/142/rotation = Quaternion(0.29894966, -0.19029593, -0.35716766, 0.86420363)
-bones/143/rotation = Quaternion(-0.42673105, 0.02942675, 0.11885223, 0.8960519)
-bones/144/rotation = Quaternion(-0.46497723, 0.008944834, 0.07150616, 0.88238496)
-bones/144/scale = Vector3(0.99999917, 0.9999933, 1.0000119)
-bones/145/rotation = Quaternion(-0.3313567, 0.009469705, 0.022359585, 0.94319314)
-bones/146/rotation = Quaternion(0.4341789, -0.14068018, 0.09198949, 0.8850061)
-bones/148/position = Vector3(4.172325e-07, 0.16451259, -5.9604645e-07)
-bones/148/rotation = Quaternion(0.8428675, -0.35946953, -0.3594719, 0.17645398)
-bones/151/rotation = Quaternion(0.59810126, 0.32711947, 0.062103916, 0.72897935)
-bones/152/rotation = Quaternion(0.24592075, 0.18750422, 0.36812842, 0.87683904)
-bones/153/rotation = Quaternion(-0.37054226, -0.013620121, -0.098168276, 0.9235129)
-bones/154/rotation = Quaternion(-0.3764224, 0.00272141, -0.041977398, 0.9254927)
-bones/154/scale = Vector3(0.99999934, 0.9999948, 1.0000076)
-bones/155/rotation = Quaternion(-0.24826156, -0.0061153453, -0.0005273085, 0.96867365)
-bones/156/rotation = Quaternion(0.34122014, -0.062039286, 0.09373976, 0.93323785)
+[node name="R_1" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="1" unique_id=1954593182]
+root_bone = &"Leg1_R_1_12"
+tip_bone = &"Leg1_R_5_8"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/R_1_target")
+script = ExtResource("2_8i6e1")
 
-[editable path="spider_deciamate"]
+[node name="R_2" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="2" unique_id=2033835235]
+root_bone = &"Leg2_R_1_16"
+tip_bone = &"Leg2_R_4_13"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/R_2_target")
+script = ExtResource("2_8i6e1")
+
+[node name="R_3" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="3" unique_id=1775384781]
+root_bone = &"Leg3_R_1_20"
+tip_bone = &"Leg3_R_4_17"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/R_3_target")
+script = ExtResource("2_8i6e1")
+
+[node name="R_4" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="4" unique_id=970572607]
+root_bone = &"Leg4_R_1_24"
+tip_bone = &"Leg4_R_4_21"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/R_4_target")
+script = ExtResource("2_8i6e1")
+
+[node name="L_1" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="5" unique_id=1544150057]
+root_bone = &"Leg1_L_1_33"
+tip_bone = &"Leg1_L_5_29"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/L_1_target")
+script = ExtResource("2_8i6e1")
+
+[node name="L_2" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="6" unique_id=2085720586]
+root_bone = &"Leg2_L_1_37"
+tip_bone = &"Leg2_L_4_34"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/L_2_target")
+script = ExtResource("2_8i6e1")
+
+[node name="L_3" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="7" unique_id=1351941671]
+root_bone = &"Leg3_L_1_41"
+tip_bone = &"Leg3_L_4_38"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/L_3_target")
+script = ExtResource("2_8i6e1")
+
+[node name="L_4" type="SkeletonIK3D" parent="Sketchfab_Scene/Sketchfab_model/root/GLTF_SceneRootNode/Armature_49/GLTF_created_0/Skeleton3D" parent_id_path=PackedInt32Array(2083286687, 257506411) index="8" unique_id=567826739]
+root_bone = &"Leg4_L_1_45"
+tip_bone = &"Leg4_L_4_42"
+use_magnet = true
+magnet = Vector3(0, 10, 0)
+target_node = NodePath("../../../../../../../../target_container/L_4_target")
+script = ExtResource("2_8i6e1")
+
+[node name="target_container" type="Node3D" parent="." unique_id=114459836]
+top_level = true
+
+[node name="R_1_target" type="Marker3D" parent="target_container" unique_id=798764286 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0475712, 0, 2.7717488)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_R_1/R_1_target2")
+step_distance = 0.4
+step_height = 0.3
+adjacent_target = NodePath("../R_2_target")
+
+[node name="R_2_target" type="Marker3D" parent="target_container" unique_id=398439039 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.71474445, 0, 3.4735894)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_R_2/R_2_target2")
+step_distance = 1.0
+step_height = 0.3
+adjacent_target = NodePath("../R_3_target")
+
+[node name="R_3_target" type="Marker3D" parent="target_container" unique_id=800226707 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0479498, 0, 2.8885202)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_R_3/R_3_target2")
+step_distance = 1.0
+step_height = 0.3
+adjacent_target = NodePath("../R_4_target")
+
+[node name="R_4_target" type="Marker3D" parent="target_container" unique_id=1173665195 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.449358, 0, 2.3043187)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_R_4/R_4_target2")
+step_distance = 1.0
+step_height = 0.3
+adjacent_target = NodePath("../R_3_target")
+
+[node name="L_1_target" type="Marker3D" parent="target_container" unique_id=1822379007 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5302773, 0, -2.5282881)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_L_1/L_1_target2")
+step_distance = 0.4
+step_height = 0.3
+adjacent_target = NodePath("../L_2_target")
+
+[node name="L_2_target" type="Marker3D" parent="target_container" unique_id=1217633448 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43446147, 0, -3.3266945)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_L_2/L_2_target2")
+step_distance = 1.0
+step_height = 0.3
+adjacent_target = NodePath("../L_3_target")
+
+[node name="L_3_target" type="Marker3D" parent="target_container" unique_id=593725124 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.694623, 0, -2.9940248)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_L_3/L_3_target2")
+step_distance = 1.0
+step_height = 0.3
+adjacent_target = NodePath("../L_4_target")
+
+[node name="L_4_target" type="Marker3D" parent="target_container" unique_id=647892126 node_paths=PackedStringArray("step_target", "adjacent_target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2642837, 0, -2.2549307)
+script = ExtResource("3_24dvt")
+step_target = NodePath("../../step_target_container/RayCast_L_4/L_4_target2")
+step_distance = 1.0
+step_height = 0.3
+adjacent_target = NodePath("../L_3_target")
+
+[node name="step_target_container" type="Node3D" parent="." unique_id=2120713317]
+script = ExtResource("4_vlvqd")
+offset = 22.0
+
+[node name="RayCast_R_1" type="RayCast3D" parent="step_target_container" unique_id=134138557 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(1.0000006, 0, 0, 0, 1.0000006, 0, 0, 0, 1, 2.0475712, 0, 2.7717488)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("R_1_target2")
+
+[node name="R_1_target2" type="Marker3D" parent="step_target_container/RayCast_R_1" unique_id=851199873]
+transform = Transform3D(0.9999994, 0, 0, 0, 0.9999994, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="RayCast_R_2" type="RayCast3D" parent="step_target_container" unique_id=629636254 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0.71474445, 0, 3.4735894)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("R_2_target2")
+
+[node name="R_2_target2" type="Marker3D" parent="step_target_container/RayCast_R_2" unique_id=1493749855]
+
+[node name="RayCast_R_3" type="RayCast3D" parent="step_target_container" unique_id=495948531 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -1.0479498, 0, 2.8885202)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("R_3_target2")
+
+[node name="R_3_target2" type="Marker3D" parent="step_target_container/RayCast_R_3" unique_id=353762260]
+
+[node name="RayCast_R_4" type="RayCast3D" parent="step_target_container" unique_id=1595354617 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -2.449358, 0, 2.3043187)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("R_4_target2")
+
+[node name="R_4_target2" type="Marker3D" parent="step_target_container/RayCast_R_4" unique_id=409389570]
+
+[node name="RayCast_L_1" type="RayCast3D" parent="step_target_container" unique_id=1789622782 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 2.5302773, 0, -2.5282881)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("L_1_target2")
+
+[node name="L_1_target2" type="Marker3D" parent="step_target_container/RayCast_L_1" unique_id=746796936]
+
+[node name="RayCast_L_2" type="RayCast3D" parent="step_target_container" unique_id=162948673 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0.43446147, 0, -3.3266945)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("L_2_target2")
+
+[node name="L_2_target2" type="Marker3D" parent="step_target_container/RayCast_L_2" unique_id=1768636199]
+
+[node name="RayCast_L_3" type="RayCast3D" parent="step_target_container" unique_id=69986073 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -1.694623, 0, -2.9940248)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("L_3_target2")
+
+[node name="L_3_target2" type="Marker3D" parent="step_target_container/RayCast_L_3" unique_id=318461502]
+
+[node name="RayCast_L_4" type="RayCast3D" parent="step_target_container" unique_id=42401872 node_paths=PackedStringArray("step_target")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -3.091836, 0, -2.1956186)
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_ae8y7")
+step_target = NodePath("L_4_target2")
+
+[node name="L_4_target2" type="Marker3D" parent="step_target_container/RayCast_L_4" unique_id=475990915]
+
+[editable path="Sketchfab_Scene"]

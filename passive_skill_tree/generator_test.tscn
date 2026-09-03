@@ -56,7 +56,7 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ug1u1"]
 noise_type = 4
-seed = 1619160796
+seed = 1079329242
 frequency = 0.0254
 offset = Vector3(256.55, 203.6, 0)
 fractal_octaves = 1
@@ -77,7 +77,6 @@ script = ExtResource("1_k7a3p")
 num_nodes = 200
 tree_radius = 1000.0
 min_node_distance = 70.0
-cross_link_percent = 15.0
 notable_match_multiplier = 8.0
 keystone_match_multiplier = 15.0
 tag_match_multiplier_per_tag_notable = 10.0

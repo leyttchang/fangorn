@@ -9,38 +9,38 @@ signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
 		generate_tree()
 
 @export_category("Parameters")
-## Nombre total de nœuds de l'arbre.
+## Nombre total de nÅ“uds de l'arbre.
 @export var num_nodes: int = 150
 ## Taille globale de l'arbre (rayon en pixels).
 @export var tree_radius: float = 400.0
-## Espace minimum entre deux nœuds (empêche les superpositions).
+## Espace minimum entre deux nÅ“uds (empÃªche les superpositions).
 @export var min_node_distance: float = 40.0
-@export_range(0.0, 100.0) var cross_link_percent: float = 10.0 # Pourcentage de connexions supplémentaires
+@export_range(0.0, 100.0) var cross_link_percent: float = 10.0 # Pourcentage de connexions supplÃ©mentaires
 
-@export_category("Equilibrage (Poids & Règles)")
-@export_group("Types & Thèmes")
-## Force avec laquelle le système tente de placer un Mineur sur un chemin normal.
-## (Mettre à 100.0+ pour forcer).
+@export_category("Equilibrage (Poids & RÃ¨gles)")
+@export_group("Types & ThÃ¨mes")
+## Force avec laquelle le systÃ¨me tente de placer un Mineur sur un chemin normal.
+## (Mettre Ã  100.0+ pour forcer).
 @export var minor_match_multiplier: float = 3.0
-## Force avec laquelle le système tente de placer un Notable sur un Carrefour (3+ connexions).
-## (Mettre à 100.0+ pour forcer).
+## Force avec laquelle le systÃ¨me tente de placer un Notable sur un Carrefour (3+ connexions).
+## (Mettre Ã  100.0+ pour forcer).
 @export var notable_match_multiplier: float = 3.0
-## Force avec laquelle le système tente de placer une Keystone sur une Impasse.
-## (Mettre à 100.0+ pour forcer).
+## Force avec laquelle le systÃ¨me tente de placer une Keystone sur une Impasse.
+## (Mettre Ã  100.0+ pour forcer).
 @export var keystone_match_multiplier: float = 3.0
-## Force d'infection : Multiplicateur de thème quand le voisin est un MINEUR.
+## Force d'infection : Multiplicateur de thÃ¨me quand le voisin est un MINEUR.
 @export var tag_match_multiplier_per_tag_minor: float = 2.5
-## Force d'infection : Multiplicateur de thème quand le voisin est un NOTABLE.
+## Force d'infection : Multiplicateur de thÃ¨me quand le voisin est un NOTABLE.
 @export var tag_match_multiplier_per_tag_notable: float = 6.0
-## Force d'infection : Multiplicateur de thème quand le voisin est une KEYSTONE.
+## Force d'infection : Multiplicateur de thÃ¨me quand le voisin est une KEYSTONE.
 @export var tag_match_multiplier_per_tag_keystone: float = 8.0
 @export_group("Zones Hybrides")
-## Réduit les chances des nœuds normaux dans les zones frontières (laissant la place aux Hybrides Exclusifs).
+## RÃ©duit les chances des nÅ“uds normaux dans les zones frontiÃ¨res (laissant la place aux Hybrides Exclusifs).
 @export_range(0.0, 1.0) var hybrid_penalty_multiplier: float = 0.2
 @export_group("Impasses (Dead Ends)")
-## Plus une impasse est longue, plus une Keystone a de chance d'apparaître au bout.
+## Plus une impasse est longue, plus une Keystone a de chance d'apparaÃ®tre au bout.
 @export_range(0.0, 10.0) var dead_end_keystone_multiplier_per_depth: float = 2.5
-## Interdit l'apparition de nœuds Mineurs sur les X dernières cases d'une très longue impasse.
+## Interdit l'apparition de nÅ“uds Mineurs sur les X derniÃ¨res cases d'une trÃ¨s longue impasse.
 @export var dead_end_minor_cutoff_depth: int = 2
 
 @export_category("Zones & Hybrides")
@@ -54,8 +54,8 @@ signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
 @export var starter_nodes_duelist: Array[SkillNodeData] = []
 @export var starter_nodes_barbarian: Array[SkillNodeData] = []
 
-@export_category("UI & Données")
-## Cochez pour générer un rapport complet du contenu du Skill Deck dans la console (Output).
+@export_category("UI & DonnÃ©es")
+## Cochez pour gÃ©nÃ©rer un rapport complet du contenu du Skill Deck dans la console (Output).
 @export var analyze_skill_deck: bool = false :
 	set(val):
 		analyze_skill_deck = false
@@ -64,7 +64,7 @@ signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
 			
 func _print_deck_statistics() -> void:
 	print("\n=======================================================")
-	print("📊 ANALYSE DU SKILL DECK (", skill_deck.size(), " Noeuds)")
+	print("ðŸ“Š ANALYSE DU SKILL DECK (", skill_deck.size(), " Noeuds)")
 	print("=======================================================")
 	
 	var stats = {
@@ -116,7 +116,7 @@ func _print_deck_statistics() -> void:
 	print("=======================================================\n")
 
 
-@export var tree_seed: int = 12345 # Graine de génération pour avoir le même arbre
+@export var tree_seed: int = 12345 # Graine de gÃ©nÃ©ration pour avoir le mÃªme arbre
 @export var node_ui_scene: PackedScene
 @export var skill_deck: Array[SkillNodeData] = []
 
@@ -130,14 +130,14 @@ func _print_deck_statistics() -> void:
 @export_range(0.1, 10.0) var noise_contrast: float = 1.0 # 1.0 = normal, > 1.0 = plus de contraste (plus de noir pur et de blanc pur)
 
 var points: PackedVector2Array = []
-var edges: Array[Vector2i] = [] # stocke les indices des points connectés (u, v)
+var edges: Array[Vector2i] = [] # stocke les indices des points connectÃ©s (u, v)
 var noise_texture: ImageTexture = null
 
 # --- Nouvelles variables pour l'interaction ---
 var ui_nodes: Array[SkillNodeUI] = []
 var adjacency_list: Dictionary = {}
-var node_skills: Dictionary = {} # Associe un index de noeud à sa compétence
-var edge_lines: Dictionary = {} # NOUVEAU: Pour garder une référence aux Line2D
+var node_skills: Dictionary = {} # Associe un index de noeud Ã  sa compÃ©tence
+var edge_lines: Dictionary = {} # NOUVEAU: Pour garder une rÃ©fÃ©rence aux Line2D
 
 var is_dragging: bool = false
 var last_mouse_pos: Vector2
@@ -150,7 +150,7 @@ func _gui_input(event: InputEvent) -> void:
 	if not visible:
 		return
 		
-	# On utilise le CanvasLayer parent comme "Caméra" (c'est la meilleure méthode pour l'UI)
+	# On utilise le CanvasLayer parent comme "CamÃ©ra" (c'est la meilleure mÃ©thode pour l'UI)
 	var canvas = get_parent()
 	if not canvas is CanvasLayer:
 		return
@@ -176,17 +176,17 @@ func _gui_input(event: InputEvent) -> void:
 			canvas.scale = Vector2(new_zoom, new_zoom)
 			
 	elif event is InputEventMouseMotion and is_dragging:
-		# Sécurité : si on bouge la souris mais qu'on ne maintient plus le clic physique, on arrête le drag (anti-accrochage)
+		# SÃ©curitÃ© : si on bouge la souris mais qu'on ne maintient plus le clic physique, on arrÃªte le drag (anti-accrochage)
 		if (event.button_mask & MOUSE_BUTTON_MASK_LEFT) == 0:
 			is_dragging = false
 			return
 			
-		# Panning (Déplacement)
-		# UTILISER event.relative !! Sinon ça crée une boucle infinie car l'UI bouge sous la souris !
+		# Panning (DÃ©placement)
+		# UTILISER event.relative !! Sinon Ã§a crÃ©e une boucle infinie car l'UI bouge sous la souris !
 		var new_offset = canvas.offset + event.relative
 		
-		# Mathématiques pures : on calcule exactement les bords pour que le Control (-1000 à viewport+1000)
-		# couvre toujours l'écran [0, viewport], peu importe le zoom !
+		# MathÃ©matiques pures : on calcule exactement les bords pour que le Control (-1000 Ã  viewport+1000)
+		# couvre toujours l'Ã©cran [0, viewport], peu importe le zoom !
 		var margin = 1000.0
 		var viewport_size = get_viewport_rect().size
 		
@@ -196,7 +196,7 @@ func _gui_input(event: InputEvent) -> void:
 		var max_y = margin * canvas.scale.y
 		var min_y = viewport_size.y * (1.0 - canvas.scale.y) - margin * canvas.scale.y
 		
-		# Sécurité anti-glitch si l'écran est géant (ultra-wide)
+		# SÃ©curitÃ© anti-glitch si l'Ã©cran est gÃ©ant (ultra-wide)
 		if min_x > max_x:
 			var mid = (min_x + max_x) / 2.0
 			min_x = mid
@@ -212,14 +212,14 @@ func _gui_input(event: InputEvent) -> void:
 		canvas.offset = new_offset
 
 func _ready():
-	# Agrandir le panneau BEAUCOUP plus que la limite de caméra (3000 pixels) 
-	# pour créer une zone morte géante qui captera TOUJOURS la souris.
+	# Agrandir le panneau BEAUCOUP plus que la limite de camÃ©ra (3000 pixels) 
+	# pour crÃ©er une zone morte gÃ©ante qui captera TOUJOURS la souris.
 	offset_left = -3000
 	offset_top = -3000
 	offset_right = 3000
 	offset_bottom = 3000
 
-	# Si on n'est pas dans l'éditeur (donc on lance le jeu), on génère l'arbre automatiquement
+	# Si on n'est pas dans l'Ã©diteur (donc on lance le jeu), on gÃ©nÃ¨re l'arbre automatiquement
 	if not Engine.is_editor_hint():
 		generate_tree()
 
@@ -230,7 +230,7 @@ func generate_tree():
 	if current_seed == 0:
 		randomize()
 		current_seed = randi()
-		print("Génération avec une seed aléatoire : ", current_seed)
+		print("GÃ©nÃ©ration avec une seed alÃ©atoire : ", current_seed)
 		
 	seed(current_seed)
 	if noise_map:
@@ -240,13 +240,13 @@ func generate_tree():
 	edges.clear()
 	
 	# --- ETAPE 1 : Placement des points (Rejection Sampling) ---
-	points.append(Vector2.ZERO) # Le noeud central (départ)
+	points.append(Vector2.ZERO) # Le noeud central (dÃ©part)
 	
 	var angle1 = -PI / 2.0
 	var angle2 = angle1 + (TAU / 3.0)
 	var angle3 = angle1 + (TAU * 2.0 / 3.0)
 	
-	# Ajouter les 3 points de départ fixes (au milieu de chaque zone)
+	# Ajouter les 3 points de dÃ©part fixes (au milieu de chaque zone)
 	var mid_angle1 = angle1 + (TAU / 6.0)
 	var mid_angle2 = angle2 + (TAU / 6.0)
 	var mid_angle3 = angle3 + (TAU / 6.0)
@@ -256,7 +256,7 @@ func generate_tree():
 	points.append(Vector2(cos(mid_angle3), sin(mid_angle3)) * min_node_distance)
 	
 	var attempts = 0
-	var max_attempts = num_nodes * 200 # Augmenté car on va rejeter plus de points
+	var max_attempts = num_nodes * 200 # AugmentÃ© car on va rejeter plus de points
 	
 	while points.size() < num_nodes and attempts < max_attempts:
 		attempts += 1
@@ -278,13 +278,13 @@ func generate_tree():
 			normalized_noise = clamp((normalized_noise - 0.5) * nc + 0.5, 0.0, 1.0)
 			
 			var ni = float(noise_influence)
-			# On interpole selon l'influence souhaitée
+			# On interpole selon l'influence souhaitÃ©e
 			accept_chance = lerp(1.0, normalized_noise, ni)
 			
 		if randf() > accept_chance:
-			continue # Point rejeté par le bruit, on saute à l'essai suivant
+			continue # Point rejetÃ© par le bruit, on saute Ã  l'essai suivant
 		
-		# Vérifier si le point est trop proche d'un autre
+		# VÃ©rifier si le point est trop proche d'un autre
 		var too_close = false
 		for p in points:
 			if p.distance_to(new_pt) < min_node_distance:
@@ -300,7 +300,7 @@ func generate_tree():
 		queue_redraw()
 		return
 		
-	# Extraire les arrêtes uniques et calculer leur longueur
+	# Extraire les arrÃªtes uniques et calculer leur longueur
 	var all_edges = []
 	for i in range(0, delaunay_indices.size(), 3):
 		var p1 = delaunay_indices[i]
@@ -311,7 +311,7 @@ func generate_tree():
 		_add_edge_if_unique(all_edges, p2, p3)
 		_add_edge_if_unique(all_edges, p3, p1)
 		
-	# Filtrer pour s'assurer que le centre (0) ne se connecte qu'à 1, 2, et 3
+	# Filtrer pour s'assurer que le centre (0) ne se connecte qu'Ã  1, 2, et 3
 	var filtered_edges = []
 	for edge in all_edges:
 		if edge.u == 0 or edge.v == 0:
@@ -320,7 +320,7 @@ func generate_tree():
 		else:
 			filtered_edges.append(edge)
 		
-	# Trier les arrêtes de la plus courte à la plus longue
+	# Trier les arrÃªtes de la plus courte Ã  la plus longue
 	filtered_edges.sort_custom(func(a, b): return a.length < b.length)
 	
 	# --- ETAPE 3 : Kruskal's MST (Arbre pur) ---
@@ -339,25 +339,25 @@ func generate_tree():
 			parent[root1] = root2
 			mst_edges.append(edge)
 		else:
-			# Ces arrêtes créeraient une boucle
+			# Ces arrÃªtes crÃ©eraient une boucle
 			remaining_edges.append(edge)
 			
 	for e in mst_edges:
 		edges.append(Vector2i(e.u, e.v))
 		
 	# --- ETAPE 4 : Hybridation (Cross-linking) ---
-	# On mélange les arrêtes restantes pour en prendre au hasard
+	# On mÃ©lange les arrÃªtes restantes pour en prendre au hasard
 	remaining_edges.shuffle()
 	var cross_link_count = int(mst_edges.size() * (cross_link_percent / 100.0))
 	for i in range(min(cross_link_count, remaining_edges.size())):
 		edges.append(Vector2i(remaining_edges[i].u, remaining_edges[i].v))
 		
-	# --- ETAPE 4.5 : Sécurité de connectivité par région ---
+	# --- ETAPE 4.5 : SÃ©curitÃ© de connectivitÃ© par rÃ©gion ---
 	_ensure_region_connectivity(SkillNodeData.Zone.MAGE)
 	_ensure_region_connectivity(SkillNodeData.Zone.DUELIST)
 	_ensure_region_connectivity(SkillNodeData.Zone.BARBARIAN)
 		
-	# --- ETAPE 5 : Génération de l'image de fond du bruit ---
+	# --- ETAPE 5 : GÃ©nÃ©ration de l'image de fond du bruit ---
 	if noise_map != null:
 		_generate_noise_texture()
 	else:
@@ -366,22 +366,22 @@ func generate_tree():
 	# --- ETAPE 6 : Construction de l'interface interactive ---
 	_build_interactive_tree()
 		
-	# Demande à Godot de redessiner l'UI (le fond)
+	# Demande Ã  Godot de redessiner l'UI (le fond)
 	queue_redraw()
 
 func _generate_noise_texture():
 	var img_size = int(tree_radius * 2.0)
-	# On crée une image pour stocker les pixels de bruit (Godot 4.x)
+	# On crÃ©e une image pour stocker les pixels de bruit (Godot 4.x)
 	var img = Image.create_empty(img_size, img_size, false, Image.FORMAT_RGBA8)
 		
 	for y in range(img_size):
 		for x in range(img_size):
-			# Convertir la position du pixel en coordonnées de l'arbre
+			# Convertir la position du pixel en coordonnÃ©es de l'arbre
 			var px = float(x) - tree_radius
 			var py = float(y) - tree_radius
 			
 			var nv = float(noise_map.get_noise_2d(px, py))
-			# On n'inverse pas le visuel, ainsi les zones de spawn apparaîtront en noir
+			# On n'inverse pas le visuel, ainsi les zones de spawn apparaÃ®tront en noir
 			var norm = (nv + 1.0) / 2.0
 			
 			var nc = float(noise_contrast)
@@ -399,7 +399,7 @@ func _add_edge_if_unique(edge_list: Array, u: int, v: int) -> void:
 	
 	for e in edge_list:
 		if e.u == min_idx and e.v == max_idx:
-			return # L'arrête existe déjà
+			return # L'arrÃªte existe dÃ©jÃ 
 	
 	var length = points[u].distance_to(points[v])
 	edge_list.append({"u": min_idx, "v": max_idx, "length": length})
@@ -441,7 +441,7 @@ func _ensure_region_connectivity(target_zone: int) -> void:
 						q.push_back(neighbor)
 			components.append(comp)
 			
-	# Tant qu'on a plus d'un groupe isolé dans la même couleur, on les relie
+	# Tant qu'on a plus d'un groupe isolÃ© dans la mÃªme couleur, on les relie
 	while components.size() > 1:
 		var comp_a = components[0]
 		var comp_b = components[1]
@@ -480,15 +480,15 @@ func _draw():
 	# Dessiner le fond (qui montre les limites du Control) en gris clair transparent
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.8, 0.8, 0.8, 0.1))
 		
-	# On centre par rapport à l'écran, peu importe la taille ou la position décalée du Control
+	# On centre par rapport Ã  l'Ã©cran, peu importe la taille ou la position dÃ©calÃ©e du Control
 	var center_offset = Vector2(3960, 3540)
 	
-	# Dessiner la texture de bruit en arrière-plan
+	# Dessiner la texture de bruit en arriÃ¨re-plan
 	if show_noise_background and noise_texture != null:
 		var tex_pos = center_offset - Vector2(tree_radius, tree_radius)
 		draw_texture(noise_texture, tex_pos)
 	
-	# Lignes de séparation (120 degrés)
+	# Lignes de sÃ©paration (120 degrÃ©s)
 	var hybrid_rad = deg_to_rad(hybrid_zone_width_degrees) / 2.0
 	for angle in [-PI / 2.0, PI / 6.0, 5.0 * PI / 6.0]:
 		var dir_mid = Vector2(cos(angle), sin(angle)) * tree_radius
@@ -497,12 +497,12 @@ func _draw():
 		
 		# Ligne centrale (optionnelle, fine)
 		draw_line(center_offset, center_offset + dir_mid, Color(1, 1, 1, 0.1), 1.0, true)
-		# Frontières de la zone hybride
+		# FrontiÃ¨res de la zone hybride
 		draw_line(center_offset, center_offset + dir_left, Color(1, 1, 0, 0.4), 2.0, true)
 		draw_line(center_offset, center_offset + dir_right, Color(1, 1, 0, 0.4), 2.0, true)
 	
 	# Cercles concentriques (Tiers)
-	# Utiliser 0.5 et 0.8 équilibre beaucoup mieux les aires de chaque zone (environ 25% / 39% / 36% des points)
+	# Utiliser 0.5 et 0.8 Ã©quilibre beaucoup mieux les aires de chaque zone (environ 25% / 39% / 36% des points)
 	draw_arc(center_offset, tree_radius * 0.5, 0.0, TAU, 64, Color(1, 1, 1, 0.2), 1.5, true)
 	draw_arc(center_offset, tree_radius * 0.8, 0.0, TAU, 64, Color(1, 1, 1, 0.2), 1.5, true)
 	draw_arc(center_offset, tree_radius, 0.0, TAU, 64, Color(1, 1, 1, 0.1), 1.0, true)
@@ -520,7 +520,7 @@ func _build_interactive_tree():
 	adjacency_list.clear()
 	node_skills.clear()
 	
-	# Construire le graphe d'adjacence pour propager les déblocages
+	# Construire le graphe d'adjacence pour propager les dÃ©blocages
 	for i in range(points.size()):
 		adjacency_list[i] = []
 		
@@ -531,37 +531,37 @@ func _build_interactive_tree():
 			adjacency_list[edge.y].append(edge.x)
 			
 	if node_ui_scene == null:
-		push_warning("Veuillez assigner la scène SkillNodeUI dans l'inspecteur !")
+		push_warning("Veuillez assigner la scÃ¨ne SkillNodeUI dans l'inspecteur !")
 		return
 		
-	# On centre par rapport à l'écran
+	# On centre par rapport Ã  l'Ã©cran
 	var center_offset = Vector2(3960, 3540)
 	
-	# 1. Créer les lignes visuelles (Line2D)
+	# 1. CrÃ©er les lignes visuelles (Line2D)
 	edge_lines.clear()
 	for edge in edges:
 		var line = Line2D.new()
 		line.add_point(points[edge.x] + center_offset)
 		line.add_point(points[edge.y] + center_offset)
 		line.width = 4.0
-		line.default_color = Color(0.4, 0.4, 0.5, 0.5) # Gris par défaut
+		line.default_color = Color(0.4, 0.4, 0.5, 0.5) # Gris par dÃ©faut
 		add_child(line)
 		
-		# On crée une clé unique "min_max" pour retrouver la ligne plus tard
+		# On crÃ©e une clÃ© unique "min_max" pour retrouver la ligne plus tard
 		var min_idx = min(edge.x, edge.y)
 		var max_idx = max(edge.x, edge.y)
 		edge_lines[str(min_idx) + "_" + str(max_idx)] = line
 		
-	# 2. Cloner le deck pour le modifier pendant la génération
+	# 2. Cloner le deck pour le modifier pendant la gÃ©nÃ©ration
 	var available_deck = []
 	for skill in skill_deck:
 		if skill != null:
-			# On duplique la ressource en mémoire pour pouvoir modifier max_occurrences
-			# sans altérer le fichier original sauvegardé sur le disque
+			# On duplique la ressource en mÃ©moire pour pouvoir modifier max_occurrences
+			# sans altÃ©rer le fichier original sauvegardÃ© sur le disque
 			var skill_copy = skill.duplicate()
 			available_deck.append(skill_copy)
 	
-	# 2.5. Pré-calculer la longueur des impasses (pour les feuilles uniquement)
+	# 2.5. PrÃ©-calculer la longueur des impasses (pour les feuilles uniquement)
 	var leaf_dead_end_length = {}
 	for i in range(points.size()):
 		leaf_dead_end_length[i] = 0
@@ -586,7 +586,7 @@ func _build_interactive_tree():
 				
 			leaf_dead_end_length[i] = chain_length
 
-	# 3. NOUVEAU: Parcourir le graphe avec un ordre de priorité !
+	# 3. NOUVEAU: Parcourir le graphe avec un ordre de prioritÃ© !
 	# Racines -> Feuilles (Impasses) -> Carrefours -> Le reste
 	var roots = []
 	var leaves = []
@@ -621,7 +621,7 @@ func _build_interactive_tree():
 		var is_hub = (connections >= 3)
 		var is_root = (curr == 1 or curr == 2 or curr == 3)
 		
-		# Récupérer les skills des voisins déjà assignés
+		# RÃ©cupÃ©rer les skills des voisins dÃ©jÃ  assignÃ©s
 		var neighbor_skills = []
 		for neighbor in adjacency_list[curr]:
 			if node_skills.has(neighbor) and node_skills[neighbor] != null:
@@ -667,19 +667,19 @@ func _build_interactive_tree():
 		ui_nodes.append(ui)
 
 
-	# 4. Initialisation des états
-	# On fait ça en mode "call_deferred" pour être sûr que tout est bien ajouté à l'arbre
+	# 4. Initialisation des Ã©tats
+	# On fait Ã§a en mode "call_deferred" pour Ãªtre sÃ»r que tout est bien ajoutÃ© Ã  l'arbre
 	call_deferred("_init_tree_states")
 
 func _init_tree_states():
 	if ui_nodes.size() > 0:
-		# Le noeud central (0) est débloqué
+		# Le noeud central (0) est dÃ©bloquÃ©
 		ui_nodes[0].set_state(SkillNodeUI.NodeState.UNLOCKED)
 		# Ses voisins deviennent disponibles
 		for neighbor in adjacency_list[0]:
 			ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
 			
-		# Mise à jour des lignes pour les noeuds initiaux (et futurs chargements de sauvegarde)
+		# Mise Ã  jour des lignes pour les noeuds initiaux (et futurs chargements de sauvegarde)
 		for i in range(ui_nodes.size()):
 			if ui_nodes[i].current_state == SkillNodeUI.NodeState.UNLOCKED:
 				for neighbor in adjacency_list[i]:
@@ -690,7 +690,7 @@ func _init_tree_states():
 							edge_lines[edge_key].width = 6.0
 
 func _on_ui_node_clicked(ui: SkillNodeUI, node_index: int):
-	# On dit au Component (s'il écoute) que ce noeud veut être débloqué
+	# On dit au Component (s'il Ã©coute) que ce noeud veut Ãªtre dÃ©bloquÃ©
 	if ui.current_state == SkillNodeUI.NodeState.AVAILABLE:
 		tree_node_clicked.emit(node_index, node_skills.get(node_index, null))
 
@@ -698,12 +698,12 @@ func unlock_node(node_index: int):
 	if node_index >= 0 and node_index < ui_nodes.size():
 		ui_nodes[node_index].set_state(SkillNodeUI.NodeState.UNLOCKED)
 		
-		# Rendre les voisins disponibles (s'ils sont encore verrouillés)
+		# Rendre les voisins disponibles (s'ils sont encore verrouillÃ©s)
 		for neighbor in adjacency_list[node_index]:
 			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.LOCKED:
 				ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
 				
-			# Mettre à jour la ligne si le voisin est AUSSI débloqué
+			# Mettre Ã  jour la ligne si le voisin est AUSSI dÃ©bloquÃ©
 			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.UNLOCKED:
 				var edge_key = str(min(node_index, neighbor)) + "_" + str(max(node_index, neighbor))
 				if edge_lines.has(edge_key):
@@ -725,7 +725,7 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 		desired_type = SkillNodeData.NodeType.NOTABLE
 	
 	for skill in deck:
-		# Vérifier la zone
+		# VÃ©rifier la zone
 		var zone_mult = 0.0
 		if skill.is_hybrid_exclusive:
 			if hybrid_zone == SkillNodeData.Zone.HYBRID_BARB_MAGE and skill.spawn_in_barb_mage:
@@ -756,7 +756,7 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 		if weight <= 0.0:
 			continue
 			
-		# Règle stricte : les 3 premiers points DOIVENT être mineurs
+		# RÃ¨gle stricte : les 3 premiers points DOIVENT Ãªtre mineurs
 		if is_root and skill.node_type != SkillNodeData.NodeType.MINOR:
 			continue
 			
@@ -795,7 +795,7 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 		for n_skill in neighbor_skills:
 			var shared_tags = skill.tags & n_skill.tags
 			if shared_tags != 0:
-				# Compter le nombre de tags en commun (bits à 1)
+				# Compter le nombre de tags en commun (bits Ã  1)
 				var count = 0
 				var temp = shared_tags
 				while temp > 0:
@@ -825,7 +825,7 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 			
 	if best_candidates.is_empty():
 		if not fallback_candidates.is_empty():
-			# Sécurité : on utilise les mineurs bannis si on a rien d'autre
+			# SÃ©curitÃ© : on utilise les mineurs bannis si on a rien d'autre
 			best_candidates = fallback_candidates
 			total_weight = fallback_total_weight
 		else:
@@ -867,7 +867,7 @@ func _get_hybrid_zone(pos: Vector2) -> int:
 		return SkillNodeData.Zone.HYBRID_MAGE_DUEL
 	if abs(angle - bound_barb_duel) <= hybrid_rad:
 		return SkillNodeData.Zone.HYBRID_DUEL_BARB
-	# Cas spécial pour la frontière Barb/Duelist qui pourrait déborder sur PI / -PI
+	# Cas spÃ©cial pour la frontiÃ¨re Barb/Duelist qui pourrait dÃ©border sur PI / -PI
 	if abs(angle - (bound_barb_duel - TAU)) <= hybrid_rad:
 		return SkillNodeData.Zone.HYBRID_DUEL_BARB
 		

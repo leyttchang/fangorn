@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bgl8ep1qhsou4" path="res://character/enemie/smart_spawner/start_beacon.tscn" id="16_ssq7y"]
 [ext_resource type="PackedScene" uid="uid://b2i01iy66mw4o" path="res://ui/Pause_menu/pause_menu.tscn" id="19_2g21l"]
 [ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="19_bqr07"]
+[ext_resource type="PackedScene" uid="uid://bfs8ho4jxd260" path="res://character/enemie/spider/spider_bundle.tscn" id="21_ssq7y"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_6i2mx"]
 density = 0.4
@@ -168,8 +169,10 @@ start_spawn_time = 1.0
 
 [node name="SmartSpawner" parent="spawner" unique_id=1089854815 node_paths=PackedStringArray("beacon_spawn_point") instance=ExtResource("10_6i2mx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.60695, -20.34161)
-monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("19_bqr07"), ExtResource("8_bqr07")])
-monster_costs = Array[int]([5, 10, 25, 30])
+monster_types = Array[PackedScene]([ExtResource("11_2ho30"), ExtResource("9_1eb17"), ExtResource("19_bqr07"), ExtResource("8_bqr07"), ExtResource("21_ssq7y")])
+monster_costs = Array[int]([5, 10, 25, 30, 18])
+monster_weights = Array[float]([1.0, 0.7, 1.0, 0.4, 1.0])
+initial_wave_credits = 30
 delay_between_waves = 10.0
 time_between_spawns = 0.2
 spawn_radius = 60.0
@@ -186,9 +189,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 20, -9)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 20, -9)
 chest_scene = ExtResource("15_apj7j")
 spawn_chance = 33.0
-
-[node name="dumb" parent="spawner" unique_id=888204308 instance=ExtResource("11_2ho30")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 23, -1)
 
 [node name="wave_display" parent="." unique_id=114584502 node_paths=PackedStringArray("smart_spawner") instance=ExtResource("12_2ho30")]
 smart_spawner = NodePath("../spawner/SmartSpawner")

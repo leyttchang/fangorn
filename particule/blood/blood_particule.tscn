@@ -3,29 +3,30 @@
 [ext_resource type="Texture2D" uid="uid://vaf8h8a5i0ab" path="res://assets/LeLu's Noise Pack/T_blood_stain_mask.png" id="1_t8vxh"]
 [ext_resource type="Texture2D" uid="uid://vg334al3d61o" path="res://assets/LeLu's Noise Pack/T_blood_stain_normal_map.png" id="2_wbvup"]
 
-[sub_resource type="Curve" id="Curve_ye7aw"]
+[sub_resource type="Curve" id="Curve_t8vxh"]
 _data = [Vector2(0, 0), 0.0, 6.455378, 0, 0, Vector2(0.14396888, 1), -2.204873, -2.204873, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 3
 
-[sub_resource type="CurveTexture" id="CurveTexture_3bpsp"]
-curve = SubResource("Curve_ye7aw")
+[sub_resource type="CurveTexture" id="CurveTexture_wbvup"]
+curve = SubResource("Curve_t8vxh")
 
 [sub_resource type="Gradient" id="Gradient_jt66o"]
 interpolation_color_space = 1
 offsets = PackedFloat32Array(0.12554112, 0.62770563, 1)
-colors = PackedColorArray(0.27, 0, 0.013500052, 1, 0.91, 0, 0.015166435, 1, 1, 1, 1, 1)
+colors = PackedColorArray(0.17, 0, 0, 1, 0.75, 0, 0, 1, 1, 1, 1, 1)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_ces26"]
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_x1dli"]
 gradient = SubResource("Gradient_jt66o")
 
-[sub_resource type="Curve" id="Curve_x1dli"]
+[sub_resource type="Curve" id="Curve_io4tv"]
 _data = [Vector2(0, 0), 0.0, 3.7755823, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="CurveTexture" id="CurveTexture_as728"]
-curve = SubResource("Curve_x1dli")
+[sub_resource type="CurveTexture" id="CurveTexture_682pj"]
+curve = SubResource("Curve_io4tv")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_lsoq3"]
+resource_local_to_scene = true
 lifetime_randomness = 0.5
 particle_flag_rotate_y = true
 emission_shape = 1
@@ -39,14 +40,15 @@ radial_velocity_min = -2.2351742e-05
 radial_velocity_max = 0.39997762
 scale_min = 0.5
 scale_max = 1.1999999
-scale_curve = SubResource("CurveTexture_as728")
-color_ramp = SubResource("GradientTexture1D_ces26")
-alpha_curve = SubResource("CurveTexture_3bpsp")
+scale_curve = SubResource("CurveTexture_682pj")
+color_ramp = SubResource("GradientTexture1D_x1dli")
+alpha_curve = SubResource("CurveTexture_wbvup")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dria3"]
 transparency = 2
 alpha_scissor_threshold = 0.2
 alpha_antialiasing_mode = 0
+cull_mode = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("1_t8vxh")
@@ -108,7 +110,7 @@ one_shot = true
 preprocess = 0.2
 explosiveness = 1.0
 fixed_fps = 60
-process_material = SubResource("ParticleProcessMaterial_hlie2")
+process_material = SubResource("ParticleProcessMaterial_lsoq3")
 draw_pass_1 = SubResource("QuadMesh_yqkk6")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=538253399]

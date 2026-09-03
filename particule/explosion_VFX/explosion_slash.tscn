@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://obnykqx07k8f"]
+
+[ext_resource type="Shader" uid="uid://dp8ga6qm0iwk4" path="res://particule/explosion_VFX/4_spikes_shader.tres" id="1_72uew"]
+
+[sub_resource type="Curve" id="Curve_ujg7l"]
+_data = [Vector2(0, 0), 0.0, 7.100716, 0, 0, Vector2(0.43034056, 0.9631902), 0.0, 0.0, 0, 0, Vector2(0.99071205, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_28p78"]
+curve = SubResource("Curve_ujg7l")
+
+[sub_resource type="Curve" id="Curve_lbfyj"]
+_data = [Vector2(0, 0.49079758), 0.0, 1.3423709, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_as728"]
+curve = SubResource("Curve_lbfyj")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+particle_flag_align_y = true
+direction = Vector3(0, 1, 0)
+spread = 90.0
+initial_velocity_min = 0.5
+initial_velocity_max = 1.0
+gravity = Vector3(0, 0, 0)
+scale_min = 12.0
+scale_max = 14.0
+scale_curve = SubResource("CurveTexture_as728")
+alpha_curve = SubResource("CurveTexture_28p78")
+hue_variation_min = -1.0
+hue_variation_max = 0.99999994
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dria3"]
+render_priority = -1
+shader = ExtResource("1_72uew")
+shader_parameter/spieks_color = Color(5.3472958, 1.6137717, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_yqkk6"]
+material = SubResource("ShaderMaterial_dria3")
+size = Vector2(0.25, 1)
+center_offset = Vector3(0, 0.4, 0)
+
+[node name="explosion_slash" type="GPUParticles3D" unique_id=885436822]
+lifetime = 0.5
+explosiveness = 0.89
+randomness = 1.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_hlie2")
+draw_pass_1 = SubResource("QuadMesh_yqkk6")

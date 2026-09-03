@@ -35,7 +35,10 @@ func _on_area_entered(area: Area3D) -> void:
 func _on_area_exited(area: Area3D) -> void:
 	if area is HitboxComponent:
 		targets_inside -= 1
-		# attack_component.hit_entities.erase(area)
+		
+		# On permet au joueur de reprendre des dégâts immédiatement s'il rerentre dans la zone
+		var entity = area.owner if area.owner != null else area.get_parent()
+		attack_component.hit_entities.erase(entity)
 		
 		# Si le piège est complètement vide, on endort le Timer
 		if targets_inside <= 0:

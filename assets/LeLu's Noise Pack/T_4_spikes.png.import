@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dgu2l66qeji0t"
-path.s3tc="res://.godot/imported/T_MarbleNoise_tiled.png-332579a6fe2614d0363c967406f90e26.s3tc.ctex"
+uid="uid://cb21hikao4ik6"
+path.s3tc="res://.godot/imported/T_4_spikes.png-630687ee92b09c386bf19505c954308d.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/LeLu's Noise Pack/T_MarbleNoise_tiled.png"
-dest_files=["res://.godot/imported/T_MarbleNoise_tiled.png-332579a6fe2614d0363c967406f90e26.s3tc.ctex"]
+source_file="res://assets/LeLu's Noise Pack/T_4_spikes.png"
+dest_files=["res://.godot/imported/T_4_spikes.png-630687ee92b09c386bf19505c954308d.s3tc.ctex"]
 
 [params]
 
@@ -22,12 +22,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://assets/LeLu's Noise Pack/T_MarbleNoise_tiled.png"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

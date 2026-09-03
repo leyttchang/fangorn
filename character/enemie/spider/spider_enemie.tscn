@@ -1,0 +1,370 @@
+[gd_scene format=3 uid="uid://bwv7mkwsym0an"]
+
+[ext_resource type="PackedScene" uid="uid://be6hnf0fy02s" path="res://character/enemie/spider/spider.tscn" id="1_b4s5t"]
+[ext_resource type="Script" uid="uid://cqlvtv5jutfkd" path="res://character/enemie/spider/spider_enemie.gd" id="1_sco0t"]
+[ext_resource type="Script" uid="uid://0gemtrlg1hbh" path="res://character/enemie/EnemyBehaviorData.gd" id="2_8ll2r"]
+[ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="2_sco0t"]
+[ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="4_gay16"]
+[ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="6_4sr65"]
+[ext_resource type="Resource" uid="uid://dyttqdtb532vf" path="res://character/enemie/spider/spider_stats.tres" id="6_8ll2r"]
+[ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="7_16yx4"]
+[ext_resource type="PackedScene" uid="uid://bdv5anb4oalnr" path="res://components/combat_feedback_component.tscn" id="8_o53sc"]
+[ext_resource type="PackedScene" uid="uid://glbx6he6cprl" path="res://ui/damage_text.tscn" id="9_tkjch"]
+[ext_resource type="PackedScene" uid="uid://bnq7s2tgri30i" path="res://components/EnemyMovementComponent.tscn" id="10_uabx2"]
+[ext_resource type="PackedScene" uid="uid://mnnj3o8ilins" path="res://components/enemy_navigation_component.tscn" id="11_ncnfm"]
+[ext_resource type="PackedScene" uid="uid://wefscg5hf58q" path="res://components/foot_step_component.tscn" id="12_72jfa"]
+[ext_resource type="AudioStream" uid="uid://d4jwhrrkgb4ny" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-001.ogg" id="13_idxer"]
+[ext_resource type="AudioStream" uid="uid://cw04xi6t0uk2w" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-002.ogg" id="14_kcko2"]
+[ext_resource type="AudioStream" uid="uid://dhi3ne5ow4hki" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-003.ogg" id="15_okfxt"]
+[ext_resource type="AudioStream" uid="uid://d2hetsn2xc84m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-004.ogg" id="16_2kcin"]
+[ext_resource type="AudioStream" uid="uid://7he0i6bcgtf" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-005.ogg" id="17_a4p5k"]
+[ext_resource type="AudioStream" uid="uid://cpm0u8qk8hp5x" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-006.ogg" id="18_bbw4w"]
+[ext_resource type="AudioStream" uid="uid://bf3wi3aisq6nj" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-007.ogg" id="19_w6ni5"]
+[ext_resource type="AudioStream" uid="uid://c5m3k2snt1c8l" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-008.ogg" id="20_3ygfk"]
+[ext_resource type="AudioStream" uid="uid://c6n07ms36rkq" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-009.ogg" id="21_l2mhe"]
+[ext_resource type="AudioStream" uid="uid://dgl2sncrmdkla" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-010.ogg" id="22_wo4lv"]
+[ext_resource type="AudioStream" uid="uid://woyyyxi4fo5l" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-011.ogg" id="23_sekdy"]
+[ext_resource type="AudioStream" uid="uid://c7s5akercg3wh" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-012.ogg" id="24_78bco"]
+[ext_resource type="AudioStream" uid="uid://g7u6flvjc8lc" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-013.ogg" id="25_rl0ts"]
+[ext_resource type="AudioStream" uid="uid://jshdnniut88m" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-014.ogg" id="26_3t2vj"]
+[ext_resource type="AudioStream" uid="uid://tfugyctgh7pl" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-015.ogg" id="27_p7qrx"]
+[ext_resource type="AudioStream" uid="uid://xq8iyb7d2ku" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-016.ogg" id="28_pvq6v"]
+[ext_resource type="AudioStream" uid="uid://de5yma1byjkm" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-017.ogg" id="29_g33fu"]
+[ext_resource type="AudioStream" uid="uid://elaef3wckdwi" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-018.ogg" id="30_j6xr8"]
+[ext_resource type="AudioStream" uid="uid://crpa74k6e5lw7" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-019.ogg" id="31_kda08"]
+[ext_resource type="AudioStream" uid="uid://cuqwgpeqeqonr" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-020.ogg" id="32_lieyy"]
+[ext_resource type="AudioStream" uid="uid://nhhox4s8eah1" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-021.ogg" id="33_hlkjb"]
+[ext_resource type="PackedScene" uid="uid://8phfagxw0ymc" path="res://components/hurt_sound_component.tscn" id="34_x021n"]
+[ext_resource type="AudioStream" uid="uid://ciu3mffcanmdx" path="res://assets/sound_effects/Human/belch_1.wav" id="35_xrj2m"]
+[ext_resource type="AudioStream" uid="uid://lij60mhnigeg" path="res://assets/sound_effects/Human/belch_2.wav" id="36_48cqo"]
+[ext_resource type="AudioStream" uid="uid://d28g7j4vbcf31" path="res://assets/sound_effects/Human/belch_3.wav" id="37_ajimf"]
+[ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="38_m0x33"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="40_4sr65"]
+[ext_resource type="PackedScene" uid="uid://ctq6vkw5fnt60" path="res://character/enemie/spider/blood_explosion_vfx.tscn" id="41_16yx4"]
+
+[sub_resource type="Resource" id="Resource_3vwuf"]
+script = ExtResource("2_8ll2r")
+metadata/_custom_type_script = "uid://0gemtrlg1hbh"
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hlie2"]
+height = 0.53100586
+radius = 0.31298828
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wp75a"]
+height = 0.6448364
+radius = 0.82910156
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_lswwf"]
+properties/0/path = NodePath("HealthComponent:current_health")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[sub_resource type="Animation" id="Animation_16yx4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AttackComponent/CollisionShape3D:disabled")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("blood_explosion_vfx/chunks:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("blood_explosion_vfx/chunks2:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("spider:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_8ll2r"]
+resource_name = "attaque"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AttackComponent/CollisionShape3D:disabled")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.33333334, 0.76, 0.98),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [true, false, false, true]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AttackComponent")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"reset_hit_entities"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_o53sc"]
+resource_name = "death"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("blood_explosion_vfx/chunks:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("blood_explosion_vfx/chunks2:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("spider:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4sr65"]
+_data = {
+&"RESET": SubResource("Animation_16yx4"),
+&"attaque": SubResource("Animation_8ll2r"),
+&"death": SubResource("Animation_o53sc")
+}
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
+
+[sub_resource type="Curve" id="Curve_8uod0"]
+_data = [Vector2(0.98761606, 1), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="CurveTexture" id="CurveTexture_ikrtx"]
+curve = SubResource("Curve_8uod0")
+
+[sub_resource type="Curve" id="Curve_jhx1r"]
+_data = [Vector2(0.006191954, 1), 0.0, 0.0, 0, 0, Vector2(0.7770897, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_pqn18"]
+curve = SubResource("Curve_jhx1r")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_16yx4"]
+particle_flag_align_y = true
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_min = -179.99998
+angle_max = 180.00002
+angle_curve = SubResource("CurveTexture_ikrtx")
+direction = Vector3(0, 1, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+angular_velocity_min = 1.9999839
+angular_velocity_max = 9.999984
+angular_velocity_curve = SubResource("CurveTexture_pqn18")
+scale_min = 0.19999999
+scale_max = 0.39999998
+sub_emitter_mode = 1
+sub_emitter_frequency = 18.700000000000003
+
+[sub_resource type="Curve" id="Curve_16yx4"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.99071205, 0), -3.4227579, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_4r43b"]
+curve = SubResource("Curve_16yx4")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o53sc"]
+particle_flag_align_y = true
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_min = -179.99998
+angle_max = 180.00002
+angle_curve = SubResource("CurveTexture_ikrtx")
+direction = Vector3(0, 1, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 5.0
+angular_velocity_min = 1.9999839
+angular_velocity_max = 9.999984
+angular_velocity_curve = SubResource("CurveTexture_pqn18")
+scale_min = 0.19999999
+scale_max = 0.39999998
+scale_curve = SubResource("CurveTexture_4r43b")
+sub_emitter_mode = 1
+sub_emitter_frequency = 21.990000000000002
+
+[node name="spider_enemie" type="CharacterBody3D" unique_id=1214796846 groups=["Enemie"]]
+collision_layer = 256
+collision_mask = 257
+script = ExtResource("1_sco0t")
+behavior = SubResource("Resource_3vwuf")
+
+[node name="spider" parent="." unique_id=1015881093 instance=ExtResource("1_b4s5t")]
+transform = Transform3D(-1.3113417e-08, 0, -0.3, 0, 0.3, 0, 0.3, 0, -1.3113417e-08, 0, 0, 0)
+
+[node name="R_1_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="0" unique_id=798764286]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6776108, 0, 0.8431932)
+
+[node name="R_2_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="1" unique_id=398439039]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1664042, 0, 0.4649269)
+
+[node name="R_3_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="2" unique_id=800226707]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9760239, 0, -0.21373528)
+
+[node name="R_4_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="3" unique_id=1173665195]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.812835, 0, -0.6505914)
+
+[node name="L_1_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="4" unique_id=1822379007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.68176985, 0, 0.7668772)
+
+[node name="L_2_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="5" unique_id=1217633448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0437938, 0, 0.1730609)
+
+[node name="L_3_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="6" unique_id=593725124]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7739532, 0, -0.43170404)
+
+[node name="L_4_target" parent="spider/target_container" parent_id_path=PackedInt32Array(1015881093, 114459836) index="7" unique_id=647892126]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6573167, 0, -0.83315444)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=121766159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22619629, 0)
+shape = SubResource("CylinderShape3D_hlie2")
+
+[node name="HitboxComponent" parent="." unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("2_sco0t")]
+health_component = NodePath("../HealthComponent")
+knockback_component = NodePath("../knockback_componant")
+
+[node name="CollisionShape3D" parent="HitboxComponent" index="0" unique_id=1270273544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34451294, 0)
+shape = SubResource("CylinderShape3D_wp75a")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=91965186]
+
+[node name="StatsComponent" type="Node3D" parent="." unique_id=1781719803]
+script = ExtResource("4_gay16")
+starting_stats = ExtResource("6_8ll2r")
+
+[node name="HealthComponent" type="Node3D" parent="." unique_id=907588865 node_paths=PackedStringArray("stats_component")]
+script = ExtResource("6_4sr65")
+stats_component = NodePath("../StatsComponent")
+
+[node name="knockback_componant" parent="." unique_id=1074612668 node_paths=PackedStringArray("stats_component") instance=ExtResource("7_16yx4")]
+stats_component = NodePath("../StatsComponent")
+
+[node name="CombatFeedbackComponent" parent="." unique_id=2086975508 node_paths=PackedStringArray("health_component") instance=ExtResource("8_o53sc")]
+damage_text_scene = ExtResource("9_tkjch")
+health_component = NodePath("../HealthComponent")
+
+[node name="EnemyMovementComponent" parent="." unique_id=280066399 instance=ExtResource("10_uabx2")]
+
+[node name="EnemyNavigationComponent" parent="." unique_id=1659678892 node_paths=PackedStringArray("nav_agent") instance=ExtResource("11_ncnfm")]
+nav_agent = NodePath("../NavigationAgent3D")
+
+[node name="FootStep_component" parent="." unique_id=1544068964 node_paths=PackedStringArray("character_body") instance=ExtResource("12_72jfa")]
+character_body = NodePath("..")
+footstep_sounds = Array[AudioStream]([ExtResource("13_idxer"), ExtResource("14_kcko2"), ExtResource("15_okfxt"), ExtResource("16_2kcin"), ExtResource("17_a4p5k"), ExtResource("18_bbw4w"), ExtResource("19_w6ni5"), ExtResource("20_3ygfk"), ExtResource("21_l2mhe"), ExtResource("22_wo4lv"), ExtResource("23_sekdy"), ExtResource("24_78bco"), ExtResource("25_rl0ts"), ExtResource("26_3t2vj"), ExtResource("27_p7qrx"), ExtResource("28_pvq6v"), ExtResource("29_g33fu"), ExtResource("30_j6xr8"), ExtResource("31_kda08"), ExtResource("32_lieyy"), ExtResource("33_hlkjb")])
+step_interval = 1.0
+volume_db = -14.0
+max_distance = 50.0
+
+[node name="hurt_sound" parent="." unique_id=1503784435 node_paths=PackedStringArray("health_component") instance=ExtResource("34_x021n")]
+health_component = NodePath("../HealthComponent")
+hurt_sounds = Array[AudioStream]([ExtResource("35_xrj2m"), ExtResource("36_48cqo"), ExtResource("37_ajimf")])
+volume_db = -40.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1957688880]
+replication_config = SubResource("SceneReplicationConfig_lswwf")
+
+[node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("38_m0x33")]
+stats_component = NodePath("../StatsComponent")
+health_component = NodePath("../HealthComponent")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2028088098]
+libraries/ = SubResource("AnimationLibrary_4sr65")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("40_4sr65")]
+collision_layer = 16
+collision_mask = 2
+base_damage = 5.0
+knockback_force = 1.0
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23269099, 0.8155185)
+shape = SubResource("SphereShape3D_hlie2")
+disabled = true
+
+[node name="blood_explosion_vfx" parent="." unique_id=1363400936 instance=ExtResource("41_16yx4")]
+
+[node name="blood" parent="blood_explosion_vfx" index="0" unique_id=815233806]
+emitting = false
+
+[node name="chunks" parent="blood_explosion_vfx" index="2" unique_id=1367193875]
+process_material = SubResource("ParticleProcessMaterial_16yx4")
+
+[node name="chunks2" parent="blood_explosion_vfx" index="3" unique_id=183690460]
+amount = 3
+process_material = SubResource("ParticleProcessMaterial_o53sc")
+
+[editable path="spider"]
+[editable path="spider/Sketchfab_Scene"]
+[editable path="HitboxComponent"]
+[editable path="AttackComponent"]
+[editable path="blood_explosion_vfx"]

@@ -1,7 +1,7 @@
 class_name SkillBarComponent
 extends Node
 
-enum State { IDLE, TARGETING, SELECTED, CASTING, AUTO_CASTING }
+enum State { IDLE, TARGETING, SELECTED, CASTING, AUTO_CASTING, RECOVERY }
 var current_state: State = State.IDLE
 var can_cast_spells: bool = true
 
@@ -344,11 +344,23 @@ func _validate_and_fire() -> void:
 
 func _reset_casting(is_canceled: bool = false) -> void:
 	var rec_anim = ""
+	var has_recovery = false
+	var recovery_time = 0.0
+	
 	if not is_canceled and casting_ability != null and casting_ability.anim_name != "":
 		rec_anim = casting_ability.anim_name + "_recovery"
+		if anim_player != null and anim_player.has_animation(rec_anim):
+			has_recovery = true
+			# La longueur reelle = longueur de l'anim / speed_scale actuel
+			recovery_time = anim_player.get_animation(rec_anim).length / max(anim_player.speed_scale, 0.01)
+			
 	rpc("_rpc_stop_casting_vfx", rec_anim)
 
-	current_state = State.IDLE
+	if has_recovery:
+		current_state = State.RECOVERY
+	else:
+		current_state = State.IDLE
+		
 	casting_ability = null
 	
 	# Si on avait un spell complex en attente, on oublie le lien (il s'auto-detruira ou restera en vie selon son script)
@@ -375,6 +387,12 @@ func _reset_casting(is_canceled: bool = false) -> void:
 			else:
 				anim_player.stop()
 		if anim_tree != null: anim_tree.active = true
+
+	if has_recovery:
+		await get_tree().create_timer(recovery_time).timeout
+		if current_state == State.RECOVERY:
+			current_state = State.IDLE
+			if anim_tree != null: anim_tree.active = true
 
 # ==========================================
 # FONCTION DE SÉCURITÉ POUR LES ANIMATIONS

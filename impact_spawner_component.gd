@@ -5,16 +5,26 @@ extends Node
 @export var duration_on_ground: float = 4.0 
 @export var destroy_parent_on_impact: bool = true
 
+@export var delay_before_spawn: float = 0.0
+
 # Il a besoin de l'AttackComponent pour savoir quand on touche
 @export var attack_component: AttackComponent
 # Il a besoin du ScalingComponent pour connaître la taille calculée !
 @export var scaling_component: SpellScalingComponent 
+
+var has_spawned: bool = false
 
 func _ready() -> void:
 	if attack_component != null:
 		attack_component.attack_landed.connect(_on_attack_landed)
 
 func _on_attack_landed(_target: Node) -> void:
+	if has_spawned: return
+	has_spawned = true
+	
+	if delay_before_spawn > 0.0:
+		await get_tree().create_timer(delay_before_spawn).timeout
+		
 	if impact_scene != null:
 		var impact_instance = impact_scene.instantiate()
 		

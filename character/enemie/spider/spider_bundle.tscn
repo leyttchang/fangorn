@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bfs8ho4jxd260"]
+
+[ext_resource type="Script" uid="uid://c38ir8ceq525l" path="res://character/enemie/spider/spider_bundle.gd" id="1_w0h8n"]
+[ext_resource type="PackedScene" uid="uid://bwv7mkwsym0an" path="res://character/enemie/spider/spider_enemie.tscn" id="2_xjakg"]
+
+[node name="spider bundle" type="Node3D" unique_id=617526240]
+script = ExtResource("1_w0h8n")
+
+[node name="spider_enemie" parent="." unique_id=1214796846 instance=ExtResource("2_xjakg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9116235, 0, -1.383919)
+
+[node name="spider_enemie2" parent="." unique_id=1491210400 instance=ExtResource("2_xjakg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0554066, 0, -2.0309463)
+
+[node name="spider_enemie3" parent="." unique_id=1605806881 instance=ExtResource("2_xjakg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4263525, 0, 1.797298)
+
+[node name="spider_enemie4" parent="." unique_id=1208567156 instance=ExtResource("2_xjakg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3429747, 0, 0.6110813)
+
+[node name="spider_enemie5" parent="." unique_id=201975453 instance=ExtResource("2_xjakg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16175652, 0, -2.9231086)

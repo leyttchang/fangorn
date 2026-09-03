@@ -12,7 +12,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
 shader = ExtResource("2_prk0l")
 shader_parameter/liquide_color = Color(0.3, 0.008999992, 0.008999992, 1)
-shader_parameter/current_offset = Vector2(0.5511967, 0.33972582)
+shader_parameter/current_offset = Vector2(0.11995562, 0.6467331)
 shader_parameter/texture_1_add = ExtResource("5_fbv3k")
 shader_parameter/reflect_speed = Vector2(0.1, 0.1)
 shader_parameter/reflect_text = ExtResource("5_mc7qp")
@@ -94,9 +94,9 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 430.485
-offset_top = -296.03497
+offset_top = -266.51
 offset_right = 470.485
-offset_bottom = -256.03497
+offset_bottom = -226.51001
 grow_vertical = 0
 scale = Vector2(0.3, 0.3)
 mouse_filter = 2

@@ -10,6 +10,8 @@ signal enemy_spawned(enemy: Node3D)
 @export var monster_types: Array[PackedScene] = []
 ## Les couts des monstres (doit etre dans le meme ordre que monster_types). Par defaut = 10
 @export var monster_costs: Array[int] = []
+## Les poids/chances de spawn (ex: 1.0 pour standard, 0.5 pour rare, 2.0 pour trs frquent)
+@export var monster_weights: Array[float] = []
 
 # --- CONFIGURATION DES VAGUES ---
 @export_group("Configuration Vagues")
@@ -84,13 +86,34 @@ func _get_affordable_monsters() -> Array:
 	var affordable = []
 	for i in range(monster_types.size()):
 		if monster_types[i] == null: continue
+		
 		var cost = 10
 		if i < monster_costs.size():
 			cost = monster_costs[i]
+			
+		var weight = 1.0
+		if i < monster_weights.size():
+			weight = monster_weights[i]
 		
-		if cost <= credits_left_to_spawn:
-			affordable.append({"scene": monster_types[i], "cost": cost})
+		# On n'ajoute que si on peut se l'offrir et si son poids n'est pas zro
+		if cost <= credits_left_to_spawn and weight > 0.0:
+			affordable.append({"scene": monster_types[i], "cost": cost, "weight": weight})
 	return affordable
+
+func _pick_weighted_random(options: Array) -> Dictionary:
+	var total_weight: float = 0.0
+	for opt in options:
+		total_weight += opt.weight
+		
+	var random_val: float = randf() * total_weight
+	var current_weight: float = 0.0
+	
+	for opt in options:
+		current_weight += opt.weight
+		if random_val <= current_weight:
+			return opt
+			
+	return options.back()
 
 func _spawn_next_enemy_in_wave() -> void:
 	if not is_inside_tree(): return
@@ -107,8 +130,8 @@ func _spawn_next_enemy_in_wave() -> void:
 		_check_wave_completion()
 		return
 		
-	# On achete un monstre aleatoire parmi ceux qu'on a les moyens de s'offrir
-	var choice = affordable.pick_random()
+	# On achete un monstre en prenant en compte les probabilits (Poids)
+	var choice = _pick_weighted_random(affordable)
 	_spawn_single_enemy(choice.scene)
 	
 	credits_left_to_spawn -= choice.cost
