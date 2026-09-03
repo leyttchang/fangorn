@@ -5,40 +5,111 @@
 [ext_resource type="Texture2D" uid="uid://d1cg7loqk4vfy" path="res://assets/UI/health_abr/orb_background.png" id="3_fbv3k"]
 [ext_resource type="Texture2D" uid="uid://dwe18t02dl0s1" path="res://assets/UI/health_abr/orb_mask.png" id="4_mc7qp"]
 [ext_resource type="Texture2D" uid="uid://o52nhibumb25" path="res://assets/LeLu's Noise Pack/T_NKQ443.png" id="5_fbv3k"]
+[ext_resource type="Texture2D" uid="uid://b1m87caab8flo" path="res://assets/LeLu's Noise Pack/T_Noise_Wf4.png" id="5_mc7qp"]
 [ext_resource type="Texture2D" uid="uid://basv4y1vmx48a" path="res://assets/UI/health_abr/liquide.png" id="6_3710l"]
 [ext_resource type="Texture2D" uid="uid://dpn32wa87uqg3" path="res://assets/UI/health_abr/orb_frame.png" id="7_lfoab"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
 shader = ExtResource("2_prk0l")
 shader_parameter/liquide_color = Color(0.3, 0.008999992, 0.008999992, 1)
-shader_parameter/text_1_speed = 0.5
+shader_parameter/current_offset = Vector2(0.5511967, 0.33972582)
 shader_parameter/texture_1_add = ExtResource("5_fbv3k")
+shader_parameter/reflect_speed = Vector2(0.1, 0.1)
+shader_parameter/reflect_text = ExtResource("5_mc7qp")
+shader_parameter/reflect_intensity = 0.2
+shader_parameter/reflect_color = Color(1.942335, 0, 0, 1)
 shader_parameter/health_percent = 0.667
 shader_parameter/wave_frequency = 10.0
 shader_parameter/wave_speed = 5.0
 shader_parameter/wave_amplitude = 0.01
 
+[sub_resource type="Animation" id="Animation_mc7qp"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scroll_speed")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.255, 0.375)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MarginContainer/Health_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.3, 0.008999992, 0.008999992, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_fbv3k"]
+resource_name = "health"
+length = 45.533333
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scroll_speed")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 7.4947596, 16.866667, 29.466667, 37.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.255, 0.375), Vector2(0.93, 0.13), Vector2(-0.005, -1.07), Vector2(-1.62, -0.025), Vector2(-0.7, 0.62)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MarginContainer/Health_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 10.266666, 21.417185, 29.133333, 35.344208),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(0.3, 0.008999992, 0.008999992, 1), Color(0.47, 0.0282, 0.0282, 1), Color(0.4, 0.020000005, 0.020000005, 1), Color(0.71, 0.056799985, 0.056799985, 1), Color(0.45, 0.031499997, 0.031499997, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mc7qp"]
+_data = {
+&"RESET": SubResource("Animation_mc7qp"),
+&"health": SubResource("Animation_fbv3k")
+}
+
 [node name="health_bar" type="CanvasLayer" unique_id=427302170]
 script = ExtResource("1_rwxrv")
+scroll_speed = Vector2(0.255, 0.375)
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1528769839]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 321.09
+offset_left = 430.485
 offset_top = -296.03497
-offset_right = 361.09
+offset_right = 470.485
 offset_bottom = -256.03497
 grow_vertical = 0
 scale = Vector2(0.3, 0.3)
+mouse_filter = 2
 
 [node name="Health_bar" type="Control" parent="MarginContainer" unique_id=851709097]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="background" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=693152589]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 texture = ExtResource("3_fbv3k")
 
 [node name="mask" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=44227863]
@@ -46,6 +117,7 @@ clip_children = 1
 layout_mode = 0
 offset_right = 1024.0
 offset_bottom = 1024.0
+mouse_filter = 2
 texture = ExtResource("4_mc7qp")
 
 [node name="liquid" type="TextureRect" parent="MarginContainer/Health_bar/mask" unique_id=417102526]
@@ -55,6 +127,7 @@ offset_left = 193.0
 offset_top = 17.0
 offset_right = 822.0
 offset_bottom = 574.0
+mouse_filter = 2
 texture = ExtResource("6_3710l")
 expand_mode = 1
 
@@ -62,4 +135,9 @@ expand_mode = 1
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 texture = ExtResource("7_lfoab")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1346458141]
+libraries/ = SubResource("AnimationLibrary_mc7qp")
+autoplay = &"health"

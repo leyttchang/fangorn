@@ -1,23 +1,144 @@
 [gd_scene format=3 uid="uid://manabar00000"]
 
-[ext_resource type="Script" path="res://ui/mana_bar.gd" id="1_mana"]
+[ext_resource type="Script" uid="uid://c54w2qabme4w1" path="res://ui/mana_bar.gd" id="1_mana"]
+[ext_resource type="Texture2D" uid="uid://ctb3ujasrhsjx" path="res://assets/UI/health_abr/R_orb_background.png" id="2_s8rmr"]
+[ext_resource type="Texture2D" uid="uid://cxkocpaepxohv" path="res://assets/UI/health_abr/R_orb_mask.png" id="3_oqx85"]
+[ext_resource type="Shader" uid="uid://dsxa5017yrm8h" path="res://ui/health_bar_shader.tres" id="4_o2luo"]
+[ext_resource type="Texture2D" uid="uid://ddsimec20xmux" path="res://assets/LeLu's Noise Pack/T_Noise_6Yu1.png" id="5_8leqs"]
+[ext_resource type="Texture2D" uid="uid://f4ocdpsvn6f1" path="res://assets/LeLu's Noise Pack/T_Noise_Wfk14.png" id="5_oqx85"]
+[ext_resource type="Texture2D" uid="uid://basv4y1vmx48a" path="res://assets/UI/health_abr/liquide.png" id="6_e2ud7"]
+[ext_resource type="Texture2D" uid="uid://cc4w2qsyvvfk0" path="res://assets/UI/health_abr/R_orb_frame.png" id="7_g5af6"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mana"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xnbdy"]
+shader = ExtResource("4_o2luo")
+shader_parameter/liquide_color = Color(0.24746971, 0.11457498, 1.575597, 1)
+shader_parameter/current_offset = Vector2(0.26017854, 0.13382535)
+shader_parameter/texture_1_add = ExtResource("5_8leqs")
+shader_parameter/reflect_speed = Vector2(0.3, 0.3)
+shader_parameter/reflect_text = ExtResource("5_oqx85")
+shader_parameter/reflect_intensity = 1.7650000000000001
+shader_parameter/reflect_color = Color(0, 0.009865668, 0.5688079, 1)
+shader_parameter/health_percent = 0.667
+shader_parameter/wave_frequency = 10.0
+shader_parameter/wave_speed = 5.0
+shader_parameter/wave_amplitude = 0.01
 
-[node name="mana_bar" type="CanvasLayer"]
+[sub_resource type="Animation" id="Animation_fxr8a"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("mana_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.24746971, 0.11457498, 1.575597, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:scroll_speed")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.5, 0.06)]
+}
+
+[sub_resource type="Animation" id="Animation_3kato"]
+resource_name = "mana"
+length = 45.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("mana_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.99, 9.266666),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0.29376695, 0.14384432, 1.9429119, 1), Color(0.12916684, 0.050000012, 1, 1), Color(0.09803384, 0.044958092, 0.65524715, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:scroll_speed")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 9.830839, 20.01278, 26.098537, 32.886497),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.5, 0.06), Vector2(0.06, -0.625), Vector2(-1.018, 0.033), Vector2(-0.433, 0.04), Vector2(-0.098, 0.827)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_88duq"]
+_data = {
+&"RESET": SubResource("Animation_fxr8a"),
+&"mana": SubResource("Animation_3kato")
+}
+
+[node name="mana_bar" type="CanvasLayer" unique_id=631590621]
 script = ExtResource("1_mana")
+scroll_speed = Vector2(0.5, 0.06)
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
-custom_minimum_size = Vector2(200, 20)
-anchors_preset = 2
+[node name="mana_bar" type="Control" parent="." unique_id=2039367325]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -65.0
-offset_right = 210.0
-offset_bottom = -45.0
+offset_left = -757.245
+offset_top = -310.61102
+offset_right = -757.245
+offset_bottom = -310.61102
+grow_horizontal = 0
 grow_vertical = 0
-step = 0.1
-nine_patch_stretch = true
-texture_progress = SubResource("PlaceholderTexture2D_mana")
-tint_progress = Color(0.0, 0.4, 1.0, 1.0)
+scale = Vector2(0.3, 0.3)
+mouse_filter = 2
+
+[node name="background" type="TextureRect" parent="mana_bar" unique_id=204662949]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource("2_s8rmr")
+
+[node name="mask" type="TextureRect" parent="mana_bar" unique_id=82693150]
+clip_children = 1
+layout_mode = 0
+offset_right = 1024.0
+offset_bottom = 1024.0
+mouse_filter = 2
+texture = ExtResource("3_oqx85")
+
+[node name="liquid" type="TextureRect" parent="mana_bar/mask" unique_id=1772840489]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_xnbdy")
+layout_mode = 0
+offset_left = 193.0
+offset_top = 17.0
+offset_right = 822.0
+offset_bottom = 574.0
+mouse_filter = 2
+texture = ExtResource("6_e2ud7")
+expand_mode = 1
+
+[node name="frame" type="TextureRect" parent="mana_bar" unique_id=53022489]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource("7_g5af6")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2109190684]
+libraries/ = SubResource("AnimationLibrary_88duq")
+autoplay = &"mana"
