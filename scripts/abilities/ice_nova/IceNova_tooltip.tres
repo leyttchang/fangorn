@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://bxth3vonlf0t0"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_ssyuw"]
+
+[resource]
+script = ExtResource("1_ssyuw")
+generated_text = "[color=lightblue]Spell | Cooldown: 6.0s | Mana Cost: 30.0[/color]
+
+[color=orange][b]- Ice Nova -[/b][/color]
+Damage: [b]60.0[/b] Base [color=yellow](AoE)[/color]
+Damage Type: [color=cyan]100.0% Ice[/color]
+Knockback: 15.0
+Applies [b]Chill[/b] (100.0% chance) for 5.0s
+
+"

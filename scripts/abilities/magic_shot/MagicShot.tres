@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://qvuc7exik4g5"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://b4tuhgub2rxqn"]
 
 [ext_resource type="PackedScene" uid="uid://2gxlbnerkd5y" path="res://scripts/abilities/magic_shot/magic_shot.tscn" id="1_fullj"]
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ty360"]
@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_ty360")
 ability_name = "Magic shot"
+description = "Fires a dense, kinetic bolt of magical force that strikes with brutal physical impact. Designed to pierce through heavy defenses, this projectile effectively shatters enemy armor on contact."
 icon = ExtResource("2_hk3mx")
 mana_cost = 10.0
 cast_time = 0.5

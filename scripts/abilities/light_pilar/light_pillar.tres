@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dipiprkv1btfv"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dfbr8ntmoyvah"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ldasm"]
 [ext_resource type="PackedScene" uid="uid://cvloxeiewl8vl" path="res://scripts/abilities/light_pilar/light_pilar.tscn" id="1_ow66a"]
@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1_ldasm")
 ability_name = "Light Pillar"
+description = "Summons a localized pillar of holy light from the heavens."
 icon = ExtResource("2_ygo4i")
 cooldown = 30.0
 mana_cost = 10.0

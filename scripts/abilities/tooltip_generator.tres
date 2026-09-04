@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TooltipGenerator" format=3 uid="uid://b8psbiicn467d"]
+
+[ext_resource type="Script" uid="uid://ck718o6n8b62b" path="res://scripts/abilities/tooltip_generator.gd" id="1_ope5g"]
+[ext_resource type="Resource" uid="uid://d2bji8erutnyd" path="res://scripts/abilities/Burning_ground/BurningGround.tres" id="2_vehf4"]
+
+[resource]
+script = ExtResource("1_ope5g")
+spell_data = ExtResource("2_vehf4")

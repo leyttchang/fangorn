@@ -34,6 +34,13 @@ curve_x = SubResource("Curve_hwdfp")
 curve_y = SubResource("Curve_r85b6")
 curve_z = SubResource("Curve_w15mb")
 
+[sub_resource type="Curve" id="Curve_hcswv"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.51283, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_1xmby"]
+curve = SubResource("Curve_hcswv")
+
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_as728"]
 emission_shape = 6
 emission_ring_axis = Vector3(0, 1, 0)
@@ -47,7 +54,9 @@ orbit_velocity_curve = SubResource("CurveXYZTexture_ye7aw")
 radial_velocity_min = -1.0000223
 radial_velocity_max = -1.0000223
 gravity = Vector3(0, 3, 0)
-scale_min = 0.099999994
+scale_min = 0.049999997
+scale_max = 0.19999999
+scale_curve = SubResource("CurveTexture_1xmby")
 color = Color(1.6197081, 1.6197081, 1.6197081, 1)
 color_ramp = SubResource("GradientTexture1D_ces26")
 alpha_curve = SubResource("CurveTexture_8pegv")
@@ -75,7 +84,7 @@ material = SubResource("StandardMaterial3D_3bpsp")
 [node name="warcry_particule" type="Node3D" unique_id=1530128154]
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=633377578]
-amount = 30
+amount = 50
 lifetime = 3.0
 process_material = SubResource("ParticleProcessMaterial_as728")
 draw_pass_1 = SubResource("QuadMesh_dria3")

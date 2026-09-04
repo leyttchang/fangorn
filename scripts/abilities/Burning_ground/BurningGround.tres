@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://gu5hxjbjuwrq"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://daqdw4sgg0trk"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ilgln"]
 [ext_resource type="PackedScene" uid="uid://bwq4tvxnrffrt" path="res://scripts/abilities/Burning_ground/burning_ground.tscn" id="1_x2yls"]
@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1_ilgln")
 ability_name = "Burning Ground"
+description = "Ignites the earth beneath your enemies. Creates a lingering pool of molten fire that continuously scorches anyone foolish enough to remain within its radius."
 icon = ExtResource("2_8dwsn")
 cooldown = 6.0
 mana_cost = 20.0

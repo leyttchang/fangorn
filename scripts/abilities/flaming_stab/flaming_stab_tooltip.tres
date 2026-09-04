@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://dg22tjugrcr12"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_d1qna"]
+
+[resource]
+script = ExtResource("1_d1qna")
+generated_text = "[color=lightblue]Attack | Cooldown: 4.0s | Mana Cost: 20.0[/color]
+
+[color=orange][b]- Sphere 3 -[/b][/color]
+Damage: [b]1.0[/b] Base [b]+ 100.0%[/b] Weapon Damage
+Damage Type: [color=gray]50.0% Physical[/color] / [color=orangered]50.0% Fire[/color]
+Knockback: 15.0
+[color=red]* Can Headshot[/color]
+Applies [b]Burn[/b] (75.0% chance) for 5.0s
+
+"

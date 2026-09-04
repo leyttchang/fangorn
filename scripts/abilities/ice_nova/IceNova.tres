@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://durjcipfe8sr0"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://baoapw1xxjddl"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://7ps47quwy8v5" path="res://assets/icon/32x32/fb787.png" id="2_iffjh"]
@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_script")
 ability_name = "Ice Nova"
+description = "Releases a sudden, violent burst of frost radiating from your body. Instantly chills all nearby enemies, crippling their movement speed."
 icon = ExtResource("2_iffjh")
 cooldown = 6.0
 mana_cost = 30.0

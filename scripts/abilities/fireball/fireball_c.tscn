@@ -332,7 +332,6 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0
 
 [node name="SpellScalingComponent" parent="." unique_id=1128614238 node_paths=PackedStringArray("attack_component") instance=ExtResource("5_vrer4")]
 attack_component = NodePath("../AttackComponent")
-is_aoe = true
 phys_ratio = 0.0
 fire_ratio = 1.0
 

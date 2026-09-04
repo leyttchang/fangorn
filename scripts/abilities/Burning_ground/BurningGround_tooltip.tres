@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://gimm045he28t"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_mxhyj"]
+
+[resource]
+script = ExtResource("1_mxhyj")
+generated_text = "[color=lightblue]Spell | Cooldown: 6.0s | Mana Cost: 20.0[/color]
+
+[color=orange][b]- Ground Fire -[/b][/color]
+Damage: [b]1.0[/b] Base [color=yellow](AoE)[/color]
+Damage Type: [color=orangered]100.0% Fire[/color]
+Applies [b]Burn[/b] (100.0% chance) for 10.0s
+
+"

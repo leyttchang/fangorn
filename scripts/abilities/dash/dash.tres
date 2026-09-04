@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://c48j238bwssjh"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dc6rwvs262h3y"]
 
 [ext_resource type="PackedScene" uid="uid://c8l2qxcste64b" path="res://scripts/abilities/dash/dash.tscn" id="1_dl6yv"]
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_t1i8s"]
@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_t1i8s")
 ability_name = "Dash"
+description = "Swiftly dashes in the targeted direction. A crucial maneuver to evade incoming lethal strikes or to quickly close the gap with your prey."
 icon = ExtResource("2_62800")
 mana_cost = 15.0
 ability_scene = ExtResource("1_dl6yv")

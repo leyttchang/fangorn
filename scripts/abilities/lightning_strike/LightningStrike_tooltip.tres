@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://dhwgdkqpgrew"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_wam2v"]
+
+[resource]
+script = ExtResource("1_wam2v")
+generated_text = "[color=lightblue]Spell | Cooldown: 4.0s | Mana Cost: 25.0[/color]
+
+[color=orange][b]- Lightning Strike -[/b][/color]
+Damage: [b]100.0[/b] Base
+Damage Type: [color=gold]100.0% Lightning[/color]
+Knockback: 15.0
+Applies [b]Shock[/b] (50.0% chance) for 6.0s
+
+"

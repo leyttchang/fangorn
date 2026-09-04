@@ -3,6 +3,7 @@ extends Panel
 
 var slot_name: String = ""
 var skill_bar: SkillBarComponent
+var ability: AbilityData
 
 var glow_outline: ReferenceRect
 var glow_tween: Tween
@@ -52,3 +53,13 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	if skill_bar != null and slot_name != "":
 		skill_bar.equip_spell(slot_name, data["ability"])
 
+
+func _make_custom_tooltip(_for_text: String) -> Object:
+	if ability == null:
+		return null
+		
+	var tooltip_scene = preload("res://ui/inventaire/Spell_tooltip.tscn")
+	var tooltip = tooltip_scene.instantiate()
+	if tooltip.has_method("setup"):
+		tooltip.setup(ability)
+	return tooltip

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://6r5uctag43e1"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_jeg7a"]
+
+[resource]
+script = ExtResource("1_jeg7a")
+generated_text = "[color=lightblue]Spell | Cooldown: 1.0s | Mana Cost: 10.0[/color]
+
+[color=orange][b]- Magic Shot -[/b][/color]
+Damage: [b]30.0[/b] Base
+Damage Type: [color=gray]100.0% Physical[/color]
+Knockback: 2.0
+[color=red]* Can Headshot[/color]
+Applies [b]Break Armor 50[/b] (100.0% chance) for 5.0s
+
+"

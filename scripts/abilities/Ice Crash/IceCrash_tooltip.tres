@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://dluka3psq22nw"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_k3jup"]
+
+[resource]
+script = ExtResource("1_k3jup")
+generated_text = "[color=lightblue]Attack | Cooldown: 5.0s | Mana Cost: 30.0[/color]
+
+[color=orange][b]- Ice Crash -[/b][/color]
+Damage: [b]10.0[/b] Base [b]+ 100.0%[/b] Weapon Damage [color=yellow](AoE)[/color]
+Damage Type: [color=gray]50.0% Physical[/color] / [color=cyan]50.0% Ice[/color]
+Knockback: 15.0
+Applies [b]Chill[/b] (80.0% chance) for 4.0s
+
+"

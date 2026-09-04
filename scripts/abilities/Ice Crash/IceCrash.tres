@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dpb1mwe1g2a53"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://jqd8cqvuiv32"]
 
 [ext_resource type="PackedScene" uid="uid://pgcyx0lli8mn" path="res://scripts/abilities/Ice Crash/ice_crash.tscn" id="1_4ipbx"]
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_e8vsc"]
@@ -7,11 +7,12 @@
 [resource]
 script = ExtResource("1_e8vsc")
 ability_name = "Ice Crash"
+description = "You hit the ground with your weapon causing ice spikes to impale your enemies."
 icon = ExtResource("1_fkfg7")
 category = 1
 cooldown = 5.0
 mana_cost = 30.0
-weapon_damage_multiplier = 1.5
+skill_type = 1
 weapon_speed_multiplier = 0.65
 anim_name = "attack_heavy_slam"
 ability_scene = ExtResource("1_4ipbx")

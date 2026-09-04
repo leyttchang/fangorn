@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://1k4ihmc4d7mi"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://doq568n6w50u3"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_f0e63"]
 [ext_resource type="PackedScene" uid="uid://bbv5mf11ajagf" path="res://scripts/abilities/thunder_aspect/thunder_aspect.tscn" id="1_joaxw"]
@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_f0e63")
 ability_name = "Thunder aspect"
+description = "Channels the raw, untamed power of the storm directly into your body. Envelops you in crackling energy, augmenting your movment speed, attack speed, and combat capabilities with lightning."
 icon = ExtResource("3_onhlx")
 cooldown = 15.0
 mana_cost = 20.0

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://r5s3kpvm32mc"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_euqkb"]
+
+[resource]
+script = ExtResource("1_euqkb")
+generated_text = "[color=lightblue]Attack | Cooldown: 5.0s | Mana Cost: 20.0[/color]
+
+[color=orange][b]- Slash 1 -[/b][/color]
+Damage: [b]25.0[/b] Base
+Damage Type: [color=gray]50.0% Physical[/color] / [color=gold]50.0% Lightning[/color]
+Knockback: 0.5
+Applies [b]Shock[/b] (33.0% chance) for 5.0s
+
+[color=orange][b]- Slash 2 -[/b][/color]
+Damage: [b]25.0[/b] Base
+Damage Type: [color=gray]50.0% Physical[/color] / [color=gold]50.0% Lightning[/color]
+Knockback: 5.0
+Applies [b]Shock[/b] (33.0% chance) for 5.0s
+
+"

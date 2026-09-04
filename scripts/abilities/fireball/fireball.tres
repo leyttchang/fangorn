@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cs618ik4co076"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dqb24sph7m7kt"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_20ysy"]
 [ext_resource type="PackedScene" uid="uid://coj4bs1y7mwte" path="res://scripts/abilities/fireball/fireball_c.tscn" id="1_i6nhm"]
@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_20ysy")
 ability_name = "Fireball"
+description = "Hurls a sphere of concentrated flame that detonates upon impact, scorching all enemies caught in the blast and leaving them with lingering burns."
 icon = ExtResource("1_w6ik7")
 cooldown = 10.0
 mana_cost = 50.0

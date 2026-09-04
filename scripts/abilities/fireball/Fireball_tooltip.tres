@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_f2ync"]
+
+[resource]
+script = ExtResource("1_f2ync")
+generated_text = "[color=lightblue]Spell | Cooldown: 10.0s | Mana Cost: 50.0[/color]
+
+[color=orange][b]- Fireball -[/b][/color]
+Damage: [b]100.0[/b] Base
+Damage Type: [color=orangered]100.0% Fire[/color]
+Knockback: 10.0
+Applies [b]Burn[/b] (100.0% chance) for 5.0s
+
+[color=orange][b]- Explosion -[/b][/color]
+Damage: [b]30.0[/b] Base [color=yellow](AoE)[/color]
+Damage Type: [color=orangered]100.0% Fire[/color]
+Applies [b]Burn[/b] (100.0% chance) for 5.0s
+
+"

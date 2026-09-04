@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cqjqr7u15ttu5"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://dqr267hv8kb33"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_a8h7x"]
 [ext_resource type="PackedScene" uid="uid://db2hwlxxok88o" path="res://scripts/abilities/chain_lightning/chain_lightning.tscn" id="1_tdoh0"]
@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_a8h7x")
 ability_name = "Chaing lightning"
+description = "Unleashes a fierce bolt of raw lightning that violently arcs between multiple targets. The electricity seeks out nearby enemies, shocking them into submission."
 icon = ExtResource("2_fpq6r")
 cooldown = 8.0
 mana_cost = 40.0

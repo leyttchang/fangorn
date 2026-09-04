@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://dd6eqips418h4"]
+
+[ext_resource type="Script" uid="uid://bx3q8rcbyslfw" path="res://ui/ability_tooltip.gd" id="1_u1xhg"]
+[ext_resource type="Texture2D" uid="uid://y0yx7bguud8t" path="res://assets/UI/item_nameplates/magique_item_nameplate.png" id="3_n1che"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3u4dq"]
+texture = ExtResource("3_n1che")
+texture_margin_left = 30.0
+texture_margin_top = 3.0
+texture_margin_right = 30.0
+texture_margin_bottom = 3.0
+
+[node name="ItemTooltip" type="PanelContainer" unique_id=1311198574 node_paths=PackedStringArray("title_label", "description_label", "stats_label")]
+custom_minimum_size = Vector2(250, 0)
+offset_right = 250.0
+offset_bottom = 100.0
+size_flags_vertical = 0
+script = ExtResource("1_u1xhg")
+title_label = NodePath("VBoxContainer/NameLabel")
+description_label = NodePath("VBoxContainer/MarginContainer/InnerVBox/DescLabel")
+stats_label = NodePath("VBoxContainer/MarginContainer/InnerVBox/StatsLabel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=234218751]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="NameLabel" type="Label" parent="VBoxContainer" unique_id=173278572]
+custom_minimum_size = Vector2(411, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxTexture_3u4dq")
+text = "Item Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=1088487733]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="InnerVBox" type="VBoxContainer" parent="VBoxContainer/MarginContainer" unique_id=282529480]
+layout_mode = 2
+
+[node name="DescLabel" type="Label" parent="VBoxContainer/MarginContainer/InnerVBox" unique_id=551983688]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="StatsLabel" type="RichTextLabel" parent="VBoxContainer/MarginContainer/InnerVBox" unique_id=2098843308]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=green]Stats[/color]"
+fit_content = true

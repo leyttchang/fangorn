@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cuypi77a4wo07"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://bydvk3tsqivhm"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_f5dn0"]
 [ext_resource type="PackedScene" uid="uid://cwdxsnmvc58je" path="res://scripts/abilities/thunder_slash/thunder_slash.tscn" id="1_rdmw5"]
@@ -7,11 +7,12 @@
 [resource]
 script = ExtResource("1_f5dn0")
 ability_name = "Thunder slash"
+description = "Empowers your weapon with storm magic to deliver two rapid, successive melee strikes. Each swing forcefully projects a fierce wave of electricity outward, striking enemies with a devastating combination of physical steel and pure lightning."
 icon = ExtResource("2_rdmw5")
 category = 1
 cooldown = 5.0
 mana_cost = 20.0
-weapon_damage_multiplier = 1.0
+skill_type = 1
 weapon_speed_multiplier = 0.8
 target_mode = 5
 anim_name = "thunder_slash"

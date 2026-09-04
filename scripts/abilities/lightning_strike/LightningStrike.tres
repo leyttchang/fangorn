@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://6tqk0rgtd57c"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://8t2ped2x12jn"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://djtioufafqhx8" path="res://scripts/abilities/casting_animation/lightning_casting_vfx.tscn" id="2_0cfru"]
@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1_script")
 ability_name = "Lightning Strike"
+description = "Calls down a devastating thunderbolt from the sky to smite the targeted area. Strikes with pinpoint accuracy and pure electrical wrath."
 icon = ExtResource("2_docdq")
 cooldown = 4.0
 mana_cost = 25.0

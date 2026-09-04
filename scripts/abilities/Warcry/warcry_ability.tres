@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://vbt1o3jxdjmh"]
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://cmp20cjai6u8c"]
 
 [ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_warcry"]
 [ext_resource type="Texture2D" uid="uid://h84nk1kywttt" path="res://assets/icon/32x32/fb1249.png" id="2_70w65"]
@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_warcry")
 ability_name = "Warcry"
+description = "Unleashes a fierce, bloodcurdling roar that awakens the primal rage of you and your allies. Fills the party with unyielding strength, instantly granting increased maximum health and physical damage."
 icon = ExtResource("2_70w65")
 cooldown = 15.0
 mana_cost = 20.0

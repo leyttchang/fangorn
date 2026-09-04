@@ -49,9 +49,6 @@ func on_execute(caster: Node3D, target_data: Dictionary) -> void:
 				if stat != null: flat_phys_stat = stat.get_value()
 				
 			var mult = base_weapon_multiplier
-			if ability_data != null:
-				mult = ability_data.weapon_damage_multiplier
-				
 			final_base += (weapon_damage + flat_phys_stat) * mult
 			
 		# ====================================================

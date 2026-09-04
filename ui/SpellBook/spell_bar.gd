@@ -112,12 +112,15 @@ func _update_single_slot(slot_node: Node, ability: AbilityData) -> void:
 		return
 		
 	# Application des données
+	slot_node.set("ability", ability)
 	if ability != null and ability.icon != null:
 		icon_rect.texture = ability.icon
 		icon_rect.visible = true
+		slot_node.set("tooltip_text", " ")
 	else:
 		icon_rect.texture = null
 		icon_rect.visible = false
+		slot_node.set("tooltip_text", "")
 
 func _get_action_key_text(action_name: String, fallback_number: int) -> String:
 	if InputMap.has_action(action_name):

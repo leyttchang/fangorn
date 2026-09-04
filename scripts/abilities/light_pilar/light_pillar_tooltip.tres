@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://ypb1c0w76kwe"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_ciyt5"]
+
+[resource]
+script = ExtResource("1_ciyt5")
+generated_text = "[color=lightblue]Spell | Cooldown: 30.0s | Mana Cost: 10.0[/color]
+
+"
