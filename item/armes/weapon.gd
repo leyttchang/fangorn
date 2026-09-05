@@ -2,6 +2,7 @@ class_name Weapon
 extends Node3D
 
 @export var weapon_stats: WeaponItem
+@export var blade_meshes: Array[MeshInstance3D] = []
 @onready var attack_component: AttackComponent = $AttackComponent
 
 func _ready() -> void:

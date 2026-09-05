@@ -12,7 +12,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
 shader = ExtResource("2_prk0l")
 shader_parameter/liquide_color = Color(0.3, 0.008999992, 0.008999992, 1)
-shader_parameter/current_offset = Vector2(0.11995562, 0.6467331)
+shader_parameter/current_offset = Vector2(0.21331476, 0.31355178)
 shader_parameter/texture_1_add = ExtResource("5_fbv3k")
 shader_parameter/reflect_speed = Vector2(0.1, 0.1)
 shader_parameter/reflect_text = ExtResource("5_mc7qp")
@@ -40,7 +40,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MarginContainer/Health_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/1/path = NodePath("Health_bar/mask/liquid_health:material:shader_parameter/liquide_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -69,7 +69,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MarginContainer/Health_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/1/path = NodePath("Health_bar/mask/liquid_health:material:shader_parameter/liquide_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -85,34 +85,29 @@ _data = {
 &"health": SubResource("Animation_fbv3k")
 }
 
-[node name="health_bar" type="CanvasLayer" unique_id=427302170]
+[node name="health_bar" type="Control" unique_id=1813357559]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_rwxrv")
 scroll_speed = Vector2(0.255, 0.375)
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1528769839]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
+[node name="Health_bar" type="Control" parent="." unique_id=851709097]
+anchors_preset = 0
 offset_left = 430.485
 offset_top = -266.51
-offset_right = 470.485
-offset_bottom = -226.51001
-grow_vertical = 0
-scale = Vector2(0.3, 0.3)
+offset_right = 1516.0
+offset_bottom = 823.0
+scale = Vector2(0.23, 0.23)
 mouse_filter = 2
 
-[node name="Health_bar" type="Control" parent="MarginContainer" unique_id=851709097]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="background" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=693152589]
+[node name="background" type="TextureRect" parent="Health_bar" unique_id=693152589]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 2
 texture = ExtResource("3_fbv3k")
 
-[node name="mask" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=44227863]
+[node name="mask" type="TextureRect" parent="Health_bar" unique_id=44227863]
 clip_children = 1
 layout_mode = 0
 offset_right = 1024.0
@@ -120,7 +115,9 @@ offset_bottom = 1024.0
 mouse_filter = 2
 texture = ExtResource("4_mc7qp")
 
-[node name="liquid" type="TextureRect" parent="MarginContainer/Health_bar/mask" unique_id=417102526]
+[node name="liquid_health" type="TextureRect" parent="Health_bar/mask" unique_id=417102526]
+unique_name_in_owner = true
+visible = false
 material = SubResource("ShaderMaterial_yqkk6")
 layout_mode = 0
 offset_left = 193.0
@@ -131,12 +128,13 @@ mouse_filter = 2
 texture = ExtResource("6_3710l")
 expand_mode = 1
 
-[node name="frame" type="TextureRect" parent="MarginContainer/Health_bar" unique_id=949715135]
+[node name="frame" type="TextureRect" parent="Health_bar" unique_id=949715135]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 1024.0
+offset_bottom = 1024.0
 mouse_filter = 2
 texture = ExtResource("7_lfoab")
+expand_mode = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1346458141]
 libraries/ = SubResource("AnimationLibrary_mc7qp")

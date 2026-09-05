@@ -1,5 +1,5 @@
 class_name SpellBarUI
-extends CanvasLayer
+extends Control
 
 # Référence au script logique (à glisser dans l'inspecteur)
 @export var skill_bar: SkillBarComponent
@@ -9,8 +9,18 @@ extends CanvasLayer
 
 func _ready() -> void:
 	if skill_bar == null:
+		var player = get_tree().get_first_node_in_group("Player")
+		if player != null and player.owner != null and not player.has_node("SkillBarComponent"):
+			player = player.owner
+		if player == null:
+			player = owner
+		if player != null:
+			skill_bar = player.get_node_or_null("SkillBarComponent")
+			
+	if skill_bar == null:
 		push_error("SpellBarUI : Le composant SkillBarComponent n'est pas assigné dans l'inspecteur.")
 		return
+		
 	skill_bar.spells_updated.connect(update_all_slots)
 		
 	# Initialisation de l'affichage au lancement

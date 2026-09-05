@@ -31,6 +31,7 @@ _data = {
 script = ExtResource("1_c6euc")
 weapon_material = ExtResource("2_wklt7")
 buff_data = ExtResource("3_bpr28")
+buff_duration = 7.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1354737807]
 libraries/ = SubResource("AnimationLibrary_x8q2j")

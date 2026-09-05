@@ -30,9 +30,10 @@ func _on_equipment_changed(slot_name: String, item: ItemData) -> void:
 				path = item.weapon_scene.resource_path
 			rpc("_rpc_update_visual_weapon", path)
 		
+		var wrist = get_parent().get_node("%wrist")
 		# 1. On detruit l'ancienne arme (s'il y en a une)
-		for child in main_droite.get_children():
-			if not child is WeaponImpactComponent and child.name != "weapon_impact_componant":
+		for child in wrist.get_children():
+			if child.name != "weapon_impact_componant" and not child is WeaponImpactComponent:
 				child.queue_free()
 			
 		# 2. Si on a juste desequipe (mains nues), on s'arrete la
@@ -48,16 +49,17 @@ func _on_equipment_changed(slot_name: String, item: ItemData) -> void:
 			weapon_instance.weapon_stats = item
 			
 		# 5. On l'attache physiquement a la main
-		main_droite.add_child(weapon_instance)
+		wrist.add_child(weapon_instance)
 
 # ==========================================
 # GESTION RESEAU DE L'APPARENCE DE L'ARME
 # ==========================================
 @rpc("any_peer", "call_remote", "reliable")
 func _rpc_update_visual_weapon(resource_path: String) -> void:
+	var wrist = get_parent().get_node("%wrist")
 	# 1. On detruit l'ancienne arme
-	for child in main_droite.get_children():
-		if not child is WeaponImpactComponent and child.name != "weapon_impact_componant":
+	for child in wrist.get_children():
+		if child.name != "weapon_impact_componant" and not child is WeaponImpactComponent:
 			child.queue_free()
 		
 	# 2. Si mains nues
@@ -75,7 +77,7 @@ func _rpc_update_visual_weapon(resource_path: String) -> void:
 	# Pas besoin de weapon_stats pour le visuel des autres joueurs
 	# (car leur AttackComponent sera desactive de toute facon)
 		
-	main_droite.add_child(weapon_instance)
+	wrist.add_child(weapon_instance)
 
 func _on_peer_connected(peer_id: int) -> void:
 	if equipment_component != null:

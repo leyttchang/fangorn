@@ -30,8 +30,15 @@ func _exit_tree() -> void:
 func _set_weapon_material(mat: Material) -> void:
 	if mon_lanceur == null: return
 	
-	var main_droite = mon_lanceur.get_node_or_null("Camera3D/MainDroite")
+	var main_droite = mon_lanceur.get_node_or_null("%MainDroite")
 	if main_droite:
-		var meshes = main_droite.find_children("*", "MeshInstance3D", true, false)
+		var current_weapon = main_droite._get_actual_weapon()
+		var meshes = []
+		if current_weapon and "blade_meshes" in current_weapon and not current_weapon.blade_meshes.is_empty():
+			meshes = current_weapon.blade_meshes
+		else:
+			meshes = main_droite.find_children("*", "MeshInstance3D", true, false)
+			
 		for mesh in meshes:
-			mesh.material_overlay = mat
+			if mesh != null:
+				mesh.material_overlay = mat

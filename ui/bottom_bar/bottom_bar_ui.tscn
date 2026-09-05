@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://chkis6ceuutm3"]
+
+[ext_resource type="PackedScene" uid="uid://bk1064mxurpec" path="res://ui/health_bar.tscn" id="1_d8y3f"]
+[ext_resource type="PackedScene" uid="uid://manabar00000" path="res://ui/mana_bar.tscn" id="3_mubif"]
+[ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="4_giw72"]
+
+[node name="bottom_bar_UI" type="CanvasLayer" unique_id=1066360708]
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=142367386]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.61, 0.61)
+pivot_offset = Vector2(960, 1080)
+offset_transform_enabled = true
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1385363817]
+layout_mode = 2
+size_flags_vertical = 8
+alignment = 1
+
+[node name="health_bar" parent="MarginContainer/HBoxContainer" unique_id=1813357559 instance=ExtResource("1_d8y3f")]
+z_index = 1
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+
+[node name="Health_bar" parent="MarginContainer/HBoxContainer/health_bar" index="0" unique_id=851709097]
+layout_mode = 1
+offset_left = 39.73
+offset_top = -4.92
+offset_right = 39.73
+offset_bottom = -4.92
+
+[node name="liquid_health" parent="MarginContainer/HBoxContainer/health_bar/Health_bar/mask" parent_id_path=PackedInt32Array(1813357559, 44227863) index="0" unique_id=417102526]
+visible = true
+
+[node name="Spell_bar" parent="MarginContainer/HBoxContainer" unique_id=503653297 instance=ExtResource("4_giw72")]
+custom_minimum_size = Vector2(600, 200)
+layout_mode = 2
+
+[node name="MainPanel" parent="MarginContainer/HBoxContainer/Spell_bar" index="0" unique_id=403461903]
+anchors_preset = 12
+anchor_top = 1.0
+grow_vertical = 0
+
+[node name="MarginContainer" parent="MarginContainer/HBoxContainer/Spell_bar/MainPanel" index="0" unique_id=742100801]
+offset_top = -110.0
+
+[node name="inv_grid" parent="MarginContainer/HBoxContainer/Spell_bar/MainPanel/MarginContainer/inventaire" parent_id_path=PackedInt32Array(503653297, 1251645797) index="0" unique_id=468804349]
+offset_left = -300.0
+offset_top = -50.0
+offset_right = 330.0
+offset_bottom = 50.0
+
+[node name="mana_bar" parent="MarginContainer/HBoxContainer" unique_id=1972456803 instance=ExtResource("3_mubif")]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+
+[node name="mana_bar" parent="MarginContainer/HBoxContainer/mana_bar" index="0" unique_id=2039367325]
+offset_left = -61.11
+offset_top = -18.655
+offset_right = -61.11
+offset_bottom = -18.655
+scale = Vector2(0.23, 0.23)
+
+[editable path="MarginContainer/HBoxContainer/health_bar"]
+[editable path="MarginContainer/HBoxContainer/Spell_bar"]
+[editable path="MarginContainer/HBoxContainer/mana_bar"]

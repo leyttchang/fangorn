@@ -1,0 +1,43 @@
+[gd_resource type="VisualShader" format=3 uid="uid://uy7bf4hvvjvn"]
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_mmyin"]
+parameter_name = "snow_flakes_particules"
+color_default = 2
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_5k4fm"]
+output_port_for_preview = 0
+source = 5
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_54p37"]
+expanded_output_ports = [0]
+input_name = "color"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_0e206"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeSmoothStep" id="VisualShaderNodeSmoothStep_y1iqn"]
+output_port_for_preview = 0
+default_input_values = [0, 1.0, 1, 1.0, 2, 0.5]
+
+[sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_asbaa"]
+expanded_output_ports = [0]
+parameter_name = "ColorParameter"
+
+[resource]
+modes/cull = 2
+flags/unshaded = true
+preview_params/ColorParameter = "Color(1.4759609, 2.6338627, 3.7917647, 1)"
+preview_params/snow_flakes_particules = "Resource(\"uid://lc2d3ly8t5hw\", \"res://assets/LeLu's Noise Pack/T_snow_flakes.png\")"
+nodes/fragment/2/node = SubResource("VisualShaderNodeTexture2DParameter_mmyin")
+nodes/fragment/2/position = Vector2(-720, 576)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture_5k4fm")
+nodes/fragment/3/position = Vector2(-720, 416)
+nodes/fragment/4/node = SubResource("VisualShaderNodeInput_54p37")
+nodes/fragment/4/position = Vector2(-736, 80)
+nodes/fragment/5/node = SubResource("VisualShaderNodeVectorOp_0e206")
+nodes/fragment/5/position = Vector2(176, 384)
+nodes/fragment/6/node = SubResource("VisualShaderNodeSmoothStep_y1iqn")
+nodes/fragment/6/position = Vector2(-176, 528)
+nodes/fragment/7/node = SubResource("VisualShaderNodeColorParameter_asbaa")
+nodes/fragment/7/position = Vector2(-208, -96)
+nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 5, 0, 0, 1, 3, 0, 6, 2, 6, 0, 5, 0, 7, 4, 5, 1, 4, 0, 6, 0)

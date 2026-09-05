@@ -18,7 +18,7 @@ signal player_hit_enemy
 
 @onready var stats_component: StatsComponent = %StatsComponent
 @onready var health_component: HealthComponent = $HealthComponent
-@onready var main_droite = $Camera3D/MainDroite
+@onready var main_droite = %MainDroite
 
 @export var custom_footstep_sound: AudioStream # Optionnel : Glisser un fichier .wav / .ogg
 @export var step_interval: float = 2.8 # Distance en mÃ¨tres entre deux bruits de pas

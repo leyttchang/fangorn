@@ -1,11 +1,11 @@
 @tool
 class_name ManaBarUI
-extends CanvasLayer
+extends Control
 
 @export var mana_component: Node 
 @export var scroll_speed: Vector2 = Vector2(0.5, -0.5)
 
-@onready var liquide: TextureRect = %liquid
+@onready var liquide: TextureRect = %liquid_mana
 var current_uv_offset: Vector2 = Vector2.ZERO
 
 func _ready() -> void:

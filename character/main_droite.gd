@@ -111,7 +111,8 @@ func get_current_attack_speed() -> float:
 	return max(final_speed, 0.1)
 
 func _get_actual_weapon() -> Node3D:
-	for child in get_children():
+	var wrist = owner.get_node("%wrist")
+	for child in wrist.get_children():
 		if child.name != "weapon_impact_componant" and not child is WeaponImpactComponent:
 			return child
 	return null

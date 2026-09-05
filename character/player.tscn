@@ -25,14 +25,13 @@
 [ext_resource type="Script" uid="uid://bld6nuxn07jod" path="res://character/loot_cast.gd" id="15_2o2rg"]
 [ext_resource type="PackedScene" uid="uid://cs8orhii0a0o7" path="res://components/visual_equipment_manager.tscn" id="15_j51ly"]
 [ext_resource type="PackedScene" uid="uid://bs0k0q7fq1bbi" path="res://particule/blood/blood_particule.tscn" id="15_uy1o2"]
+[ext_resource type="PackedScene" uid="uid://bkcrhf14uynjl" path="res://item/armes/test_axe.tscn" id="16_uy1o2"]
 [ext_resource type="PackedScene" uid="uid://bhvj2ircd33r1" path="res://ui/inventaire/inventory_ui.tscn" id="16_xqqx8"]
 [ext_resource type="PackedScene" uid="uid://bh8emqqgp4pi1" path="res://ui/global_shader/global_shader.tscn" id="18_uy1o2"]
 [ext_resource type="PackedScene" uid="uid://cw1qnfxqpge0t" path="res://ui/SpellBook/spell_book_ui.tscn" id="21_007hi"]
-[ext_resource type="PackedScene" uid="uid://byhe67undjbyr" path="res://ui/SpellBook/spell_bar.tscn" id="21_ynykn"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="21_yr573"]
 [ext_resource type="PackedScene" uid="uid://cm8vpgrn4bp77" path="res://ui/SpellBook/Casting_Bar.tscn" id="24_u2y57"]
 [ext_resource type="PackedScene" uid="uid://cg50ca34fajqd" path="res://ui/crosshair.tscn" id="25_tr32s"]
-[ext_resource type="PackedScene" uid="uid://bk1064mxurpec" path="res://ui/health_bar.tscn" id="27_2tvps"]
 [ext_resource type="PackedScene" uid="uid://dtn1sa360mw67" path="res://ui/score.tscn" id="28_nw0js"]
 [ext_resource type="PackedScene" uid="uid://wefscg5hf58q" path="res://components/foot_step_component.tscn" id="30_73sc4"]
 [ext_resource type="AudioStream" uid="uid://d4jwhrrkgb4ny" path="res://assets/sound_effects/footstep/Dirt/Steps_dirt-001.ogg" id="31_pn6xv"]
@@ -59,13 +58,13 @@
 [ext_resource type="PackedScene" uid="uid://bowtifq1hsnmv" path="res://components/lvl_component.tscn" id="54_vp26o"]
 [ext_resource type="PackedScene" uid="uid://beurqx4t0mjwa" path="res://ui/xp_bar_ui.tscn" id="55_ooc2e"]
 [ext_resource type="PackedScene" uid="uid://c2u4m28i4uc43" path="res://components/mana_component.tscn" id="56_dadkq"]
-[ext_resource type="PackedScene" uid="uid://manabar00000" path="res://ui/mana_bar.tscn" id="57_aynll"]
 [ext_resource type="PackedScene" uid="uid://8phfagxw0ymc" path="res://components/hurt_sound_component.tscn" id="58_aynll"]
 [ext_resource type="PackedScene" uid="uid://cmcf3finvkk0k" path="res://components/Skilltree_comp.tscn" id="58_tmwgi"]
 [ext_resource type="Script" uid="uid://c8qhr0hxtdymv" path="res://components/skill_tree_component.gd" id="59_ay40t"]
 [ext_resource type="PackedScene" uid="uid://dnv6k8v44l8xw" path="res://passive_skill_tree/generator_test.tscn" id="60_ce8hk"]
 [ext_resource type="Script" uid="uid://v0dr1ndsmbrc" path="res://ui/ui_manager.gd" id="61_ay40t"]
 [ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="62_ce8hk"]
+[ext_resource type="PackedScene" uid="uid://chkis6ceuutm3" path="res://ui/bottom_bar/bottom_bar_ui.tscn" id="65_jekax"]
 [ext_resource type="PackedScene" uid="uid://desweaab8m7pq" path="res://character/lanterne.tscn" id="67_g1p3m"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ay40t"]
@@ -117,6 +116,30 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector3(-1.3395716, 0.0063336045, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("wrist:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(2.235174e-08, -1.49011585e-08, 2.9802319e-08)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%wrist:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.5707964, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_a1kp2"]
@@ -193,6 +216,18 @@ tracks/4/keys = {
 "method": &"play_attack_sound"
 }]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("%wrist:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.38359115, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 1.118756, 0), Vector3(0, 0, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_fqwjq"]
 resource_name = "attack_axe_2"
@@ -228,7 +263,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.56666666, 0.8),
+"times": PackedFloat32Array(0.6, 0.8),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -257,6 +292,18 @@ tracks/3/keys = {
 "args": [],
 "method": &"end_combat_state"
 }]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%wrist:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.56666666, 0.7, 1.1615788),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.4886922, 0), Vector3(0, -1.1519173, 0), Vector3(0, -1.1519173, 0), Vector3(0, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_fn6jh"]
@@ -551,6 +598,18 @@ tracks/3/keys = {
 "method": &"end_combat_state"
 }]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%wrist:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.9670819),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_aw5rd"]
 resource_name = "attack_sword_2"
@@ -614,6 +673,18 @@ tracks/3/keys = {
 "args": [],
 "method": &"end_combat_state"
 }]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%wrist:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.02701346, 0.98869264),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_pn6xv"]
@@ -679,6 +750,18 @@ tracks/3/keys = {
 "method": &"end_combat_state"
 }]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("wrist:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.2010468, 0.49280983),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(2.235174e-08, -1.49011585e-08, 2.9802319e-08), Vector3(0, 2.1554816, 0), Vector3(0, 0, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_4vy5w"]
 resource_name = "attack_sword_4"
@@ -742,6 +825,18 @@ tracks/3/keys = {
 "args": [],
 "method": &"end_combat_state"
 }]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("wrist:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.08581266, 0.33333334, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, -2.3561945, 0), Vector3(0, 1.4922565, 0), Vector3(0, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_2o2rg"]
@@ -834,6 +929,18 @@ tracks/1/keys = {
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.017177094, 0, 0), Vector3(0.12670197, 0, 0)]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%wrist:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 3.4631257),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_e72n5"]
 resource_name = "idle_spear"
@@ -878,7 +985,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1.1666666, 2.5666666),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.5, -0.9, -1), Vector3(0.5, -0.8091459, -1), Vector3(0.5, -1.0362347, -1)]
+"values": [Vector3(0.5, -0.68, -1.07), Vector3(0.5, -0.594, -1.07), Vector3(0.5, -0.621, -1.07)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -891,6 +998,18 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.017177094, 0, 0), Vector3(0.12670197, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%wrist:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 3.457723),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_ce8hk"]
@@ -1138,6 +1257,7 @@ starting_inventory_items = Array[ExtResource("3_45wte")]([ExtResource("2_j51ly")
 friction = 50.0
 
 [node name="GameOverText" parent="." unique_id=962979278 instance=ExtResource("5_ce8hk")]
+visible = false
 
 [node name="KeystoneModifiers" type="Node3D" parent="." unique_id=1916084816]
 
@@ -1158,21 +1278,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7400116, -0.2528488)
 metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
-transform = Transform3D(0.999977, -0.0061649964, 0.0014514605, 0, 0.22916958, 0.9733859, -0.0063335435, -0.97336584, 0.22916509, 0.5, -0.9, -1)
+unique_name_in_owner = true
+transform = Transform3D(0.999977, -0.0061649974, 0.0014514608, 0, 0.2291696, 0.97338605, -0.0063335435, -0.97336596, 0.22916514, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
 
-[node name="TestSword" parent="Camera3D/MainDroite" unique_id=2020783524 instance=ExtResource("12_pn6xv")]
+[node name="wrist" type="Marker3D" parent="Camera3D/MainDroite" unique_id=717254626]
+unique_name_in_owner = true
+transform = Transform3D(-4.3711392e-08, 0, 1.0000001, 0, 1.0000001, 0, -1.0000001, 0, -4.3711392e-08, 0, 0, 0)
 
-[node name="weapon_impact_componant" parent="Camera3D/MainDroite" unique_id=226347209 node_paths=PackedStringArray("raycast", "main_droite") instance=ExtResource("14_jekax")]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+[node name="TestSword" parent="Camera3D/MainDroite/wrist" unique_id=2020783524 instance=ExtResource("12_pn6xv")]
+transform = Transform3D(0.9999999, -2.9802322e-08, 1.4901161e-08, -2.9802322e-08, 0.9999999, -7.450581e-09, 4.4703484e-08, -3.7252903e-08, 0.9999999, 0, 0, 0)
+
+[node name="weapon_impact_componant" parent="Camera3D/MainDroite/wrist" unique_id=226347209 node_paths=PackedStringArray("raycast", "main_droite") instance=ExtResource("14_jekax")]
+unique_name_in_owner = true
+transform = Transform3D(0.9999999, 1.4901161e-08, 0, -2.9802322e-08, -3.7252903e-08, -0.9999999, 4.4703484e-08, 0.9999999, 7.450581e-09, 0, 0, 0)
 raycast = NodePath("RayCast3D")
 blood_particles_scene = ExtResource("15_uy1o2")
-main_droite = NodePath("..")
+main_droite = NodePath("../..")
 
-[node name="RayCast3D" parent="Camera3D/MainDroite/weapon_impact_componant" index="0" unique_id=607664755]
+[node name="RayCast3D" parent="Camera3D/MainDroite/wrist/weapon_impact_componant" index="0" unique_id=607664755]
 hit_from_inside = true
+
+[node name="test_axe" parent="Camera3D/MainDroite/wrist" unique_id=1520606184 instance=ExtResource("16_uy1o2")]
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=729055229]
 target_position = Vector3(0, 0, -50)
@@ -1188,7 +1317,7 @@ libraries/ = SubResource("AnimationLibrary_aw5rd")
 
 [node name="AnimationTree" type="AnimationTree" parent="Camera3D" unique_id=2091119579]
 active = false
-root_node = NodePath("../MainDroite")
+root_node = NodePath("%MainDroite")
 tree_root = SubResource("AnimationNodeBlendTree_combo")
 anim_player = NodePath("../attack_animation")
 parameters/TimeScale/scale = 1.0
@@ -1260,37 +1389,13 @@ main_droite = NodePath("../Camera3D/MainDroite")
 
 [node name="Crosshair" parent="." unique_id=894221743 instance=ExtResource("25_tr32s")]
 
+[node name="bottom_bar_UI" parent="." unique_id=1066360708 instance=ExtResource("65_jekax")]
+
 [node name="InventoryUI" parent="." unique_id=1946714399 node_paths=PackedStringArray("inventory_component", "equipment_component", "stats_component") instance=ExtResource("16_xqqx8")]
+visible = false
 inventory_component = NodePath("../InventoryComponent")
 equipment_component = NodePath("../EquipmentComponent")
 stats_component = NodePath("../StatsComponent")
-
-[node name="equipe" parent="InventoryUI/MainPanel" parent_id_path=PackedInt32Array(1946714399, 2104048239) index="1" unique_id=1441282182]
-offset_top = -1.3120012
-offset_bottom = -325.0
-
-[node name="equipment_weapon_1" parent="InventoryUI/MainPanel/equipe" index="0" unique_id=178112762 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-equipment_component = NodePath("../../../../EquipmentComponent")
-inventory_component = NodePath("../../../../InventoryComponent")
-
-[node name="equipment_slot_head" parent="InventoryUI/MainPanel/equipe" index="2" unique_id=206346114 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-equipment_component = NodePath("../../../../EquipmentComponent")
-inventory_component = NodePath("../../../../InventoryComponent")
-
-[node name="equipment_slot_chest" parent="InventoryUI/MainPanel/equipe" index="3" unique_id=1961633882 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-equipment_component = NodePath("../../../../EquipmentComponent")
-inventory_component = NodePath("../../../../InventoryComponent")
-
-[node name="equipment_slot_legs" parent="InventoryUI/MainPanel/equipe" index="4" unique_id=1693178314 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-equipment_component = NodePath("../../../../EquipmentComponent")
-inventory_component = NodePath("../../../../InventoryComponent")
-
-[node name="equipment_slot_boots" parent="InventoryUI/MainPanel/equipe" index="5" unique_id=2093880661 node_paths=PackedStringArray("equipment_component", "inventory_component")]
-equipment_component = NodePath("../../../../EquipmentComponent")
-inventory_component = NodePath("../../../../InventoryComponent")
-
-[node name="Spell_bar" parent="." unique_id=243740632 node_paths=PackedStringArray("skill_bar") instance=ExtResource("21_ynykn")]
-skill_bar = NodePath("../SkillBarComponent")
 
 [node name="SpellBook_UI" parent="." unique_id=1635640243 node_paths=PackedStringArray("skill_bar") instance=ExtResource("21_007hi")]
 visible = false
@@ -1299,9 +1404,6 @@ skill_bar = NodePath("../SkillBarComponent")
 [node name="CastingBar" parent="." unique_id=1878220428 node_paths=PackedStringArray("skill_bar") instance=ExtResource("24_u2y57")]
 visible = false
 skill_bar = NodePath("../SkillBarComponent")
-
-[node name="health_bar" parent="." unique_id=427302170 node_paths=PackedStringArray("health_component") instance=ExtResource("27_2tvps")]
-health_component = NodePath("../HealthComponent")
 
 [node name="CanvasLayer" parent="." unique_id=1608159447 node_paths=PackedStringArray("player_health") instance=ExtResource("28_nw0js")]
 player_health = NodePath("../HealthComponent")
@@ -1321,9 +1423,6 @@ level_component = NodePath("../lvl_component")
 
 [node name="mana_component" parent="." unique_id=1179339449 node_paths=PackedStringArray("stats_component") instance=ExtResource("56_dadkq")]
 stats_component = NodePath("../StatsComponent")
-
-[node name="mana_bar" parent="." unique_id=1134976734 node_paths=PackedStringArray("mana_component") instance=ExtResource("57_aynll")]
-mana_component = NodePath("../mana_component")
 
 [node name="Skill_tree_comp" parent="." unique_id=1911323837 node_paths=PackedStringArray("stats_component", "level_component", "skill_tree_ui", "points_label") instance=ExtResource("58_tmwgi")]
 script = ExtResource("59_ay40t")
@@ -1376,6 +1475,6 @@ no_depth_test = true
 [node name="lanterne" parent="." unique_id=1064551459 instance=ExtResource("67_g1p3m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66503906, 0, -0.21276855)
 
-[editable path="Camera3D/MainDroite/weapon_impact_componant"]
+[editable path="Camera3D/MainDroite/wrist/weapon_impact_componant"]
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]

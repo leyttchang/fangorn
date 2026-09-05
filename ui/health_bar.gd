@@ -1,10 +1,10 @@
-﻿@tool
-extends CanvasLayer
+@tool
+extends Control
 
 @export var health_component: HealthComponent
 @export var scroll_speed: Vector2 = Vector2(0.5, -0.5)
 
-@onready var liquide: TextureRect = $MarginContainer/Health_bar/mask/liquid
+@onready var liquide: TextureRect = %liquid_health
 var current_uv_offset: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
@@ -12,6 +12,15 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 		
+	if health_component == null:
+		var player = get_tree().get_first_node_in_group("Player")
+		if player != null and player.owner != null and not player.has_node("HealthComponent"):
+			player = player.owner
+		if player == null:
+			player = owner
+		if player != null:
+			health_component = player.get_node_or_null("HealthComponent")
+			
 	if health_component != null:
 		var max_hp = health_component.stats_component.get_stat_value("max_health")
 		var health_percent = health_component.current_health / max_hp

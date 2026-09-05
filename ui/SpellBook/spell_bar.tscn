@@ -10,11 +10,13 @@ texture_margin_right = 50.0
 texture_margin_bottom = 50.0
 region_rect = Rect2(9.762806, 14.7692375, 605.0376, 404.60632)
 
-[node name="Spell_bar" type="CanvasLayer" unique_id=243740632]
+[node name="Spell_bar" type="Control" unique_id=503653297]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_p6csa")
 
 [node name="MainPanel" type="Control" parent="." unique_id=403461903]
-layout_mode = 3
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

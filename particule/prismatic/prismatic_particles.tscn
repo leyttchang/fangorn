@@ -1,0 +1,149 @@
+[gd_scene format=3 uid="uid://iq6y1b48v8nu"]
+
+[ext_resource type="PackedScene" uid="uid://b864y5lmf88we" path="res://particule/lightning/lightning_trails.tscn" id="1_mfumy"]
+[ext_resource type="PackedScene" uid="uid://qfgiwuimhddm" path="res://particule/fire/fire_spiral_sparks.tscn" id="2_m2fjk"]
+[ext_resource type="PackedScene" uid="uid://cmsvphk4fytv2" path="res://particule/ice/snow_flakes.tscn" id="3_uvhen"]
+[ext_resource type="Shader" uid="uid://uy7bf4hvvjvn" path="res://particule/ice/snow_flakesèshader_partickes.tres" id="4_d6l8u"]
+[ext_resource type="Texture2D" uid="uid://bvbcfptjsrlef" path="res://assets/LeLu's Noise Pack/T_snow_flakes_B_BG.png" id="5_uvhen"]
+
+[sub_resource type="Curve" id="Curve_xagfw"]
+_data = [Vector2(0, 0.8300001), 0.0, 0.0, 0, 0, Vector2(0.1658986, 1), 0.0, 0.0, 0, 0, Vector2(0.57249075, 0.35000008), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_m2uy2"]
+curve = SubResource("Curve_xagfw")
+
+[sub_resource type="Curve" id="Curve_73mms"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_m2fjk"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_uvhen"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_as728"]
+curve_x = SubResource("Curve_73mms")
+curve_y = SubResource("Curve_m2fjk")
+curve_z = SubResource("Curve_uvhen")
+
+[sub_resource type="Curve" id="Curve_nd0jf"]
+_limits = [-2.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 2), 0.0, 0.0, 0, 0, Vector2(1, 2), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_d6l8u"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_ariw5"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_yqkk6"]
+curve_x = SubResource("Curve_nd0jf")
+curve_y = SubResource("Curve_d6l8u")
+curve_z = SubResource("Curve_ariw5")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yjr0x"]
+particle_flag_align_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(1, 0, 0)
+emission_ring_height = 3.0
+emission_ring_radius = 2.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 90.0
+directional_velocity_min = 4.999984
+directional_velocity_max = 9.999984
+directional_velocity_curve = SubResource("CurveXYZTexture_as728")
+orbit_velocity_min = 1.7070001
+orbit_velocity_max = 1.8240002
+orbit_velocity_curve = SubResource("CurveXYZTexture_yqkk6")
+gravity = Vector3(0, 0, 0)
+scale_min = 0.099999994
+scale_max = 0.39999998
+color = Color(1.3521297, 1.6549777, 2.503, 1)
+alpha_curve = SubResource("CurveTexture_m2uy2")
+turbulence_enabled = true
+turbulence_noise_strength = 0.0
+turbulence_noise_scale = 0.0
+turbulence_noise_speed = Vector3(1, 0, 0)
+turbulence_noise_speed_random = 4.0
+turbulence_influence_min = 0.0
+turbulence_influence_max = 0.70000005
+turbulence_initial_displacement_min = 1.3000015
+turbulence_initial_displacement_max = 7.0000014
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cmdta"]
+render_priority = 0
+shader = ExtResource("4_d6l8u")
+shader_parameter/ColorParameter = Color(1.2231879, 2.2087784, 3.194369, 1)
+shader_parameter/snow_flakes_particules = ExtResource("5_uvhen")
+
+[sub_resource type="Gradient" id="Gradient_ariw5"]
+offsets = PackedFloat32Array(0, 0.21896552, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_5k4fm"]
+gradient = SubResource("Gradient_ariw5")
+
+[sub_resource type="Curve" id="Curve_1y5qs"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.74613, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.5092025), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2ejji"]
+curve = SubResource("Curve_1y5qs")
+
+[sub_resource type="Curve" id="Curve_yjr0x"]
+_data = [Vector2(0, 0), 0.0, -0.37648147, 0, 0, Vector2(0.49845198, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_iialw"]
+curve = SubResource("Curve_yjr0x")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1y5qs"]
+particle_flag_rotate_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 2.0
+emission_ring_radius = 1.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+angle_min = -179.99998
+angle_max = 180.00002
+gravity = Vector3(0, 0, 0)
+linear_accel_min = 9.999997
+linear_accel_max = 9.999997
+linear_accel_curve = SubResource("CurveTexture_2ejji")
+scale_min = 0.099999994
+scale_max = 0.39999998
+scale_curve = SubResource("CurveTexture_iialw")
+color_ramp = SubResource("GradientTexture1D_5k4fm")
+
+[node name="prismatic_particles" type="Node3D" unique_id=787408045]
+
+[node name="trails3" parent="." unique_id=1188745182 instance=ExtResource("1_mfumy")]
+transform = Transform3D(-2.1855694e-08, -0.5, 0, 0.5, -2.1855694e-08, 0, 0, 0, 0.5, -0.053424295, -0.0957245, -0.071561456)
+amount = 4
+lifetime = 0.4
+speed_scale = 1.0
+explosiveness = 0.0
+fixed_fps = 120
+trail_lifetime = 0.05
+process_material = SubResource("ParticleProcessMaterial_yjr0x")
+
+[node name="fire_spiral_sparks" parent="." unique_id=728790300 instance=ExtResource("2_m2fjk")]
+transform = Transform3D(-0.9991205, -0.012216997, -0.040112846, -0.012207163, 0.9999254, -0.00049009477, 0.04011584, 3.4924597e-10, -0.99919504, -0.3011136, 0.05397138, 0.10053325)
+
+[node name="snow_flakes" parent="." unique_id=898839786 instance=ExtResource("3_uvhen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1472472, 0)
+material_override = SubResource("ShaderMaterial_cmdta")
+amount = 6
+process_material = SubResource("ParticleProcessMaterial_1y5qs")

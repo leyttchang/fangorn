@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://cmsvphk4fytv2"]
+
+[ext_resource type="Texture2D" uid="uid://lc2d3ly8t5hw" path="res://assets/LeLu's Noise Pack/T_snow_flakes.png" id="1_jjy48"]
+
+[sub_resource type="Curve" id="Curve_wovp1"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.75541794, 0.9754602), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_5prvy"]
+curve = SubResource("Curve_wovp1")
+
+[sub_resource type="Curve" id="Curve_1y5qs"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.74613, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.5092025), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2ejji"]
+curve = SubResource("Curve_1y5qs")
+
+[sub_resource type="Curve" id="Curve_yjr0x"]
+_data = [Vector2(0, 0), 0.0, -0.37648147, 0, 0, Vector2(0.49845198, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_iialw"]
+curve = SubResource("Curve_yjr0x")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+particle_flag_rotate_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 2.0
+emission_ring_radius = 1.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+angle_min = -179.99998
+angle_max = 180.00002
+gravity = Vector3(0, 0, 0)
+linear_accel_min = 9.999997
+linear_accel_max = 9.999997
+linear_accel_curve = SubResource("CurveTexture_2ejji")
+scale_min = 0.099999994
+scale_max = 0.39999998
+scale_curve = SubResource("CurveTexture_iialw")
+color = Color(0.8021131, 1.9851702, 2.4921954, 1)
+alpha_curve = SubResource("CurveTexture_5prvy")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o5n2e"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_jjy48")
+
+[sub_resource type="QuadMesh" id="QuadMesh_yqkk6"]
+material = SubResource("StandardMaterial3D_o5n2e")
+
+[node name="snow_flakes" type="GPUParticles3D" unique_id=898839786]
+lifetime = 3.0
+process_material = SubResource("ParticleProcessMaterial_hlie2")
+draw_pass_1 = SubResource("QuadMesh_yqkk6")

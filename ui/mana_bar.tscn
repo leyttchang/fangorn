@@ -12,11 +12,11 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xnbdy"]
 shader = ExtResource("4_o2luo")
 shader_parameter/liquide_color = Color(0.24746971, 0.11457498, 1.575597, 1)
-shader_parameter/current_offset = Vector2(0.55109346, 0.9687692)
+shader_parameter/current_offset = Vector2(0.37955362, 0.7655584)
 shader_parameter/texture_1_add = ExtResource("5_8leqs")
 shader_parameter/reflect_speed = Vector2(0.3, 0.3)
 shader_parameter/reflect_text = ExtResource("5_oqx85")
-shader_parameter/reflect_intensity = 1.7650000000000001
+shader_parameter/reflect_intensity = 1.765
 shader_parameter/reflect_color = Color(0, 0.009865668, 0.5688079, 1)
 shader_parameter/health_percent = 0.667
 shader_parameter/wave_frequency = 10.0
@@ -28,7 +28,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("mana_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/0/path = NodePath("mana_bar/mask/liquid_mana:material:shader_parameter/liquide_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -57,7 +57,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("mana_bar/mask/liquid:material:shader_parameter/liquide_color")
+tracks/0/path = NodePath("mana_bar/mask/liquid_mana:material:shader_parameter/liquide_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -85,23 +85,19 @@ _data = {
 &"mana": SubResource("Animation_3kato")
 }
 
-[node name="mana_bar" type="CanvasLayer" unique_id=631590621]
+[node name="mana_bar" type="Control" unique_id=1972456803]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_mana")
 scroll_speed = Vector2(0.5, 0.06)
 
 [node name="mana_bar" type="Control" parent="." unique_id=2039367325]
-layout_mode = 3
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -757.245
-offset_top = -284.961
-offset_right = -757.245
-offset_bottom = -284.961
-grow_horizontal = 0
-grow_vertical = 0
+layout_mode = 1
+anchors_preset = 0
+offset_left = 3.315
+offset_top = 49.185
+offset_right = 3.315
+offset_bottom = 49.185
 scale = Vector2(0.3, 0.3)
 mouse_filter = 2
 
@@ -120,7 +116,7 @@ offset_bottom = 1024.0
 mouse_filter = 2
 texture = ExtResource("3_oqx85")
 
-[node name="liquid" type="TextureRect" parent="mana_bar/mask" unique_id=1772840489]
+[node name="liquid_mana" type="TextureRect" parent="mana_bar/mask" unique_id=1772840489]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_xnbdy")
 layout_mode = 0
