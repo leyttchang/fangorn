@@ -6,4 +6,10 @@
 script = ExtResource("1_te6h1")
 generated_text = "[color=lightblue]Spell | Cooldown: 15.0s | Mana Cost: 20.0[/color]
 
+[color=green][b]- Warcry (Buff) -[/b][/color]
+Duration: 10.0s
+Radius: 15.0m
+  +30.0 Max Health
+  +40.0% Physical Damage
+
 "

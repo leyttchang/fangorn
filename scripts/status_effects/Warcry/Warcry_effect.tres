@@ -13,21 +13,15 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 [sub_resource type="Resource" id="Resource_cbi1q"]
 script = ExtResource("2_2mfdh")
 stat_name = "physical_damage"
-value = 0.3
+value = 0.4
 mod_type = 1
-metadata/_custom_type_script = "uid://x6g2xwk4dhug"
-
-[sub_resource type="Resource" id="Resource_kto6x"]
-script = ExtResource("2_2mfdh")
-stat_name = "flat_physical_damage"
-value = 5.0
 metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 
 [resource]
 script = ExtResource("1_67n26")
 effect_id = "Warcry"
 is_buff = true
-stat_modifiers = Array[ExtResource("2_2mfdh")]([SubResource("Resource_k6ixs"), SubResource("Resource_cbi1q"), SubResource("Resource_kto6x")])
+stat_modifiers = Array[ExtResource("2_2mfdh")]([SubResource("Resource_k6ixs"), SubResource("Resource_cbi1q")])
 enemie_effect = ExtResource("1_2mfdh")
 player_effect = ExtResource("2_k6ixs")
 metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

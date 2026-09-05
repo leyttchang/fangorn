@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_gqjw2"]
 [ext_resource type="PackedScene" uid="uid://bupuux1pg7pcj" path="res://particule/lightning/lightning_particle_around.tscn" id="1_mqfpg"]
 [ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_4b6b3"]
-[ext_resource type="Texture2D" uid="uid://bplw0wn3cot0f" path="res://scripts/abilities/chain_lightning/lighting_ball_noise_texture.tres" id="2_mqfpg"]
+[ext_resource type="Texture2D" uid="uid://vneibmg5yx7v" path="res://scripts/status_effects/shock/shock_noise.tres" id="3_mqfpg"]
 
 [sub_resource type="Gradient" id="Gradient_eb1tv"]
 offsets = PackedFloat32Array(0.7, 0.75, 0.8117647)
@@ -34,7 +34,7 @@ seamless = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0ifye"]
 render_priority = 0
 shader = ExtResource("1_d5qtw")
-shader_parameter/lightningNoise1 = ExtResource("2_mqfpg")
+shader_parameter/lightningNoise1 = ExtResource("3_mqfpg")
 shader_parameter/lightningNoise2 = SubResource("NoiseTexture2D_rdofv")
 shader_parameter/tint = Color(1.9609993, 2.0054464, 3.2944162, 1)
 shader_parameter/disapear = 1.0

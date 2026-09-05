@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dgaa86cel3xvl"
-path.s3tc="res://.godot/imported/spark_07.png-ec743a328e75fc9f1ab80836110a05eb.s3tc.ctex"
+uid="uid://crgvhcbfndgau"
+path.s3tc="res://.godot/imported/T_grad_B_W_B.png-4b664a783c53aa749b9561972d90f64f.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/LeLu's Noise Pack/PNG (Transparent)/spark_07.png"
-dest_files=["res://.godot/imported/spark_07.png-ec743a328e75fc9f1ab80836110a05eb.s3tc.ctex"]
+source_file="res://assets/LeLu's Noise Pack/T_grad_B_W_B.png"
+dest_files=["res://.godot/imported/T_grad_B_W_B.png-4b664a783c53aa749b9561972d90f64f.s3tc.ctex"]
 
 [params]
 

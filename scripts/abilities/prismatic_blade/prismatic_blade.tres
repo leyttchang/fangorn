@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://niuk0hsfcu8g"]
+
+[ext_resource type="PackedScene" uid="uid://bvb6kxhq6wj4s" path="res://scripts/abilities/prismatic_blade/prismatic_blade.tscn" id="1_h3arr"]
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_sqxxk"]
+[ext_resource type="PackedScene" uid="uid://xaa82q5x5mm7" path="res://scripts/abilities/casting_animation/arcane_casting_vfx.tscn" id="2_e1j8f"]
+[ext_resource type="Texture2D" uid="uid://bop3v5rx7xnre" path="res://assets/icon/32x32/fb1306.png" id="3_ocvin"]
+
+[resource]
+script = ExtResource("1_sqxxk")
+ability_name = "Prismatic blade"
+description = "Infuse your blade with fire, ice and lightning power."
+icon = ExtResource("3_ocvin")
+cooldown = 8.0
+mana_cost = 20.0
+cast_time = 1.0
+cast_vfx_scene = ExtResource("2_e1j8f")
+ability_scene = ExtResource("1_h3arr")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dx4ea7hxsi3hp"]
+
+[ext_resource type="Script" uid="uid://cuipxb8kc6bgq" path="res://scripts/shader_precompiler.gd" id="1_modqr"]
+
+[node name="shader_compiler" type="CanvasLayer" unique_id=797006765]
+script = ExtResource("1_modqr")

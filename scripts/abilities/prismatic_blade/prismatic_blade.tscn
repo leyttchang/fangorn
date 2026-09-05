@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bvb6kxhq6wj4s"]
+
+[ext_resource type="Script" uid="uid://pgpvvup68rm2" path="res://scripts/abilities/prismatic_blade/prismatic_blade.gd" id="1_c6euc"]
+[ext_resource type="Material" uid="uid://ch5ua72cu4mjw" path="res://scripts/status_effects/prismatic_blade_effect/prismatic_blade_materialt.tres" id="2_wklt7"]
+[ext_resource type="Resource" uid="uid://cqiive4y7e25p" path="res://scripts/status_effects/prismatic_blade_effect/prismatic_blade_effect.tres" id="3_bpr28"]
+
+[sub_resource type="Animation" id="Animation_bpr28"]
+resource_name = "buff_duration"
+length = 7.0
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(7),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_x8q2j"]
+_data = {
+&"buff_duration": SubResource("Animation_bpr28")
+}
+
+[node name="prismatic_blade" type="Node3D" unique_id=1551025595]
+script = ExtResource("1_c6euc")
+weapon_material = ExtResource("2_wklt7")
+buff_data = ExtResource("3_bpr28")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1354737807]
+libraries/ = SubResource("AnimationLibrary_x8q2j")

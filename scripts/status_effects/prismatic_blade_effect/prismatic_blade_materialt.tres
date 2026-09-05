@@ -1,0 +1,38 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://ch5ua72cu4mjw"]
+
+[ext_resource type="Shader" uid="uid://bxo5k8altftsn" path="res://scripts/abilities/prismatic_blade/prismatic_blade_shader.tres" id="1_scb0s"]
+[ext_resource type="Texture2D" uid="uid://b1m87caab8flo" path="res://assets/LeLu's Noise Pack/T_Noise_Wf4.png" id="2_s3q6y"]
+[ext_resource type="Texture2D" uid="uid://ct64e4jse07mh" path="res://assets/LeLu's Noise Pack/T_Noise_HU85k.png" id="3_s3q6y"]
+[ext_resource type="Texture2D" uid="uid://crgvhcbfndgau" path="res://assets/LeLu's Noise Pack/T_grad_B_W_B.png" id="3_ufhxe"]
+[ext_resource type="Texture2D" uid="uid://dgu2l66qeji0t" path="res://assets/LeLu's Noise Pack/T_MarbleNoise_tiled.png" id="4_6de7b"]
+[ext_resource type="Texture2D" uid="uid://vneibmg5yx7v" path="res://scripts/status_effects/shock/shock_noise.tres" id="4_ufhxe"]
+[ext_resource type="Texture2D" uid="uid://duxs7utxtjtrp" path="res://assets/LeLu's Noise Pack/T_Noise_W5i.png" id="5_lm66m"]
+[ext_resource type="Texture2D" uid="uid://cbqw2dv43s0xl" path="res://assets/LeLu's Noise Pack/T_shine.png" id="7_1t34q"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_scb0s")
+shader_parameter/displacement_intesity2 = 0.2
+shader_parameter/displacement_speed2 = Vector2(0, 0.665)
+shader_parameter/displacement_scale2 = Vector2(1, 0.55)
+shader_parameter/displacement2 = ExtResource("4_6de7b")
+shader_parameter/displacement_speed = Vector2(0.82, 0.8)
+shader_parameter/displacement_scale = Vector2(1, 1)
+shader_parameter/displacement = ExtResource("3_ufhxe")
+shader_parameter/displacement_intesity = 0.1
+shader_parameter/speed_disolve_1_param = 2.12
+shader_parameter/disolve_text_1 = ExtResource("2_s3q6y")
+shader_parameter/current_offset = Vector2(0, 0.33)
+shader_parameter/texture_1_add = ExtResource("4_ufhxe")
+shader_parameter/texture_1_color = Color(0.9457014, 1.3203226, 3.1934307, 1)
+shader_parameter/ice_shine_speed_param = 0.065
+shader_parameter/shine_texture = ExtResource("7_1t34q")
+shader_parameter/shine_freq = 2.015
+shader_parameter/ice_texture = ExtResource("5_lm66m")
+shader_parameter/ice_intensity = 4.32
+shader_parameter/ice_color = Color(0, 0.28619558, 0.538513, 1)
+shader_parameter/reflect_speed = Vector2(0.18, 0.995)
+shader_parameter/reflect_text = ExtResource("3_s3q6y")
+shader_parameter/reflect_intensity = 3.485
+shader_parameter/reflect_color = Color(1.1730844, 0.53285086, 0, 1)
+shader_parameter/fresnel_power = 0.175

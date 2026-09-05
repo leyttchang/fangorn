@@ -6,4 +6,11 @@
 script = ExtResource("1_i2xrj")
 generated_text = "[color=lightblue]Spell | Cooldown: 15.0s | Mana Cost: 20.0[/color]
 
+[color=green][b]- Thunder Aspect (Buff) -[/b][/color]
+Duration: 5.0s
+  +50.0% Attack Speed
+  +80.0% Movement Speed
+  +30.0% Lightning Damage
+  +5.0 Flat Lightning Damage
+
 "

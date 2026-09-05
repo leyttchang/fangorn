@@ -1,4 +1,4 @@
-﻿@tool
+@tool
 class_name TooltipGenerator
 extends Resource
 
@@ -8,6 +8,7 @@ extends Resource
 	set(val):
 		if val:
 			_generate()
+			generer_tooltip = false
 
 func _generate():
 	if spell_data == null or spell_data.ability_scene == null:
@@ -24,15 +25,15 @@ func _generate():
 	bbcode += "[color=lightblue]%s | Cooldown: %ss | Mana Cost: %s[/color]\n\n" % [type_str, spell_data.cooldown, spell_data.mana_cost]
 	
 	var scene_instance = spell_data.ability_scene.instantiate()
-	var scalings = _find_all_nodes(scene_instance, "SpellScalingComponent")
 	
+	# 1. ATTAQUES & DEGATS CLASSIQUES
+	var scalings = _find_all_nodes(scene_instance, "SpellScalingComponent")
 	for scaling in scalings:
 		var attack_comp = scaling.get("attack_component")
 		if attack_comp == null: continue
-		
 		bbcode += _format_attack(attack_comp, scaling)
 		
-	# -- RECHERCHE DES EXPLOSIONS SPECIALES (ex: Boule de feu) --
+	# 2. RECHERCHE DES EXPLOSIONS SPECIALES (ex: Boule de feu)
 	var explosions = _find_explosion_nodes(scene_instance)
 	for explo in explosions:
 		var parent_attack = explo.get("attack_component")
@@ -41,7 +42,6 @@ func _generate():
 		if ratio == null: ratio = 1.0
 		
 		if parent_attack != null and parent_scaling != null:
-			# On simule un attack component temporaire avec les degats reduits
 			var fake_attack = parent_attack.duplicate()
 			fake_attack.base_damage = parent_attack.base_damage * ratio
 			bbcode += "[color=orange][b]- %s -[/b][/color]\n" % "Explosion"
@@ -63,7 +63,6 @@ func _generate():
 			if elements.size() > 0:
 				bbcode += "Damage Type: " + " / ".join(elements) + "\n"
 				
-			# On recopie les status effects
 			if "status_effects_to_apply" in parent_attack and parent_attack.status_effects_to_apply != null:
 				for effect_app in parent_attack.status_effects_to_apply:
 					if effect_app != null and effect_app.effect != null:
@@ -74,6 +73,41 @@ func _generate():
 						]
 			bbcode += "\n"
 			fake_attack.free()
+			
+	# 3. RECHERCHE DES BUFFS/DEBUFFS DE ZONE DIRECTS (ex: Warcry, Thunder Aspect)
+	var buffs = _find_buff_nodes(scene_instance)
+	for b in buffs:
+		var buff_data = b.get("buff_data")
+		if buff_data != null:
+			var dur = b.get("buff_duration")
+			if dur == null: dur = 0.0
+			
+			var buff_title = buff_data.effect_id.capitalize()
+			if buff_title == "": buff_title = "Aura"
+			
+			if buff_data.is_buff:
+				bbcode += "[color=green][b]- %s (Buff) -[/b][/color]\n" % buff_title
+			else:
+				bbcode += "[color=purple][b]- %s (Debuff) -[/b][/color]\n" % buff_title
+				
+			bbcode += "Duration: %ss\n" % dur
+			
+			if "buff_radius" in b and b.buff_radius > 0:
+				bbcode += "Radius: %sm\n" % b.buff_radius
+			
+			if buff_data.stat_modifiers != null and buff_data.stat_modifiers.size() > 0:
+				for mod in buff_data.stat_modifiers:
+					if mod == null: continue
+					var mod_type_str = "%" if mod.mod_type == 1 else "" # 1 = PERCENT
+					var display_val = mod.value * 100 if mod.mod_type == 1 else mod.value
+					var sign_str = "+" if display_val >= 0 else ""
+					var stat_nice = mod.stat_name.replace("_", " ").capitalize()
+					bbcode += "  %s%s%s %s\n" % [sign_str, display_val, mod_type_str, stat_nice]
+					
+			if buff_data.tick_damage > 0:
+				bbcode += "  Deals %s damage every %ss\n" % [buff_data.tick_damage, buff_data.tick_interval]
+				
+			bbcode += "\n"
 			
 	scene_instance.queue_free()
 	
@@ -132,7 +166,6 @@ func _find_all_nodes(node: Node, class_name_str: String) -> Array:
 		result.append(node)
 	elif node.get_class() == class_name_str:
 		result.append(node)
-		
 	for child in node.get_children():
 		result.append_array(_find_all_nodes(child, class_name_str))
 	return result
@@ -144,4 +177,12 @@ func _find_explosion_nodes(node: Node) -> Array:
 		result.append(node)
 	for child in node.get_children():
 		result.append_array(_find_explosion_nodes(child))
+	return result
+
+func _find_buff_nodes(node: Node) -> Array:
+	var result = []
+	if "buff_data" in node and node.get("buff_data") != null:
+		result.append(node)
+	for child in node.get_children():
+		result.append_array(_find_buff_nodes(child))
 	return result

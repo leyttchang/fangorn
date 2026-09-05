@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://cqiive4y7e25p"]
+
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_bxsl7"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_pkava"]
+
+[sub_resource type="Resource" id="Resource_rc6cq"]
+script = ExtResource("2_pkava")
+stat_name = "flat_fire_damage"
+value = 3.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_knixm"]
+script = ExtResource("2_pkava")
+stat_name = "flat_ice_damage"
+value = 3.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[sub_resource type="Resource" id="Resource_ih68s"]
+script = ExtResource("2_pkava")
+stat_name = "flat_lightning_damage"
+value = 3.0
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_bxsl7")
+effect_id = "Prismatic_blade_effect"
+is_buff = true
+stat_modifiers = Array[ExtResource("2_pkava")]([SubResource("Resource_rc6cq"), SubResource("Resource_knixm"), SubResource("Resource_ih68s")])
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

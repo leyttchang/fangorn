@@ -16,11 +16,25 @@ func _ready() -> void:
 
 func update_damage_from_stats(player_stats: Node, combo_step: int = 1) -> void:
 	if weapon_stats != null and player_stats != null:
-		var phys_multiplier = player_stats.get_stat_value("physical_damage")
-		var flat_bonus = player_stats.get_stat_value("flat_physical_damage")
 		var combo_multiplier = 1.0 + (combo_step - 1) * 0.10
-		attack_component.damage_physical = (weapon_stats.base_damage + flat_bonus) * phys_multiplier * combo_multiplier
-		print("Weapon Damage Updated! phys_mult:", phys_multiplier, " -> final damage:", attack_component.damage_physical)
+		
+		var phys_multiplier = player_stats.get_stat_value("physical_damage")
+		var flat_phys = player_stats.get_stat_value("flat_physical_damage")
+		attack_component.damage_physical = (weapon_stats.base_damage + flat_phys) * phys_multiplier * combo_multiplier
+		
+		var fire_multiplier = player_stats.get_stat_value("fire_damage")
+		var flat_fire = player_stats.get_stat_value("flat_fire_damage")
+		attack_component.damage_fire = flat_fire * fire_multiplier * combo_multiplier
+		
+		var ice_multiplier = player_stats.get_stat_value("ice_damage")
+		var flat_ice = player_stats.get_stat_value("flat_ice_damage")
+		attack_component.damage_ice = flat_ice * ice_multiplier * combo_multiplier
+		
+		var lightning_multiplier = player_stats.get_stat_value("lightning_damage")
+		var flat_lightning = player_stats.get_stat_value("flat_lightning_damage")
+		attack_component.damage_lightning = flat_lightning * lightning_multiplier * combo_multiplier
+		
+		print("Weapon Damage Updated! phys: ", attack_component.damage_physical, " | fire: ", attack_component.damage_fire, " | ice: ", attack_component.damage_ice, " | lightning: ", attack_component.damage_lightning)
 		
 		# --- APPLICATION DU KNOCKBACK POWER ---
 		var kb_mult = player_stats.get_stat_value("knockback_power")

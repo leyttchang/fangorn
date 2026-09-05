@@ -76,7 +76,7 @@ func _on_kill_all_pressed() -> void:
 
 
 var stat_categories = {
-	"Offense": ["physical_damage", "magic_damage", "fire_damage", "ice_damage", "lightning_damage", "attack_speed", "casting_speed", "area_of_effect", "knockback_power", "flat_physical_damage"],
+	"Offense": ["physical_damage", "magic_damage", "fire_damage", "ice_damage", "lightning_damage", "attack_speed", "casting_speed", "area_of_effect", "knockback_power", "flat_physical_damage", "flat_magic_damage", "flat_fire_damage", "flat_ice_damage", "flat_lightning_damage"],
 	"Defense": ["max_health", "armor", "physical_resistance", "fire_resistance", "ice_resistance", "lightning_resistance", "knockback_resistance"],
 	"Misc": ["max_mana", "mana_regen", "movement_speed", "cd_red", "luck"]
 }

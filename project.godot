@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Fangorn"
-run/main_scene="uid://cpvcfdqrbu4i4"
+run/main_scene="uid://dx4ea7hxsi3hp"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
