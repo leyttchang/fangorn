@@ -83,7 +83,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26, 2)
 [node name="NetworkObjects" type="Node3D" parent="." unique_id=1188869520]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="NetworkObjects" unique_id=990877686]
-_spawnable_scenes = PackedStringArray("uid://bh02yc666r2ee", "uid://5wrdcmpkd7se", "uid://dw8bplvo56b74", "uid://cekr3wmhu571c", "uid://uwqnpr24nibv", "uid://bgl8ep1qhsou4", "uid://c616syg183bcn", "uid://bnkdi4tveecs7")
+_spawnable_scenes = PackedStringArray("uid://bh02yc666r2ee", "uid://5wrdcmpkd7se", "uid://dw8bplvo56b74", "uid://cekr3wmhu571c", "uid://uwqnpr24nibv", "uid://bgl8ep1qhsou4", "uid://c616syg183bcn", "uid://bnkdi4tveecs7", "uid://bfs8ho4jxd260", "uid://bwv7mkwsym0an", "uid://bj37u0qrir8ld", "uid://btg4a1s8kbui")
 spawn_path = NodePath("..")
 
 [node name="Dummy" parent="." unique_id=922894006 instance=ExtResource("3_7mfpx")]

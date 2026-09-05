@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="TooltipGenerator" format=3 uid="uid://b8psbiicn467d"]
 
 [ext_resource type="Script" uid="uid://ck718o6n8b62b" path="res://scripts/abilities/tooltip_generator.gd" id="1_ope5g"]
-[ext_resource type="Resource" uid="uid://doq568n6w50u3" path="res://scripts/abilities/thunder_aspect/thunder_aspect.tres" id="2_vehf4"]
+[ext_resource type="Resource" uid="uid://niuk0hsfcu8g" path="res://scripts/abilities/prismatic_blade/prismatic_blade.tres" id="2_vehf4"]
 
 [resource]
 script = ExtResource("1_ope5g")

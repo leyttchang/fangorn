@@ -13,17 +13,14 @@ func _ready() -> void:
 		return
 		
 	if mana_component == null:
-		var player = get_tree().get_first_node_in_group("Player")
-		if player != null and not player.has_node("lvl_component") and player.owner != null:
-			player = player.owner
-			
-		if player == null:
-			player = owner
-			
-		if player != null:
-			mana_component = player.get_node_or_null("ManaComponent")
-			if mana_component == null:
-				mana_component = player.get_node_or_null("mana_component")
+		var p = owner
+		while p != null:
+			if p is CharacterBody3D and p.is_in_group("Player"):
+				mana_component = p.get_node_or_null("ManaComponent")
+				if mana_component == null:
+					mana_component = p.get_node_or_null("mana_component")
+				break
+			p = p.owner if p.owner != null else p.get_parent()
 			
 	if mana_component != null:
 		mana_component.mana_changed.connect(_on_mana_changed)

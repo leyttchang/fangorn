@@ -12,7 +12,21 @@ extends Panel
 @onready var shadow_btn: OptionButton = $MarginContainer/VBoxContainer/Shadow/Shadow_selection
 @onready var render_distance_btn: OptionButton = $MarginContainer/VBoxContainer/render_distance/OptionButton
 
+@onready var keybinds_menu_btn: Button = $MarginContainer/VBoxContainer/Keybind
+@onready var keybinds_panel: Panel = $Panel
+@onready var keybinds_return_btn: Button = $Panel/MarginContainer2/VBoxContainer/return
+
 func _ready() -> void:
+	# Masquer le panel de keybinds par defaut
+	if keybinds_panel:
+		keybinds_panel.hide()
+		
+	if keybinds_menu_btn:
+		keybinds_menu_btn.pressed.connect(func(): keybinds_panel.show())
+		
+	if keybinds_return_btn:
+		keybinds_return_btn.pressed.connect(func(): keybinds_panel.hide())
+		
 	# Configure the sliders bounds
 	sensitivity_slider.min_value = 0.0005
 	sensitivity_slider.max_value = 0.01

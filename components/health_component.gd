@@ -13,7 +13,13 @@ signal damage_taken(amount: float, is_critical: bool)
 # La courbe de rduction qu'on va glisser dans l'inspecteur
 # La valeur d'armure maximale prvue par ton graphique (l'axe X = 1.0)
 
-var current_health: float
+var current_health: float:
+	set(value):
+		var was_alive = (current_health > 0)
+		current_health = value
+		if was_alive and current_health <= 0:
+			died.emit()
+
 var _known_max_health: float # NOUVEAU : On mmorise l'ancienne limite
 var has_cheat_death: bool = false
 
@@ -71,8 +77,6 @@ func take_damage(raw_damage: float, is_critical: bool = false) -> void:
 					var lvl_comp = p.get_node_or_null("lvl_component")
 					if lvl_comp != null:
 						lvl_comp.rpc_id(p.get_multiplayer_authority(), "_rpc_add_xp", int(xp))
-					
-		died.emit()
 
 # =========================================================
 # L'COUTE DES STATS EN TEMPS REL (Armure, Buffs, etc.)

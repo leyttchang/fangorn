@@ -254,4 +254,9 @@ func _on_died() -> void:
 			ik.stop()
 			
 	await get_tree().create_timer(3.0).timeout
+	if is_multiplayer_authority():
+		rpc("rpc_delete_spider")
+
+@rpc("authority", "call_local", "reliable")
+func rpc_delete_spider() -> void:
 	queue_free()

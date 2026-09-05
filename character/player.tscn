@@ -66,6 +66,7 @@
 [ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="62_ce8hk"]
 [ext_resource type="PackedScene" uid="uid://chkis6ceuutm3" path="res://ui/bottom_bar/bottom_bar_ui.tscn" id="65_jekax"]
 [ext_resource type="PackedScene" uid="uid://desweaab8m7pq" path="res://character/lanterne.tscn" id="67_g1p3m"]
+[ext_resource type="PackedScene" uid="uid://danvkaikt7anv" path="res://components/revive_componant.tscn" id="67_tvgtm"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ay40t"]
 properties/0/path = NodePath(".:rotation")
@@ -86,6 +87,12 @@ properties/4/replication_mode = 1
 properties/5/path = NodePath("Camera3D:rotation")
 properties/5/spawn = true
 properties/5/replication_mode = 1
+properties/6/path = NodePath("Camera3D/MainDroite/wrist:rotation")
+properties/6/spawn = true
+properties/6/replication_mode = 1
+properties/7/path = NodePath("Camera3D/MainDroite/wrist:position")
+properties/7/spawn = true
+properties/7/replication_mode = 1
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
@@ -1279,7 +1286,7 @@ metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
 unique_name_in_owner = true
-transform = Transform3D(0.999977, -0.0061649974, 0.0014514608, 0, 0.2291696, 0.97338605, -0.0063335435, -0.97336596, 0.22916514, 0.5, -0.9, -1)
+transform = Transform3D(0.99997705, -0.0061649974, 0.0014514605, 0, 0.2291696, 0.97338593, -0.006333544, -0.97336596, 0.2291651, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
@@ -1475,6 +1482,13 @@ no_depth_test = true
 [node name="lanterne" parent="." unique_id=1064551459 instance=ExtResource("67_g1p3m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66503906, 0, -0.21276855)
 
+[node name="ReviveComponant" parent="." unique_id=1081907047 instance=ExtResource("67_tvgtm")]
+
+[node name="CollisionShape3D" parent="ReviveComponant/InteractionComponent" parent_id_path=PackedInt32Array(1081907047, 987654321) index="0" unique_id=987654322]
+disabled = true
+
 [editable path="Camera3D/MainDroite/wrist/weapon_impact_componant"]
 [editable path="HitboxComponent"]
 [editable path="InventoryUI"]
+[editable path="ReviveComponant"]
+[editable path="ReviveComponant/InteractionComponent"]

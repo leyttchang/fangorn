@@ -262,4 +262,5 @@ func _on_died() -> void:
 	if has_node("HitboxComponent/CollisionShape3D"):
 		$HitboxComponent/CollisionShape3D.set_deferred("disabled", true)
 	await get_tree().create_timer(3.0).timeout
-	queue_free()
+	if is_multiplayer_authority():
+		queue_free()

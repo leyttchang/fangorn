@@ -145,6 +145,14 @@ func _spawn_next_enemy_in_wave() -> void:
 func _spawn_single_enemy(enemy_scene: PackedScene) -> void:
 	if not is_inside_tree() or enemy_scene == null: return
 	
+	var is_bundle = enemy_scene.resource_path.ends_with("spider_bundle.tscn")
+	var spider_scene = preload("res://character/enemie/spider/spider_enemie.tscn")
+	
+	if is_bundle:
+		for i in range(5):
+			_spawn_single_spider_from_bundle(spider_scene)
+		return
+		
 	var enemy_instance: Node3D = enemy_scene.instantiate() as Node3D
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
 	
@@ -176,6 +184,25 @@ func _on_enemy_removed(enemy: Node3D) -> void:
 	if active_enemies.has(enemy):
 		active_enemies.erase(enemy)
 	_check_wave_completion()
+
+func _spawn_single_spider_from_bundle(spider_scene: PackedScene) -> void:
+	if not is_inside_tree() or spider_scene == null: return
+	var enemy_instance: Node3D = spider_scene.instantiate() as Node3D
+	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
+	
+	var stats = enemy_instance.get_node_or_null("StatsComponent")
+	if stats != null and current_wave > 1:
+		var bonus_percent_hp = (current_wave - 1) * 0.10 
+		stats.add_modifier("max_health", 1, bonus_percent_hp, "wave_scaling")
+	
+	var random_angle: float = randf_range(0, TAU)
+	var random_dist: float = sqrt(randf()) * spawn_radius
+	var offset: Vector3 = Vector3(cos(random_angle) * random_dist, 0, sin(random_angle) * random_dist)
+	enemy_instance.global_position = global_position + offset
+	
+	active_enemies.append(enemy_instance)
+	enemy_spawned.emit(enemy_instance)
+	enemy_instance.tree_exited.connect(func(): _on_enemy_removed(enemy_instance))
 
 func _check_wave_completion() -> void:
 	if not is_inside_tree(): return

@@ -22,6 +22,7 @@ enum State { IDLE, SNEAK, APPROACH, CHARGE, FLEE, ATTACK, DEAD }
 var current_state: State = State.IDLE
 
 var flee_time: float = 0.0
+var rest_time: float = 0.0
 var is_tired: bool = false
 var _target_update_timer: float = 0.0
 
@@ -66,6 +67,14 @@ func _physics_process(delta: float) -> void:
 		_update_closest_target()
 		
 	_process_state(delta)
+	
+	if current_state != State.FLEE:
+		rest_time += delta
+		if rest_time >= 3.0:
+			flee_time = 0.0
+			is_tired = false
+	else:
+		rest_time = 0.0
 	
 	move_and_slide()
 	
@@ -172,10 +181,6 @@ func _stop_movement(delta: float) -> void:
 	velocity.z = vel_2d.y
 
 func change_state(new_state: State) -> void:
-	if current_state == State.FLEE and new_state != State.FLEE:
-		flee_time = 0.0
-		is_tired = false
-		
 	current_state = new_state
 	
 	if anim_playback:
@@ -184,7 +189,10 @@ func change_state(new_state: State) -> void:
 		elif new_state == State.CHARGE:
 			anim_playback.travel("run_fast")
 		elif new_state == State.FLEE:
-			anim_playback.travel("run_fast")
+			if is_tired:
+				anim_playback.travel("tired_walk")
+			else:
+				anim_playback.travel("run_fast")
 		elif new_state == State.ATTACK:
 			anim_playback.travel("stab")
 		elif new_state == State.IDLE:

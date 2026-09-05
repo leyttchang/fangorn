@@ -9,13 +9,13 @@ extends Control
 
 func _ready() -> void:
 	if skill_bar == null:
-		var player = get_tree().get_first_node_in_group("Player")
-		if player != null and player.owner != null and not player.has_node("SkillBarComponent"):
-			player = player.owner
-		if player == null:
-			player = owner
-		if player != null:
-			skill_bar = player.get_node_or_null("SkillBarComponent")
+		# On cherche LE JOUEUR auquel appartient cette UI, pas le premier de la scène !
+		var p = owner
+		while p != null:
+			if p is CharacterBody3D and p.is_in_group("Player"):
+				skill_bar = p.get_node_or_null("SkillBarComponent")
+				break
+			p = p.owner if p.owner != null else p.get_parent()
 			
 	if skill_bar == null:
 		push_error("SpellBarUI : Le composant SkillBarComponent n'est pas assigné dans l'inspecteur.")

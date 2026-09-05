@@ -33,6 +33,11 @@ func _process(delta: float) -> void:
 				current_target.hide_prompt()
 			current_target = collider
 			current_target.show_prompt()
+			
+		# --- GESTION DU MAINTIEN (ReviveComponent) ---
+		if current_target.get_parent() is ReviveComponent:
+			if Input.is_key_pressed(current_target.interaction_key) or Input.is_physical_key_pressed(current_target.interaction_key):
+				current_target.get_parent().process_revive(delta, player)
 	else:
 		if current_target != null:
 			current_target.hide_prompt()

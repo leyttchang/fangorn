@@ -55,6 +55,7 @@ var config = ConfigFile.new()
 
 func _ready() -> void:
 	load_settings()
+	load_keybinds()
 
 func _apply_fsr_mode() -> void:
 	match fsr_mode:
@@ -118,6 +119,16 @@ func load_settings() -> void:
 	fsr_mode = config.get_value("Video", "fsr_mode", 1)
 	fps_cap = config.get_value("Video", "fps_cap", 0)
 	vsync = config.get_value("Video", "vsync", true)
-	shadow_quality = config.get_value("Video", "shadow_quality", 0)
+	var loaded_shadow = config.get_value("Settings", "shadow_quality", 0)
+	shadow_quality = loaded_shadow
 	render_distance = config.get_value("Video", "render_distance", 1)
 	volumetric_fog_enabled = config.get_value("Video", "volumetric_fog", true)
+
+func load_keybinds() -> void:
+	var keybind_config = ConfigFile.new()
+	if keybind_config.load("user://keybinds.cfg") == OK:
+		for action in keybind_config.get_section_keys("Keybinds"):
+			var event = keybind_config.get_value("Keybinds", action)
+			if InputMap.has_action(action):
+				InputMap.action_erase_events(action)
+				InputMap.action_add_event(action, event)

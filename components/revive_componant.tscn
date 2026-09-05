@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://danvkaikt7anv"]
+
+[ext_resource type="Script" uid="uid://cpkoowosg1pgp" path="res://components/revive_componant.gd" id="1_kgj5i"]
+[ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="2_iv5md"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kgj5i"]
+size = Vector3(1.458435, 1.1616211, 1.3568726)
+
+[node name="ReviveComponant" type="Node3D" unique_id=1081907047]
+script = ExtResource("1_kgj5i")
+
+[node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("2_iv5md")]
+prompt_text = "Press E to revive"
+
+[node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.069488525, 0.58081055, 0.12612915)
+shape = SubResource("BoxShape3D_kgj5i")
+
+[editable path="InteractionComponent"]

@@ -2,6 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://17vaqfwxb44j" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Text_zone.png" id="1_b57jb"]
 [ext_resource type="Script" uid="uid://21yv0amk5xc4" path="res://ui/Pause_menu/option.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://h0rey5tb7wrp" path="res://assets/UI/Foozle_UI_0001_RPG_Set_1/Panel_1.png" id="3_dcohy"]
+[ext_resource type="Script" uid="uid://cuodhp1t3lt5q" path="res://ui/Pause_menu/controls_menu.gd" id="4_hvten"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hlie2"]
 texture = ExtResource("1_b57jb")
@@ -10,6 +12,14 @@ texture_margin_top = 10.0
 texture_margin_right = 10.0
 texture_margin_bottom = 10.0
 region_rect = Rect2(91.701294, 258.60623, 339.7114, 70.86368)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3vtqj"]
+texture = ExtResource("3_dcohy")
+texture_margin_left = 50.0
+texture_margin_top = 50.0
+texture_margin_right = 50.0
+texture_margin_bottom = 50.0
+region_rect = Rect2(9.762806, 14.7692375, 605.0376, 404.60632)
 
 [node name="option" type="Panel" unique_id=1114594140]
 custom_minimum_size = Vector2(500, 500)
@@ -162,8 +172,64 @@ popup/item_1/id = 1
 popup/item_2/text = "Close"
 popup/item_2/id = 2
 
+[node name="Keybind" type="Button" parent="MarginContainer/VBoxContainer" unique_id=358060415]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Keybinds"
+
 [node name="return" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2146650173]
 unique_name_in_owner = true
+layout_mode = 2
+text = "Return
+"
+
+[node name="Panel" type="Panel" parent="." unique_id=1009347021]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -345.5
+offset_right = 350.0
+offset_bottom = 345.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_3vtqj")
+
+[node name="MarginContainer2" type="MarginContainer" parent="Panel" unique_id=28449559]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -215.0
+offset_top = -292.31482
+offset_right = 205.0
+offset_bottom = 306.5741
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 100
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer2" unique_id=149728040]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer2/VBoxContainer" unique_id=859719731]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer2/VBoxContainer/ScrollContainer" unique_id=137838390]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("4_hvten")
+
+[node name="return" type="Button" parent="Panel/MarginContainer2/VBoxContainer" unique_id=451598421]
 layout_mode = 2
 text = "Return
 "

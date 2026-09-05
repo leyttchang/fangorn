@@ -83,9 +83,13 @@ func reset_attack_state():
 	combo_step = 1 
 	disable_current_hitbox()
 	if anim_tree != null:
-		anim_tree.set("parameters/TimeScale/scale", 1.0)
-		if not anim_tree.active:
-			anim_tree.active = true
+		if owner.is_multiplayer_authority():
+			anim_tree.set("parameters/TimeScale/scale", 1.0)
+			if not anim_tree.active:
+				anim_tree.active = true
+		else:
+			if anim_tree.active:
+				anim_tree.active = false
 
 func update_idle_stance():
 	var equipped_item = equipment.equipped_items.get("main_hand") as WeaponItem
@@ -94,7 +98,13 @@ func update_idle_stance():
 		return
 	var style_string = WeaponItem.WeaponStyle.keys()[equipped_item.weapon_style].to_lower()
 	var idle_anim = "idle_" + style_string
-	anim_playback.travel(idle_anim)
+	if owner.is_multiplayer_authority():
+		if anim_tree and not anim_tree.active:
+			anim_tree.active = true
+		anim_playback.travel(idle_anim)
+	else:
+		if anim_tree and anim_tree.active:
+			anim_tree.active = false
 
 # --- NOUVEAU : Calcul des stats de vitesse pour les attaques de base ---
 func get_current_attack_speed() -> float:
@@ -120,8 +130,8 @@ func _get_actual_weapon() -> Node3D:
 func start_attack():
 	current_weapon = _get_actual_weapon()
 	if current_weapon == null: return
-	var attack_shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
-	if attack_shape == null: return
+	var attack_comp = current_weapon.get_node_or_null("AttackComponent")
+	if attack_comp == null: return
 		
 	is_attacking = true
 	last_click_time = 0
@@ -145,8 +155,8 @@ func start_attack():
 func start_heavy_attack():
 	current_weapon = _get_actual_weapon()
 	if current_weapon == null: return
-	var attack_shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
-	if attack_shape == null: return
+	var attack_comp = current_weapon.get_node_or_null("AttackComponent")
+	if attack_comp == null: return
 		
 	is_attacking = true
 	last_click_time = 0
@@ -174,18 +184,24 @@ func enable_current_hitbox():
 		if current_weapon.has_method("update_damage_from_stats"):
 			current_weapon.update_damage_from_stats(player_stats, combo_step)
 		
-		var ac = current_weapon.get("attack_component")
-		if ac != null and not ac.attack_landed.is_connected(_on_weapon_hit):
-			ac.attack_landed.connect(_on_weapon_hit)
-		var shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
-		if is_instance_valid(shape): shape.set_deferred("disabled", false)
+		var ac = current_weapon.get_node_or_null("AttackComponent")
+		if ac != null:
+			if not ac.attack_landed.is_connected(_on_weapon_hit):
+				ac.attack_landed.connect(_on_weapon_hit)
+			for child in ac.get_children():
+				if child is CollisionShape3D or child is CollisionPolygon3D:
+					child.set_deferred("disabled", false)
 
 func disable_current_hitbox():
 	if is_instance_valid(current_weapon):
-		var shape = current_weapon.get_node_or_null("AttackComponent/CollisionShape3D")
-		current_weapon.attack_component.reset_hit_entities() 
 		has_hit_in_combo_swing = false
-		if is_instance_valid(shape): shape.set_deferred("disabled", true)
+		var ac = current_weapon.get_node_or_null("AttackComponent")
+		if ac != null:
+			if ac.has_method("reset_hit_entities"):
+				ac.reset_hit_entities()
+			for child in ac.get_children():
+				if child is CollisionShape3D or child is CollisionPolygon3D:
+					child.set_deferred("disabled", true)
 
 func check_combo():
 	# On vÃ©rifie si le dernier clic a eu lieu dans la fenÃªtre de tolÃ©rance (ex: moins de 350ms)

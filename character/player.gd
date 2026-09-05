@@ -28,6 +28,7 @@ var last_weapon_switch_time: int = 0
 
 const JUMP_VELOCITY = 4.5
 var mouse_sensitivity = 0.002
+var is_dead: bool = false
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
@@ -61,6 +62,13 @@ func _ready() -> void:
 		var canvas_layers = find_children("*", "CanvasLayer", true, false)
 		for canvas in canvas_layers:
 			canvas.visible = false
+	var revive = get_node_or_null("ReviveComponant")
+	if revive == null:
+		revive = get_node_or_null("ReviveComponent")
+	if revive:
+		revive.player_revived.connect(_on_player_revived)
+		
+	# Synchronisation des stats
 	if is_multiplayer_authority():
 		camera.current = true
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -84,7 +92,10 @@ func _ready() -> void:
 	# ========================================
 	
 func _physics_process(delta: float) -> void:
-	if not is_multiplayer_authority():
+	if not is_multiplayer_authority() or is_dead:
+		if not is_on_floor():
+			velocity += get_gravity() * delta
+			move_and_slide()
 		return
 
 	# 1. Gestion de la gravitÃ©
@@ -149,9 +160,9 @@ func _physics_process(delta: float) -> void:
 		_footstep_distance = 0.0
 	
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_multiplayer_authority():
+	if not is_multiplayer_authority() or is_dead:
 		return
-
+		
 	if event is InputEventMouseMotion:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
@@ -184,17 +195,46 @@ func _unhandled_input(event: InputEvent) -> void:
 			equip_comp.swap_weapons()
 
 func _on_died() -> void:
-	print("mort")
+	print("Joueur mort : verification du multi...")
+	is_dead = true
 	
-	# On rcupre le Game Over s'il existe et on l'affiche !
-	var game_over = get_node_or_null("GameOverText")
-	if game_over != null and is_multiplayer_authority():
-		game_over.afficher_game_over()
+	var all_players = get_tree().get_nodes_in_group("Player")
+	var other_players_alive = false
+	
+	for p in all_players:
+		if p != self:
+			var h = p.get_node_or_null("HealthComponent")
+			if h and h.current_health > 0:
+				other_players_alive = true
+				break
+				
+	if other_players_alive:
+		print("Passage a terre !")
+		var revive_comp = get_node_or_null("ReviveComponant")
+		if revive_comp == null:
+			revive_comp = get_node_or_null("ReviveComponent")
+		if revive_comp:
+			revive_comp.enable_revive()
+	else:
+		print("Tout le monde est mort, GAME OVER")
+		for p in all_players:
+			p.rpc("_rpc_show_game_over")
 
-	# Temporairement, on empeche le jeu de se fermer en multi !
-	# await get_tree().create_timer(2.0).timeout
-	# get_tree().quit()
+@rpc("any_peer", "call_local", "reliable")
+func _rpc_show_game_over() -> void:
+	if is_multiplayer_authority():
+		var game_over = get_node_or_null("GameOverText")
+		if game_over != null:
+			game_over.afficher_game_over()
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
+func _on_player_revived() -> void:
+	print("Je suis de nouveau sur pied !")
+	is_dead = false
+	var health_comp = get_node_or_null("HealthComponent")
+	if health_comp != null:
+		health_comp.heal(health_comp.stats_component.get_stat_value("max_health") * 0.5)
+	# Re-activer les mouvements, retirer l'animation "a terre", etc.
 
 func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")

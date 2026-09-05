@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://bl1dwuh6jltod"]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_sbl44"]
+
+[resource]
+script = ExtResource("1_sbl44")
+generated_text = "[color=lightblue]Spell | Cooldown: 8.0s | Mana Cost: 20.0[/color]
+
+[color=green][b]- Prismatic Blade Effect (Buff) -[/b][/color]
+Duration: 7.0s
+  +3.0 Flat Fire Damage
+  +3.0 Flat Ice Damage
+  +3.0 Flat Lightning Damage
+
+"

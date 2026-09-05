@@ -11,6 +11,14 @@ extends CanvasLayer
 func _ready() -> void:
 	visible = false
 	if skill_bar == null:
+		var p = owner
+		while p != null:
+			if p is CharacterBody3D and p.is_in_group("Player"):
+				skill_bar = p.get_node_or_null("SkillBarComponent")
+				break
+			p = p.owner if p.owner != null else p.get_parent()
+			
+	if skill_bar == null:
 		push_error("SpellBookUI : SkillBarComponent manquant.")
 		return
 		
