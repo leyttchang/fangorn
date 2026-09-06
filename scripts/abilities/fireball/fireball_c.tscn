@@ -368,10 +368,10 @@ local_coords = true
 draw_pass_1 = SubResource("SphereMesh_vavt8")
 
 [node name="explosion_slash" parent="explosion_vfx/explosion_VFX" unique_id=885436822 instance=ExtResource("14_okf3j")]
-transform = Transform3D(0.98480785, -0.1736482, 0, 0.1736482, 0.98480785, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1.0000001, 0, 0, 0, 1.0000001, 0, 0, 0, 1, 0, 0, 0)
 emitting = false
-amount = 12
 one_shot = true
+visibility_aabb = AABB(-1.3585182, -1, -1.0954689, 2.7315845, 2.375468, 2.3995342)
 local_coords = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="explosion_vfx" unique_id=1350429737]

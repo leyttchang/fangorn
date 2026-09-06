@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://bh8emqqgp4pi1"]
 
-[ext_resource type="Script" path="res://ui/global_shader/global_shader.gd" id="1_script"]
 [ext_resource type="Shader" uid="uid://b4dwgbg6c0mqq" path="res://ui/global_shader/global_shader.gdshader" id="1_e7gaw"]
+[ext_resource type="Script" uid="uid://gvtnd15m8lf2" path="res://ui/global_shader/global_shader.gd" id="1_script"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
-render_priority = -1
+render_priority = -10
 shader = ExtResource("1_e7gaw")
 shader_parameter/outline_color = Color(0, 0, 0, 1)
 shader_parameter/outline_thickness = 1.5
