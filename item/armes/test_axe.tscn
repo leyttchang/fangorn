@@ -148,7 +148,7 @@ shadow_mesh = SubResource("ArrayMesh_cm7r7")
 
 [node name="test_axe" type="Node3D" unique_id=1520606184 node_paths=PackedStringArray("blade_meshes")]
 script = ExtResource("1_gn7bg")
-blade_meshes = [null]
+blade_meshes = [null, NodePath("Hammer/Cube"), NodePath("Hammer/Cylinder_002")]
 
 [node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("1_f786w")]
 collision_layer = 4

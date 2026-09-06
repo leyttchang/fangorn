@@ -1,10 +1,15 @@
 [gd_resource type="ArrayMesh" format=4 uid="uid://cquoqptmboq1l"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eec2p"]
-resource_name = "rock"
-cull_mode = 2
-albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+[ext_resource type="Texture2D" uid="uid://b7v6vybjj5ppg" path="res://assets/texture/stone_material/textures/marble_rock_02_diff_4k.jpg" id="1_2ivg0"]
+[ext_resource type="Texture2D" uid="uid://b1iuut0nqnn6k" path="res://assets/texture/stone_material/textures/marble_rock_02_nor_gl_4k.jpg" id="2_hcgy5"]
+[ext_resource type="Texture2D" uid="uid://dxl03pdctre7b" path="res://assets/texture/stone_material/textures/marble_rock_02_arm_4k.jpg" id="3_w1ucj"]
+
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_v2i1m"]
+albedo_texture = ExtResource("1_2ivg0")
+orm_texture = ExtResource("3_w1ucj")
+normal_enabled = true
+normal_scale = 3.44
+normal_texture = ExtResource("2_hcgy5")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ngmdi"]
 _surfaces = [{
@@ -28,7 +33,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 66,
 "index_data": PackedByteArray("AAABAAIAAAADAAEABAAFAAYABwAIAAkABwAKAAgACwAMAA0ACwAOAAwADwAQABEAEgATABQAEgAVABMAFgAXABgAFgAZABcAGgAbABwAHQAeAB8AHQAgAB4AIQAiACMAIQAkACIAJQAmACcAKAApACoAKAArACkALAAtAC4ALAAvAC0A"),
-"material": SubResource("StandardMaterial3D_eec2p"),
+"material": SubResource("ORMMaterial3D_v2i1m"),
 "name": "rock",
 "primitive": 3,
 "uv_scale": Vector4(1.8229803, 2, 0, 0),

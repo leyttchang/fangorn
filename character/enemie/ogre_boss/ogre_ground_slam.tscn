@@ -1,13 +1,13 @@
-[gd_scene format=4 uid="uid://c616syg183bcn"]
+[gd_scene format=4 uid="uid://sgu32jj5jt5s"]
 
-[ext_resource type="Texture2D" uid="uid://bnv7axehaxeju" path="res://assets/LeLu's Noise Pack/T_Cracks336_transparent.png" id="1_4o3px"]
-[ext_resource type="Script" uid="uid://bks7nwa2hrln8" path="res://character/enemie/Scout/scout_slam.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_whv0q"]
-[ext_resource type="Texture2D" uid="uid://ct5p2s70ef55j" path="res://assets/LeLu's Noise Pack/T_Cracks336_normal_map.png" id="3_bw62r"]
+[ext_resource type="Texture2D" uid="uid://bnv7axehaxeju" path="res://assets/LeLu's Noise Pack/T_Cracks336_transparent.png" id="1_o1v5m"]
+[ext_resource type="Texture2D" uid="uid://ct5p2s70ef55j" path="res://assets/LeLu's Noise Pack/T_Cracks336_normal_map.png" id="2_7dku8"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_4gnxw"]
+[ext_resource type="ArrayMesh" uid="uid://cmaf4prcm7q0l" path="res://assets/3D_models/VFX_spell/open_cylinder_mesh.res" id="4_3upxy"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_bw62r"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_rakdg"]
 height = 1.34375
-radius = 1.8496094
+radius = 3.8842773
 
 [sub_resource type="Animation" id="Animation_4o3px"]
 length = 0.001
@@ -42,6 +42,18 @@ tracks/2/path = NodePath("AttackComponent/CollisionShape3D:disabled")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("wave_impact:emitting")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -87,19 +99,31 @@ tracks/2/keys = {
 "update": 1,
 "values": [false, true]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("wave_impact:emitting")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_bw62r"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_q8qnh"]
 _data = {
 &"RESET": SubResource("Animation_4o3px"),
 &"slam": SubResource("Animation_whv0q")
 }
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7l2a6"]
 emission_shape = 6
 emission_ring_axis = Vector3(0, 1, 0)
 emission_ring_height = 0.5
-emission_ring_radius = 1.0
-emission_ring_inner_radius = 0.5
+emission_ring_radius = 2.5
+emission_ring_inner_radius = 1.0
 emission_ring_cone_angle = 90.0
 angle_min = -219.7
 angle_max = 140.30002
@@ -115,7 +139,7 @@ scale_max = 0.5
 color = Color(0.4, 0.20666666, 0, 1)
 collision_mode = 1
 collision_friction = 0.0
-collision_bounce = 0.09
+collision_bounce = 0.69
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eec2p"]
 resource_name = "rock"
@@ -138,7 +162,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_xb2uu"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_j6dkc"]
 resource_name = "rock_chunck_Gem"
 _surfaces = [{
 "aabb": AABB(-0.49497473, -0.3963893, -0.49497473, 0.9969584, 0.694816, 1.0085931),
@@ -156,17 +180,27 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_ngmdi")
 
-[node name="Scout_slam" type="Node3D" unique_id=1350223791]
-script = ExtResource("1_script")
+[sub_resource type="Gradient" id="Gradient_541an"]
 
-[node name="Decal" type="Decal" parent="." unique_id=1129212880]
-size = Vector3(6, 1, 6)
-texture_albedo = ExtResource("1_4o3px")
-texture_normal = ExtResource("3_bw62r")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yyufi"]
+gradient = SubResource("Gradient_541an")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vkd04"]
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+scale_max = 0.5
+color_ramp = SubResource("GradientTexture1D_yyufi")
+
+[node name="ogre_ground_slam" type="Node3D" unique_id=1819674997]
+
+[node name="Decal" type="Decal" parent="." unique_id=1703964679]
+size = Vector3(7, 1, 7)
+texture_albedo = ExtResource("1_o1v5m")
+texture_normal = ExtResource("2_7dku8")
 modulate = Color(0.34, 0.22439998, 0.1088, 1)
 upper_fade = 4.7999973
 
-[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("2_whv0q")]
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("3_4gnxw")]
 collision_layer = 16
 collision_mask = 2
 base_damage = 50.0
@@ -174,24 +208,31 @@ knockback_angle = 60.0
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.328125, 0)
-shape = SubResource("CylinderShape3D_bw62r")
+shape = SubResource("CylinderShape3D_rakdg")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1150126878]
-libraries/ = SubResource("AnimationLibrary_bw62r")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1798383051]
+libraries/ = SubResource("AnimationLibrary_q8qnh")
 autoplay = &"slam"
 
-[node name="rock_chunk" type="GPUParticles3D" parent="." unique_id=1890708729]
+[node name="rock_chunk" type="GPUParticles3D" parent="." unique_id=1802004562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26600718, 0)
 emitting = false
 amount = 20
 lifetime = 2.0
 one_shot = true
 explosiveness = 1.0
-process_material = SubResource("ParticleProcessMaterial_hlie2")
-draw_pass_1 = SubResource("ArrayMesh_xb2uu")
+process_material = SubResource("ParticleProcessMaterial_7l2a6")
+draw_pass_1 = SubResource("ArrayMesh_j6dkc")
 
-[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="." unique_id=2105175591]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04454148, 0)
-size = Vector3(7, 0.1, 7)
+[node name="GPUParticlesCollisionHeightField3D" type="GPUParticlesCollisionHeightField3D" parent="." unique_id=48838753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.448761, 0, -0.13027)
+size = Vector3(10.878601, 2, 11.199711)
+
+[node name="wave_impact" type="GPUParticles3D" parent="." unique_id=1329138115]
+emitting = false
+amount = 1
+one_shot = true
+process_material = SubResource("ParticleProcessMaterial_vkd04")
+draw_pass_1 = ExtResource("4_3upxy")
 
 [editable path="AttackComponent"]

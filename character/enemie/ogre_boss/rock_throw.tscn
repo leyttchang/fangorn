@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://c7b1m1q2lklet"]
+
+[ext_resource type="Script" uid="uid://c81eo1nqy8agk" path="res://character/enemie/ogre_boss/rock_throw.gd" id="1_icpms"]
+[ext_resource type="ArrayMesh" uid="uid://cquoqptmboq1l" path="res://assets/3D_models/particule/rock_chunk_mesh.tres" id="2_k528u"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_k528u"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
+radius = 0.44821298
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_foj6j"]
+radius = 0.5481663
+
+[node name="Rock_throw" type="RigidBody3D" unique_id=1279369073]
+script = ExtResource("1_icpms")
+throw_speed = 30.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1392209855]
+shape = SubResource("SphereShape3D_hlie2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=609805186]
+mesh = ExtResource("2_k528u")
+
+[node name="AttackComponent" parent="." unique_id=63324796 instance=ExtResource("3_k528u")]
+collision_layer = 16
+collision_mask = 2
+base_damage = 30.0
+is_projectile = true
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
+shape = SubResource("SphereShape3D_foj6j")
+
+[editable path="AttackComponent"]
