@@ -23,13 +23,22 @@ signal enemy_spawned(enemy: Node3D)
 @export var wave_reward_score: int = 5
 @export var auto_start: bool = true
 
-@export_group("Système de Beacon")
+@export_group("Systeme de Beacon")
 @export var waves_before_beacon: int = 3
 @export var beacon_scene: PackedScene
 @export var beacon_spawn_point: Marker3D
 
-# --- ÉTAT INTERNE ---
+# --- CONFIGURATION DES BOSS WAVES ---
+@export_group("Boss Waves")
+@export var boss_wave_numbers: Array[int] = []
+@export var boss_scenes: Array[PackedScene] = []
+@export var boss_costs: Array[int] = []
+@export var boss_weights: Array[float] = []
+@export var boss_spawn_point: Marker3D
+
+# --- ETAT INTERNE ---
 var current_wave: int = 0
+var current_effective_wave: int = 0
 var active_enemies: Array[Node3D] = []
 var is_spawning_wave: bool = false
 var credits_left_to_spawn: int = 0
@@ -66,21 +75,45 @@ func toggle_pause() -> void:
 
 func start_next_wave() -> void:
 	if not is_inside_tree(): return
-	if monster_types.is_empty():
-		push_warning("SmartSpawner sur " + name + " : Aucune scène d'ennemi dans monster_types !")
+	if monster_types.is_empty() and boss_scenes.is_empty():
+		push_warning("SmartSpawner sur " + name + " : Aucune scene d'ennemi ou de boss !")
 		return
 		
 	current_wave += 1
 	active_enemies.clear()
 	is_spawning_wave = true
 	
-	# Calcul des credits pour cette vague
-	credits_left_to_spawn = initial_wave_credits + (current_wave - 1) * credits_increase_per_wave
+	var boss_waves_passed = 0
+	var is_boss_wave = false
+	var boss_idx = -1
 	
-	rpc("rpc_wave_started", current_wave, credits_left_to_spawn)
-	print("--- DÉBUT DE LA VAGUE " + str(current_wave) + " (" + str(credits_left_to_spawn) + " crédits restants) ---")
+	for i in range(boss_wave_numbers.size()):
+		if boss_wave_numbers[i] < current_wave:
+			boss_waves_passed += 1
+		elif boss_wave_numbers[i] == current_wave:
+			boss_waves_passed += 1
+			is_boss_wave = true
+			boss_idx = i
+			
+	current_effective_wave = current_wave - boss_waves_passed
 	
-	_spawn_next_enemy_in_wave()
+	if is_boss_wave:
+		credits_left_to_spawn = 0
+		rpc("rpc_wave_started", current_wave, 0)
+		print("--- DEBUT DE LA VAGUE BOSS " + str(current_wave) + " ---")
+		
+		var b_scene = boss_scenes[boss_idx] if boss_idx < boss_scenes.size() else null
+		if b_scene != null:
+			_spawn_boss(b_scene)
+		else:
+			push_error("Aucune scene assignee pour le boss de la vague ", current_wave)
+			is_spawning_wave = false
+			_check_wave_completion()
+	else:
+		credits_left_to_spawn = initial_wave_credits + (current_effective_wave - 1) * credits_increase_per_wave
+		rpc("rpc_wave_started", current_wave, credits_left_to_spawn)
+		print("--- DEBUT DE LA VAGUE " + str(current_wave) + " (" + str(credits_left_to_spawn) + " credits restants, scaling niv " + str(current_effective_wave) + ") ---")
+		_spawn_next_enemy_in_wave()
 
 func _get_affordable_monsters() -> Array:
 	var affordable = []
@@ -95,7 +128,6 @@ func _get_affordable_monsters() -> Array:
 		if i < monster_weights.size():
 			weight = monster_weights[i]
 		
-		# On n'ajoute que si on peut se l'offrir et si son poids n'est pas zro
 		if cost <= credits_left_to_spawn and weight > 0.0:
 			affordable.append({"scene": monster_types[i], "cost": cost, "weight": weight})
 	return affordable
@@ -124,23 +156,40 @@ func _spawn_next_enemy_in_wave() -> void:
 	
 	var affordable = _get_affordable_monsters()
 	
-	# S'il n'y a plus de credits ou qu'on ne peut plus rien acheter
 	if credits_left_to_spawn <= 0 or affordable.is_empty():
 		is_spawning_wave = false
 		_check_wave_completion()
 		return
 		
-	# On achete un monstre en prenant en compte les probabilits (Poids)
 	var choice = _pick_weighted_random(affordable)
 	_spawn_single_enemy(choice.scene)
 	
 	credits_left_to_spawn -= choice.cost
-	print("Achat d'un monstre pour ", choice.cost, " crédits. Reste: ", credits_left_to_spawn)
 	
-	# On attend et on lance le prochain achat
 	var tree = get_tree()
 	if tree != null:
 		tree.create_timer(time_between_spawns).timeout.connect(_spawn_next_enemy_in_wave)
+
+func _spawn_boss(boss_scene: PackedScene) -> void:
+	if not is_inside_tree() or boss_scene == null: return
+	
+	var boss_instance: Node3D = boss_scene.instantiate() as Node3D
+	get_tree().current_scene.get_node("NetworkObjects").add_child(boss_instance, true)
+	
+	if boss_spawn_point != null:
+		boss_instance.global_position = boss_spawn_point.global_position
+	else:
+		var random_angle: float = randf_range(0, TAU)
+		var random_dist: float = sqrt(randf()) * spawn_radius
+		var offset: Vector3 = Vector3(cos(random_angle) * random_dist, 0, sin(random_angle) * random_dist)
+		boss_instance.global_position = global_position + offset
+	
+	active_enemies.append(boss_instance)
+	enemy_spawned.emit(boss_instance)
+	boss_instance.tree_exited.connect(func(): _on_enemy_removed(boss_instance))
+	
+	is_spawning_wave = false
+	_check_wave_completion()
 
 func _spawn_single_enemy(enemy_scene: PackedScene) -> void:
 	if not is_inside_tree() or enemy_scene == null: return
@@ -156,28 +205,20 @@ func _spawn_single_enemy(enemy_scene: PackedScene) -> void:
 	var enemy_instance: Node3D = enemy_scene.instantiate() as Node3D
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
 	
-	# ===== SCALING DE VAGUE (Buff des monstres) =====
 	var stats = enemy_instance.get_node_or_null("StatsComponent")
-	if stats != null and current_wave > 1:
-		# +10% de vie maximum (additionnel) par vague, on ne touche pas aux dgts
-		var bonus_percent_hp = (current_wave - 1) * 0.10 
-		
-		# Type 1 = PERCENT dans StatModifier
+	if stats != null and current_effective_wave > 1:
+		var bonus_percent_hp = (current_effective_wave - 1) * 0.10 
 		stats.add_modifier("max_health", 1, bonus_percent_hp, "wave_scaling")
-	# ================================================
 	
-	# Position aléatoire dans le rayon autour du spawner
 	var random_angle: float = randf_range(0, TAU)
 	var random_dist: float = sqrt(randf()) * spawn_radius
 	var offset: Vector3 = Vector3(cos(random_angle) * random_dist, 0, sin(random_angle) * random_dist)
 	
 	enemy_instance.global_position = global_position + offset
 	
-	# Suivi de l'ennemi vivant
 	active_enemies.append(enemy_instance)
 	enemy_spawned.emit(enemy_instance)
 	
-	# On s'abonne à la suppression de l'ennemi
 	enemy_instance.tree_exited.connect(func(): _on_enemy_removed(enemy_instance))
 
 func _on_enemy_removed(enemy: Node3D) -> void:
@@ -191,8 +232,8 @@ func _spawn_single_spider_from_bundle(spider_scene: PackedScene) -> void:
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
 	
 	var stats = enemy_instance.get_node_or_null("StatsComponent")
-	if stats != null and current_wave > 1:
-		var bonus_percent_hp = (current_wave - 1) * 0.10 
+	if stats != null and current_effective_wave > 1:
+		var bonus_percent_hp = (current_effective_wave - 1) * 0.10 
 		stats.add_modifier("max_health", 1, bonus_percent_hp, "wave_scaling")
 	
 	var random_angle: float = randf_range(0, TAU)
@@ -207,21 +248,26 @@ func _spawn_single_spider_from_bundle(spider_scene: PackedScene) -> void:
 func _check_wave_completion() -> void:
 	if not is_inside_tree(): return
 	
-	# Nettoyage des instances invalides
 	active_enemies = active_enemies.filter(func(e): return is_instance_valid(e) and e.is_inside_tree())
 	
-	# Si la vague a fini de spawner ET qu'il n'y a plus d'ennemi actif dans cette vague
 	if not is_spawning_wave and active_enemies.is_empty():
-		print("--- VAGUE " + str(current_wave) + " TERMINÉE ! ---")
+		print("--- VAGUE " + str(current_wave) + " TERMINEE ! ---")
 		rpc("rpc_wave_completed", current_wave)
 		
-		# Récompense de score pour la vague réussie
+		var boss_idx = boss_wave_numbers.find(current_wave)
+		if boss_idx != -1:
+			var b_scene = boss_scenes[boss_idx] if boss_idx < boss_scenes.size() else null
+			if b_scene != null and not monster_types.has(b_scene):
+				monster_types.append(b_scene)
+				monster_costs.append(boss_costs[boss_idx] if boss_idx < boss_costs.size() else 50)
+				monster_weights.append(boss_weights[boss_idx] if boss_idx < boss_weights.size() else 0.5)
+				print("--- Boss ajoute au pool des monstres spawnables ! ---")
+		
 		var score_managers = get_tree().get_nodes_in_group("ScoreManager")
 		for sm in score_managers:
 			if sm.has_method("add_score_points"):
 				sm.add_score_points(wave_reward_score)
 		
-		# Pause avant la vague suivante
 		var tree = get_tree()
 		if tree != null:
 			tree.create_timer(delay_between_waves).timeout.connect(_on_delay_between_waves_finished)
@@ -243,11 +289,10 @@ func _spawn_beacon() -> void:
 		get_tree().current_scene.get_node("NetworkObjects").add_child(beacon, true)
 		beacon.global_position = beacon_spawn_point.global_position
 		
-		# Connecter un signal si le beacon a un signal "interacted" (optionnel, selon ce que tu feras)
 		if beacon.has_signal("interacted"):
 			beacon.interacted.connect(trigger_beacon)
 	else:
-		push_warning("SmartSpawner : Pas de beacon_scene ou de beacon_spawn_point configuré ! Lancement immédiat de la vague.")
+		push_warning("SmartSpawner : Pas de beacon_scene ou de beacon_spawn_point configure ! Lancement immediat de la vague.")
 		trigger_beacon()
 
 func trigger_beacon() -> void:
