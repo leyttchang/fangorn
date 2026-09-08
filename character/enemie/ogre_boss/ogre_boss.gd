@@ -22,6 +22,7 @@ extends CharacterBody3D
 @export var max_jump_range: float = 20.0
 @export var height_detector: RayCast3D
 @export var unfreeze_distance: float = 3.0
+@export var jump_aggro_change_chance: float = 0.5
 
 @export_category("Lancer de rocher")
 @export var rock_scene: PackedScene
@@ -69,8 +70,10 @@ var _jump_target_pos: Vector3 = Vector3.ZERO
 var _current_rock: RigidBody3D = null
 var _has_midlife_roared: bool = false
 var _wants_to_roar: bool = false
+var _consecutive_melee_attacks: int = 0
 
 func _ready() -> void:
+	randomize()
 	if behavior == null:
 		push_error("OgreBoss (" + name + ") : Fichier EnemyBehaviorData manquant !")
 		
@@ -84,9 +87,11 @@ func actor_setup() -> void:
 	_update_closest_target()
 	change_state(State.IDLE)
 	
-	var hitbox = find_child("HitboxComponent*", true, false)
-	if hitbox != null and hitbox.has_signal("aggro_requested"):
-		hitbox.aggro_requested.connect(_on_aggro_requested)
+	var hitboxes = find_children("*HitboxComponent*", "", true, false)
+	for hitbox in hitboxes:
+		if hitbox.has_signal("aggro_requested"):
+			if not hitbox.aggro_requested.is_connected(_on_aggro_requested):
+				hitbox.aggro_requested.connect(_on_aggro_requested)
 
 func _physics_process(delta: float) -> void:
 	if is_instance_valid(_current_rock) and _rock_in_hand and throw_pos != null:
@@ -117,18 +122,25 @@ func _physics_process(delta: float) -> void:
 		
 	if _damage_aggro_timer > 0.0:
 		_damage_aggro_timer -= delta
-		if _damage_aggro_timer <= 0.0 and _pending_attacker != null and current_state != State.ATTACK:
+		if _damage_aggro_timer <= 0.0:
+			_damage_aggro_timer = 0.0 # Prêt à changer de cible
+			
+	if _damage_aggro_timer == 0.0 and _pending_attacker != null:
+		if current_state != State.ATTACK:
 			target = _pending_attacker
 			_target_update_timer = 0.0
 			_next_aggro_limit = randf_range(min_aggro_change_time, max_aggro_change_time)
 			_pending_attacker = null
-			print("OgreBoss: Aggro change (Damage) vers ", target.name)
+			_damage_aggro_timer = -1.0 # Réinitialisé
+		else:
+			pass # On est en train d'attaquer, on attend !
 
 	_target_update_timer += delta
 	if _target_update_timer > _next_aggro_limit or target == null or not is_instance_valid(target):
-		_target_update_timer = 0.0
-		_next_aggro_limit = randf_range(min_aggro_change_time, max_aggro_change_time)
-		_update_closest_target()
+		if current_state != State.ATTACK or target == null or not is_instance_valid(target):
+			_target_update_timer = 0.0
+			_next_aggro_limit = randf_range(min_aggro_change_time, max_aggro_change_time)
+			_update_closest_target()
 		
 	_process_state(delta)
 	move_and_slide()
@@ -227,11 +239,24 @@ func change_state(new_state: State) -> void:
 			else:
 				_current_attack_anim = "rock_throw"
 			_force_jump = false
-		elif randf() < 0.33: # 33% de chance de faire le ground slam
-			_current_attack_anim = "ground_slam"
+			_consecutive_melee_attacks = 0
 		else:
-			_current_attack_anim = "swing_attack" # 67% swing normal
-		print("OgreBoss: Entre dans l'Ã©tat ATTACK avec ", _current_attack_anim)
+			var force_ranged_chance = max(0.0, (_consecutive_melee_attacks - 3) * 0.20)
+			if force_ranged_chance > 0.0 and randf() < force_ranged_chance:
+				print("OgreBoss: Attaque distance forcee par probabilite (", force_ranged_chance * 100, "%)")
+				if randf() < 0.5:
+					_current_attack_anim = "jumping_attack"
+				else:
+					_current_attack_anim = "rock_throw"
+				_consecutive_melee_attacks = 0
+			else:
+				if randf() < 0.33: # 33% de chance de faire le ground slam
+					_current_attack_anim = "ground_slam"
+				else:
+					_current_attack_anim = "swing_attack" # 67% swing normal
+				_consecutive_melee_attacks += 1
+				
+		print("OgreBoss: Entre dans l'état ATTACK avec ", _current_attack_anim)
 	elif new_state == State.CHASE and current_state != State.CHASE:
 		if _current_attack_anim == "roar": _current_attack_anim = "" # Reset pour la prochaine attaque !
 		print("OgreBoss: Entre dans l'Ã©tat CHASE")
@@ -357,6 +382,7 @@ func pick_up_rock() -> void:
 		get_tree().current_scene.get_node("NetworkObjects").add_child(_current_rock, true)
 		_current_rock.scale = Vector3(1.5, 1.5, 1.5)
 		_current_rock.freeze = true
+		_current_rock.add_collision_exception_with(self)
 		_rock_in_hand = true
 		rpc("_rpc_set_current_rock", _current_rock.get_path())
 		print("OgreBoss: Rocher ramasse !")
@@ -370,6 +396,7 @@ func _rpc_set_current_rock(rock_path: NodePath) -> void:
 	_rock_in_hand = true
 	if _current_rock:
 		_current_rock.freeze = true
+		_current_rock.add_collision_exception_with(self)
 
 func throw_rock() -> void:
 	if not is_multiplayer_authority(): return
@@ -403,6 +430,23 @@ func _rpc_throw_rock(target_pos: Vector3) -> void:
 func apply_jump() -> void:
 	if not is_multiplayer_authority():
 		return
+		
+	# Chance de changer d'aggro pendant le saut
+	if randf() <= jump_aggro_change_chance:
+		var players = get_tree().get_nodes_in_group("Player")
+		var valid_players = []
+		for p in players:
+			if p.get("is_dead") == true or p == target: continue
+			var dist = global_position.distance_to(p.global_position)
+			if dist <= max_jump_range:
+				valid_players.append(p)
+		
+		if valid_players.size() > 0:
+			var random_target = valid_players[randi() % valid_players.size()]
+			target = random_target
+			_target_update_timer = 0.0
+			_next_aggro_limit = randf_range(min_aggro_change_time, max_aggro_change_time)
+			print("OgreBoss: Aggro change (Jump) vers ", target.name)
 		
 	var angle_rad = deg_to_rad(jump_angle)
 	
@@ -479,6 +523,12 @@ func disable_hitbox() -> void:
 		print("OgreBoss: reset_hit_entities() appelÃ© (depuis disable)")
 
 func freeze_animation() -> void:
+	if not is_multiplayer_authority(): 
+		return
+	rpc("_rpc_freeze_jump")
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_freeze_jump() -> void:
 	_is_jump_frozen = true
 	var anim_tree = find_child("AnimationTree", true, false)
 	if anim_tree:
@@ -520,12 +570,8 @@ func play_roar() -> void:
 		return
 		
 	var roar = midlife_roar_scene.instantiate() as Node3D
-	get_tree().current_scene.get_node("NetworkObjects").add_child(roar, true)
-	roar.global_position = roar_pos.global_position
-	roar.global_rotation = roar_pos.global_rotation
+	roar_pos.add_child(roar)
 	
-	if roar.has_method("rpc_set_position"):
-		roar.rpc("rpc_set_position", roar_pos.global_position)
 	print("OgreBoss: Scene Midlife Roar instanciee !")
 	
 	# Le boss s'enerve et court plus vite !
@@ -574,9 +620,9 @@ func _rpc_trigger_death() -> void:
 	collision_mask = 1
 	if anim_playback:
 		anim_playback.travel("death")
-	if is_multiplayer_authority():
-		await get_tree().create_timer(5.0).timeout
-		queue_free()
+	
+	await get_tree().create_timer(5.0).timeout
+	queue_free()
 
 func _update_closest_target() -> void:
 	var players = get_tree().get_nodes_in_group("Player")
@@ -591,5 +637,7 @@ func _update_closest_target() -> void:
 
 func _on_aggro_requested(attacker: Node3D) -> void:
 	if not is_multiplayer_authority() or current_state == State.DEAD: return
+	
 	_pending_attacker = attacker
-	_damage_aggro_timer = damage_aggro_delay
+	if _damage_aggro_timer < 0.0:
+		_damage_aggro_timer = damage_aggro_delay

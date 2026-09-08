@@ -9,14 +9,21 @@ func _ready() -> void:
 		# 1. On fait spawner notre propre personnage (ID = 1)
 		spawn_player(1)
 		
-		# 2. On fait spawner les joueurs deja dans le lobby
-		for peer_id in multiplayer.get_peers():
-			spawn_player(peer_id)
-			
-		# 3. On ecoute le reseau : si quelqu'un se connecte plus tard, on le fait spawner
-		multiplayer.peer_connected.connect(spawn_player)
-		# Si quelqu'un part, on efface son personnage
+		# 2. On n'utilise plus peer_connected pour faire spawner direct, car le client
+		# n'a pas encore eu le temps de charger la map (écran gris) !
+		# On ecoute juste la deconnexion.
 		multiplayer.peer_disconnected.connect(remove_player)
+	else:
+		# Si on est un client, on vient de finir de charger l'ecran. 
+		# On dit au serveur "C'est bon, je suis la, fais-moi spawner !"
+		rpc_id(1, "_rpc_client_ready")
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_client_ready() -> void:
+	if multiplayer.is_server():
+		var sender_id = multiplayer.get_remote_sender_id()
+		if not players_container.has_node(str(sender_id)):
+			spawn_player(sender_id)
 
 # Fonction appelee par le serveur pour creer un joueur
 func spawn_player(peer_id: int) -> void:

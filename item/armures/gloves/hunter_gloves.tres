@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_i0w75"]
 [ext_resource type="Script" uid="uid://b6114jo5bnldt" path="res://item/equipment_item.gd" id="2_drkvl"]
 [ext_resource type="Resource" uid="uid://cygmvghryt5uv" path="res://item/affixes/affix_armor.tres" id="2_o6cl8"]
-[ext_resource type="Texture2D" uid="uid://bc62u387718mp" path="res://assets/icon/rpg_icon/Icon182.png" id="3_o6cl8"]
+[ext_resource type="Texture2D" uid="uid://bof6syhqvwnom" path="res://assets/icon/armor/64x64/medium_hand_armor_03.png" id="3_g2mfu"]
 
 [resource]
 script = ExtResource("2_drkvl")
@@ -24,6 +24,6 @@ excluded_affixes = Array[ExtResource("1_i0w75")]([ExtResource("2_o6cl8")])
 id = "hunters_gloves"
 item_name = "Hunter Gloves"
 description = "Flexible leather gloves."
-icon = ExtResource("3_o6cl8")
+icon = ExtResource("3_g2mfu")
 item_type = 5
 metadata/_custom_type_script = "uid://b6114jo5bnldt"

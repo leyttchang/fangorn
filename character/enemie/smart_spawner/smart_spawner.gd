@@ -115,9 +115,16 @@ func start_next_wave() -> void:
 			is_spawning_wave = false
 			_check_wave_completion()
 	else:
-		credits_left_to_spawn = initial_wave_credits + (current_effective_wave - 1) * credits_increase_per_wave
+		var base_credits = initial_wave_credits + (current_effective_wave - 1) * credits_increase_per_wave
+		
+		# Calcul du multiplicateur multijoueur (1 joueur = x1.0, 2 joueurs = x1.5, 3 joueurs = x2.0...)
+		var player_count = multiplayer.get_peers().size() + 1
+		var multi_multiplier = 1.0 + (player_count - 1) * 0.5
+		
+		credits_left_to_spawn = int(base_credits * multi_multiplier)
+		
 		rpc("rpc_wave_started", current_wave, credits_left_to_spawn)
-		print("--- DEBUT DE LA VAGUE " + str(current_wave) + " (" + str(credits_left_to_spawn) + " credits restants, scaling niv " + str(current_effective_wave) + ") ---")
+		print("--- DEBUT DE LA VAGUE " + str(current_wave) + " (" + str(credits_left_to_spawn) + " credits restants, scaling niv " + str(current_effective_wave) + ", multi x" + str(multi_multiplier) + ") ---")
 		_spawn_next_enemy_in_wave()
 
 func _get_affordable_monsters() -> Array:

@@ -4,6 +4,14 @@ extends RigidBody3D
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+func _ready() -> void:
+	contact_monitor = true
+	max_contacts_reported = 5
+	body_entered.connect(_on_body_entered)
+
+func _on_body_entered(body: Node) -> void:
+	print("[DEBUG ROCK] Le rocher a heurte : ", body.name, " (", body.get_class(), ")")
+
 func throw_at(target_pos: Vector3) -> void:
 	freeze = false
 	var dir_to_target = target_pos - global_position

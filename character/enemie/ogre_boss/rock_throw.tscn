@@ -14,6 +14,7 @@ radius = 0.42702544
 radius = 0.5481663
 
 [node name="Rock_throw" type="RigidBody3D" unique_id=1279369073]
+collision_layer = 524288
 physics_material_override = SubResource("PhysicsMaterial_o5e77")
 script = ExtResource("1_icpms")
 throw_speed = 30.0
