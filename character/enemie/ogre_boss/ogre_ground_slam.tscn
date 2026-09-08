@@ -1,5 +1,6 @@
 [gd_scene format=4 uid="uid://sgu32jj5jt5s"]
 
+[ext_resource type="Script" uid="uid://dtdpaiqe8tliw" path="res://character/enemie/ogre_boss/ogre_ground_slam.gd" id="1_7dku8"]
 [ext_resource type="Texture2D" uid="uid://bnv7axehaxeju" path="res://assets/LeLu's Noise Pack/T_Cracks336_transparent.png" id="1_o1v5m"]
 [ext_resource type="Texture2D" uid="uid://ct5p2s70ef55j" path="res://assets/LeLu's Noise Pack/T_Cracks336_normal_map.png" id="2_7dku8"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_4gnxw"]
@@ -192,6 +193,7 @@ scale_max = 0.5
 color_ramp = SubResource("GradientTexture1D_yyufi")
 
 [node name="ogre_ground_slam" type="Node3D" unique_id=1819674997]
+script = ExtResource("1_7dku8")
 
 [node name="Decal" type="Decal" parent="." unique_id=1703964679]
 size = Vector3(7, 1, 7)

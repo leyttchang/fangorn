@@ -4,13 +4,17 @@
 [ext_resource type="ArrayMesh" uid="uid://cquoqptmboq1l" path="res://assets/3D_models/particule/rock_chunk_mesh.tres" id="2_k528u"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_k528u"]
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_o5e77"]
+bounce = 0.54
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
-radius = 0.44821298
+radius = 0.42702544
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_foj6j"]
 radius = 0.5481663
 
 [node name="Rock_throw" type="RigidBody3D" unique_id=1279369073]
+physics_material_override = SubResource("PhysicsMaterial_o5e77")
 script = ExtResource("1_icpms")
 throw_speed = 30.0
 
@@ -24,7 +28,6 @@ mesh = ExtResource("2_k528u")
 collision_layer = 16
 collision_mask = 2
 base_damage = 30.0
-is_projectile = true
 
 [node name="CollisionShape3D" parent="AttackComponent" index="0" unique_id=710296738]
 shape = SubResource("SphereShape3D_foj6j")

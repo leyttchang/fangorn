@@ -1,5 +1,6 @@
 [gd_scene format=4 uid="uid://cso4f62dx4wyu"]
 
+[ext_resource type="Script" uid="uid://cgveq18i8fefy" path="res://character/enemie/ogre_boss/ogre_jumping_slam.gd" id="1_emxox"]
 [ext_resource type="Texture2D" uid="uid://bnv7axehaxeju" path="res://assets/LeLu's Noise Pack/T_Cracks336_transparent.png" id="1_ummuu"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_hn0cn"]
 [ext_resource type="Texture2D" uid="uid://ct5p2s70ef55j" path="res://assets/LeLu's Noise Pack/T_Cracks336_normal_map.png" id="2_lpbkk"]
@@ -190,6 +191,7 @@ gravity = Vector3(0, 0, 0)
 color_ramp = SubResource("GradientTexture1D_yyufi")
 
 [node name="ogre_jumping_slam" type="Node3D" unique_id=477262352]
+script = ExtResource("1_emxox")
 
 [node name="Decal" type="Decal" parent="." unique_id=565076259]
 size = Vector3(12, 1, 12)

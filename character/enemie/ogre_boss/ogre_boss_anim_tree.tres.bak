@@ -1,7 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://5r8qy5aojxrc"]
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_Injured_run"]
-animation = &"anim/Injured_run"
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://c8ogre1234567"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_death"]
 animation = &"anim/death"
@@ -122,32 +119,7 @@ advance_mode = 2
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_25"]
 xfade_time = 0.1
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_26"]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_27"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_28"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_29"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_30"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_31"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_32"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_33"]
-xfade_time = 0.1
-
 [resource]
-states/Injured_run/node = SubResource("AnimationNodeAnimation_Injured_run")
-states/Injured_run/position = Vector2(500, 200)
 states/Start/position = Vector2(100, 100)
 states/death/node = SubResource("AnimationNodeAnimation_death")
 states/death/position = Vector2(600, -100)
@@ -165,4 +137,4 @@ states/swing_attack/node = SubResource("AnimationNodeAnimation_swing_attack")
 states/swing_attack/position = Vector2(300, -20)
 states/walk/node = SubResource("AnimationNodeAnimation_walk")
 states/walk/position = Vector2(500, 100)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_1"), "idle", "walk", SubResource("AnimationNodeStateMachineTransition_2"), "walk", "idle", SubResource("AnimationNodeStateMachineTransition_3"), "idle", "swing_attack", SubResource("AnimationNodeStateMachineTransition_4"), "walk", "swing_attack", SubResource("AnimationNodeStateMachineTransition_5"), "swing_attack", "idle", SubResource("AnimationNodeStateMachineTransition_6"), "idle", "death", SubResource("AnimationNodeStateMachineTransition_7"), "walk", "death", SubResource("AnimationNodeStateMachineTransition_8"), "swing_attack", "death", SubResource("AnimationNodeStateMachineTransition_9"), "idle", "jumping_attack", SubResource("AnimationNodeStateMachineTransition_10"), "walk", "jumping_attack", SubResource("AnimationNodeStateMachineTransition_11"), "jumping_attack", "idle", SubResource("AnimationNodeStateMachineTransition_12"), "jumping_attack", "death", SubResource("AnimationNodeStateMachineTransition_13"), "idle", "ground_slam", SubResource("AnimationNodeStateMachineTransition_14"), "walk", "ground_slam", SubResource("AnimationNodeStateMachineTransition_15"), "ground_slam", "idle", SubResource("AnimationNodeStateMachineTransition_16"), "ground_slam", "death", SubResource("AnimationNodeStateMachineTransition_17"), "idle", "rock_throw", SubResource("AnimationNodeStateMachineTransition_18"), "walk", "rock_throw", SubResource("AnimationNodeStateMachineTransition_19"), "rock_throw", "idle", SubResource("AnimationNodeStateMachineTransition_20"), "rock_throw", "death", SubResource("AnimationNodeStateMachineTransition_21"), "idle", "roar", SubResource("AnimationNodeStateMachineTransition_22"), "walk", "roar", SubResource("AnimationNodeStateMachineTransition_23"), "roar", "idle", SubResource("AnimationNodeStateMachineTransition_24"), "roar", "death", SubResource("AnimationNodeStateMachineTransition_25"), "idle", "Injured_run", SubResource("AnimationNodeStateMachineTransition_26"), "Injured_run", "idle", SubResource("AnimationNodeStateMachineTransition_27"), "Injured_run", "swing_attack", SubResource("AnimationNodeStateMachineTransition_28"), "Injured_run", "death", SubResource("AnimationNodeStateMachineTransition_29"), "Injured_run", "jumping_attack", SubResource("AnimationNodeStateMachineTransition_30"), "Injured_run", "ground_slam", SubResource("AnimationNodeStateMachineTransition_31"), "Injured_run", "rock_throw", SubResource("AnimationNodeStateMachineTransition_32"), "Injured_run", "roar", SubResource("AnimationNodeStateMachineTransition_33")]
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_1"), "idle", "walk", SubResource("AnimationNodeStateMachineTransition_2"), "walk", "idle", SubResource("AnimationNodeStateMachineTransition_3"), "idle", "swing_attack", SubResource("AnimationNodeStateMachineTransition_4"), "walk", "swing_attack", SubResource("AnimationNodeStateMachineTransition_5"), "swing_attack", "idle", SubResource("AnimationNodeStateMachineTransition_6"), "idle", "death", SubResource("AnimationNodeStateMachineTransition_7"), "walk", "death", SubResource("AnimationNodeStateMachineTransition_8"), "swing_attack", "death", SubResource("AnimationNodeStateMachineTransition_9"), "idle", "jumping_attack", SubResource("AnimationNodeStateMachineTransition_10"), "walk", "jumping_attack", SubResource("AnimationNodeStateMachineTransition_11"), "jumping_attack", "idle", SubResource("AnimationNodeStateMachineTransition_12"), "jumping_attack", "death", SubResource("AnimationNodeStateMachineTransition_13"), "idle", "ground_slam", SubResource("AnimationNodeStateMachineTransition_14"), "walk", "ground_slam", SubResource("AnimationNodeStateMachineTransition_15"), "ground_slam", "idle", SubResource("AnimationNodeStateMachineTransition_16"), "ground_slam", "death", SubResource("AnimationNodeStateMachineTransition_17"), "idle", "rock_throw", SubResource("AnimationNodeStateMachineTransition_18"), "walk", "rock_throw", SubResource("AnimationNodeStateMachineTransition_19"), "rock_throw", "idle", SubResource("AnimationNodeStateMachineTransition_20"), "rock_throw", "death", SubResource("AnimationNodeStateMachineTransition_21"), "idle", "roar", SubResource("AnimationNodeStateMachineTransition_22"), "walk", "roar", SubResource("AnimationNodeStateMachineTransition_23"), "roar", "idle", SubResource("AnimationNodeStateMachineTransition_24"), "roar", "death", SubResource("AnimationNodeStateMachineTransition_25")]

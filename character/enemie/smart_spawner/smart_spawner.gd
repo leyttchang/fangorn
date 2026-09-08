@@ -4,6 +4,7 @@ extends Node3D
 # --- SIGNAUX ---
 signal wave_started(wave_number: int, total_enemies: int)
 signal wave_completed(wave_number: int)
+signal boss_wave_incoming(wave_number: int)
 signal enemy_spawned(enemy: Node3D)
 
 # --- TYPES D'ENNEMIS ---
@@ -62,6 +63,10 @@ func rpc_wave_started(wave_number: int, total_credits: int) -> void:
 @rpc("authority", "call_local", "reliable")
 func rpc_wave_completed(wave_number: int) -> void:
 	wave_completed.emit(wave_number)
+
+@rpc("authority", "call_local", "reliable")
+func rpc_boss_wave_incoming(wave_number: int) -> void:
+	boss_wave_incoming.emit(wave_number)
 
 func toggle_pause() -> void:
 	is_paused = not is_paused
@@ -273,7 +278,13 @@ func _check_wave_completion() -> void:
 			tree.create_timer(delay_between_waves).timeout.connect(_on_delay_between_waves_finished)
 
 func _on_delay_between_waves_finished() -> void:
-	if current_wave > 0 and waves_before_beacon > 0 and current_wave % waves_before_beacon == 0:
+	var next_wave = current_wave + 1
+	var is_next_wave_boss = boss_wave_numbers.has(next_wave)
+	
+	if is_next_wave_boss:
+		rpc("rpc_boss_wave_incoming", next_wave)
+		_spawn_beacon()
+	elif current_wave > 0 and waves_before_beacon > 0 and current_wave % waves_before_beacon == 0:
 		_spawn_beacon()
 	elif is_paused:
 		_waiting_for_next_wave = true

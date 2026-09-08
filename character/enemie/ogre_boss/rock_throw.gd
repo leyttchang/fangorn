@@ -5,6 +5,7 @@ extends RigidBody3D
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func throw_at(target_pos: Vector3) -> void:
+	freeze = false
 	var dir_to_target = target_pos - global_position
 	var dist_2d = Vector2(dir_to_target.x, dir_to_target.z).length()
 	var height_diff = target_pos.y - global_position.y # Positif si cible plus haute
@@ -64,3 +65,10 @@ func _disable_attack() -> void:
 		if col != null:
 			col.set_deferred("disabled", true)
 		print("RockThrow: AttackComponent désactivé.")
+
+@rpc("authority", "call_remote", "reliable")
+func rpc_set_position(pos: Vector3) -> void:
+	global_position = pos
+@rpc("authority", "call_local", "reliable")
+func rpc_throw_at(target_pos: Vector3) -> void:
+	throw_at(target_pos)
