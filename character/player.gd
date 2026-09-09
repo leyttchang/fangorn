@@ -170,6 +170,17 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	var is_f11 = event is InputEventKey and event.keycode == KEY_F11 and event.pressed
 	var is_alt_enter = event is InputEventKey and event.keycode == KEY_ENTER and event.alt_pressed and event.pressed
+	var is_m_key = event is InputEventKey and event.keycode == KEY_M and event.pressed and not event.echo
+	
+	if is_m_key:
+		var enemies = get_tree().get_nodes_in_group("Enemie")
+		for enemy in enemies:
+			if is_instance_valid(enemy) and enemy.is_inside_tree():
+				var health = enemy.get_node_or_null("HealthComponent")
+				if health == null or health.current_health > 0:
+					global_position = enemy.global_position + Vector3(0, 2, 0)
+					print("Teleportation au monstre : ", enemy.name)
+					break
 	
 	if is_f11 or is_alt_enter:
 		var current_mode = DisplayServer.window_get_mode()
