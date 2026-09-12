@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="UniqueWeaponItem" format=3 uid="uid://crxi1c2sg2w3l"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_yj4gc"]
+[ext_resource type="Script" uid="uid://dd5yjjdnobyu5" path="res://item/unique_drop_data.gd" id="2_8vo4q"]
+[ext_resource type="Texture2D" uid="uid://c0nijfk6axey7" path="res://assets/icon/Weapons/64x64/spear_03.png" id="2_iepg4"]
+[ext_resource type="Script" uid="uid://d2vrqeaeqvmpt" path="res://item/armes/unique_weapon_item.gd" id="3_jxuk8"]
+[ext_resource type="Script" uid="uid://cubgx4moxnfii" path="res://item/unique/Mirage/Mirage_effect.gd" id="4_jxuk8"]
+[ext_resource type="PackedScene" uid="uid://5f5n0bss2ar0" path="res://item/unique/Mirage/Mirage.tscn" id="5_iepg4"]
+
+[resource]
+script = ExtResource("3_jxuk8")
+unique_effect_script = ExtResource("4_jxuk8")
+unique_model_scene = ExtResource("5_iepg4")
+base_damage = 45.0
+base_attack_speed = 0.7
+hit_slow = 0.6
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(0, 0),
+"attack_speed": Vector2(0, 0),
+"casting_speed": Vector2(0.1, 0.3),
+"cd_red": Vector2(0.7, 1),
+"fire_damage": Vector2(0, 0),
+"flat_fire_damage": Vector2(0, 0),
+"flat_ice_damage": Vector2(0, 0),
+"flat_lightning_damage": Vector2(0, 0),
+"flat_physical_damage": Vector2(0, 0),
+"ice_damage": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"lightning_damage": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(0, 0),
+"movement_speed": Vector2(0.3, 0.6),
+"physical_damage": Vector2(0, 0)
+}
+id = "Mirage"
+item_name = "Mirage"
+description = "The physical spear was lost to time. You wield only its spectral remnant, held together by the memory of a blade and the shimmering colors of a shattered dream."
+icon = ExtResource("2_iepg4")
+weapon_style = 4
+metadata/_custom_type_script = "uid://d2vrqeaeqvmpt"

@@ -4,6 +4,14 @@
 [ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_2l38e"]
 [ext_resource type="Texture2D" uid="uid://chui0cma3g01" path="res://assets/icon/32x32/fb401.png" id="1_6gp2h"]
 [ext_resource type="PackedScene" uid="uid://bscyin7n03udp" path="res://item/armes/test_spear.tscn" id="2_tnt7o"]
+[ext_resource type="Script" uid="uid://dd5yjjdnobyu5" path="res://item/unique_drop_data.gd" id="3_bso0v"]
+[ext_resource type="Resource" uid="uid://crxi1c2sg2w3l" path="res://item/unique/Mirage/Mirage.tres" id="4_t3lmn"]
+
+[sub_resource type="Resource" id="Resource_jxuk8"]
+script = ExtResource("3_bso0v")
+unique_item = ExtResource("4_t3lmn")
+drop_chance = 0.5
+metadata/_custom_type_script = "uid://dd5yjjdnobyu5"
 
 [resource]
 script = ExtResource("1_0f405")
@@ -13,6 +21,7 @@ hit_slow = 0.6
 damage_range = Vector2(45, 53)
 attack_speed_range = Vector2(0.7, 0.85)
 weapon_scene = ExtResource("2_tnt7o")
+possible_uniques = Array[ExtResource("3_bso0v")]([SubResource("Resource_jxuk8")])
 id = "TEST8SPEAR"
 item_name = "Test Spear"
 description = "A basic test spear."

@@ -4,6 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_jwtq2"]
 [ext_resource type="PackedScene" uid="uid://b00d8jw4pmre5" path="res://assets/3D_models/item/weapons/sword_1.glb" id="3_psydu"]
 [ext_resource type="Texture2D" uid="uid://clwmoo5t5kv0u" path="res://assets/LeLu's Noise Pack/T_Noise1_tiled.png" id="4_nfqd2"]
+[ext_resource type="Shader" uid="uid://otyieecfybt1" path="res://item/unique/Old_sword/Old_sword_particule_shader.tres" id="5_75aj2"]
+[ext_resource type="Texture2D" uid="uid://ddsimec20xmux" path="res://assets/LeLu's Noise Pack/T_Noise_6Yu1.png" id="6_6vbim"]
+[ext_resource type="Texture2D" uid="uid://d2vvrwr6e5843" path="res://assets/LeLu's Noise Pack/T_FirePanningCyl45.png" id="6_75aj2"]
+[ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="6_y2p0v"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_m1j5a"]
 size = Vector3(0.11, 1.2981689, 0.11)
@@ -166,6 +170,110 @@ _data = {
 &"glow": SubResource("Animation_23ww1")
 }
 
+[sub_resource type="Curve" id="Curve_ovopg"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.0977918, 0.32786882), 0.0, 0.0, 0, 0, Vector2(0.2555205, 0.10655737), 0.0, 0.0, 0, 0, Vector2(0.33123028, 0), 0.0, 0.0, 0, 0, Vector2(0.45425865, 0.10655737), 0.0, 0.0, 0, 0, Vector2(0.5268139, 0.32786882), 0.0, 0.0, 0, 0, Vector2(0.615142, 0.11475408), 0.0, 0.0, 0, 0, Vector2(0.7223975, 0.06557369), 0.0, 0.0, 0, 0, Vector2(0.8422713, 0.22131145), 1.113583, 1.113583, 0, 0, Vector2(0.92113566, 0.39344257), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 11
+
+[sub_resource type="CurveTexture" id="CurveTexture_wdh2o"]
+curve = SubResource("Curve_ovopg")
+
+[sub_resource type="Gradient" id="Gradient_6vbim"]
+colors = PackedColorArray(0, 0.39999986, 1, 1, 0.06836651, 0.11656567, 1.4811683, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_48uws"]
+gradient = SubResource("Gradient_6vbim")
+
+[sub_resource type="Curve" id="Curve_xrn84"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.5331231, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_365lo"]
+curve = SubResource("Curve_xrn84")
+
+[sub_resource type="Curve" id="Curve_6vbim"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1e-05, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_w8gj5"]
+_limits = [-2.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.9508196), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_sx32q"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_b5rwf"]
+curve_x = SubResource("Curve_6vbim")
+curve_y = SubResource("Curve_w8gj5")
+curve_z = SubResource("Curve_sx32q")
+
+[sub_resource type="Curve" id="Curve_oyj7h"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.23343849, 0.76229507), 3.0502498, 3.0502498, 0, 0, Vector2(0.5394322, 0.9836066), 0.0, 0.0, 0, 0, Vector2(0.79810727, 0.34426224), -2.2735648, -2.2735648, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="CurveTexture" id="CurveTexture_sp7id"]
+curve = SubResource("Curve_oyj7h")
+
+[sub_resource type="Curve" id="Curve_48uws"]
+_data = [Vector2(0.0030395165, 0.0390625), 0.0, -0.39543268, 0, 0, Vector2(1, 1), 2.1167288, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_6vbim"]
+curve = SubResource("Curve_48uws")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_as728"]
+emission_shape_scale = Vector3(0.1, 0.8, 0.1)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+angle_min = -720.0
+angle_max = 720.0
+direction = Vector3(0, 1, 0)
+spread = 2.0
+initial_velocity_min = 0.29999998
+initial_velocity_max = 1.0
+angular_velocity_min = -720.0
+angular_velocity_max = 719.99994
+orbit_velocity_min = 0.287
+orbit_velocity_max = 0.55
+orbit_velocity_curve = SubResource("CurveXYZTexture_b5rwf")
+gravity = Vector3(0, 0, 0)
+scale_min = 0.099999994
+scale_max = 0.19999999
+scale_curve = SubResource("CurveTexture_sp7id")
+color_initial_ramp = SubResource("GradientTexture1D_48uws")
+alpha_curve = SubResource("CurveTexture_wdh2o")
+emission_curve = SubResource("CurveTexture_365lo")
+hue_variation_min = -0.050000023
+hue_variation_max = 0.049999975
+turbulence_enabled = true
+turbulence_noise_strength = 1.11
+turbulence_noise_speed_random = 0.86
+turbulence_influence_min = 0.016
+turbulence_influence_max = 0.049000002
+turbulence_initial_displacement_min = 1.490116e-06
+turbulence_initial_displacement_max = 3.8000016
+turbulence_influence_over_life = SubResource("CurveTexture_6vbim")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3bpsp"]
+render_priority = 0
+shader = ExtResource("5_75aj2")
+shader_parameter/displacement_intesity2 = 0.705
+shader_parameter/displacement_speed2 = Vector2(2.205, 0.82)
+shader_parameter/displacement_scale2 = Vector2(1, 1)
+shader_parameter/displacement2 = ExtResource("6_y2p0v")
+shader_parameter/displacement_speed = Vector2(0.67, 0.215)
+shader_parameter/displacement_scale = Vector2(1.24, 1.305)
+shader_parameter/displacement = ExtResource("6_6vbim")
+shader_parameter/displacement_intesity = 1.75
+shader_parameter/main_text = ExtResource("6_75aj2")
+shader_parameter/Fresnel_power = 5.605
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_dria3"]
+material = SubResource("ShaderMaterial_3bpsp")
+
 [node name="TestSword" type="Node3D" unique_id=2020783524 node_paths=PackedStringArray("blade_meshes")]
 script = ExtResource("1_hfkbb")
 blade_meshes = [NodePath("sword_1/Cube")]
@@ -196,6 +304,16 @@ mesh = SubResource("ArrayMesh_fouvp")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="sword_1" unique_id=384532960]
 libraries/ = SubResource("AnimationLibrary_75aj2")
 autoplay = &"glow"
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1063394343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.53197634, 0)
+amount = 12
+lifetime = 2.0
+randomness = 1.0
+fixed_fps = 60
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_as728")
+draw_pass_1 = SubResource("CapsuleMesh_dria3")
 
 [editable path="AttackComponent"]
 [editable path="sword_1"]

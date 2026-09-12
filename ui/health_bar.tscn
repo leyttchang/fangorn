@@ -12,13 +12,13 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
 shader = ExtResource("2_prk0l")
 shader_parameter/liquide_color = Color(0.3, 0.008999992, 0.008999992, 1)
-shader_parameter/current_offset = Vector2(0.21331476, 0.31355178)
+shader_parameter/current_offset = Vector2(0.19492364, 0.69830424)
 shader_parameter/texture_1_add = ExtResource("5_fbv3k")
 shader_parameter/reflect_speed = Vector2(0.1, 0.1)
 shader_parameter/reflect_text = ExtResource("5_mc7qp")
 shader_parameter/reflect_intensity = 0.2
 shader_parameter/reflect_color = Color(1.942335, 0, 0, 1)
-shader_parameter/health_percent = 0.667
+shader_parameter/health_percent = 0.8
 shader_parameter/wave_frequency = 10.0
 shader_parameter/wave_speed = 5.0
 shader_parameter/wave_amplitude = 0.01
@@ -117,7 +117,6 @@ texture = ExtResource("4_mc7qp")
 
 [node name="liquid_health" type="TextureRect" parent="Health_bar/mask" unique_id=417102526]
 unique_name_in_owner = true
-visible = false
 material = SubResource("ShaderMaterial_yqkk6")
 layout_mode = 0
 offset_left = 193.0

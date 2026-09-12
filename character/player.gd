@@ -72,6 +72,13 @@ func _ready() -> void:
 	if is_multiplayer_authority():
 		camera.current = true
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		
+		# Fix pour le bug de Terrain3D en multi (assure qu'il utilise la camera du client)
+		if get_tree().current_scene != null:
+			var terrains = get_tree().current_scene.find_children("*", "Terrain3D")
+			if terrains.size() > 0:
+				terrains[0].set_camera(camera)
+				
 	health_component.died.connect(_on_died)
 	health_component.damage_taken.connect(_on_damage_taken)
 	

@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="Resource_hlie2"]
 script = ExtResource("3_ky62i")
 unique_item = ExtResource("4_g0bps")
-drop_chance = 0.05
+drop_chance = 0.5
 metadata/_custom_type_script = "uid://dd5yjjdnobyu5"
 
 [resource]

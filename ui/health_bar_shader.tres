@@ -103,6 +103,11 @@ parameter_name = "reflect_intensity"
 default_value_enabled = true
 default_value = 0.2
 
+[sub_resource type="VisualShaderNodeSmoothStep" id="VisualShaderNodeSmoothStep_1xsnk"]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_8j4q1"]
+default_input_values = [0, 0.0, 1, 0.03]
+
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_wtasa"]
 
 [sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_vo6nh"]
@@ -189,4 +194,8 @@ nodes/fragment/40/node = SubResource("VisualShaderNodeFloatOp_prjek")
 nodes/fragment/40/position = Vector2(3760, 368)
 nodes/fragment/41/node = SubResource("VisualShaderNodeFloatParameter_1xsnk")
 nodes/fragment/41/position = Vector2(3821.1614, 599.2398)
-nodes/fragment/connections = PackedInt32Array(2, 0, 3, 0, 5, 0, 6, 0, 6, 0, 7, 0, 8, 0, 7, 1, 13, 0, 12, 1, 12, 0, 14, 0, 7, 0, 14, 1, 14, 0, 15, 0, 3, 1, 15, 1, 15, 0, 0, 1, 3, 0, 16, 0, 17, 0, 16, 1, 16, 0, 5, 0, 4, 0, 18, 0, 19, 0, 18, 1, 18, 0, 5, 1, 20, 0, 21, 0, 22, 0, 21, 1, 24, 0, 23, 2, 21, 0, 28, 0, 29, 0, 23, 0, 30, 0, 29, 2, 33, 0, 32, 2, 31, 0, 32, 0, 35, 0, 36, 0, 34, 0, 36, 1, 36, 0, 31, 2, 28, 0, 37, 0, 37, 0, 0, 0, 39, 0, 38, 1, 23, 0, 28, 1, 38, 0, 37, 1, 32, 0, 40, 0, 40, 0, 38, 0, 29, 0, 31, 0, 41, 0, 40, 1)
+nodes/fragment/42/node = SubResource("VisualShaderNodeSmoothStep_1xsnk")
+nodes/fragment/42/position = Vector2(1600, -100)
+nodes/fragment/43/node = SubResource("VisualShaderNodeFloatOp_8j4q1")
+nodes/fragment/43/position = Vector2(1820, 60)
+nodes/fragment/connections = PackedInt32Array(2, 0, 3, 0, 5, 0, 6, 0, 6, 0, 7, 0, 8, 0, 7, 1, 13, 0, 12, 1, 12, 0, 14, 0, 7, 0, 14, 1, 3, 0, 16, 0, 17, 0, 16, 1, 16, 0, 5, 0, 4, 0, 18, 0, 19, 0, 18, 1, 18, 0, 5, 1, 20, 0, 21, 0, 22, 0, 21, 1, 24, 0, 23, 2, 21, 0, 28, 0, 29, 0, 23, 0, 30, 0, 29, 2, 33, 0, 32, 2, 31, 0, 32, 0, 35, 0, 36, 0, 34, 0, 36, 1, 36, 0, 31, 2, 28, 0, 37, 0, 37, 0, 0, 0, 39, 0, 38, 1, 23, 0, 28, 1, 38, 0, 37, 1, 32, 0, 40, 0, 40, 0, 38, 0, 29, 0, 31, 0, 41, 0, 40, 1, 3, 1, 42, 2, 14, 0, 42, 0, 14, 0, 43, 0, 43, 0, 42, 1, 42, 0, 0, 1)
