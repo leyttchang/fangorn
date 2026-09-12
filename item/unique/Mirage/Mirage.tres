@@ -14,6 +14,8 @@ unique_model_scene = ExtResource("5_iepg4")
 base_damage = 45.0
 base_attack_speed = 0.7
 hit_slow = 0.6
+damage_range = Vector2(49, 55)
+attack_speed_range = Vector2(0.85, 0.85)
 base_stat_ranges = {
 "area_of_effect": Vector2(0, 0),
 "armor": Vector2(0, 0),

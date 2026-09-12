@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dfqdtx7plslpg" path="res://assets/3D_models/item/weapons/spear.fbx" id="3_mubtj"]
 [ext_resource type="Shader" uid="uid://csjs2ex5e8yb1" path="res://item/unique/Mirage/Mirage_shader.tres" id="4_jl30p"]
 [ext_resource type="Texture2D" uid="uid://crx325p8jjbl" path="res://assets/3D_models/item/weapons/spear_text/spaer_color_1024x1024.png" id="4_uth45"]
-[ext_resource type="Texture2D" uid="uid://ddg4ccdxptl7h" path="res://assets/LeLu's Noise Pack/T_Noise78a.png" id="5_vs4f0"]
+[ext_resource type="Texture2D" uid="uid://b1m87caab8flo" path="res://assets/LeLu's Noise Pack/T_Noise_Wf4.png" id="5_jl30p"]
 [ext_resource type="Texture2D" uid="uid://dk67ogcehfal1" path="res://assets/3D_models/item/weapons/spear_text/spear_metal_1024x1024.png" id="6_clpoc"]
 [ext_resource type="Texture2D" uid="uid://dvh8t42k18b8h" path="res://assets/3D_models/item/weapons/spear_text/spear_normal_1024x1024.png" id="7_d8dv2"]
 [ext_resource type="Texture2D" uid="uid://fyq1jcv0n5be" path="res://assets/3D_models/item/weapons/spear_text/spear_roughness_1024x1024.png" id="8_21ex8"]
@@ -17,11 +17,11 @@ radius = 0.038085938
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fv1jd"]
 render_priority = 0
 shader = ExtResource("4_jl30p")
-shader_parameter/color_variation_direction = Vector2(-1, 0)
-shader_parameter/color = ExtResource("5_vs4f0")
-shader_parameter/color_variation_direction2 = Vector2(1, 1)
+shader_parameter/color_variation_direction = Vector2(-1.065, 0)
+shader_parameter/color = ExtResource("5_jl30p")
+shader_parameter/color_variation_direction2 = Vector2(0.595, 1)
 shader_parameter/texture_albedo = ExtResource("4_uth45")
-shader_parameter/fresnel_power = 0.64
+shader_parameter/fresnel_power = 3.17
 shader_parameter/metal = ExtResource("6_clpoc")
 shader_parameter/roughness = ExtResource("8_21ex8")
 shader_parameter/normal_map = ExtResource("7_d8dv2")

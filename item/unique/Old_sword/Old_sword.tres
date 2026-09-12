@@ -11,6 +11,8 @@
 script = ExtResource("3_6ctrm")
 unique_effect_script = ExtResource("5_yylu1")
 unique_model_scene = ExtResource("5_2ka3m")
+damage_range = Vector2(19, 25)
+attack_speed_range = Vector2(1.5, 2.2)
 base_stat_ranges = {
 "area_of_effect": Vector2(0, 0),
 "armor": Vector2(0, 0),

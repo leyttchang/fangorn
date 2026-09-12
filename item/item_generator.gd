@@ -36,6 +36,14 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 			
 			new_item.stat_bonuses[stat_name] = snapped_roll
 			new_item.innate_stats[stat_name] = snapped_roll
+		else:
+			# FIX: Si l'utilisateur a rentré une stat fixe directement (ex: arme unique), on scale aussi !
+			if new_item.stat_bonuses.has(stat_name) and new_item.stat_bonuses[stat_name] != 0.0:
+				var fixed_val = new_item.stat_bonuses[stat_name] * ilvl_multiplier
+				var is_percent = percent_stats.has(stat_name)
+				var snapped_val = snapped(fixed_val, 0.01) if is_percent else round(fixed_val)
+				new_item.stat_bonuses[stat_name] = snapped_val
+				new_item.innate_stats[stat_name] = snapped_val
 			
 	# 2b. Roll des dégâts et vitesse si c'est une arme
 	if new_item is WeaponItem:
@@ -43,11 +51,17 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 		if weapon.damage_range.y > 0 or weapon.damage_range.x > 0:
 			var dmg_roll = randf_range(weapon.damage_range.x, weapon.damage_range.y) * ilvl_multiplier
 			weapon.base_damage = round(dmg_roll)
+		elif weapon.base_damage > 0:
+			weapon.base_damage = round(weapon.base_damage * ilvl_multiplier)
+			
 		if weapon.attack_speed_range.y > 0 or weapon.attack_speed_range.x > 0:
 			# L'attack speed scale généralement beaucoup moins dans les ARPG
 			var as_mult = 1.0 + (ilvl * 0.02) 
 			var as_roll = randf_range(weapon.attack_speed_range.x, weapon.attack_speed_range.y) * as_mult
 			weapon.base_attack_speed = snapped(as_roll, 0.01)
+		elif weapon.base_attack_speed > 0:
+			var as_mult = 1.0 + (ilvl * 0.02) 
+			weapon.base_attack_speed = snapped(weapon.base_attack_speed * as_mult, 0.01)
 			
 	# 3. Déterminer le nombre d'affixes bonus selon la rareté
 	var num_affixes = 0
