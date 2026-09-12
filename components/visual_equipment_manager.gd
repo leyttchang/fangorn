@@ -26,8 +26,11 @@ func _on_equipment_changed(slot_name: String, item: ItemData) -> void:
 		# Envoi reseau ! On evite de le faire au tout debut car l'arme est deja equipee localement par le _ready() de Player.gd
 		if _is_ready_finished and multiplayer.has_multiplayer_peer() and get_parent().is_multiplayer_authority():
 			var path = ""
-			if item != null and item.get("weapon_scene") != null:
-				path = item.weapon_scene.resource_path
+			if item != null:
+				if item.get("unique_model_scene") != null:
+					path = item.unique_model_scene.resource_path
+				elif item.get("weapon_scene") != null:
+					path = item.weapon_scene.resource_path
 			rpc("_rpc_update_visual_weapon", path)
 		
 		var wrist = get_parent().get_node("%wrist")
@@ -37,11 +40,20 @@ func _on_equipment_changed(slot_name: String, item: ItemData) -> void:
 				child.queue_free()
 			
 		# 2. Si on a juste desequipe (mains nues), on s'arrete la
-		if item == null or item.get("weapon_scene") == null:
+		if item == null:
+			return
+			
+		var scene_to_spawn = null
+		if item.get("unique_model_scene") != null:
+			scene_to_spawn = item.unique_model_scene
+		elif item.get("weapon_scene") != null:
+			scene_to_spawn = item.weapon_scene
+			
+		if scene_to_spawn == null:
 			return
 			
 		# 3. On cree la nouvelle arme 3D
-		var weapon_instance = item.weapon_scene.instantiate()
+		var weapon_instance = scene_to_spawn.instantiate()
 		
 		# 4. L'INJECTION MAGIQUE DES STATS :
 		# C'est ici qu'on donne le fichier .tres a la scene 3D vide !

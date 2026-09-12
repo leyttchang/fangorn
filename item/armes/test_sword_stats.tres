@@ -3,7 +3,15 @@
 [ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_ntqqa"]
 [ext_resource type="Texture2D" uid="uid://cuhjrv04p384e" path="res://assets/icon/fc155.png" id="1_oe5x5"]
 [ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="2_oe5x5"]
+[ext_resource type="Script" uid="uid://dd5yjjdnobyu5" path="res://item/unique_drop_data.gd" id="3_ky62i"]
 [ext_resource type="PackedScene" uid="uid://8k77usk0x7g0" path="res://item/armes/test_sword.tscn" id="3_oe5x5"]
+[ext_resource type="Resource" uid="uid://cy7mfm1dfl7mc" path="res://item/unique/Old_sword/Old_sword.tres" id="4_g0bps"]
+
+[sub_resource type="Resource" id="Resource_hlie2"]
+script = ExtResource("3_ky62i")
+unique_item = ExtResource("4_g0bps")
+drop_chance = 0.05
+metadata/_custom_type_script = "uid://dd5yjjdnobyu5"
 
 [resource]
 script = ExtResource("2_oe5x5")
@@ -11,6 +19,7 @@ base_damage = 0.0
 damage_range = Vector2(17, 23)
 attack_speed_range = Vector2(1.5, 2)
 weapon_scene = ExtResource("3_oe5x5")
+possible_uniques = Array[ExtResource("3_ky62i")]([SubResource("Resource_hlie2")])
 id = "epee_test"
 item_name = "Test Sword"
 description = "Une simple epee de test."

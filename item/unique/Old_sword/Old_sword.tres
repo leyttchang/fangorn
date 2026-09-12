@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="UniqueWeaponItem" format=3 uid="uid://cy7mfm1dfl7mc"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_d3jsa"]
+[ext_resource type="Texture2D" uid="uid://b3vc4571flvx" path="res://assets/icon/32x32/fb730.png" id="2_6ctrm"]
+[ext_resource type="Script" uid="uid://dd5yjjdnobyu5" path="res://item/unique_drop_data.gd" id="2_u6tjq"]
+[ext_resource type="Script" uid="uid://d2vrqeaeqvmpt" path="res://item/armes/unique_weapon_item.gd" id="3_6ctrm"]
+[ext_resource type="PackedScene" uid="uid://clhv6qoqdd84w" path="res://item/unique/Old_sword/Old_sword.tscn" id="5_2ka3m"]
+[ext_resource type="Script" uid="uid://ba8locjtmu23m" path="res://item/unique/Old_sword/Old_sword_effect.gd" id="5_yylu1"]
+
+[resource]
+script = ExtResource("3_6ctrm")
+unique_effect_script = ExtResource("5_yylu1")
+unique_model_scene = ExtResource("5_2ka3m")
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(0, 0),
+"attack_speed": Vector2(0.2, 0.3),
+"casting_speed": Vector2(0, 0),
+"cd_red": Vector2(0, 0),
+"fire_damage": Vector2(0, 0),
+"flat_fire_damage": Vector2(0, 0),
+"flat_ice_damage": Vector2(0, 0),
+"flat_lightning_damage": Vector2(0, 0),
+"flat_physical_damage": Vector2(10, 20),
+"ice_damage": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"lightning_damage": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(0, 0),
+"movement_speed": Vector2(0.05, 0.1),
+"physical_damage": Vector2(0.1, 0.3)
+}
+id = "Old_sword"
+item_name = "Old sword"
+description = "This sword seems to be as old as this forest."
+icon = ExtResource("2_6ctrm")
+rarity = 4
+weapon_style = 1

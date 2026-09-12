@@ -3,6 +3,16 @@ extends RefCounted
 
 ## Fonction principale pour générer un équipement ou une arme
 static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.Rarity, all_possible_affixes: Array[AffixData]) -> EquipmentItem:
+	# 0. Vérification du drop Unique
+	var is_unique_roll = false
+	if base.possible_uniques.size() > 0:
+		for drop_data in base.possible_uniques:
+			if drop_data.unique_item != null and randf() <= drop_data.drop_chance:
+				base = drop_data.unique_item
+				rarity = ItemData.Rarity.UNIQUE
+				is_unique_roll = true
+				break
+
 	# 1. Dupliquer la base pour avoir une instance unique
 	var new_item: EquipmentItem = base.duplicate(true)
 	new_item.original_base_path = base.resource_path
@@ -46,6 +56,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 		ItemData.Rarity.MAGIC: num_affixes = 1
 		ItemData.Rarity.RARE: num_affixes = 2
 		ItemData.Rarity.LEGENDARY: num_affixes = 3 # On laisse de la place pour les légendaires plus tard
+		ItemData.Rarity.UNIQUE: num_affixes = 0 # Les uniques ont des stats fixes, pas d'affixes aléatoires
 		
 	# 4. Filtrer les affixes valides
 	var valid_affixes: Array[AffixData] = []

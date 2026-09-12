@@ -48,6 +48,14 @@ func use_mana(amount: float) -> bool:
 		return true
 	return false
 
+# Rend du mana au joueur
+func add_mana(amount: float) -> void:
+	if amount > 0:
+		var max_m = stats_component.get_stat_value("max_mana")
+		current_mana += amount
+		current_mana = min(current_mana, max_m)
+		mana_changed.emit(current_mana, max_m)
+
 # Si le joueur équipe un objet qui modifie son max_mana
 func _on_stat_changed(stat_name: String, new_value: float) -> void:
 	if stat_name == "max_mana":

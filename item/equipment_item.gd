@@ -5,8 +5,15 @@ extends ItemData
 @export var stat_bonuses: Dictionary = {
 	"max_health": 0.0,
 	"armor": 0.0,
+	"flat_physical_damage": 0.0,
+	"flat_fire_damage": 0.0,
+	"flat_ice_damage": 0.0,
+	"flat_lightning_damage": 0.0,
 	"physical_damage": 0.0,
 	"magic_damage": 0.0,
+	"fire_damage": 0.0,
+	"ice_damage": 0.0,
+	"lightning_damage": 0.0,
 	"attack_speed": 0.0,
 	"cd_red": 0.0,
 	"area_of_effect": 0.0,
@@ -25,8 +32,15 @@ var affix_stats: Dictionary = {}
 @export var base_stat_ranges: Dictionary = {
 	"max_health": Vector2(0, 0),
 	"armor": Vector2(0, 0),
+	"flat_physical_damage": Vector2(0, 0),
+	"flat_fire_damage": Vector2(0, 0),
+	"flat_ice_damage": Vector2(0, 0),
+	"flat_lightning_damage": Vector2(0, 0),
 	"physical_damage": Vector2(0, 0),
 	"magic_damage": Vector2(0, 0),
+	"fire_damage": Vector2(0, 0),
+	"ice_damage": Vector2(0, 0),
+	"lightning_damage": Vector2(0, 0),
 	"attack_speed": Vector2(0, 0),
 	"cd_red": Vector2(0, 0),
 	"area_of_effect": Vector2(0, 0),
@@ -38,6 +52,10 @@ var affix_stats: Dictionary = {}
 
 @export_category("Génération ARPG - Affixes")
 @export var excluded_affixes: Array[AffixData] = []
+
+@export_category("Uniques")
+## Liste des objets uniques en lesquels cette base peut se transformer au moment du drop
+@export var possible_uniques: Array[UniqueDropData] = []
 
 @export_group("Puissance des Affixes")
 ## Multiplie la valeur de TOUS les affixes tirés sur cet objet (ex: 2.0 pour un Plastron, 0.5 pour des Bottes)

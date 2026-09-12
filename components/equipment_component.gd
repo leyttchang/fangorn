@@ -103,11 +103,13 @@ func _apply_item_stats(item: ItemData) -> void:
 		for stat_name in item.stat_bonuses.keys():
 			var bonus_value = item.stat_bonuses[stat_name]
 			
-			if bonus_value != 0.0: # (J'ai mis != 0.0 au cas où tu as des objets maudits qui donnent -10 !)
-				
-				# LA CORRECTION EST LÀ : on rajoute le "0" en deuxième argument
-				# (0 correspond très certainement au mod_type "FLAT" / Addition classique de ton StatModifier)
+			if bonus_value != 0.0:
 				stats_component.add_modifier(stat_name, 0, bonus_value, item.id)
+				
+		# --- GESTION DES OBJETS UNIQUES ---
+		var effect_script = item.get("unique_effect_script")
+		if effect_script != null and effect_script is GDScript:
+			_apply_unique_effect(effect_script, item.id)
 
 func _remove_item_stats(item: ItemData) -> void:
 	if stats_component == null:
@@ -117,3 +119,33 @@ func _remove_item_stats(item: ItemData) -> void:
 		print("Retrait des stats pour : ", item.item_name)
 		# On retire tous les bonus qui ont pour source l'ID de cette arme
 		stats_component.remove_modifier_by_source(item.id)
+		
+		# --- GESTION DES OBJETS UNIQUES ---
+		var effect_script = item.get("unique_effect_script")
+		if effect_script != null and effect_script is GDScript:
+			_remove_unique_effect(item.id)
+
+func _apply_unique_effect(script: GDScript, item_id: String) -> void:
+	if script != null:
+		var effect_node = Node.new()
+		effect_node.set_script(script)
+		effect_node.name = "Unique_" + item_id
+		
+		var player = get_parent()
+		var container = player.get_node_or_null("UniqueItemModifiers")
+		if container == null:
+			container = Node.new()
+			container.name = "UniqueItemModifiers"
+			player.add_child(container)
+			
+		container.add_child(effect_node)
+		print("Effet Unique activé (Script) pour l'item : ", item_id)
+
+func _remove_unique_effect(item_id: String) -> void:
+	var player = get_parent()
+	var container = player.get_node_or_null("UniqueItemModifiers")
+	if container != null:
+		var effect_node = container.get_node_or_null("Unique_" + item_id)
+		if effect_node != null:
+			effect_node.queue_free()
+			print("Effet Unique retiré : ", item_id)

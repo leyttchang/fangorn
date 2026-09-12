@@ -5,6 +5,7 @@ extends PanelContainer
 @export var magic_nameplate: Texture2D
 @export var rare_nameplate: Texture2D
 @export var legendary_nameplate: Texture2D
+@export var unique_nameplate: Texture2D
 
 @onready var name_label: Label = $VBoxContainer/NameLabel
 @onready var desc_label: Label = $VBoxContainer/MarginContainer/InnerVBox/DescLabel
@@ -27,7 +28,8 @@ func _ready() -> void:
 		ItemData.Rarity.COMMON: Color.WHITE,
 		ItemData.Rarity.MAGIC: Color(0.2, 0.6, 1.0), # Bleu
 		ItemData.Rarity.RARE: Color(1.0, 0.8, 0.2), # Jaune
-		ItemData.Rarity.LEGENDARY: Color(1.0, 0.5, 0.0) # Orange
+		ItemData.Rarity.LEGENDARY: Color(1.0, 0.5, 0.0), # Orange
+		ItemData.Rarity.UNIQUE: Color(0.8, 0.3, 0.1) # Cuivre / Orange foncé pour les Uniques
 	}
 	name_label.add_theme_color_override("font_color", rarity_colors[_item.rarity])
 	
@@ -35,7 +37,8 @@ func _ready() -> void:
 		ItemData.Rarity.COMMON: normal_nameplate,
 		ItemData.Rarity.MAGIC: magic_nameplate,
 		ItemData.Rarity.RARE: rare_nameplate,
-		ItemData.Rarity.LEGENDARY: legendary_nameplate
+		ItemData.Rarity.LEGENDARY: legendary_nameplate,
+		ItemData.Rarity.UNIQUE: unique_nameplate if unique_nameplate != null else legendary_nameplate # Fallback
 	}
 	
 	# Mise à jour dynamique de la texture d'arrière-plan du nom !

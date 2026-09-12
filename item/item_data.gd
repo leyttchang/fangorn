@@ -9,7 +9,7 @@ extends Resource
 @export var icon: Texture2D
 
 # --- ARPG SYSTÈME ---
-enum Rarity { COMMON, MAGIC, RARE, LEGENDARY }
+enum Rarity { COMMON, MAGIC, RARE, LEGENDARY, UNIQUE }
 @export var rarity: Rarity = Rarity.COMMON
 @export var ilvl: int = 1
 
