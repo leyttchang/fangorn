@@ -1,0 +1,127 @@
+[gd_scene format=3 uid="uid://davgp2m6lkil8"]
+
+[ext_resource type="Script" uid="uid://lr8qkgh0bql" path="res://map/map_generator/map_generator.gd" id="1_6yigo"]
+[ext_resource type="Script" uid="uid://plmo62ye4mlu" path="res://map/map_generator/spectator.gd" id="2_6yjpd"]
+[ext_resource type="Texture2D" uid="uid://cicdfuy5wi2w2" path="res://assets/texture/grass_05/Grass005_alb_ht.dds" id="2_ghlbt"]
+[ext_resource type="Script" uid="uid://bc06ntciqnvas" path="res://map/map_generator/path_generator.gd" id="3_7ts6b"]
+[ext_resource type="Texture2D" uid="uid://bffpi2xeyh5hn" path="res://assets/texture/grass_05/Grass005_nrm_rgh.dds" id="3_f1fk6"]
+[ext_resource type="Texture2D" uid="uid://ctwp7ykel7tm2" path="res://assets/texture/ground_37/ground_37_albd_hgt.dds" id="4_aiau3"]
+[ext_resource type="Texture2D" uid="uid://dpnopmtribtg4" path="res://assets/texture/ground_37/ground_37_nrm_rgh.dds" id="5_ilvso"]
+[ext_resource type="PackedScene" uid="uid://d3sr0a7dxfkr8" path="res://addons/terrain_3d/extras/particle_example/Terrain3DParticles.tscn" id="8_f1fk6"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_f1fk6"]
+noise_type = 3
+frequency = 0.0788
+fractal_octaves = 10
+fractal_lacunarity = 0.69
+fractal_gain = 3.705
+fractal_weighted_strength = 0.43
+
+[sub_resource type="Gradient" id="Gradient_6yjpd"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7ts6b"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ypy7y"]
+noise = SubResource("FastNoiseLite_7ts6b")
+color_ramp = SubResource("Gradient_6yjpd")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_hlie2"]
+_shader_parameters = {
+&"bias_distance": null,
+&"blend_sharpness": null,
+&"depth_blur": null,
+&"enable_macro_variation": null,
+&"enable_projection": null,
+&"flat_terrain_normals": null,
+&"macro_variation1": null,
+&"macro_variation2": null,
+&"macro_variation_slope": null,
+&"mipmap_bias": null,
+&"noise1_angle": null,
+&"noise1_offset": null,
+&"noise1_scale": null,
+&"noise2_scale": null,
+&"noise_texture": SubResource("NoiseTexture2D_ypy7y"),
+&"projection_threshold": null
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wmcjb"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_rvf1x"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_wmcjb")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_1f83o"]
+name = "grass"
+albedo_texture = ExtResource("2_ghlbt")
+normal_texture = ExtResource("3_f1fk6")
+detiling_rotation = 0.083
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_gd8ys"]
+name = "chemin"
+id = 1
+albedo_color = Color(1, 0.8075, 0.45, 1)
+albedo_texture = ExtResource("4_aiau3")
+normal_texture = ExtResource("5_ilvso")
+detiling_rotation = 0.174
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_ghlbt"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_rvf1x")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_1f83o"), SubResource("Terrain3DTextureAsset_gd8ys")])
+
+[sub_resource type="Environment" id="Environment_hlie2"]
+
+[node name="Map_generator" type="Node3D" unique_id=1125476848 node_paths=PackedStringArray("terrain", "path_generator")]
+script = ExtResource("1_6yigo")
+terrain = NodePath("Terrain3D")
+noise = SubResource("FastNoiseLite_f1fk6")
+path_generator = NodePath("path_generator")
+map_width_chunks = 2
+map_height_chunks = 2
+
+[node name="Terrain3D" type="Terrain3D" parent="." unique_id=1489340855]
+data_directory = "res://map/map_generator/data_directorie"
+material = SubResource("Terrain3DMaterial_hlie2")
+assets = SubResource("Terrain3DAssets_ghlbt")
+top_level = true
+metadata/_edit_lock_ = true
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2009361889]
+script = ExtResource("2_6yjpd")
+
+[node name="path_generator" type="Node3D" parent="." unique_id=171877823]
+script = ExtResource("3_7ts6b")
+path_width = 50.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=598699122]
+environment = SubResource("Environment_hlie2")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=1437863725]
+
+[node name="Terrain3DParticles" parent="." unique_id=1079709393 node_paths=PackedStringArray("terrain") instance=ExtResource("8_f1fk6")]
+terrain = NodePath("../Terrain3D")
