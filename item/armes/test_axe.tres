@@ -3,7 +3,15 @@
 [ext_resource type="Texture2D" uid="uid://bhgw0w3m2d6bs" path="res://assets/icon/fc126.png" id="1_imlsj"]
 [ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_w65v3"]
 [ext_resource type="Script" uid="uid://dgtcfko7wc1cp" path="res://item/armes/weapon_item.gd" id="2_imlsj"]
+[ext_resource type="Script" uid="uid://dd5yjjdnobyu5" path="res://item/unique_drop_data.gd" id="3_6t5kd"]
 [ext_resource type="PackedScene" uid="uid://bkcrhf14uynjl" path="res://item/armes/test_axe.tscn" id="3_imlsj"]
+[ext_resource type="Resource" uid="uid://bv7icda3n5dqn" path="res://item/unique/Winter_Shatter/Winter_Shatter.tres" id="4_1yb35"]
+
+[sub_resource type="Resource" id="Resource_3ddld"]
+script = ExtResource("3_6t5kd")
+unique_item = ExtResource("4_1yb35")
+drop_chance = 0.5
+metadata/_custom_type_script = "uid://dd5yjjdnobyu5"
 
 [resource]
 script = ExtResource("2_imlsj")
@@ -13,6 +21,7 @@ hit_slow = 0.5
 damage_range = Vector2(50, 60)
 attack_speed_range = Vector2(0.7, 0.8)
 weapon_scene = ExtResource("3_imlsj")
+possible_uniques = Array[ExtResource("3_6t5kd")]([SubResource("Resource_3ddld")])
 id = "axe_test"
 item_name = "Test Axe"
 description = "A basic test axe."

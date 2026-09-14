@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="UniqueWeaponItem" format=3 uid="uid://bv7icda3n5dqn"]
+
+[ext_resource type="Script" uid="uid://0rnbtdpri67q" path="res://item/affix_data.gd" id="1_ivx8d"]
+[ext_resource type="Texture2D" uid="uid://bs1tau14m317o" path="res://assets/icon/32x32/fb1666.png" id="2_8iwhv"]
+[ext_resource type="Script" uid="uid://dd5yjjdnobyu5" path="res://item/unique_drop_data.gd" id="2_n72w2"]
+[ext_resource type="Script" uid="uid://d2vrqeaeqvmpt" path="res://item/armes/unique_weapon_item.gd" id="3_8iwhv"]
+[ext_resource type="Script" uid="uid://vrbxd3smesws" path="res://item/unique/Winter_Shatter/Winter_Shatter.gd" id="5_5pqd8"]
+[ext_resource type="PackedScene" uid="uid://btlewda2el8l" path="res://item/unique/Winter_Shatter/Winter_Shatter.tscn" id="5_qoxtf"]
+
+[resource]
+script = ExtResource("3_8iwhv")
+unique_effect_script = ExtResource("5_5pqd8")
+unique_model_scene = ExtResource("5_qoxtf")
+damage_range = Vector2(15, 20)
+base_stat_ranges = {
+"area_of_effect": Vector2(0, 0),
+"armor": Vector2(0, 0),
+"attack_speed": Vector2(0, 0),
+"casting_speed": Vector2(0, 0),
+"cd_red": Vector2(0, 0),
+"fire_damage": Vector2(0, 0),
+"flat_fire_damage": Vector2(0, 0),
+"flat_ice_damage": Vector2(40, 60),
+"flat_lightning_damage": Vector2(0, 0),
+"flat_physical_damage": Vector2(0, 0),
+"ice_damage": Vector2(0, 0),
+"knockback_power": Vector2(0, 0),
+"knockback_resistance": Vector2(0, 0),
+"lightning_damage": Vector2(0, 0),
+"magic_damage": Vector2(0, 0),
+"max_health": Vector2(0, 0),
+"movement_speed": Vector2(0, 0),
+"physical_damage": Vector2(0, 0)
+}
+id = "Winter_Shatter"
+item_name = "Winter Shatter"
+description = "A chunk of never melting ice."
+icon = ExtResource("2_8iwhv")
+metadata/_custom_type_script = "uid://d2vrqeaeqvmpt"
