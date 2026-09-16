@@ -10,6 +10,10 @@ func _ready() -> void:
 	target_body = get_parent()
 
 func apply_knockback(push_direction: Vector3, raw_knockback_force: float) -> void:
+	# Ne jamais appliquer de knockback à un joueur à terre (évite le stack de velocity au sol)
+	if target_body.get("is_dead") == true:
+		return
+	
 	# On accepte la direction envoyée par l'attaque (qui gère l'angle)
 	if push_direction.length_squared() > 0.001:
 		push_direction = push_direction.normalized()

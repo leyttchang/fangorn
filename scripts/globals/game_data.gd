@@ -17,6 +17,10 @@ const PERCENT_STATS: Array[String] = [
 	"knockback_power"
 ]
 
+const FLOAT_STATS: Array[String] = [
+	"mana_regen"
+]
+
 static var _all_affixes: Array[AffixData] = []
 
 static func get_all_affixes() -> Array[AffixData]:

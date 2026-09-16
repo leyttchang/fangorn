@@ -75,20 +75,45 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 	# 4. Filtrer les affixes valides
 	var valid_affixes: Array[AffixData] = []
 	if num_affixes > 0:
+		# On collecte les chemins des affixes exclus pour comparer par path (resource_path)
+		# et pas par référence — car duplicate(true) crée de nouvelles instances qui ne matchent pas avec ==
+		var excluded_paths: Array[String] = []
+		for excl in new_item.excluded_affixes:
+			if excl != null and excl.resource_path != "":
+				excluded_paths.append(excl.resource_path)
+		
 		for affix in all_possible_affixes:
-			if not new_item.excluded_affixes.has(affix):
+			# Ignorer les affixes sans stat_name valide (évite les slots fantômes)
+			if affix.stat_name == "":
+				push_warning("ItemGenerator: affix '" + affix.affix_name + "' n'a pas de stat_name défini, ignoré.")
+				continue
+			# Exclure par path au lieu de référence
+			if not excluded_paths.has(affix.resource_path):
 				valid_affixes.append(affix)
 	
 	# On charge la courbe de probabilité
 	var roll_curve: Curve = load("res://components/stats/affix_roll_curve.tres")
 	
-	# Si on a droit à des affixes et qu'on a des affixes valides
 	if num_affixes > 0 and valid_affixes.size() > 0:
 		# 5. Tirer les affixes aléatoires
-		valid_affixes.shuffle() # Mélange pour prendre des affixes au hasard
-		for i in range(min(num_affixes, valid_affixes.size())):
-			var chosen_affix = valid_affixes[i]
+		# IMPORTANT : on travaille sur une copie locale pour ne PAS mélanger le tableau
+		# static _all_affixes partagé dans GameData (sinon le cache est corrompu pour tous les appels suivants)
+		var shuffled = valid_affixes.duplicate()
+		shuffled.shuffle()
+		
+		var used_stat_names: Array[String] = []
+		var picked = 0
+		
+		for chosen_affix in shuffled:
+			if picked >= num_affixes:
+				break
+			
 			var stat_name = chosen_affix.stat_name
+			
+			if used_stat_names.has(stat_name):
+				print("[ItemGen]   SKIP (doublon stat_name): ", chosen_affix.affix_name, " (", stat_name, ")")
+				continue
+			used_stat_names.append(stat_name)
 			
 			# Calcul du budget (multiplicateur) de cette base d'équipement pour cet affixe
 			var equipment_budget = new_item.global_affix_multiplier
@@ -96,21 +121,33 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 				equipment_budget *= new_item.specific_affix_multipliers[stat_name]
 				
 			# Tirage avec la courbe de probabilité (Algorithme du Rejet)
-			# Plus la courbe est haute (proche de 1) sur un point X, plus la valeur X a de chances d'être gardée.
 			var roll_t = 0.0
 			if roll_curve != null:
 				while true:
-					var x = randf() # Tirage entre 0 et 1 (Le résultat du roll de l'affixe : 0 = min, 1 = max)
-					var y = randf() # Tirage de la chance
+					var x = randf()
+					var y = randf()
 					if y <= roll_curve.sample(x):
 						roll_t = x
 						break
 			else:
-				roll_t = randf() # Si la courbe n'existe pas, on fait du hasard pur
+				roll_t = randf()
 				
 			var affix_roll = lerp(chosen_affix.min_roll, chosen_affix.max_roll, roll_t) * ilvl_multiplier * equipment_budget
 			var is_percent = percent_stats.has(stat_name)
-			var snapped_affix = snapped(affix_roll, 0.01) if is_percent else round(affix_roll)
+			var is_float = GameData.FLOAT_STATS.has(stat_name)
+			
+			var snapped_affix = 0.0
+			if is_percent:
+				snapped_affix = snapped(affix_roll, 0.01)
+			elif is_float:
+				snapped_affix = snapped(affix_roll, 0.1)
+			else:
+				snapped_affix = round(affix_roll)
+				# Anti-bug: Si l'arrondi entier donne 0 mais roll positif, forcer 1
+				if snapped_affix == 0.0 and affix_roll > 0.001:
+					snapped_affix = 1.0
+			
+			print("[ItemGen]   PICKED: ", chosen_affix.affix_name, " (", stat_name, ") = ", snapped_affix, " (raw: ", affix_roll, ")")
 			
 			# Ajouter le bonus aux stats (additionne par dessus la stat de base)
 			if new_item.stat_bonuses.has(stat_name):
@@ -123,5 +160,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 				new_item.affix_stats[stat_name] += snapped_affix
 			else:
 				new_item.affix_stats[stat_name] = snapped_affix
-				
+			
+			picked += 1
+			
 	return new_item

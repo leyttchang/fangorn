@@ -65,10 +65,13 @@ func _ready() -> void:
 		stats_text += "[color=white]Attack Speed : " + ("%.2f" % weapon.base_attack_speed) + "[/color]\n"
 		
 	var percent_stats = GameData.PERCENT_STATS
+	var float_stats = GameData.FLOAT_STATS
 	var get_formatted_val = func(k, v):
 		if k in percent_stats:
 			var pct = int(round(v * 100.0))
 			return ("+" if pct > 0 else "") + str(pct) + "%"
+		elif k in float_stats:
+			return ("+" if v > 0 else "") + str(snapped(v, 0.1))
 		else:
 			return ("+" if v > 0 else "") + str(int(round(v)))
 			

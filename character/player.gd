@@ -43,52 +43,58 @@ func _ready() -> void:
 		mouse_sensitivity = settings.mouse_sensitivity
 		settings.mouse_sensitivity_changed.connect(func(val): mouse_sensitivity = val)
 
-	# -- Affichage du Pseudo --
-	var pseudo_label = get_node_or_null("PseudoLabel")
-	if pseudo_label != null:
-		var my_id = name.to_int()
-		if GameData.player_pseudos.has(my_id):
-			pseudo_label.text = GameData.player_pseudos[my_id]
-		else:
-			pseudo_label.text = "Joueur " + str(my_id)
-			
-		# Si c'est nous-meme, on peut cacher le pseudo pour pas l'avoir devant la camera (optionnel)
-		if is_multiplayer_authority():
-			pseudo_label.visible = false
-	# --------------------------
-
-	if not is_multiplayer_authority():
-		# Cacher TOUTE l'UI du joueur (mme celles dans des composants) si ce n'est pas NOTRE joueur !
-		var canvas_layers = find_children("*", "CanvasLayer", true, false)
-		for canvas in canvas_layers:
-			canvas.visible = false
+	# Connexions qui ne dépendent pas de l'autorité : on les fait tout de suite
 	var revive = get_node_or_null("ReviveComponant")
 	if revive == null:
 		revive = get_node_or_null("ReviveComponent")
 	if revive:
 		revive.player_revived.connect(_on_player_revived)
-		
-	# Synchronisation des stats
-	if is_multiplayer_authority():
-		camera.current = true
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		
-		# Fix pour le bug de Terrain3D en multi (assure qu'il utilise la camera du client)
-		if get_tree().current_scene != null:
-			var terrains = get_tree().current_scene.find_children("*", "Terrain3D")
-			if terrains.size() > 0:
-				terrains[0].set_camera(camera)
-				
+
 	health_component.died.connect(_on_died)
 	health_component.damage_taken.connect(_on_damage_taken)
-	
-	var equip_comp = $EquipmentComponent 
+
+	# IMPORTANT : On diffère tout ce qui dépend de is_multiplayer_authority().
+	# _enter_tree() assigne l'autorité AVANT _ready(), mais le MultiplayerSpawner
+	# peut encore être en train de propager l'info sur les autres clients.
+	# call_deferred garantit qu'on attend la fin du frame courant.
+	call_deferred("_setup_local_player")
+
+func _setup_local_player() -> void:
+	# À ce stade, l'autorité réseau est définitivement établie sur ce client.
+	var my_id = name.to_int()
+
+	# -- Affichage du Pseudo --
+	var pseudo_label = get_node_or_null("PseudoLabel")
+	if pseudo_label != null:
+		if GameData.player_pseudos.has(my_id):
+			pseudo_label.text = GameData.player_pseudos[my_id]
+		else:
+			pseudo_label.text = "Joueur " + str(my_id)
+		pseudo_label.visible = not is_multiplayer_authority()
+
+	if not is_multiplayer_authority():
+		# Cacher toute l'UI (CanvasLayers) des joueurs distants
+		var canvas_layers = find_children("*", "CanvasLayer", true, false)
+		for canvas in canvas_layers:
+			canvas.visible = false
+		return # Les clients distants n'ont rien de plus à faire ici
+
+	# --- À partir d'ici : seulement pour NOTRE joueur local ---
+	camera.current = true
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+	# Fix Terrain3D : assure qu'il utilise la bonne caméra en multi
+	if get_tree().current_scene != null:
+		var terrains = get_tree().current_scene.find_children("*", "Terrain3D")
+		if terrains.size() > 0:
+			terrains[0].set_camera(camera)
+
+	var equip_comp = $EquipmentComponent
 	if equip_comp != null and starting_equipped_weapon != null:
-		# On Ã©quipe l'arme telle qu'elle est dÃ©finie dans l'inspecteur
 		var w = starting_equipped_weapon.duplicate(true)
 		w.original_base_path = starting_equipped_weapon.resource_path
 		equip_comp.equip_item(w, "main_hand")
-		
+
 	var inv_comp = $InventoryComponent
 	if inv_comp != null:
 		for item in starting_inventory_items:
@@ -96,8 +102,8 @@ func _ready() -> void:
 				var new_item = item.duplicate(true)
 				new_item.original_base_path = item.resource_path
 				inv_comp.add_item(new_item, 1)
-	# ========================================
-	
+
+
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority() or is_dead:
 		if not is_on_floor():
@@ -214,7 +220,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_died() -> void:
 	print("Joueur mort : verification du multi...")
-	is_dead = true
+	# Propager l'état "à terre" à tous les clients pour bloquer les attaques ennemies en multi
+	rpc("_rpc_set_downed")
 	
 	var all_players = get_tree().get_nodes_in_group("Player")
 	var other_players_alive = false
@@ -225,7 +232,7 @@ func _on_died() -> void:
 			if h and h.current_health > 0:
 				other_players_alive = true
 				break
-				
+			
 	if other_players_alive:
 		print("Passage a terre !")
 		var revive_comp = get_node_or_null("ReviveComponant")
@@ -238,6 +245,10 @@ func _on_died() -> void:
 		for p in all_players:
 			p.rpc("_rpc_show_game_over")
 
+@rpc("authority", "call_local", "reliable")
+func _rpc_set_downed() -> void:
+	is_dead = true
+
 @rpc("any_peer", "call_local", "reliable")
 func _rpc_show_game_over() -> void:
 	if is_multiplayer_authority():
@@ -247,12 +258,19 @@ func _rpc_show_game_over() -> void:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func _on_player_revived() -> void:
+	# Appelé uniquement sur l'autorité du joueur (via signal local)
 	print("Je suis de nouveau sur pied !")
+	# Propager l'état "vivant" à tous les clients pour que les ennemis le sachent
+	rpc("_rpc_set_alive")
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_set_alive() -> void:
 	is_dead = false
+	# Purger tout le knockback stacké pendant qu'on était à terre
+	velocity = Vector3.ZERO
 	var health_comp = get_node_or_null("HealthComponent")
 	if health_comp != null:
 		health_comp.heal(health_comp.stats_component.get_stat_value("max_health") * 0.5)
-	# Re-activer les mouvements, retirer l'animation "a terre", etc.
 
 func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")

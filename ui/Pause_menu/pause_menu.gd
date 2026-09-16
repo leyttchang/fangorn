@@ -170,8 +170,15 @@ func _get_random_rarity() -> ItemData.Rarity:
 	return ItemData.Rarity.LEGENDARY
 
 func _on_god_mode_pressed() -> void:
-	var player = get_tree().get_first_node_in_group("Player")
-	# Fallback si le groupe n'est pas bien défini :
+	# En multi, on doit trouver NOTRE propre joueur (celui dont on est l'autorité)
+	# et non pas le premier dans le groupe (qui est toujours le host)
+	var player = null
+	for p in get_tree().get_nodes_in_group("Player"):
+		if p.is_multiplayer_authority():
+			player = p
+			break
+	
+	# Fallback solo : si pas de groupe, on cherche par nom
 	if player == null and get_tree().current_scene:
 		player = get_tree().current_scene.find_child("player", true, false)
 		if player == null:
@@ -200,4 +207,4 @@ func _on_god_mode_pressed() -> void:
 	if skill_tree:
 		skill_tree.available_skill_points += 1000
 		
-	print("God Mode activé : +10000 Vie/Mana, +100 Regen, +1000 Points de compétence !")
+	print("God Mode activé sur ", player.name, " : +10000 Vie/Mana, +100 Regen, +1000 Points de compétence !")

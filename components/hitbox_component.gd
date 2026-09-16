@@ -18,8 +18,13 @@ func _ready() -> void:
 	if health_component == null:
 		push_warning("HitboxComponent sur " + get_parent().name + " n'a pas de HealthComponent assign !")
 
-# MODIFI : On reoit l'attaque en entier (AttackComponent) au lieu d'un simple chiffre
+# MODIFIÉ : On reçoit l'attaque en entier (AttackComponent) au lieu d'un simple chiffre
 func receive_hit(attack: AttackComponent) -> void:
+	# Ne rien faire si la cible est un joueur à terre — bloque dégâts ET knockback
+	var owner_node = get_parent()
+	if owner_node.get("is_dead") == true:
+		return
+	
 	# 1. On calcule et applique d'abord le recul (pour que l'impulsion de mort puisse le recuperer)
 	if knockback_component != null:
 		var push_dir: Vector3

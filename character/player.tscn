@@ -1286,7 +1286,7 @@ metadata/_edit_group_ = true
 
 [node name="MainDroite" type="Marker3D" parent="Camera3D" unique_id=130851055]
 unique_name_in_owner = true
-transform = Transform3D(0.999977, -0.0061649974, 0.0014514605, 0, 0.22916959, 0.9733859, -0.0063335435, -0.9733659, 0.22916509, 0.5, -0.9, -1)
+transform = Transform3D(0.99997693, -0.006164997, 0.0014514605, 0, 0.22916958, 0.9733859, -0.006333543, -0.97336584, 0.22916509, 0.5, -0.9, -1)
 script = ExtResource("2_dkowc")
 attack_sounds = Array[AudioStream]([ExtResource("6_r5ovt"), ExtResource("7_4vy5w"), ExtResource("8_dadkq"), ExtResource("9_aynll"), ExtResource("10_ubgyp"), ExtResource("11_tmwgi")])
 attack_sound_volume_db = -40.0
