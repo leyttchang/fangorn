@@ -6,8 +6,21 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 @export var terrain: Terrain3D
 @export var noise: FastNoiseLite
 @export var path_generator: PathGenerator
+@export_category("Seed / Graine du Monde")
+## Graine du monde : dicte 100% de l'aléatoire de la carte (relief, routes, forêts, arbres).
+## La même graine produira EXACTEMENT la même carte à chaque fois !
+@export var world_seed: int = 123456
+
+## Coche cette case pour générer une nouvelle graine au hasard et reconstruire le monde !
+@export var randomize_seed_now: bool = false:
+	set(value):
+		randomize_seed_now = false
+		world_seed = randi() % 1000000
+		if Engine.is_editor_hint():
+			call_deferred("generate_terrain_async")
 
 @export_category("Dimensions")
+
 # Taille d'une région (laisse 1024 pour Terrain3D)
 @export var region_size: int = 1024
 ## Largeur de la carte (en nombre de chunks de 1024m)
@@ -74,6 +87,10 @@ func clear_terrain() -> void:
 			terrain.data_directory = ""
 			terrain.data_directory = dir_path
 			
+	var mesh_spawner = find_child("MeshSpawner", true, false)
+	if mesh_spawner and mesh_spawner.has_method("clear_trees"):
+		mesh_spawner.clear_trees()
+		
 	print("Terrain nettoyé !")
 
 func _get_active_curve() -> Curve:
@@ -97,7 +114,9 @@ func generate_terrain_async() -> void:
 		push_error("MapGenerator: Il manque le Terrain3D ou le Noise !")
 		return
 		
-	print("Début de la génération du terrain...")
+	print("Début de la génération du terrain (Seed: ", world_seed, ")...")
+	# Applique la seed sur le bruit de relief du terrain
+	noise.seed = world_seed
 	clear_terrain()
 	
 	# Pause d'une frame pour laisser Godot respirer après le nettoyage
@@ -126,33 +145,15 @@ func generate_terrain_async() -> void:
 	var total_h: int = map_height_chunks * region_size
 	
 	if path_generator != null:
-		path_generator.generate_branching_path(map_min_x, map_max_x, map_min_z, map_max_z)
+		path_generator.generate_branching_path(map_min_x, map_max_x, map_min_z, map_max_z, world_seed)
+
 		
-	# ===== ÉTAPE CLÉ 1 : Génération du bruit global en UNE SEULE passe C++ =====
-	# normalize=false garantit une échelle linéaire uniforme sur toute la carte [-1.0, 1.0] -> [0, 255].
-	print("Génération de la carte de bruit globale (", total_w, "x", total_h, ")...")
-	var global_noise_img: Image = noise.get_image(total_w, total_h, false, false, false)
-	var global_noise_bytes: PackedByteArray = global_noise_img.get_data()
-	
-	# ===== ÉTAPE CLÉ 2 : Précalcul de la table de conversion de hauteur (LUT 256 valeurs) =====
-	# Applique le contraste (plus de noir/blanc, moins de gris) et échantillonne la Curve.
-	# Coût CPU nul dans la boucle de pixels (256 échantillons au lieu de millions !).
 	var active_curve: Curve = _get_active_curve()
-	var height_lut: PackedFloat32Array = PackedFloat32Array()
-	height_lut.resize(256)
-	for i in range(256):
-		var t: float = float(i) / 255.0
-		# Contraste : étire les gris vers le noir (0.0 = sol plat) et vers le blanc (1.0 = sommets)
-		var contrasted_t: float = clampf((t - 0.5) * contrast + 0.5, 0.0, 1.0)
-		var curved_t: float = active_curve.sample_baked(contrasted_t)
-		height_lut[i] = lerp(min_height, max_height, curved_t)
-	
 	var chunks_generated: int = 0
 	var ctrl_default: int = ((0 & 0x1F) << 27) | ((1 & 0x1F) << 22)
-	var h_smooth_radius_int: int = 5
+	var h_smooth_radius: float = 5.0
 	if path_generator != null:
-		h_smooth_radius_int = maxi(1, int(round(path_generator.path_width * 0.3)))
-
+		h_smooth_radius = maxf(1.0, path_generator.path_width * 0.3)
 	
 	for cx in range(map_width_chunks):
 		for cz in range(map_height_chunks):
@@ -174,7 +175,7 @@ func generate_terrain_async() -> void:
 						chunk_segments.append(seg)
 			var seg_count: int = chunk_segments.size()
 			
-			# ===== PHASE 2 : Rasterisation des chemins (segment-first) =====
+			# ===== PHASE 1 : Rasterisation des chemins (segment-first) =====
 			var path_blend_array: PackedFloat32Array = PackedFloat32Array()
 			path_blend_array.resize(region_size * region_size)
 			
@@ -220,71 +221,53 @@ func generate_terrain_async() -> void:
 							if blend > path_blend_array[pidx]:
 								path_blend_array[pidx] = blend
 			
-			# ===== PHASE 3 : Combinaison hauteur + lissage + control map =====
+			# ===== PHASE 2 : Hauteur Float32 continue + Curve + Control map =====
+			# Échantillonne le bruit directement en Float32 (get_noise_2d).
+			# ZÉRO quantification 8-bit -> ÉLIMINATION DÉFINITIVE DE L'EFFET ESCALIER !
 			var height_bytes: PackedByteArray = PackedByteArray()
 			height_bytes.resize(region_size * region_size * 4)
 			var ctrl_bytes: PackedByteArray = PackedByteArray()
 			ctrl_bytes.resize(region_size * region_size * 4)
 			
+			var idx: int = 0
 			for z in range(region_size):
 				if z % 64 == 0 and not Engine.is_editor_hint():
 					await get_tree().process_frame
 				
-				var gz_i: int = chunk_min_z + z
-				var row_offset: int = gz_i * total_w
+				var gz: float = float(chunk_min_z + z)
 				
 				for x in range(region_size):
-					var gx_i: int = chunk_min_x + x
-					var g_idx: int = row_offset + gx_i
-					var idx: int = z * region_size + x
+					var gx: float = float(chunk_min_x + x)
 					
-					# Valeur brute du bruit (0 à 255)
-					var raw_val: float = float(global_noise_bytes[g_idx])
+					# Vrai bruit continu 32-bit float [-1.0, 1.0] -> [0.0, 1.0]
+					var n: float = noise.get_noise_2d(gx, gz) * 0.5 + 0.5
 					
-					# Lissage des petites déformations / crevasses / bosses (paramètre smooth_factor)
-					if smooth_factor > 0.0:
-						var r: int = 2
-						var gx_l: int = maxi(0, gx_i - r)
-						var gx_r: int = mini(total_w - 1, gx_i + r)
-						var gz_u: int = maxi(0, gz_i - r)
-						var gz_d: int = mini(total_h - 1, gz_i + r)
-						var sum_neighbors: float = (
-							float(global_noise_bytes[row_offset + gx_l]) +
-							float(global_noise_bytes[row_offset + gx_r]) +
-							float(global_noise_bytes[gz_u * total_w + gx_i]) +
-							float(global_noise_bytes[gz_d * total_w + gx_i])
-						) * 0.25
-						raw_val = lerp(raw_val, sum_neighbors, smooth_factor)
+					# Contraste (étire le noir et le blanc, élimine les plaines surélevées)
+					var t_contrasted: float = clampf((n - 0.5) * contrast + 0.5, 0.0, 1.0)
 					
-					# Échantillonnage continu dans la Curve via la LUT (interpolation sous-pixel fluide)
-					var b_floor: int = clampi(int(raw_val), 0, 254)
-					var b_fract: float = raw_val - float(b_floor)
-					var h: float = lerp(height_lut[b_floor], height_lut[b_floor + 1], b_fract)
+					# Hauteur continue via la Curve (sample_baked est interne à Godot C++ et ultra fluide)
+					var h: float = lerp(min_height, max_height, active_curve.sample_baked(t_contrasted))
 					
 					var blend: float = path_blend_array[idx]
 					if blend > 0.0:
-						# Aplatissement du chemin avec échantillonnage dans la carte globale et passage dans la Curve
-						var x1: int = mini(gx_i + h_smooth_radius_int, total_w - 1)
-						var x2: int = maxi(gx_i - h_smooth_radius_int, 0)
-						var z1: int = mini(gz_i + h_smooth_radius_int, total_h - 1)
-						var z2: int = maxi(gz_i - h_smooth_radius_int, 0)
-						var sum_flat: float = (
-							float(global_noise_bytes[row_offset + x1]) +
-							float(global_noise_bytes[row_offset + x2]) +
-							float(global_noise_bytes[z1 * total_w + gx_i]) +
-							float(global_noise_bytes[z2 * total_w + gx_i])
-						) * 0.25
-						var flat_floor: int = clampi(int(sum_flat), 0, 254)
-						var flat_fract: float = sum_flat - float(flat_floor)
-						var h_flat: float = lerp(height_lut[flat_floor], height_lut[flat_floor + 1], flat_fract)
-						
-						h = lerp(h, h_flat, blend)
+						# Aplatissement du chemin en échantillonnant les 4 voisins
+						var nf: float = (
+							noise.get_noise_2d(gx + h_smooth_radius, gz) +
+							noise.get_noise_2d(gx - h_smooth_radius, gz) +
+							noise.get_noise_2d(gx, gz + h_smooth_radius) +
+							noise.get_noise_2d(gx, gz - h_smooth_radius)
+						) * 0.125 + 0.5
+						var tf: float = clampf((nf - 0.5) * contrast + 0.5, 0.0, 1.0)
+						var hf: float = lerp(min_height, max_height, active_curve.sample_baked(tf))
+						h = lerp(h, hf, blend)
 						height_bytes.encode_float(idx * 4, h)
 						var blend_byte: int = int(blend * 255.0)
 						ctrl_bytes.encode_u32(idx * 4, ((1 & 0x1F) << 22) | ((blend_byte & 0xFF) << 14))
 					else:
 						height_bytes.encode_float(idx * 4, h)
 						ctrl_bytes.encode_u32(idx * 4, ctrl_default)
+					
+					idx += 1
 			
 			var time_end: int = Time.get_ticks_msec()
 			print("Chunk ", cx, ",", cz, " calculé en ", (time_end - time_start), " ms (Segments: ", seg_count, ")")
@@ -300,3 +283,10 @@ func generate_terrain_async() -> void:
 	
 	print("Génération terminée ! ", chunks_generated, " chunks créés.")
 	terrain_ready.emit()
+	
+	# Génère automatiquement les arbres s'il y a un MeshSpawner
+	var mesh_spawner = find_child("MeshSpawner", true, false)
+	if mesh_spawner and mesh_spawner.has_method("generate_trees"):
+		if "spawn_seed" in mesh_spawner:
+			mesh_spawner.spawn_seed = world_seed
+		mesh_spawner.call_deferred("generate_trees")

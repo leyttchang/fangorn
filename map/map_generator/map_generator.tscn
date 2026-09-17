@@ -8,9 +8,14 @@
 [ext_resource type="Texture2D" uid="uid://ctwp7ykel7tm2" path="res://assets/texture/ground_37/ground_37_albd_hgt.dds" id="4_aiau3"]
 [ext_resource type="Texture2D" uid="uid://dpnopmtribtg4" path="res://assets/texture/ground_37/ground_37_nrm_rgh.dds" id="5_ilvso"]
 [ext_resource type="PackedScene" uid="uid://d3sr0a7dxfkr8" path="res://addons/terrain_3d/extras/particle_example/Terrain3DParticles.tscn" id="8_f1fk6"]
+[ext_resource type="Script" uid="uid://d1um2otic4npt" path="res://map/map_generator/mesh_spawner.gd" id="9_spwnr"]
+[ext_resource type="Script" uid="uid://cuxt4cock6soy" path="res://map/map_generator/tree_spawn_entry.gd" id="10_3mir5"]
+[ext_resource type="PackedScene" uid="uid://dmt1gbe4mnsjl" path="res://objet/tree/Island_tree_hb.tscn" id="11_6laye"]
+[ext_resource type="PackedScene" uid="uid://c5gdrmuh4i2tb" path="res://objet/tree/dead_tree.tscn" id="12_oxtf5"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_f1fk6"]
 noise_type = 3
+seed = 175295
 frequency = 0.0013
 fractal_octaves = 4
 fractal_gain = 0.045
@@ -99,16 +104,35 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 
 [sub_resource type="Environment" id="Environment_hlie2"]
 
+[sub_resource type="Resource" id="Resource_0v541"]
+script = ExtResource("10_3mir5")
+tree_scene = ExtResource("11_6laye")
+weight = 0.91
+metadata/_custom_type_script = "uid://cuxt4cock6soy"
+
+[sub_resource type="Resource" id="Resource_f66lb"]
+script = ExtResource("10_3mir5")
+tree_scene = ExtResource("12_oxtf5")
+weight = 0.11
+metadata/_custom_type_script = "uid://cuxt4cock6soy"
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_forest"]
+seed = 175396
+frequency = 0.0302
+fractal_octaves = 3
+
 [node name="Map_generator" type="Node3D" unique_id=1125476848 node_paths=PackedStringArray("terrain", "path_generator")]
 script = ExtResource("1_6yigo")
 terrain = NodePath("Terrain3D")
 noise = SubResource("FastNoiseLite_f1fk6")
 path_generator = NodePath("path_generator")
+world_seed = 175295
 map_width_chunks = 4
 map_height_chunks = 4
 max_height = 200.0
 contrast = 2.0
 height_curve = SubResource("Curve_bmxbe")
+smooth_factor = 1.0
 
 [node name="Terrain3D" type="Terrain3D" parent="." unique_id=1489340855]
 data_directory = "res://map/map_generator/data_directorie"
@@ -120,9 +144,6 @@ metadata/_edit_lock_ = true
 [node name="Camera3D" type="Camera3D" parent="." unique_id=2009361889]
 script = ExtResource("2_6yjpd")
 
-[node name="Terrain3DParticles" parent="Camera3D" unique_id=1079709393 node_paths=PackedStringArray("terrain") instance=ExtResource("8_f1fk6")]
-terrain = NodePath("../../Terrain3D")
-
 [node name="path_generator" type="Node3D" parent="." unique_id=171877823]
 script = ExtResource("3_7ts6b")
 path_width = 50.0
@@ -131,3 +152,24 @@ path_width = 50.0
 environment = SubResource("Environment_hlie2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=1437863725]
+
+[node name="Terrain3DParticles" parent="." unique_id=1079709393 node_paths=PackedStringArray("terrain") instance=ExtResource("8_f1fk6")]
+terrain = NodePath("../Terrain3D")
+grid_width = 15
+process_fixed_fps = 60
+min_draw_distance = 180.0
+particle_count = 2073600
+
+[node name="MeshSpawner" type="Node3D" parent="." unique_id=1849204912 node_paths=PackedStringArray("map_generator", "terrain", "path_generator")]
+script = ExtResource("9_spwnr")
+map_generator = NodePath("..")
+terrain = NodePath("../Terrain3D")
+path_generator = NodePath("../path_generator")
+tree_variations = Array[ExtResource("10_3mir5")]([SubResource("Resource_0v541"), SubResource("Resource_f66lb")])
+forest_noise = SubResource("FastNoiseLite_forest")
+forest_threshold = 0.05000000000000004
+spawn_seed = 175295
+road_margin = 0.0
+max_trees = 60000
+max_scale = 35.0
+max_slope_degrees = 30.0

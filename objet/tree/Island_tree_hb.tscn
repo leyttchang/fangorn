@@ -44,4 +44,7 @@ shape = SubResource("CylinderShape3D_hlie2")
 [node name="Tree_Type6_04_mesh" parent="Tree Type6 04" index="0" unique_id=658652696]
 surface_material_override/0 = SubResource("ShaderMaterial_o1nhs")
 
+[node name="TrunkBase" type="Marker3D" parent="." unique_id=987654321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.088842124, 0)
+
 [editable path="Tree Type6 04"]
