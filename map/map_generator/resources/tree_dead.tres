@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TreeSpawnEntry" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://map/map_generator/tree_spawn_entry.gd" id="1_entry"]
+[ext_resource type="PackedScene" uid="uid://c5gdrmuh4i2tb" path="res://objet/tree/dead_tree.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_entry")
+name = "Arbre Mort"
+tree_scene = ExtResource("2_scene")
+weight = 20.0
+scale_multiplier = 1.0

@@ -9,31 +9,35 @@ class_name PathGenerator
 # Contient tous les segments de notre route (des dictionnaires avec start et end)
 var segments: Array[Dictionary] = []
 
-func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float):
+# Générateur de nombres aléatoires déterministe
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
+func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float, path_seed: int = 0):
 	segments.clear()
-	print("Génération d'un chemin avec embranchements...")
+	rng.seed = path_seed
+	print("Génération d'un chemin avec embranchements (Seed: ", path_seed, ")...")
 	
 	# Coordonnées du Spawn (Milieu de la face Sud)
 	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z)
 	
 	# Coordonnées des 3 Sorties
-	var exit_west = Vector2(map_min_x, randf_range(map_min_z + 200, map_max_z - 200))
-	var exit_east = Vector2(map_max_x, randf_range(map_min_z + 200, map_max_z - 200))
-	var exit_north = Vector2(randf_range(map_min_x + 200, map_max_x - 200), map_min_z)
+	var exit_west = Vector2(map_min_x, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	var exit_east = Vector2(map_max_x, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	var exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z)
 	
 	# Coordonnées des 2 embranchements
 	# Le fork 1 est en bas de la carte, le fork 2 est en haut de la carte
-	var fork1_y = lerp(map_max_z, map_min_z, randf_range(0.3, 0.45))
-	var fork2_y = lerp(map_max_z, map_min_z, randf_range(0.65, 0.8))
+	var fork1_y = lerp(map_max_z, map_min_z, rng.randf_range(0.3, 0.45))
+	var fork2_y = lerp(map_max_z, map_min_z, rng.randf_range(0.65, 0.8))
 	
-	var fork1 = Vector2(randf_range(map_min_x + 300, map_max_x - 300), fork1_y)
-	var fork2 = Vector2(randf_range(map_min_x + 300, map_max_x - 300), fork2_y)
+	var fork1 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork1_y)
+	var fork2 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork2_y)
 	
 	# TRONC PRINCIPAL
 	create_sub_path(spawn_pos, fork1, map_min_x, map_max_x, map_min_z, map_max_z)
 	
 	# On décide aléatoirement de quel côté part la première branche
-	if randf() > 0.5:
+	if rng.randf() > 0.5:
 		# Fork 1 s'occupe de la sortie Ouest.
 		create_sub_path(fork1, exit_west, map_min_x, map_max_x, map_min_z, map_max_z)
 		# Le chemin principal continue vers Fork 2
@@ -53,18 +57,18 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 	print(segments.size(), " segments de route générés dans tout l'arbre !")
 	
 	# --- GÉNÉRATION DES IMPASSES (DEAD ENDS) ---
-	var num_dead_ends = randi_range(8, 15)
+	var num_dead_ends = rng.randi_range(8, 15)
 	var main_segments = segments.duplicate()
 	for i in range(num_dead_ends):
-		var random_seg = main_segments[randi() % main_segments.size()]
+		var random_seg = main_segments[rng.randi() % main_segments.size()]
 		# On part du milieu du segment sélectionné
-		var branch_start = random_seg.start.lerp(random_seg.end, randf_range(0.2, 0.8))
+		var branch_start = random_seg.start.lerp(random_seg.end, rng.randf_range(0.2, 0.8))
 		
 		var dir = (random_seg.end - random_seg.start).normalized()
 		var perp = dir.rotated(PI/2.0)
-		if randf() > 0.5: perp = -perp # Un coup à gauche, un coup à droite
+		if rng.randf() > 0.5: perp = -perp # Un coup à gauche, un coup à droite
 		
-		var length = randf_range(150.0, 500.0)
+		var length = rng.randf_range(150.0, 500.0)
 		var branch_end = branch_start + (perp * length)
 		
 		# On crée un petit chemin beaucoup plus fin (ex: 40% de la largeur principale)
@@ -85,19 +89,20 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 	# Points de courbure qui forcent la route à suivre la direction
 	curve.add_point(point_a, -main_dir * tangent_len, main_dir * tangent_len)
 	
-	var num_waypoints = randi_range(1, 3)
+	var num_waypoints = rng.randi_range(1, 3)
 	for i in range(1, num_waypoints + 1):
 		var t = float(i) / float(num_waypoints + 1)
 		var base_point = point_a.lerp(point_b, t)
 		
-		var zigzag_strength = randf_range(-dist_ab*0.3, dist_ab*0.3)
+		var zigzag_strength = rng.randf_range(-dist_ab*0.3, dist_ab*0.3)
 		var waypoint = base_point + (perp_dir * zigzag_strength)
 		
 		waypoint.x = clamp(waypoint.x, map_min_x + 100, map_max_x - 100)
 		waypoint.y = clamp(waypoint.y, map_min_z + 100, map_max_z - 100)
 		
-		var curve_dir = main_dir * randf_range(tangent_len*0.5, tangent_len*1.5)
+		var curve_dir = main_dir * rng.randf_range(tangent_len*0.5, tangent_len*1.5)
 		curve.add_point(waypoint, -curve_dir, curve_dir)
+
 		
 	curve.add_point(point_b, -main_dir * tangent_len, main_dir * tangent_len)
 	
