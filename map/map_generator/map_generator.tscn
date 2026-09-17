@@ -11,11 +11,14 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_f1fk6"]
 noise_type = 3
-frequency = 0.0788
-fractal_octaves = 10
-fractal_lacunarity = 0.69
-fractal_gain = 3.705
+frequency = 0.0013
+fractal_octaves = 4
+fractal_gain = 0.045
 fractal_weighted_strength = 0.43
+
+[sub_resource type="Curve" id="Curve_bmxbe"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.28092784, 0.16999996), 0.6466667, 0.6466667, 0, 0, Vector2(0.45876288, 0.19499993), 0.4311107, 0.4311107, 0, 0, Vector2(0.9845361, 1), 0.57058823, 0.0, 0, 0]
+point_count = 4
 
 [sub_resource type="Gradient" id="Gradient_6yjpd"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -101,8 +104,11 @@ script = ExtResource("1_6yigo")
 terrain = NodePath("Terrain3D")
 noise = SubResource("FastNoiseLite_f1fk6")
 path_generator = NodePath("path_generator")
-map_width_chunks = 2
-map_height_chunks = 2
+map_width_chunks = 4
+map_height_chunks = 4
+max_height = 200.0
+contrast = 2.0
+height_curve = SubResource("Curve_bmxbe")
 
 [node name="Terrain3D" type="Terrain3D" parent="." unique_id=1489340855]
 data_directory = "res://map/map_generator/data_directorie"
@@ -114,6 +120,9 @@ metadata/_edit_lock_ = true
 [node name="Camera3D" type="Camera3D" parent="." unique_id=2009361889]
 script = ExtResource("2_6yjpd")
 
+[node name="Terrain3DParticles" parent="Camera3D" unique_id=1079709393 node_paths=PackedStringArray("terrain") instance=ExtResource("8_f1fk6")]
+terrain = NodePath("../../Terrain3D")
+
 [node name="path_generator" type="Node3D" parent="." unique_id=171877823]
 script = ExtResource("3_7ts6b")
 path_width = 50.0
@@ -122,6 +131,3 @@ path_width = 50.0
 environment = SubResource("Environment_hlie2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=1437863725]
-
-[node name="Terrain3DParticles" parent="." unique_id=1079709393 node_paths=PackedStringArray("terrain") instance=ExtResource("8_f1fk6")]
-terrain = NodePath("../Terrain3D")

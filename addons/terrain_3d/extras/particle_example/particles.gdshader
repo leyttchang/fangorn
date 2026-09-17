@@ -37,6 +37,7 @@ group_uniforms filtering;
 uniform float condition_dither_range : hint_range(0.0, 1.0, 0.01) = 0.15;
 uniform float surface_slope_min : hint_range(0.0, 1.0, 0.01) = 0.87;
 uniform float distance_fade_ammount : hint_range(0.0, 1.0, 0.01) = 0.5;
+uniform int filter_texture_id = 1; // ID de la texture à exclure (1 = chemin/route)
 
 group_uniforms private;
 uniform float max_dist = 1.;
@@ -238,8 +239,8 @@ void start() {
 	int over = int(control >> 22u & 0x1Fu);
 	float blend = float(control >> 14u & 0xFFu) * 0.003921568627450; // 1. / 255.
 
-	// Hardcoded example, hand painted texture id 0 is filtered out.
-	if (!auto && ((base == 0 && blend < 0.7) || (over == 0 && blend >= 0.3))) {
+	// Exclut la texture spécifiée (par défaut ID 1 = chemin) pour que l'herbe apparaisse UNIQUEMENT sur l'herbe (ID 0)
+	if (!auto && ((base == filter_texture_id && blend < 0.7) || (over == filter_texture_id && blend >= 0.3))) {
 		pos.y = 0. / 0.;
 		pos.xz = vec2(100000.0);
 	}
