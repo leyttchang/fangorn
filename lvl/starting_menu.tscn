@@ -223,6 +223,45 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Option 
 "
 
+[node name="Singleplayer" type="VBoxContainer" parent="CanvasLayer" unique_id=283303531]
+visible = false
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 384.0
+offset_top = -156.0
+offset_right = 626.0
+offset_bottom = 158.0
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="S_normal" type="Button" parent="CanvasLayer/Singleplayer" unique_id=1902671084]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
+text = "normal
+"
+
+[node name="S_wave" type="Button" parent="CanvasLayer/Singleplayer" unique_id=1008441644]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
+text = "Wave
+"
+
+[node name="S_retour" type="Button" parent="CanvasLayer/Singleplayer" unique_id=1943661745]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
+text = "Back
+"
+
 [node name="Host_menu" type="VBoxContainer" parent="CanvasLayer" unique_id=1219959799]
 visible = false
 anchors_preset = 8
@@ -232,10 +271,11 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -483.25
 offset_top = -359.5
-offset_right = -284.75
+offset_right = -190.25
 offset_bottom = -15.5
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 2
 theme_override_constants/separation = 20
 
 [node name="Pseudo" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=336119136]
@@ -249,12 +289,27 @@ text = "Player"
 [node name="Host" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=394108431]
 layout_mode = 2
 
-[node name="btnHost" type="Button" parent="CanvasLayer/Host_menu/Host" unique_id=599028656]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Host_menu/Host" unique_id=614357090]
+layout_mode = 2
+
+[node name="btnHost" type="Button" parent="CanvasLayer/Host_menu/Host/HBoxContainer" unique_id=599028656]
+custom_minimum_size = Vector2(198, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_eqfjj")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_04lvy")
 theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Host"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Host_menu/Host/HBoxContainer" unique_id=815334212]
+layout_mode = 2
+
+[node name="M_mode_select" type="OptionButton" parent="CanvasLayer/Host_menu/Host/HBoxContainer/VBoxContainer" unique_id=1249546470]
+layout_mode = 2
+item_count = 2
+popup/item_0/text = "Wave"
+popup/item_0/id = 0
+popup/item_1/text = "Normal"
+popup/item_1/id = 1
 
 [node name="Join" type="VBoxContainer" parent="CanvasLayer/Host_menu" unique_id=342560752]
 layout_mode = 2
@@ -268,6 +323,7 @@ text = "Join
 "
 
 [node name="Label" type="Label" parent="CanvasLayer/Host_menu/Join" unique_id=2066600058]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
 text = "IP adress"
@@ -381,7 +437,6 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_kmgpc")
 text = "Quit"
 
 [node name="option" type="MarginContainer" parent="CanvasLayer" unique_id=1870764764]
-visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -395,7 +450,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="option" parent="CanvasLayer/option" unique_id=1114594140 instance=ExtResource("7_vof52")]
-visible = true
 layout_mode = 2
 
 [node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("1_x1u6o")]

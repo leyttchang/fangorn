@@ -1,6 +1,10 @@
 class_name GameData
 extends RefCounted
 
+enum GameMode { WAVE, NORMAL }
+static var current_game_mode: GameMode = GameMode.WAVE
+static var current_seed: int = 0
+
 static var player_pseudos: Dictionary = {}
 
 const PERCENT_STATS: Array[String] = [

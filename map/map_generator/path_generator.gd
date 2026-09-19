@@ -6,6 +6,8 @@ class_name PathGenerator
 ## La largeur de la route
 @export var path_width: float = 15.0
 
+var encounter_positions: Array[Vector2] = []
+
 # Contient tous les segments de notre route (des dictionnaires avec start et end)
 var segments: Array[Dictionary] = []
 
@@ -56,25 +58,59 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 		
 	print(segments.size(), " segments de route générés dans tout l'arbre !")
 	
-	# --- GÉNÉRATION DES IMPASSES (DEAD ENDS) ---
-	var num_dead_ends = rng.randi_range(8, 15)
+	# --- GÉNÉRATION DES ENCOUNTERS (POI) ---
+	encounter_positions.clear()
 	var main_segments = segments.duplicate()
-	for i in range(num_dead_ends):
-		var random_seg = main_segments[rng.randi() % main_segments.size()]
-		# On part du milieu du segment sélectionné
-		var branch_start = random_seg.start.lerp(random_seg.end, rng.randf_range(0.2, 0.8))
+	
+	# Récupération des paramètres depuis le nœud Encounters
+	var enc_count: int = 8
+	var enc_min_dist: float = 400.0
+	var enc_road_dist: float = 150.0
+	var encounters_node = get_parent().find_child("Encounters", true, false)
+	if encounters_node:
+		if "encounter_count" in encounters_node:
+			enc_count = encounters_node.encounter_count
+		if "min_distance_between_encounters" in encounters_node:
+			enc_min_dist = encounters_node.min_distance_between_encounters
+		if "min_distance_from_main_roads" in encounters_node:
+			enc_road_dist = encounters_node.min_distance_from_main_roads
+	
+	var max_attempts = enc_count * 30
+	var attempts = 0
+	
+	while encounter_positions.size() < enc_count and attempts < max_attempts:
+		attempts += 1
 		
-		var dir = (random_seg.end - random_seg.start).normalized()
-		var perp = dir.rotated(PI/2.0)
-		if rng.randf() > 0.5: perp = -perp # Un coup à gauche, un coup à droite
+		# 1. Tirer un point aléatoire
+		var margin = 300.0
+		var candidate = Vector2(
+			rng.randf_range(map_min_x + margin, map_max_x - margin),
+			rng.randf_range(map_min_z + margin, map_max_z - margin)
+		)
 		
-		var length = rng.randf_range(150.0, 500.0)
-		var branch_end = branch_start + (perp * length)
+		# 2. Distance aux routes
+		var dist_to_road = get_min_distance_to_segments(candidate, main_segments)
+		if dist_to_road < enc_road_dist:
+			continue
+			
+		# 3. Distance aux autres POI
+		var too_close = false
+		for existing_pos in encounter_positions:
+			if candidate.distance_to(existing_pos) < enc_min_dist:
+				too_close = true
+				break
+		if too_close:
+			continue
+			
+		# 4. Point validé
+		encounter_positions.append(candidate)
 		
-		# On crée un petit chemin beaucoup plus fin (ex: 40% de la largeur principale)
-		create_sub_path(branch_start, branch_end, map_min_x, map_max_x, map_min_z, map_max_z, path_width * 0.4)
+	# --- CONNEXION DES ENCOUNTERS ---
+	for encounter_pos in encounter_positions:
+		var closest_point: Vector2 = _find_closest_point_on_segments(encounter_pos, main_segments)
+		create_sub_path(closest_point, encounter_pos, map_min_x, map_max_x, map_min_z, map_max_z, path_width * 0.4)
 		
-	print(segments.size(), " segments totaux avec les impasses !")
+	print(segments.size(), " segments totaux avec les accès aux Encounters !")
 
 func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float, custom_width: float = -1.0):
 	if custom_width < 0.0: custom_width = path_width
@@ -103,7 +139,6 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 		var curve_dir = main_dir * rng.randf_range(tangent_len*0.5, tangent_len*1.5)
 		curve.add_point(waypoint, -curve_dir, curve_dir)
 
-		
 	curve.add_point(point_b, -main_dir * tangent_len, main_dir * tangent_len)
 	
 	curve.bake_interval = 50.0
@@ -123,14 +158,6 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 func get_distance_to_path(point: Vector2) -> float:
 	var min_dist = 999999.0
 	for seg in segments:
-		var w = seg["width"]
-		# OPTIMISATION EXTRÊME : Rejet par Bounding Box !
-		# Si le point est plus loin que path_width + 10 du rectangle du segment, on saute directement !
-		if point.x < seg["min_x"] - path_width - 10.0 or point.x > seg["max_x"] + path_width + 10.0:
-			continue
-		if point.y < seg["min_y"] - path_width - 10.0 or point.y > seg["max_y"] + path_width + 10.0:
-			continue
-			
 		var dist = distance_to_segment(point, seg["start"], seg["end"])
 		if dist < min_dist:
 			min_dist = dist
@@ -146,3 +173,32 @@ func distance_to_segment(p: Vector2, a: Vector2, b: Vector2) -> float:
 	var t = max(0, min(1, (p - a).dot(b - a) / l2))
 	var projection = a + t * (b - a)
 	return p.distance_to(projection)
+
+# Retourne le point le plus proche sur un ensemble de segments
+func _find_closest_point_on_segments(p: Vector2, segs: Array) -> Vector2:
+	var min_dist = 999999.0
+	var closest_point = p
+	for seg in segs:
+		var a: Vector2 = seg["start"]
+		var b: Vector2 = seg["end"]
+		var l2 = a.distance_squared_to(b)
+		var proj: Vector2
+		if l2 == 0.0:
+			proj = a
+		else:
+			var t = max(0.0, min(1.0, (p - a).dot(b - a) / l2))
+			proj = a + t * (b - a)
+			
+		var dist = p.distance_to(proj)
+		if dist < min_dist:
+			min_dist = dist
+			closest_point = proj
+	return closest_point
+
+func get_min_distance_to_segments(point: Vector2, segs: Array) -> float:
+	var min_dist = 999999.0
+	for seg in segs:
+		var dist = distance_to_segment(point, seg["start"], seg["end"])
+		if dist < min_dist:
+			min_dist = dist
+	return min_dist

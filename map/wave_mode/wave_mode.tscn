@@ -1,0 +1,213 @@
+[gd_scene format=3 uid="uid://rr8dny85bftp"]
+
+[ext_resource type="PackedScene" uid="uid://b1v2w3d4s5p6q" path="res://ui/wave_display.tscn" id="1_73tj1"]
+[ext_resource type="PackedScene" uid="uid://dodpc1n4mp20v" path="res://ui/enemies_coutner.tscn" id="2_kfm53"]
+[ext_resource type="PackedScene" uid="uid://ciorbt48rdjri" path="res://character/enemie/dumb/dumb_spawner.tscn" id="3_u2vs7"]
+[ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="4_hkt7f"]
+[ext_resource type="PackedScene" uid="uid://c7s8m1k2n3p4q" path="res://character/enemie/smart_spawner/smart_spawner.tscn" id="5_bysda"]
+[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="6_t1rn3"]
+[ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="7_cftmw"]
+[ext_resource type="PackedScene" uid="uid://btg4a1s8kbui" path="res://character/enemie/creep/creep.tscn" id="8_1411p"]
+[ext_resource type="PackedScene" uid="uid://bfs8ho4jxd260" path="res://character/enemie/spider/spider_bundle.tscn" id="9_e2k33"]
+[ext_resource type="PackedScene" uid="uid://bgl8ep1qhsou4" path="res://character/enemie/smart_spawner/start_beacon.tscn" id="10_p4nc4"]
+[ext_resource type="PackedScene" uid="uid://4e1215me6xgl" path="res://character/enemie/ogre_boss/ogre_boss.tscn" id="11_0mn7j"]
+[ext_resource type="PackedScene" uid="uid://bl3bnebvggso3" path="res://objet/chest/chest_spawner.tscn" id="12_513hw"]
+[ext_resource type="PackedScene" uid="uid://cekr3wmhu571c" path="res://objet/chest/Skill_chest.tscn" id="13_uylmo"]
+[ext_resource type="PackedScene" uid="uid://c66f01tv85ipj" path="res://map/map/map_1_T3D.tscn" id="14_1lgva"]
+[ext_resource type="Texture2D" uid="uid://bufynasqx5irc" path="res://assets/skybox/NightSkyHDRI008_4K_HDR.exr" id="15_113nc"]
+[ext_resource type="PackedScene" uid="uid://dkht0vu3wt3ic" path="res://map/fog_ground.tscn" id="16_x6aeg"]
+[ext_resource type="PackedScene" uid="uid://vw0hijsmdnj0" path="res://particule/fire/fire_particule.tscn" id="17_xi8i8"]
+[ext_resource type="PackedScene" uid="uid://jvy84ml4qbnk" path="res://character/dummy.tscn" id="18_ery3v"]
+[ext_resource type="PackedScene" uid="uid://ps4gscdkslsn" path="res://objet/pic.tscn" id="19_56ntv"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hlie2"]
+size = Vector3(2000, 2000, 1)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_yqkk6"]
+panorama = ExtResource("15_113nc")
+energy_multiplier = 2.0
+
+[sub_resource type="Sky" id="Sky_hlie2"]
+sky_material = SubResource("PanoramaSkyMaterial_yqkk6")
+
+[sub_resource type="Environment" id="Environment_gf3dy"]
+background_mode = 2
+background_color = Color(1, 1, 1, 1)
+background_energy_multiplier = 0.59
+sky = SubResource("Sky_hlie2")
+ambient_light_source = 2
+ambient_light_color = Color(0.26064485, 0.37135845, 0.52897114, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 0.9
+tonemap_mode = 4
+tonemap_exposure = 1.1
+ssao_enabled = true
+ssao_radius = 1.69
+ssil_enabled = true
+glow_enabled = true
+glow_levels/1 = 0.21
+glow_intensity = 0.86
+glow_bloom = 0.15
+glow_blend_mode = 0
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.009000001, 0.017200002, 0.05, 1)
+fog_density = 1.0
+fog_sky_affect = 0.313
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.03
+volumetric_fog_albedo = Color(0.015, 0.02625, 0.06, 1)
+volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
+volumetric_fog_emission_energy = 5.0
+volumetric_fog_anisotropy = 0.75
+volumetric_fog_length = 152.09
+volumetric_fog_sky_affect = 0.95
+adjustment_enabled = true
+adjustment_brightness = 1.1
+adjustment_contrast = 1.1
+adjustment_saturation = 0.8
+
+[sub_resource type="FogMaterial" id="FogMaterial_6i2mx"]
+density = 0.4
+albedo = Color(0.37111807, 0.4431049, 0.3064715, 1)
+
+[node name="Wave_mode" type="Node3D" unique_id=1057687863]
+
+[node name="wave_display" parent="." unique_id=857701566 node_paths=PackedStringArray("smart_spawner") instance=ExtResource("1_73tj1")]
+smart_spawner = NodePath("../spawner/SmartSpawner")
+
+[node name="enemies_coutner" parent="wave_display" unique_id=1160664613 instance=ExtResource("2_kfm53")]
+
+[node name="spawner" type="Node3D" parent="." unique_id=1288462768]
+
+[node name="dumb_spawner" parent="spawner" unique_id=1600295091 instance=ExtResource("3_u2vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 24, -33)
+is_disabled = true
+start_spawn_time = 1.0
+
+[node name="dumb_spawner2" parent="spawner" unique_id=1171485016 instance=ExtResource("3_u2vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 24, -33)
+is_disabled = true
+start_spawn_time = 1.0
+
+[node name="dumb_spawner3" parent="spawner" unique_id=249582538 instance=ExtResource("3_u2vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 171)
+is_disabled = true
+start_spawn_time = 1.0
+
+[node name="dumb_spawner4" parent="spawner" unique_id=1348189608 instance=ExtResource("3_u2vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 21.894852, -19.801086)
+Dumb = ExtResource("4_hkt7f")
+is_disabled = true
+start_spawn_time = 1.0
+
+[node name="dumb_spawner5" parent="spawner" unique_id=714662514 instance=ExtResource("3_u2vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 21.894852, -19.801086)
+Dumb = ExtResource("4_hkt7f")
+is_disabled = true
+start_spawn_time = 1.0
+
+[node name="dumb_spawner6" parent="spawner" unique_id=1137056618 instance=ExtResource("3_u2vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54, 21.894852, 2.1989136)
+Dumb = ExtResource("4_hkt7f")
+is_disabled = true
+start_spawn_time = 1.0
+
+[node name="SmartSpawner" parent="spawner" unique_id=908754430 node_paths=PackedStringArray("beacon_spawn_point", "boss_spawn_point") instance=ExtResource("5_bysda")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.60695, -20.34161)
+monster_types = Array[PackedScene]([ExtResource("6_t1rn3"), ExtResource("4_hkt7f"), ExtResource("7_cftmw"), ExtResource("8_1411p"), ExtResource("9_e2k33")])
+monster_costs = Array[int]([5, 10, 25, 30, 18])
+monster_weights = Array[float]([1.0, 0.6, 0.9, 0.2, 1.0])
+initial_wave_credits = 30
+delay_between_waves = 10.0
+time_between_spawns = 0.2
+spawn_radius = 50.0
+beacon_scene = ExtResource("10_p4nc4")
+beacon_spawn_point = NodePath("start_beacon")
+boss_wave_numbers = Array[int]([6])
+boss_scenes = Array[PackedScene]([ExtResource("11_0mn7j")])
+boss_costs = Array[int]([150])
+boss_weights = Array[float]([0.2])
+boss_spawn_point = NodePath("boss_spawn")
+
+[node name="start_beacon" parent="spawner/SmartSpawner" index="1" unique_id=1226872864]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -3, 17)
+
+[node name="boss_spawn" type="Marker3D" parent="spawner/SmartSpawner" unique_id=115793713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1, 0)
+
+[node name="chest_spawner" parent="spawner" unique_id=78453180 instance=ExtResource("12_513hw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 20, -9)
+
+[node name="chest_spawner3" parent="spawner" unique_id=420889440 instance=ExtResource("12_513hw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 20, -9)
+chest_scene = ExtResource("13_uylmo")
+spawn_chance = 33.0
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=197628807]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83, 0, 0)
+collision_mask = 267
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=30738766]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.621887, 72, -200)
+shape = SubResource("BoxShape3D_hlie2")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" unique_id=1757394545]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -48.378113, 72, -20)
+shape = SubResource("BoxShape3D_hlie2")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="StaticBody3D" unique_id=1298724145]
+transform = Transform3D(-5.9604645e-08, 0, 1, 0, 1, 0, -1, 0, -5.9604645e-08, 229.62189, 72, -34)
+shape = SubResource("BoxShape3D_hlie2")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="StaticBody3D" unique_id=257781307]
+transform = Transform3D(1, 0, 1.5893256e-08, 0, 1, 0, -1.5893256e-08, 0, 1, 88.62189, 72, 123)
+shape = SubResource("BoxShape3D_hlie2")
+
+[node name="Map1T3d" parent="." unique_id=1167371297 instance=ExtResource("14_1lgva")]
+
+[node name="WorldEnvironment" parent="Map1T3d" index="0" unique_id=834492024]
+environment = SubResource("Environment_gf3dy")
+
+[node name="DirectionalLight3D" parent="Map1T3d" index="1" unique_id=210805582]
+light_color = Color(0.76, 0.82, 1, 1)
+light_energy = 1.0
+light_volumetric_fog_energy = 15.0
+shadow_blur = 1.0
+
+[node name="fog" parent="Map1T3d" unique_id=604921953 instance=ExtResource("16_x6aeg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.577293, 21, -43.831547)
+visible = false
+size = Vector3(202.2, 0.75, 232)
+material = SubResource("FogMaterial_6i2mx")
+
+[node name="Ground_fire_paricles" parent="." unique_id=1474207563 instance=ExtResource("17_xi8i8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 21, -2)
+
+[node name="Dummy" parent="." unique_id=198686853 instance=ExtResource("18_ery3v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 20, -3)
+
+[node name="pic" parent="." unique_id=1249540837 instance=ExtResource("19_56ntv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 20, -9)
+
+[node name="pic2" parent="." unique_id=1781914296 instance=ExtResource("19_56ntv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 20, -8)
+
+[node name="pic3" parent="." unique_id=212736243 instance=ExtResource("19_56ntv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 20, -7)
+
+[node name="pic4" parent="." unique_id=592281014 instance=ExtResource("19_56ntv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 20, -7)
+
+[node name="pic5" parent="." unique_id=1437139117 instance=ExtResource("19_56ntv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 20, -8)
+
+[node name="pic6" parent="." unique_id=480344911 instance=ExtResource("19_56ntv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 20, -9)
+
+[editable path="spawner/SmartSpawner"]
+[editable path="Map1T3d"]
+[editable path="Map1T3d/island_tree/island_tree19"]
+[editable path="Map1T3d/island_tree/island_tree19/Tree Type6 04"]
+[editable path="Map1T3d/dead_tree/tree5"]
+[editable path="Map1T3d/dead_tree/tree5/Tree Type0 02"]

@@ -9,11 +9,17 @@ extends Node3D
 
 @onready var option_panel: MarginContainer = $CanvasLayer/option
 
+@onready var singleplayer_panel = $CanvasLayer/Singleplayer
+@onready var btn_solo_normal: Button = %S_normal
+@onready var btn_solo_wave: Button = %S_wave
+@onready var btn_solo_retour: Button = %S_retour
+
 @onready var multiplayer_panel = $CanvasLayer/Host_menu
 @onready var btn_host: Button = $CanvasLayer/Host_menu.find_child("btnHost", true, false)
 @onready var btn_join: Button = $CanvasLayer/Host_menu.find_child("btnJoin", true, false)
 @onready var btn_back: Button = $CanvasLayer/Host_menu.find_child("btnBack", true, false)
 @onready var ip_input: LineEdit = $CanvasLayer/Host_menu.find_child("IPInput", true, false)
+@onready var m_mode_select: OptionButton = $CanvasLayer/Host_menu.find_child("M_mode_select", true, false)
 
 @export_group("Lobby")
 @export var pseudo_input: LineEdit
@@ -29,6 +35,11 @@ func _ready() -> void:
 	btn_singleplayer.pressed.connect(_on_singleplayer_pressed)
 	btn_multiplayer.pressed.connect(_on_multiplayer_pressed)
 	btn_option.pressed.connect(_on_option_pressed)
+	
+	# Connexion des boutons Solo
+	btn_solo_normal.pressed.connect(_on_solo_normal_pressed)
+	btn_solo_wave.pressed.connect(_on_solo_wave_pressed)
+	btn_solo_retour.pressed.connect(_on_solo_retour_pressed)
 	
 	# Connexion des boutons du menu multijoueur
 	if btn_host: btn_host.pressed.connect(_on_host_pressed)
@@ -55,6 +66,7 @@ func _ready() -> void:
 	
 	if lobby_panel != null:
 		lobby_panel.hide()
+	singleplayer_panel.hide()
 
 	# Si on revient d'une partie et qu'on est deja en reseau, on ouvre le lobby direct !
 	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer is ENetMultiplayerPeer:
@@ -66,6 +78,7 @@ func _ready() -> void:
 func _open_lobby() -> void:
 	multiplayer_panel.hide()
 	main_menu.hide() # On cache le menu principal (boutons solo/multi)
+	singleplayer_panel.hide()
 	if lobby_panel != null:
 		lobby_panel.show()
 		
@@ -136,20 +149,39 @@ func _on_leave_lobby_pressed() -> void:
 
 func _on_launch_pressed() -> void:
 	if multiplayer.is_server():
-		rpc("rpc_launch_game")
+		rpc("rpc_launch_game", GameData.current_game_mode, GameData.current_seed)
 
 @rpc("authority", "call_local", "reliable")
-func rpc_launch_game() -> void:
+func rpc_launch_game(mode: int, seed_val: int) -> void:
+	# TOUS les joueurs mettent à jour leur mode de jeu et la graine
+	GameData.current_game_mode = mode as GameData.GameMode
+	GameData.current_seed = seed_val
 	# TOUS les joueurs changent de scene en meme temps
 	get_tree().change_scene_to_file("res://lvl/game.tscn")
+
 
 # --- MENU PRINCIPAL ---
 
 func _on_singleplayer_pressed() -> void:
+	main_menu.hide()
+	singleplayer_panel.show()
+
+func _on_solo_normal_pressed() -> void:
+	GameData.current_game_mode = GameData.GameMode.NORMAL
+	GameData.current_seed = randi() % 1000000 # Graine aléatoire
 	get_tree().change_scene_to_file("res://lvl/game.tscn")
+
+func _on_solo_wave_pressed() -> void:
+	GameData.current_game_mode = GameData.GameMode.WAVE
+	get_tree().change_scene_to_file("res://lvl/game.tscn")
+
+func _on_solo_retour_pressed() -> void:
+	singleplayer_panel.hide()
+	main_menu.show()
 
 func _on_multiplayer_pressed() -> void:
 	main_menu.hide()
+	singleplayer_panel.hide()
 	multiplayer_panel.show()
 	anim_player.play("multi_open")
 
@@ -167,6 +199,11 @@ func _on_host_pressed() -> void:
 	if error == OK:
 		multiplayer.multiplayer_peer = peer
 		print("Serveur cree, ouverture du lobby...")
+		
+		# On recupere le mode choisi par l'hote
+		if m_mode_select:
+			GameData.current_game_mode = m_mode_select.selected as GameData.GameMode
+			GameData.current_seed = randi() % 1000000
 		
 		# Le Host s'enregistre lui-meme
 		GameData.player_pseudos.clear()

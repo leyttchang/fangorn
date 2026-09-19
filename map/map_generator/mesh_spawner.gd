@@ -2,6 +2,8 @@
 class_name MeshSpawner
 extends Node3D
 
+signal trees_ready
+
 const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 
 @export_category("Références")
@@ -377,6 +379,7 @@ func generate_trees() -> void:
 		
 	print("Génération des arbres terminée !")
 	_is_generating = false
+	trees_ready.emit()
 
 
 ## Construit une grille spatiale des routes pour tester uniquement les segments proches

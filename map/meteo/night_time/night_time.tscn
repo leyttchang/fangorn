@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://644jv1ogcn6r"]
+
+[ext_resource type="Texture2D" uid="uid://bufynasqx5irc" path="res://assets/skybox/NightSkyHDRI008_4K_HDR.exr" id="1_5drth"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_fa2oq"]
+panorama = ExtResource("1_5drth")
+energy_multiplier = 2.0
+
+[sub_resource type="Sky" id="Sky_hlie2"]
+sky_material = SubResource("PanoramaSkyMaterial_fa2oq")
+
+[sub_resource type="Environment" id="Environment_xv3v3"]
+background_mode = 2
+background_color = Color(1, 1, 1, 1)
+background_energy_multiplier = 0.59
+sky = SubResource("Sky_hlie2")
+ambient_light_source = 2
+ambient_light_color = Color(0.26064485, 0.37135845, 0.52897114, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 1.42
+tonemap_mode = 4
+tonemap_exposure = 1.1
+ssao_enabled = true
+ssao_radius = 1.69
+ssil_enabled = true
+glow_enabled = true
+glow_levels/1 = 0.21
+glow_intensity = 0.86
+glow_bloom = 0.15
+glow_blend_mode = 0
+fog_mode = 1
+fog_light_color = Color(0.009000001, 0.017200002, 0.05, 1)
+fog_density = 1.0
+fog_sky_affect = 0.313
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0168
+volumetric_fog_albedo = Color(0.015, 0.02625, 0.06, 1)
+volumetric_fog_emission = Color(0.0027583046, 0.0048818053, 0.0005390436, 1)
+volumetric_fog_emission_energy = 5.0
+volumetric_fog_anisotropy = 0.75
+volumetric_fog_length = 152.09
+volumetric_fog_sky_affect = 0.95
+adjustment_enabled = true
+adjustment_brightness = 1.1
+adjustment_contrast = 1.1
+adjustment_saturation = 0.8
+
+[node name="night_time" type="Node3D" unique_id=1381402426]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1749556693]
+environment = SubResource("Environment_xv3v3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1637709261]
+transform = Transform3D(1, 0, 0, 0, 0.39068252, 0.9205255, 0, -0.9205255, 0.39068252, -15.584869, 993.5476, 1133.7383)
+light_color = Color(0.76, 0.82, 1, 1)
+light_energy = 1.206
+light_indirect_energy = 2.342
+light_volumetric_fog_energy = 15.0
+shadow_enabled = true
