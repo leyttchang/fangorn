@@ -47,7 +47,10 @@ func _ready() -> void:
 func actor_setup() -> void:
 	await get_tree().physics_frame
 	_update_closest_target()
-	change_state(State.SNEAK)
+	if target != null:
+		change_state(State.SNEAK)
+	else:
+		change_state(State.IDLE)
 
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
@@ -62,7 +65,8 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	_target_update_timer += delta
-	if _target_update_timer > 15.0 or target == null or not is_instance_valid(target):
+	var target_check_interval = 15.0 if GameData.current_game_mode == GameData.GameMode.WAVE else (0.5 if target == null else 2.0)
+	if _target_update_timer > target_check_interval or not is_instance_valid(target):
 		_target_update_timer = 0.0
 		_update_closest_target()
 		
@@ -274,15 +278,10 @@ func _rpc_trigger_death(fatal_velocity: Vector3 = Vector3.ZERO) -> void:
 		queue_free()
 
 func _update_closest_target() -> void:
-	var players = get_tree().get_nodes_in_group("Player")
-	var closest_dist = INF
-	target = null
-	for p in players:
-		if p.has_method("is_dead") and p.is_dead(): continue
-		var d = global_position.distance_to(p.global_position)
-		if d < closest_dist:
-			closest_dist = d
-			target = p
+	if navigation_comp:
+		target = navigation_comp.acquire_target(target)
+	else:
+		target = null
 
 func _on_aggro_requested(attacker: Node3D) -> void:
 	if not is_multiplayer_authority() or current_state == State.DEAD: return

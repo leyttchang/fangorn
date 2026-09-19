@@ -83,11 +83,8 @@ func _setup_local_player() -> void:
 	camera.current = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-	# Fix Terrain3D : assure qu'il utilise la bonne caméra en multi
-	if get_tree().current_scene != null:
-		var terrains = get_tree().current_scene.find_children("*", "Terrain3D")
-		if terrains.size() > 0:
-			terrains[0].set_camera(camera)
+	# Fix Terrain3D : assure qu'il utilise la bonne caméra en solo et multijoueur
+	_setup_terrain_camera()
 
 	var equip_comp = $EquipmentComponent
 	if equip_comp != null and starting_equipped_weapon != null:
@@ -274,3 +271,33 @@ func _rpc_set_alive() -> void:
 
 func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
 	print("Attention : Le joueur vient de perdre ", amount, " PV !")
+
+# ==========================================================
+# FIX CAMERA TERRAIN3D (LOD & CLIPMAP EN MULTIJOUEUR)
+# ==========================================================
+
+func _setup_terrain_camera() -> void:
+	if not is_multiplayer_authority() or not is_instance_valid(camera):
+		return
+		
+	var found_terrain := false
+	# owned = false est indispensable pour trouver les nœuds instanciés dynamiquement
+	var terrains = get_tree().root.find_children("*", "Terrain3D", true, false)
+	for t in terrains:
+		if is_instance_valid(t) and t.has_method("set_camera"):
+			t.set_camera(camera)
+			found_terrain = true
+			print("Terrain3D: Caméra locale assignée avec succès -> ", camera.name)
+			
+	if not found_terrain:
+		call_deferred("_retry_setup_terrain_camera")
+
+func _retry_setup_terrain_camera() -> void:
+	if not is_inside_tree() or not is_multiplayer_authority() or not is_instance_valid(camera):
+		return
+	await get_tree().process_frame
+	var terrains = get_tree().root.find_children("*", "Terrain3D", true, false)
+	for t in terrains:
+		if is_instance_valid(t) and t.has_method("set_camera"):
+			t.set_camera(camera)
+			print("Terrain3D: Caméra locale assignée en différé -> ", camera.name)

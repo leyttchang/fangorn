@@ -84,20 +84,10 @@ func _on_aggro_requested(attacker: Node3D) -> void:
 var _target_update_timer: float = 0.0
 
 func _update_closest_target() -> void:
-	var players = get_tree().get_nodes_in_group("Player")
-	if players.is_empty():
+	if navigation_comp:
+		target = navigation_comp.acquire_target(target)
+	else:
 		target = null
-		return
-		
-	var closest = null
-	var min_dist = 999999.0
-	for p in players:
-		var d = global_position.distance_squared_to(p.global_position)
-		if d < min_dist:
-			min_dist = d
-			closest = p
-			
-	target = closest
 
 
 # ==========================================================
@@ -156,14 +146,10 @@ func _physics_process(delta: float) -> void:
 	if not anim_tree.active:
 		anim_tree.active = true
 
-	# Verrouillage de la cible pendant 15s
+	# Recherche / actualisation de cible selon le mode de jeu
 	_target_update_timer += delta
-	
-	# On cherche une nouvelle cible si :
-	# 1. a fait 15 secondes qu'on suit le mme gars
-	# 2. On n'a pas de cible
-	# 3. La cible a t dtruite / dconnecte
-	if _target_update_timer > 15.0 or target == null or not is_instance_valid(target):
+	var target_check_interval = 15.0 if GameData.current_game_mode == GameData.GameMode.WAVE else (0.5 if target == null else 2.0)
+	if _target_update_timer > target_check_interval or not is_instance_valid(target):
 		_target_update_timer = 0.0
 		_update_closest_target()
 

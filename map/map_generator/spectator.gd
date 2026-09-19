@@ -5,15 +5,33 @@ extends Camera3D
 @export var mouse_sensitivity: float = 0.003
 
 func _ready() -> void:
-	if not Engine.is_editor_hint():
+	# Ne se supprime QUE si on est dans le vrai jeu (ex: lancé depuis game.tscn)
+	if not is_standalone_scene():
 		queue_free()
 		return
 		
+	current = true
 	# Capture la souris pour qu'elle disparaisse et dirige la caméra
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	call_deferred("_setup_terrain_camera")
+
+func is_standalone_scene() -> bool:
+	if get_parent() == null:
+		return false
+	if get_parent().get_parent() == get_tree().root:
+		return true
+	if get_tree().current_scene == get_parent() or (get_tree().current_scene != null and get_tree().current_scene.name == "Map_generator"):
+		return true
+	return false
+
+func _setup_terrain_camera() -> void:
+	var terrains = get_tree().root.find_children("*", "Terrain3D", true, false)
+	for t in terrains:
+		if is_instance_valid(t) and t.has_method("set_camera"):
+			t.set_camera(self)
+			print("Spectator: Caméra spectateur liée au Terrain3D")
 
 func _input(event: InputEvent) -> void:
-	if not Engine.is_editor_hint(): return
 	
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		# Rotation de gauche à droite

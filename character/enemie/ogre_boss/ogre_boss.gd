@@ -136,7 +136,8 @@ func _physics_process(delta: float) -> void:
 			pass # On est en train d'attaquer, on attend !
 
 	_target_update_timer += delta
-	if _target_update_timer > _next_aggro_limit or target == null or not is_instance_valid(target):
+	var current_aggro_limit = _next_aggro_limit if GameData.current_game_mode == GameData.GameMode.WAVE else (0.5 if target == null else 2.0)
+	if _target_update_timer > current_aggro_limit or not is_instance_valid(target):
 		if current_state != State.ATTACK or target == null or not is_instance_valid(target):
 			_target_update_timer = 0.0
 			_next_aggro_limit = randf_range(min_aggro_change_time, max_aggro_change_time)
@@ -625,15 +626,10 @@ func _rpc_trigger_death() -> void:
 	queue_free()
 
 func _update_closest_target() -> void:
-	var players = get_tree().get_nodes_in_group("Player")
-	var closest_dist = INF
-	target = null
-	for p in players:
-		if p.get("is_dead") == true: continue
-		var d = global_position.distance_to(p.global_position)
-		if d < closest_dist:
-			closest_dist = d
-			target = p
+	if navigation_comp:
+		target = navigation_comp.acquire_target(target)
+	else:
+		target = null
 
 func _on_aggro_requested(attacker: Node3D) -> void:
 	if not is_multiplayer_authority() or current_state == State.DEAD: return

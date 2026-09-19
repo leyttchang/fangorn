@@ -3,7 +3,7 @@ extends RefCounted
 
 enum GameMode { WAVE, NORMAL }
 static var current_game_mode: GameMode = GameMode.WAVE
-static var current_seed: int = 0
+static var current_seed: int = 50122
 
 static var player_pseudos: Dictionary = {}
 

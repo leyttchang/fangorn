@@ -36,6 +36,8 @@ const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 @export var jitter: float = 8.0
 ## Marge de sécurité par rapport au bord de la route (en mètres). Avec des arbres scale 10, 10.0 à 15.0m évite tout débordement de branches sur la route.
 @export var road_margin: float = 12.0
+## Rayon de sécurité autour des points d'intérêt / Encounters (en mètres) pour dégager la zone de combat/camp.
+@export var encounter_clear_radius: float = 35.0
 ## Nombre maximum d'arbres à générer sur toute la carte (sécurité anti-freeze)
 @export var max_trees: int = 10000
 ## Échelle minimale de l'arbre
@@ -226,6 +228,14 @@ func generate_trees() -> void:
 		variation_transforms.append(t_arr)
 		variation_instances.append(i_arr)
 		
+	var rad: float = 35.0
+	if encounter_clear_radius != null and float(encounter_clear_radius) > 0.0:
+		rad = float(encounter_clear_radius)
+		
+	var encounter_positions: Array[Vector2] = _get_encounter_positions()
+	if not encounter_positions.is_empty():
+		print("MeshSpawner: Évitement actif pour ", encounter_positions.size(), " encounter(s) (rayon: ", rad, "m).")
+		
 	var total_spawned: int = 0
 	var margin: float = spacing
 	var row_counter: int = 0
@@ -245,6 +255,11 @@ func generate_trees() -> void:
 			# FILTRE 1 (Le plus rapide) : Bruit de forêt
 			# Rejette 70-80% des points instantanément en 1 nanoseconde !
 			if forest_noise.get_noise_2d(px, pz) < forest_threshold:
+				x += spacing
+				continue
+				
+			# FILTRE 1.5 : Évitement des Encounters (dégage les zones de combat/camps)
+			if not encounter_positions.is_empty() and _is_near_any_encounter(px, pz, encounter_positions, rad):
 				x += spacing
 				continue
 				
@@ -463,6 +478,142 @@ func _is_near_road_spatial(px: float, pz: float, margin: float, grid: Dictionary
 			return true
 			
 	return false
+
+## Récupère les positions 2D des encounters pour l'évitement des arbres
+func _get_encounter_positions() -> Array[Vector2]:
+	var positions: Array[Vector2] = []
+	if path_generator != null and "encounter_positions" in path_generator:
+		for p in path_generator.encounter_positions:
+			positions.append(p)
+			
+	var enc_node = null
+	if map_generator != null:
+		enc_node = map_generator.find_child("Encounters", true, false)
+	if enc_node == null and get_parent() != null:
+		enc_node = get_parent().find_child("Encounters", true, false)
+		
+	if enc_node != null:
+		for child in enc_node.get_children():
+			if child is Marker3D:
+				var p2 = Vector2(child.global_position.x, child.global_position.z)
+				var already_present = false
+				for ep in positions:
+					if ep.distance_squared_to(p2) < 4.0:
+						already_present = true
+						break
+				if not already_present:
+					positions.append(p2)
+					
+	return positions
+
+## Vérifie si un point (px, pz) est dans le rayon de dégagement d'un encounter
+func _is_near_any_encounter(px: float, pz: float, positions: Array[Vector2], radius: Variant = 35.0) -> bool:
+	var effective_radius: float = 35.0
+	if radius != null and float(radius) > 0.0:
+		effective_radius = float(radius)
+	var r2: float = effective_radius * effective_radius
+	for p in positions:
+		var dx = px - p.x
+		var dz = pz - p.y
+		if (dx * dx + dz * dz) < r2:
+			return true
+	return false
+
+## Supprime les arbres et leurs collisions situés dans un rayon autour d'une position 3D
+func clear_trees_in_radius(center_pos: Vector3, radius: Variant = 35.0) -> int:
+	return clear_trees_near_positions([center_pos], radius)
+
+## Supprime les arbres et leurs collisions situés à proximité d'une liste de positions
+func clear_trees_near_positions(positions: Array, radius: Variant = 35.0) -> int:
+	if positions.is_empty():
+		return 0
+		
+	var effective_radius: float = 35.0
+	if radius != null and float(radius) > 0.0:
+		effective_radius = float(radius)
+	var r2: float = effective_radius * effective_radius
+	var removed_count = 0
+	
+	# Conversion des centres en Vector2 pour test 2D (X, Z)
+	var centers_2d: Array[Vector2] = []
+	for p in positions:
+		if p is Vector3:
+			centers_2d.append(Vector2(p.x, p.z))
+		elif p is Vector2:
+			centers_2d.append(p)
+			
+	if centers_2d.is_empty():
+		return 0
+		
+	# 1. Nettoyer les MultiMeshInstance3D
+	for child in get_children():
+		if child is MultiMeshInstance3D and child.multimesh != null:
+			var mm: MultiMesh = child.multimesh
+			var total = mm.instance_count
+			if total == 0:
+				continue
+				
+			var kept_transforms: Array[Transform3D] = []
+			var chunk_modified = false
+			
+			for i in range(total):
+				var t: Transform3D = mm.get_instance_transform(i)
+				var global_origin = child.to_global(t.origin)
+				var is_near = false
+				for c in centers_2d:
+					var dx = global_origin.x - c.x
+					var dz = global_origin.z - c.y
+					if (dx * dx + dz * dz) < r2:
+						is_near = true
+						break
+						
+				if is_near:
+					chunk_modified = true
+					removed_count += 1
+				else:
+					kept_transforms.append(t)
+					
+			if chunk_modified:
+				mm.instance_count = kept_transforms.size()
+				for i in range(kept_transforms.size()):
+					mm.set_instance_transform(i, kept_transforms[i])
+	
+	# 2. Nettoyer les collisions physiques
+	if use_physics_server:
+		var new_rids: Array[RID] = []
+		for body in _physics_body_rids:
+			if body.is_valid():
+				var body_t: Transform3D = PhysicsServer3D.body_get_state(body, PhysicsServer3D.BODY_STATE_TRANSFORM)
+				var is_near = false
+				for c in centers_2d:
+					var dx = body_t.origin.x - c.x
+					var dz = body_t.origin.z - c.y
+					if (dx * dx + dz * dz) < r2:
+						is_near = true
+						break
+				if is_near:
+					PhysicsServer3D.free_rid(body)
+				else:
+					new_rids.append(body)
+		_physics_body_rids = new_rids
+	else:
+		var colliders_node = get_node_or_null("TreeColliders")
+		if colliders_node != null:
+			for body in colliders_node.get_children():
+				if body is Node3D:
+					var is_near = false
+					for c in centers_2d:
+						var dx = body.global_position.x - c.x
+						var dz = body.global_position.z - c.y
+						if (dx * dx + dz * dz) < r2:
+							is_near = true
+							break
+					if is_near:
+						body.queue_free()
+						
+	if removed_count > 0:
+		print("MeshSpawner: ", removed_count, " arbre(s) retiré(s) autour des encounters.")
+	return removed_count
 
 ## Configure les collisions (PhysicsServer3D C++ direct ou StaticBody3D)
 func _setup_collisions(instances: Array[Dictionary], tree_data: Dictionary) -> void:

@@ -13,7 +13,11 @@ func _ready() -> void:
 		
 		# On instancie la carte procédurale
 		var map_gen = PROCEDURAL_MAP_SCENE.instantiate()
-		map_gen.world_seed = GameData.current_seed
+		if GameData.current_seed != 0:
+			map_gen.world_seed = GameData.current_seed
+		else:
+			GameData.current_seed = map_gen.world_seed
+		print("game.gd: Lancement du monde avec world_seed = ", map_gen.world_seed)
 		add_child(map_gen)
 		
 		# On attend que la carte soit générée avant de continuer
@@ -56,6 +60,21 @@ func spawn_player(peer_id: int) -> void:
 	# On l'ajoute dans le dossier "Players". 
 	# Le PlayerSpawner va le détecter et l'envoyer à tout le monde !
 	players_container.add_child(player, true)
+	
+	# Si c'est notre joueur local, on assure la liaison caméra -> Terrain3D
+	if peer_id == multiplayer.get_unique_id():
+		call_deferred("_link_local_camera_to_terrain", player)
+
+func _link_local_camera_to_terrain(player_node: Node) -> void:
+	if not is_instance_valid(player_node):
+		return
+	var cam = player_node.get_node_or_null("Camera3D") as Camera3D
+	if cam != null:
+		var terrains = get_tree().root.find_children("*", "Terrain3D", true, false)
+		for t in terrains:
+			if is_instance_valid(t) and t.has_method("set_camera"):
+				t.set_camera(cam)
+				print("game.gd: Caméra du joueur local liée au Terrain3D -> ", cam.name)
 
 # Fonction appelée par le serveur quand quelqu'un quitte
 func remove_player(peer_id: int) -> void:

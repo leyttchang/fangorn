@@ -57,13 +57,20 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
-		# Détruire la caméra du générateur pour ne pas bloquer celle du joueur
-			
-		var cam2 = find_child("*Camera*", true, false)
-		if cam2 and cam2 is Camera3D:
-			cam2.queue_free()
+		# Ne détruire la caméra spectateur que si on est dans le vrai jeu (ex: sous game.tscn)
+		if not is_standalone_scene():
+			var cam2 = find_child("*Camera*", true, false)
+			if cam2 and cam2 is Camera3D:
+				cam2.queue_free()
 			
 		call_deferred("generate_terrain_async")
+
+func is_standalone_scene() -> bool:
+	if get_parent() == get_tree().root:
+		return true
+	if get_tree().current_scene == self or (get_tree().current_scene != null and get_tree().current_scene.name == "Map_generator"):
+		return true
+	return false
 		
 func clear_terrain() -> void:
 	var time_start = Time.get_ticks_msec()
@@ -103,6 +110,8 @@ func clear_terrain() -> void:
 		var current = stack.pop_back()
 		if current != self and current.has_method("clear_grass"):
 			current.clear_grass()
+		if current != self and current.has_method("clear_encounters"):
+			current.clear_encounters()
 		stack.append_array(current.get_children())
 			
 	var time_clean = Time.get_ticks_msec() - time_start
@@ -155,6 +164,8 @@ func _place_encounter_markers(terrain_data) -> void:
 			marker.owner = get_tree().edited_scene_root
 			
 	print("Markers d'Encounters placés : ", positions.size())
+	if encounters_node.has_method("spawn_encounters"):
+		encounters_node.call_deferred("spawn_encounters", world_seed)
 
 func _get_active_curve() -> Curve:
 	if height_curve != null:
@@ -483,5 +494,14 @@ func _bake_navmesh() -> void:
 	
 	var time_nav = Time.get_ticks_msec() - time_nav_start
 	print("NavMesh : Cuisson Asynchrone par chunks terminée en ", time_nav, " ms ! Polygones totaux : ", total_polygons)
+	
+	# Fix Terrain3D : synchroniser avec la caméra active locale si disponible
+	if not Engine.is_editor_hint() and terrain != null:
+		var vp = get_viewport()
+		if vp != null:
+			var active_cam = vp.get_camera_3d()
+			if active_cam != null and terrain.has_method("set_camera"):
+				terrain.set_camera(active_cam)
+				print("MapGenerator: Caméra active liée au Terrain3D -> ", active_cam.name)
 	
 	terrain_ready.emit()

@@ -13,6 +13,8 @@ extends Node3D
 @onready var btn_solo_normal: Button = %S_normal
 @onready var btn_solo_wave: Button = %S_wave
 @onready var btn_solo_retour: Button = %S_retour
+@onready var solo_seed_input: LineEdit = %S_seed_input
+@onready var btn_solo_seed_rand: Button = %S_seed_rand
 
 @onready var multiplayer_panel = $CanvasLayer/Host_menu
 @onready var btn_host: Button = $CanvasLayer/Host_menu.find_child("btnHost", true, false)
@@ -20,6 +22,8 @@ extends Node3D
 @onready var btn_back: Button = $CanvasLayer/Host_menu.find_child("btnBack", true, false)
 @onready var ip_input: LineEdit = $CanvasLayer/Host_menu.find_child("IPInput", true, false)
 @onready var m_mode_select: OptionButton = $CanvasLayer/Host_menu.find_child("M_mode_select", true, false)
+@onready var host_seed_input: LineEdit = %H_seed_input
+@onready var btn_host_seed_rand: Button = %H_seed_rand
 
 @export_group("Lobby")
 @export var pseudo_input: LineEdit
@@ -40,11 +44,21 @@ func _ready() -> void:
 	btn_solo_normal.pressed.connect(_on_solo_normal_pressed)
 	btn_solo_wave.pressed.connect(_on_solo_wave_pressed)
 	btn_solo_retour.pressed.connect(_on_solo_retour_pressed)
+	if btn_solo_seed_rand:
+		btn_solo_seed_rand.pressed.connect(func():
+			if solo_seed_input:
+				solo_seed_input.text = str(randi() % 1000000)
+		)
 	
 	# Connexion des boutons du menu multijoueur
 	if btn_host: btn_host.pressed.connect(_on_host_pressed)
 	if btn_join: btn_join.pressed.connect(_on_join_pressed)
 	if btn_back: btn_back.pressed.connect(_on_back_pressed)
+	if btn_host_seed_rand:
+		btn_host_seed_rand.pressed.connect(func():
+			if host_seed_input:
+				host_seed_input.text = str(randi() % 1000000)
+		)
 	
 	# Boutons du lobby
 	if btn_launch != null:
@@ -168,7 +182,12 @@ func _on_singleplayer_pressed() -> void:
 
 func _on_solo_normal_pressed() -> void:
 	GameData.current_game_mode = GameData.GameMode.NORMAL
-	GameData.current_seed = randi() % 1000000 # Graine aléatoire
+	var s_text = solo_seed_input.text.strip_edges() if solo_seed_input else ""
+	if s_text != "" and s_text.is_valid_int():
+		GameData.current_seed = s_text.to_int()
+	else:
+		GameData.current_seed = randi() % 1000000
+	print("Menu: Mode Normal Solo lancé avec seed = ", GameData.current_seed)
 	get_tree().change_scene_to_file("res://lvl/game.tscn")
 
 func _on_solo_wave_pressed() -> void:
@@ -203,7 +222,12 @@ func _on_host_pressed() -> void:
 		# On recupere le mode choisi par l'hote
 		if m_mode_select:
 			GameData.current_game_mode = m_mode_select.selected as GameData.GameMode
-			GameData.current_seed = randi() % 1000000
+			var h_text = host_seed_input.text.strip_edges() if host_seed_input else ""
+			if h_text != "" and h_text.is_valid_int():
+				GameData.current_seed = h_text.to_int()
+			else:
+				GameData.current_seed = randi() % 1000000
+			print("Menu Host: Mode choisi = ", GameData.current_game_mode, " | Seed = ", GameData.current_seed)
 		
 		# Le Host s'enregistre lui-meme
 		GameData.player_pseudos.clear()

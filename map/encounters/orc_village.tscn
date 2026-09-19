@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://b7fydwebsiwpe"]
+
+[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="1_7cju8"]
+[ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="2_7ylfh"]
+[ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="3_aj8o6"]
+[ext_resource type="PackedScene" uid="uid://uwqnpr24nibv" path="res://objet/chest/chest.tscn" id="4_ovs3d"]
+[ext_resource type="PackedScene" uid="uid://cekr3wmhu571c" path="res://objet/chest/Skill_chest.tscn" id="5_3gj4m"]
+
+[node name="orc_village" type="Node3D" unique_id=1992368361]
+
+[node name="dumb" parent="." unique_id=888204308 instance=ExtResource("1_7cju8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05829096, 0, 1.0105433)
+
+[node name="dumb2" parent="." unique_id=1822109421 instance=ExtResource("1_7cju8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.227888, 4.7683716e-07, -2.4776015)
+
+[node name="dumb3" parent="." unique_id=380327551 instance=ExtResource("1_7cju8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0283818, 4.7683716e-07, -1.8793097)
+
+[node name="dumb4" parent="." unique_id=1820834967 instance=ExtResource("1_7cju8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19675434, 0.32087827, -2.7536478)
+
+[node name="dumb5" parent="." unique_id=689609020 instance=ExtResource("1_7cju8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.056908, 0, 0)
+
+[node name="dumb6" parent="." unique_id=19201379 instance=ExtResource("1_7cju8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.077777, 0, 0)
+
+[node name="dumb_archer" parent="." unique_id=1437418324 instance=ExtResource("2_7ylfh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5471886, 4.7683716e-07, -7.4693685)
+
+[node name="dumb_archer2" parent="." unique_id=111093876 instance=ExtResource("2_7ylfh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6377841, 0, -7.5728784)
+
+[node name="dumb_archer3" parent="." unique_id=210735987 instance=ExtResource("2_7ylfh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0848403, 0, -5.867196)
+
+[node name="dumb_archer4" parent="." unique_id=2054441939 instance=ExtResource("2_7ylfh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9369526, 0, -6.0231495)
+
+[node name="Scout" parent="." unique_id=1082760754 instance=ExtResource("3_aj8o6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8800659, 2, 1.1954544)
+
+[node name="Scout2" parent="." unique_id=1677643188 instance=ExtResource("3_aj8o6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0142949, 2, 1.0880847)
+
+[node name="Chest" parent="." unique_id=1680074549 instance=ExtResource("4_ovs3d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24715805, 0, -5.4007874)
+
+[node name="SkillChest" parent="." unique_id=1680074550 instance=ExtResource("5_3gj4m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1394885, -4.7683716e-07, -5.556631)

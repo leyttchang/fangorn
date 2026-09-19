@@ -23,9 +23,11 @@ func accelerate_to_direction(current_velocity_2d: Vector2, direction_3d: Vector3
 
 # --- ROTATION FLUIDE ---
 func rotate_towards_direction(direction_3d: Vector3, behavior: EnemyBehaviorData, delta: float, speed_multiplier: float = 1.0) -> void:
-	if behavior == null or _parent_body == null: return
+	if behavior == null or _parent_body == null or not _parent_body.is_inside_tree(): return
 	
 	var dir_2d = Vector2(direction_3d.x, direction_3d.z)
 	if dir_2d.length() > 0.1:
 		var target_rotation_y = atan2(dir_2d.x, dir_2d.y) # En 2D, l'axe Y correspond à l'axe Z de la 3D
-		_parent_body.rotation.y = lerp_angle(_parent_body.rotation.y, target_rotation_y, behavior.rotation_speed * speed_multiplier * delta)
+		var current_rot = _parent_body.global_rotation
+		current_rot.y = lerp_angle(current_rot.y, target_rotation_y, behavior.rotation_speed * speed_multiplier * delta)
+		_parent_body.global_rotation = current_rot
