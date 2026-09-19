@@ -82,10 +82,7 @@ func _ready() -> void:
 	_ensure_default_noise()
 	_connect_to_map_generator()
 	
-	if not Engine.is_editor_hint():
-		if map_generator and map_generator.has_signal("terrain_ready"):
-			if not map_generator.terrain_ready.is_connected(generate_trees):
-				map_generator.terrain_ready.connect(generate_trees)
+
 
 func _exit_tree() -> void:
 	_clear_physics_server_bodies()
@@ -338,7 +335,9 @@ func generate_trees() -> void:
 		
 	await _safe_await_frame()
 	
-	# 5. Construction des MultiMeshInstance3D pour chaque espèce
+	# 5. Construction des MultiMeshInstance3D EN CHUNKS pour des perfs maximales (HLOD / Frustum Culling)
+	var chunk_size = 128.0 # Les arbres seront découpés en blocs de 128x128m
+	
 	for vi in range(active_variations.size()):
 		var v_data = active_variations[vi]
 		var transforms: Array = variation_transforms[vi]
@@ -347,26 +346,51 @@ func generate_trees() -> void:
 			continue
 			
 		var clean_name: String = v_data["name"].replace(" ", "_")
-		var mmi_name: String = "MultiMesh_" + str(vi) + "_" + clean_name
-		var mmi = get_node_or_null(mmi_name) as MultiMeshInstance3D
-		if mmi == null:
-			mmi = MultiMeshInstance3D.new()
-			mmi.name = mmi_name
-			add_child(mmi)
-				
-		var mm = MultiMesh.new()
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = v_data["mesh"]
-		mm.instance_count = count
 		
+		# Séparation des arbres par blocs (chunks)
+		var chunks = {}
 		for i in range(count):
-			mm.set_instance_transform(i, transforms[i])
+			var t: Transform3D = transforms[i]
+			var pos = t.origin
+			var cx = int(floor(pos.x / chunk_size))
+			var cz = int(floor(pos.z / chunk_size))
+			var key = Vector2i(cx, cz)
 			
-		mmi.multimesh = mm
-		if v_data["material"] != null:
-			mmi.material_override = v_data["material"]
+			if not chunks.has(key):
+				chunks[key] = []
+			chunks[key].append(t)
 			
-		print("  -> ", v_data["name"], " : ", count, " arbres créés.")
+		# Création d'un MultiMesh par chunk
+		for key in chunks.keys():
+			var chunk_transforms = chunks[key]
+			var chunk_count = chunk_transforms.size()
+			
+			# Exemple de nom: MultiMesh_0_Oak_C_12_5
+			var mmi_name: String = "MultiMesh_" + str(vi) + "_" + clean_name + "_C_" + str(key.x) + "_" + str(key.y)
+			
+			var mmi = get_node_or_null(mmi_name) as MultiMeshInstance3D
+			if mmi == null:
+				mmi = MultiMeshInstance3D.new()
+				mmi.name = mmi_name
+				add_child(mmi)
+					
+			var mm = MultiMesh.new()
+			mm.transform_format = MultiMesh.TRANSFORM_3D
+			mm.mesh = v_data["mesh"]
+			mm.instance_count = chunk_count
+			
+			for i in range(chunk_count):
+				mm.set_instance_transform(i, chunk_transforms[i])
+				
+			mmi.multimesh = mm
+			if v_data["material"] != null:
+				mmi.material_override = v_data["material"]
+				
+			# OPTIMISATION MAGIQUE : Distance d'affichage
+			mmi.visibility_range_end = 350.0 # Ne dessine plus les arbres au-delà de 350m
+			mmi.visibility_range_end_margin = 50.0 # Fondu progressif entre 300m et 350m
+			
+		print("  -> ", v_data["name"], " : ", count, " arbres créés dans ", chunks.size(), " chunks.")
 		
 	await _safe_await_frame()
 	

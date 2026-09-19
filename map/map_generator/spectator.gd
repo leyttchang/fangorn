@@ -5,10 +5,16 @@ extends Camera3D
 @export var mouse_sensitivity: float = 0.003
 
 func _ready() -> void:
+	if not Engine.is_editor_hint():
+		queue_free()
+		return
+		
 	# Capture la souris pour qu'elle disparaisse et dirige la caméra
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _input(event: InputEvent) -> void:
+	if not Engine.is_editor_hint(): return
+	
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		# Rotation de gauche à droite
 		rotation.y -= event.relative.x * mouse_sensitivity

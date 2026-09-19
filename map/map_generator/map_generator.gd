@@ -57,9 +57,16 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
+		# Détruire la caméra du générateur pour ne pas bloquer celle du joueur
+			
+		var cam2 = find_child("*Camera*", true, false)
+		if cam2 and cam2 is Camera3D:
+			cam2.queue_free()
+			
 		call_deferred("generate_terrain_async")
 		
 func clear_terrain() -> void:
+	var time_start = Time.get_ticks_msec()
 	print("Nettoyage radical du terrain...")
 	var terrain_data = null
 	if "data" in terrain: terrain_data = terrain.data
@@ -91,7 +98,26 @@ func clear_terrain() -> void:
 	if mesh_spawner and mesh_spawner.has_method("clear_trees"):
 		mesh_spawner.clear_trees()
 		
-	print("Terrain nettoyé !")
+	var stack = [self]
+	while stack.size() > 0:
+		var current = stack.pop_back()
+		if current != self and current.has_method("clear_grass"):
+			current.clear_grass()
+		stack.append_array(current.get_children())
+			
+	var time_clean = Time.get_ticks_msec() - time_start
+	print("Terrain nettoyé en ", time_clean, " ms !")
+
+func get_spawn_point() -> Vector3:
+	if path_generator and path_generator.start_pos != Vector2.ZERO:
+		var p2 = path_generator.start_pos
+		var ground_y = get_terrain_height_at(p2.x, p2.y)
+		print("DEBUG SPAWN: Point calculé = ", p2.x, ", ", ground_y, ", ", p2.y)
+		return Vector3(p2.x, ground_y, p2.y)
+	
+	print("DEBUG SPAWN: Fallback utilisé (0, 100, 0)")
+	# Fallback (centre de la map, hauteur arbitraire)
+	return Vector3(0, 100, 0)
 
 func _place_encounter_markers(terrain_data) -> void:
 	if path_generator == null or not ("encounter_positions" in path_generator):
@@ -145,6 +171,12 @@ func _get_active_curve() -> Curve:
 	default_curve.bake()
 	return default_curve
 
+func get_terrain_height_at(x: float, z: float) -> float:
+	if noise == null: return 0.0
+	var n: float = noise.get_noise_2d(x, z) * 0.5 + 0.5
+	var t_contrasted: float = clampf((n - 0.5) * contrast + 0.5, 0.0, 1.0)
+	return lerp(min_height, max_height, _get_active_curve().sample_baked(t_contrasted))
+
 # Génération asynchrone pour ne JAMAIS faire crasher l'éditeur Godot !
 func generate_terrain_async() -> void:
 	if terrain == null or noise == null:
@@ -192,6 +224,7 @@ func generate_terrain_async() -> void:
 	if path_generator != null:
 		h_smooth_radius = maxf(1.0, path_generator.path_width * 0.3)
 	
+	var time_chunks_start = Time.get_ticks_msec()
 	for cx in range(map_width_chunks):
 		for cz in range(map_height_chunks):
 			
@@ -241,58 +274,53 @@ func generate_terrain_async() -> void:
 						
 						var dist_sq: float
 						if l2 < 0.0001:
-							var ex: float = gx - ax; var ey: float = gz - ay
-							dist_sq = ex * ex + ey * ey
+							var dx: float = gx - ax; var dy: float = gz - ay
+							dist_sq = dx * dx + dy * dy
 						else:
-							var t: float = clamp(((gx - ax) * ddx + (gz - ay) * ddy) / l2, 0.0, 1.0)
-							var proj_x: float = ax + t * ddx
-							var proj_y: float = ay + t * ddy
-							var ex: float = gx - proj_x; var ey: float = gz - proj_y
-							dist_sq = ex * ex + ey * ey
-						
+							var t_proj: float = maxf(0.0, minf(1.0, ((gx - ax) * ddx + (gz - ay) * ddy) / l2))
+							var proj_x: float = ax + t_proj * ddx
+							var proj_y: float = ay + t_proj * ddy
+							var dx: float = gx - proj_x; var dy: float = gz - proj_y
+							dist_sq = dx * dx + dy * dy
+							
 						if dist_sq < seg_w_sq:
 							var dist: float = sqrt(dist_sq)
-							var t_raw: float = dist / seg_w
-							var blend: float = 1.0 - (t_raw * t_raw * (3.0 - 2.0 * t_raw))
-							var pidx: int = lz * region_size + lx
-							if blend > path_blend_array[pidx]:
-								path_blend_array[pidx] = blend
+							var t_val: float = dist / seg_w
+							var blend: float = 1.0 - (t_val * t_val * (3.0 - 2.0 * t_val))
+							var array_idx: int = lz * region_size + lx
+							if blend > path_blend_array[array_idx]:
+								path_blend_array[array_idx] = blend
 			
-			# ===== PHASE 2 : Hauteur Float32 continue + Curve + Control map =====
-			# Échantillonne le bruit directement en Float32 (get_noise_2d).
-			# ZÉRO quantification 8-bit -> ÉLIMINATION DÉFINITIVE DE L'EFFET ESCALIER !
+			# ===== PHASE 2 : Application du relief et de la texture =====
 			var height_bytes: PackedByteArray = PackedByteArray()
-			height_bytes.resize(region_size * region_size * 4)
 			var ctrl_bytes: PackedByteArray = PackedByteArray()
+			height_bytes.resize(region_size * region_size * 4)
 			ctrl_bytes.resize(region_size * region_size * 4)
 			
 			var idx: int = 0
-			for z in range(region_size):
-				if z % 64 == 0 and not Engine.is_editor_hint():
-					await get_tree().process_frame
-				
-				var gz: float = float(chunk_min_z + z)
-				
-				for x in range(region_size):
-					var gx: float = float(chunk_min_x + x)
+			for lz in range(region_size):
+				var global_z = chunk_min_z + lz
+				var gz: float = float(global_z)
+				for lx in range(region_size):
+					var global_x = chunk_min_x + lx
+					var gx: float = float(global_x)
 					
-					# Vrai bruit continu 32-bit float [-1.0, 1.0] -> [0.0, 1.0]
-					var n: float = noise.get_noise_2d(gx, gz) * 0.5 + 0.5
+					# Marge plate de 15m aux bords de la map
+					var margin: float = 15.0
+					var safe_gx = clampf(gx, margin, float(total_w) - margin)
+					var safe_gz = clampf(gz, margin, float(total_h) - margin)
 					
-					# Contraste (étire le noir et le blanc, élimine les plaines surélevées)
+					var n: float = noise.get_noise_2d(safe_gx, safe_gz) * 0.5 + 0.5
 					var t_contrasted: float = clampf((n - 0.5) * contrast + 0.5, 0.0, 1.0)
-					
-					# Hauteur continue via la Curve (sample_baked est interne à Godot C++ et ultra fluide)
 					var h: float = lerp(min_height, max_height, active_curve.sample_baked(t_contrasted))
 					
 					var blend: float = path_blend_array[idx]
 					if blend > 0.0:
-						# Aplatissement du chemin en échantillonnant les 4 voisins
 						var nf: float = (
-							noise.get_noise_2d(gx + h_smooth_radius, gz) +
-							noise.get_noise_2d(gx - h_smooth_radius, gz) +
-							noise.get_noise_2d(gx, gz + h_smooth_radius) +
-							noise.get_noise_2d(gx, gz - h_smooth_radius)
+							noise.get_noise_2d(safe_gx + h_smooth_radius, safe_gz) +
+							noise.get_noise_2d(safe_gx - h_smooth_radius, safe_gz) +
+							noise.get_noise_2d(safe_gx, safe_gz + h_smooth_radius) +
+							noise.get_noise_2d(safe_gx, safe_gz - h_smooth_radius)
 						) * 0.125 + 0.5
 						var tf: float = clampf((nf - 0.5) * contrast + 0.5, 0.0, 1.0)
 						var hf: float = lerp(min_height, max_height, active_curve.sample_baked(tf))
@@ -318,7 +346,8 @@ func generate_terrain_async() -> void:
 			
 			await get_tree().process_frame
 	
-	print("Génération terminée ! ", chunks_generated, " chunks créés.")
+	var time_chunks_total = Time.get_ticks_msec() - time_chunks_start
+	print("Génération terminée ! ", chunks_generated, " chunks créés en ", time_chunks_total, " ms.")
 	# Génération de la météo via le nœud dédié
 	var meteo_node = find_child("Meteo", true, false)
 	if meteo_node == null:
@@ -330,7 +359,6 @@ func generate_terrain_async() -> void:
 	# Placement des points d'intérêt (Encounters)
 	_place_encounter_markers(terrain_data)
 	
-	terrain_ready.emit()
 	
 	# Génère automatiquement les arbres s'il y a un MeshSpawner
 	var mesh_spawner = find_child("MeshSpawner", true, false)
@@ -344,12 +372,29 @@ func generate_terrain_async() -> void:
 	else:
 		# S'il n'y a pas d'arbres à générer, on lance le bake tout de suite
 		_bake_navmesh()
+		
+	var grass_gen = null
+	# Recherche récursive de tous les descendants
+	var stack = [self]
+	while stack.size() > 0:
+		var current = stack.pop_back()
+		if current != self and current.has_method("generate_grass"):
+			grass_gen = current
+			break
+		stack.append_array(current.get_children())
+			
+	if grass_gen:
+		print("Lancement de la génération d'herbe sur le noeud : ", grass_gen.name)
+		grass_gen.call_deferred("generate_grass")
+	else:
+		print("ATTENTION: Aucun noeud avec le script grass_generator.gd n'a été trouvé dans l'arbre !")
 
 # ==========================================
 # GESTION DU NAVMESH PROCEDURAL (Terrain3D)
 # ==========================================
 
 func _bake_navmesh() -> void:
+	var time_nav_start = Time.get_ticks_msec()
 	print("NavMesh : nettoyage et préparation de la cuisson en chunks...")
 	
 	# 1. Nettoyer l'ancien NavMesh monolithique (s'il existe)
@@ -377,6 +422,8 @@ func _bake_navmesh() -> void:
 
 	var total_polygons = 0
 	
+	var bake_state = {"pending": 0}
+	
 	for cx in range(map_width_chunks):
 		for cy in range(map_height_chunks):
 			var nav_region = NavigationRegion3D.new()
@@ -384,11 +431,11 @@ func _bake_navmesh() -> void:
 			
 			var n_mesh = NavigationMesh.new()
 			n_mesh.geometry_source_geometry_mode = NavigationMesh.SOURCE_GEOMETRY_ROOT_NODE_CHILDREN
-			n_mesh.cell_size = 1.5
-			n_mesh.cell_height = 0.5
+			n_mesh.cell_size = 0.75
+			n_mesh.cell_height = 0.25
 			n_mesh.agent_radius = 0.75
 			n_mesh.agent_height = 1.8
-			n_mesh.agent_max_slope = 45.0
+			n_mesh.agent_max_slope = 40.0
 			n_mesh.agent_max_climb = 0.5
 			
 			nav_region.navigation_mesh = n_mesh
@@ -399,10 +446,10 @@ func _bake_navmesh() -> void:
 			var source_data := NavigationMeshSourceGeometryData3D.new()
 			NavigationServer3D.parse_source_geometry_data(n_mesh, source_data, nav_region)
 			
-			# AABB du chunk (légèrement étendu de 5m pour que les bords se connectent parfaitement)
+			# AABB du chunk (légèrement étendu de 0.8m pour que les bords se connectent sans surcharger Godot)
 			var chunk_x := float(cx * region_size)
 			var chunk_z := float(cy * region_size)
-			var aabb := AABB(Vector3(chunk_x - 5.0, -100.0, chunk_z - 5.0), Vector3(float(region_size) + 10.0, max_height + 200.0, float(region_size) + 10.0))
+			var aabb := AABB(Vector3(chunk_x - 0.8, -100.0, chunk_z - 0.8), Vector3(float(region_size) + 1.6, max_height + 200.0, float(region_size) + 1.6))
 			
 			var has_faces := false
 			if terrain and terrain.has_method("generate_nav_mesh_source_geometry"):
@@ -412,75 +459,29 @@ func _bake_navmesh() -> void:
 					has_faces = true
 			
 			if has_faces:
-				NavigationServer3D.bake_from_source_geometry_data(n_mesh, source_data)
-				_postprocess_navmesh(n_mesh)
-				nav_region.set_navigation_mesh(null)
-				nav_region.set_navigation_mesh(n_mesh)
-				total_polygons += n_mesh.get_polygon_count()
+				bake_state.pending += 1
 				
-	print("NavMesh : Cuisson par chunks terminée ! Polygones totaux : ", total_polygons)
-
-# --- FONCTIONS DE POST-PROCESSING DE TERRAIN3D ---
-func _postprocess_navmesh(p_nav_mesh: NavigationMesh) -> void:
-	var vertices: PackedVector3Array = _postprocess_nav_mesh_round_vertices(p_nav_mesh)
-	var polygons: Array[PackedInt32Array] = _postprocess_nav_mesh_remove_empty_polygons(p_nav_mesh, vertices)
-	_postprocess_nav_mesh_remove_overlapping_polygons(p_nav_mesh, vertices, polygons)
-	p_nav_mesh.clear_polygons()
-	p_nav_mesh.set_vertices(vertices)
-	for polygon in polygons:
-		p_nav_mesh.add_polygon(polygon)
-
-func _postprocess_nav_mesh_round_vertices(p_nav_mesh: NavigationMesh) -> PackedVector3Array:
-	var cell_size: Vector3 = Vector3(p_nav_mesh.cell_size, p_nav_mesh.cell_height, p_nav_mesh.cell_size)
-	var round_factor := cell_size * 1.001
-	var vertices: PackedVector3Array = p_nav_mesh.get_vertices()
-	for i in range(vertices.size()):
-		vertices[i] = (vertices[i] / round_factor).floor() * round_factor
-	return vertices
-
-func _postprocess_nav_mesh_remove_empty_polygons(p_nav_mesh: NavigationMesh, p_vertices: PackedVector3Array) -> Array[PackedInt32Array]:
-	var polygons: Array[PackedInt32Array] = []
-	for i in range(p_nav_mesh.get_polygon_count()):
-		var old_polygon: PackedInt32Array = p_nav_mesh.get_polygon(i)
-		var new_polygon: PackedInt32Array = []
-		var polygon_vertices: PackedVector3Array = []
-		for index in old_polygon:
-			var vertex: Vector3 = p_vertices[index]
-			if polygon_vertices.has(vertex):
-				continue
-			polygon_vertices.push_back(vertex)
-			new_polygon.push_back(index)
-		if new_polygon.size() <= 2:
-			continue
-		polygons.push_back(new_polygon)
-	return polygons
-
-func _postprocess_nav_mesh_remove_overlapping_polygons(p_nav_mesh: NavigationMesh, p_vertices: PackedVector3Array, p_polygons: Array[PackedInt32Array]) -> void:
-	var cell_size: Vector3 = Vector3(p_nav_mesh.cell_size, p_nav_mesh.cell_height, p_nav_mesh.cell_size)
-	var edges: Dictionary = {}
-	for polygon_index in range(p_polygons.size()):
-		var polygon: PackedInt32Array = p_polygons[polygon_index]
-		for j in range(polygon.size()):
-			var vertex: Vector3 = p_vertices[polygon[j]]
-			var next_vertex: Vector3 = p_vertices[polygon[(j + 1) % polygon.size()]]
-			var edge_key: Array = [Vector3i(vertex / cell_size), Vector3i(next_vertex / cell_size)]
-			edge_key.sort()
-			if not edges.has(edge_key):
-				edges[edge_key] = []
-			edges[edge_key].push_back(polygon_index)
+				# Lambda asynchrone passée avec bind pour éviter les soucis de portée de boucle
+				var on_bake_done = (func(mesh: NavigationMesh, region: NavigationRegion3D, s: Dictionary):
+					region.set_navigation_mesh(null)
+					region.set_navigation_mesh(mesh)
+					s.pending -= 1
+				).bind(n_mesh, nav_region, bake_state)
+				
+				# Cuisson MULTI-THREAD en parallèle
+				NavigationServer3D.bake_from_source_geometry_data_async(n_mesh, source_data, on_bake_done)
+				
+	# On attend que tous les threads aient terminé
+	while bake_state.pending > 0:
+		await get_tree().create_timer(0.1).timeout
+		
+	# On compte les polygones après la cuisson de tous les chunks
+	total_polygons = 0
+	for child in nav_parent.get_children():
+		if child is NavigationRegion3D and child.navigation_mesh:
+			total_polygons += child.navigation_mesh.get_polygon_count()
 	
-	var overlap_count: Dictionary = {}
-	for connections in edges.values():
-		if connections.size() <= 2:
-			continue
-		for polygon_index in connections:
-			overlap_count[polygon_index] = overlap_count.get(polygon_index, 0) + 1
-			
-	var bad_polygons: Array = []
-	for polygon_index in overlap_count.keys():
-		if overlap_count[polygon_index] >= 2:
-			bad_polygons.push_back(polygon_index)
-			
-	bad_polygons.sort()
-	for i in range(bad_polygons.size() - 1, -1, -1):
-		p_polygons.remove_at(bad_polygons[i])
+	var time_nav = Time.get_ticks_msec() - time_nav_start
+	print("NavMesh : Cuisson Asynchrone par chunks terminée en ", time_nav, " ms ! Polygones totaux : ", total_polygons)
+	
+	terrain_ready.emit()

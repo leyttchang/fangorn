@@ -19,8 +19,11 @@ func _ready() -> void:
 		# On attend que la carte soit générée avant de continuer
 		await map_gen.terrain_ready
 		
-		# On positionne le conteneur des joueurs très haut pour qu'ils tombent sur le sol généré
-		players_container.global_position = Vector3(0, 100, 0)
+		# On positionne le conteneur des joueurs au point de départ du chemin
+		if map_gen.has_method("get_spawn_point"):
+			players_container.global_position = map_gen.get_spawn_point() + Vector3(0, 30.0, 0)
+		else:
+			players_container.global_position = Vector3(0, 100, 0)
 	else:
 		# En mode Vague, on ne touche à rien, la map est déjà là.
 		players_container.global_position = Vector3(0, 26, 2)

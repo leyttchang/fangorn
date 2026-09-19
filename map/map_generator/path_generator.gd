@@ -7,6 +7,7 @@ class_name PathGenerator
 @export var path_width: float = 15.0
 
 var encounter_positions: Array[Vector2] = []
+var start_pos: Vector2 = Vector2.ZERO
 
 # Contient tous les segments de notre route (des dictionnaires avec start et end)
 var segments: Array[Dictionary] = []
@@ -14,26 +15,88 @@ var segments: Array[Dictionary] = []
 # Générateur de nombres aléatoires déterministe
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
+var astar_grid: AStarGrid2D = null
+
 func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float, path_seed: int = 0):
 	segments.clear()
 	rng.seed = path_seed
 	print("Génération d'un chemin avec embranchements (Seed: ", path_seed, ")...")
 	
-	# Coordonnées du Spawn (Milieu de la face Sud)
-	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z)
+	# --- INITIALISATION ASTAR (Évitement des montagnes) ---
+	var time_start = Time.get_ticks_msec()
 	
-	# Coordonnées des 3 Sorties
-	var exit_west = Vector2(map_min_x, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	var exit_east = Vector2(map_max_x, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	var exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z)
+	astar_grid = AStarGrid2D.new()
+	var cell_res = 4.0 # Résolution Ultra ! (Cases de 4 mètres)
+	astar_grid.cell_size = Vector2(cell_res, cell_res)
+	var grid_w = int((map_max_x - map_min_x) / cell_res) + 1
+	var grid_h = int((map_max_z - map_min_z) / cell_res) + 1
+	astar_grid.region = Rect2i(0, 0, grid_w, grid_h)
+	# Il est CRUCIAL de ne pas utiliser DIAGONAL_MODE_ALWAYS, sinon l'algorithme
+	# peut passer en diagonale entre deux falaises solides et couper à travers la roche !
+	astar_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	astar_grid.update()
+	
+	var map_gen = get_parent()
+	if map_gen and map_gen.has_method("get_terrain_height_at"):
+		print("Calcul du relief Ultra-Haute Résolution (", grid_w, "x", grid_h, ") pour AStarGrid2D...")
+		for x in range(grid_w):
+			for y in range(grid_h):
+				var px = map_min_x + x * cell_res
+				var pz = map_min_z + y * cell_res
+				var h = map_gen.get_terrain_height_at(px, pz)
+				
+				var max_slope = 0.0
+				# Vérification dans les 8 directions pour être certain de ne pas rater une bosse
+				if x > 0: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px - cell_res, pz)) / cell_res)
+				if x < grid_w - 1: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px + cell_res, pz)) / cell_res)
+				if y > 0: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px, pz - cell_res)) / cell_res)
+				if y < grid_h - 1: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px, pz + cell_res)) / cell_res)
+				
+				var diag_res = cell_res * 1.4142
+				if x > 0 and y > 0: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px - cell_res, pz - cell_res)) / diag_res)
+				if x < grid_w - 1 and y > 0: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px + cell_res, pz - cell_res)) / diag_res)
+				if x > 0 and y < grid_h - 1: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px - cell_res, pz + cell_res)) / diag_res)
+				if x < grid_w - 1 and y < grid_h - 1: max_slope = max(max_slope, abs(h - map_gen.get_terrain_height_at(px + cell_res, pz + cell_res)) / diag_res)
+					
+				# 40 degrés correspondent à un ratio de pente (tan) d'environ 0.84.
+				# Au-delà, c'est un mur infranchissable absolu.
+				if max_slope > 0.84:
+					astar_grid.set_point_solid(Vector2i(x, y), true)
+				else:
+					# Système de poids : privilégie massivement le plat, mais autorise les pentes si le détour est trop long.
+					# Le poids augmente de façon exponentielle avec la pente.
+					var weight = 1.0 + (max_slope * max_slope * 200.0)
+					astar_grid.set_point_weight_scale(Vector2i(x, y), weight)
+					
+	var time_astar = Time.get_ticks_msec() - time_start
+	print("=> Grille AStar (" , grid_w * grid_h, " cellules) générée en ", time_astar, " ms.")
+	# ------------------------------------------------------
+	
+	# Coordonnées du Spawn (Milieu de la face Sud, 15m à l'intérieur)
+	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - 15.0)
+	
+	# Coordonnées des 3 Sorties (Rentrées de 15m aussi)
+	var exit_west = Vector2(map_min_x + 15.0, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	var exit_east = Vector2(map_max_x - 15.0, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	var exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + 15.0)
 	
 	# Coordonnées des 2 embranchements
-	# Le fork 1 est en bas de la carte, le fork 2 est en haut de la carte
 	var fork1_y = lerp(map_max_z, map_min_z, rng.randf_range(0.3, 0.45))
 	var fork2_y = lerp(map_max_z, map_min_z, rng.randf_range(0.65, 0.8))
 	
 	var fork1 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork1_y)
 	var fork2 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork2_y)
+	
+	# --- VALIDATION DES POINTS STRATÉGIQUES ---
+	# On décale les points s'ils tombent en plein sur une montagne !
+	spawn_pos = _get_closest_valid_point(spawn_pos, map_min_x, map_min_z)
+	start_pos = spawn_pos
+	exit_west = _get_closest_valid_point(exit_west, map_min_x, map_min_z)
+	exit_east = _get_closest_valid_point(exit_east, map_min_x, map_min_z)
+	exit_north = _get_closest_valid_point(exit_north, map_min_x, map_min_z)
+	fork1 = _get_closest_valid_point(fork1, map_min_x, map_min_z)
+	fork2 = _get_closest_valid_point(fork2, map_min_x, map_min_z)
+	# -------------------------------------------
 	
 	# TRONC PRINCIPAL
 	create_sub_path(spawn_pos, fork1, map_min_x, map_max_x, map_min_z, map_max_z)
@@ -75,72 +138,179 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 		if "min_distance_from_main_roads" in encounters_node:
 			enc_road_dist = encounters_node.min_distance_from_main_roads
 	
-	var max_attempts = enc_count * 30
-	var attempts = 0
+	# --- GÉNÉRATION DES ENCOUNTERS (POI) VIA MITCHELL'S BEST-CANDIDATE ---
+	var margin = 250.0 # Marge des bords de la map
 	
-	while encounter_positions.size() < enc_count and attempts < max_attempts:
-		attempts += 1
+	for i in range(enc_count):
+		var best_candidate: Vector2 = Vector2.ZERO
+		var best_score: float = -999999.0
 		
-		# 1. Tirer un point aléatoire
-		var margin = 300.0
-		var candidate = Vector2(
-			rng.randf_range(map_min_x + margin, map_max_x - margin),
-			rng.randf_range(map_min_z + margin, map_max_z - margin)
-		)
-		
-		# 2. Distance aux routes
-		var dist_to_road = get_min_distance_to_segments(candidate, main_segments)
-		if dist_to_road < enc_road_dist:
-			continue
+		# On génère 100 candidats au hasard et on évalue chacun
+		for attempt in range(100):
+			var candidate = Vector2(
+				rng.randf_range(map_min_x + margin, map_max_x - margin),
+				rng.randf_range(map_min_z + margin, map_max_z - margin)
+			)
 			
-		# 3. Distance aux autres POI
-		var too_close = false
-		for existing_pos in encounter_positions:
-			if candidate.distance_to(existing_pos) < enc_min_dist:
-				too_close = true
-				break
-		if too_close:
-			continue
+			# 1. Distance aux routes
+			var dist_road = get_min_distance_to_segments(candidate, main_segments)
 			
-		# 4. Point validé
-		encounter_positions.append(candidate)
+			# 2. Distance au camp (POI) le plus proche
+			var dist_poi = 999999.0
+			for existing_pos in encounter_positions:
+				var d = candidate.distance_to(existing_pos)
+				if d < dist_poi:
+					dist_poi = d
+					
+			# 3. Calcul du score d'éloignement
+			var score = 0.0
+			var road_valid = (dist_road >= enc_road_dist)
+			var poi_valid = (encounter_positions.is_empty() or dist_poi >= enc_min_dist)
+			
+			if road_valid and poi_valid:
+				# Si tout est valide, on cherche à s'éloigner au maximum des autres camps
+				score = dist_poi if not encounter_positions.is_empty() else dist_road
+			elif road_valid and not poi_valid:
+				# Valide pour la route mais trop proche d'un autre camp (malus léger, on maximise dist_poi)
+				score = dist_poi - 10000.0
+			else:
+				# Trop proche de la route (gros malus, priorité à s'éloigner de la route)
+				score = dist_road - 50000.0
+				
+			# On retient le meilleur candidat
+			if score > best_score:
+				best_score = score
+				best_candidate = candidate
+				
+		# Une fois le meilleur candidat trouvé parmi les 100, on valide qu'il n'est pas dans une montagne
+		var valid_candidate = _get_closest_valid_point(best_candidate, map_min_x, map_min_z)
+		encounter_positions.append(valid_candidate)
 		
 	# --- CONNEXION DES ENCOUNTERS ---
 	for encounter_pos in encounter_positions:
 		var closest_point: Vector2 = _find_closest_point_on_segments(encounter_pos, main_segments)
+		# On s'assure que le point d'accroche sur la route est aussi clean, juste au cas où
+		closest_point = _get_closest_valid_point(closest_point, map_min_x, map_min_z)
 		create_sub_path(closest_point, encounter_pos, map_min_x, map_max_x, map_min_z, map_max_z, path_width * 0.4)
 		
-	print(segments.size(), " segments totaux avec les accès aux Encounters !")
+	var path_time = Time.get_ticks_msec() - time_start
+	print(segments.size(), " segments totaux avec les accès aux Encounters générés en ", path_time, " ms !")
 
 func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float, custom_width: float = -1.0):
 	if custom_width < 0.0: custom_width = path_width
 	
 	var curve = Curve2D.new()
-	var main_dir = (point_b - point_a).normalized()
-	var perp_dir = main_dir.rotated(PI / 2.0)
+	var path_found = false
 	
-	var dist_ab = point_a.distance_to(point_b)
-	var tangent_len = min(150.0, dist_ab * 0.3)
-	
-	# Points de courbure qui forcent la route à suivre la direction
-	curve.add_point(point_a, -main_dir * tangent_len, main_dir * tangent_len)
-	
-	var num_waypoints = rng.randi_range(1, 3)
-	for i in range(1, num_waypoints + 1):
-		var t = float(i) / float(num_waypoints + 1)
-		var base_point = point_a.lerp(point_b, t)
+	# Utilisation de l'AStarGrid2D s'il a été généré
+	if astar_grid != null:
+		var c_size = astar_grid.cell_size.x
+		var start_cell = Vector2i(
+			clamp((point_a.x - map_min_x) / c_size, 0, astar_grid.region.size.x - 1),
+			clamp((point_a.y - map_min_z) / c_size, 0, astar_grid.region.size.y - 1)
+		)
+		var end_cell = Vector2i(
+			clamp((point_b.x - map_min_x) / c_size, 0, astar_grid.region.size.x - 1),
+			clamp((point_b.y - map_min_z) / c_size, 0, astar_grid.region.size.y - 1)
+		)
 		
-		var zigzag_strength = rng.randf_range(-dist_ab*0.3, dist_ab*0.3)
-		var waypoint = base_point + (perp_dir * zigzag_strength)
+		# On s'assure de ne pas bloquer les points de départ et d'arrivée
+		astar_grid.set_point_solid(start_cell, false)
+		astar_grid.set_point_solid(end_cell, false)
 		
-		waypoint.x = clamp(waypoint.x, map_min_x + 100, map_max_x - 100)
-		waypoint.y = clamp(waypoint.y, map_min_z + 100, map_max_z - 100)
+		var grid_path = astar_grid.get_point_path(start_cell, end_cell)
 		
-		var curve_dir = main_dir * rng.randf_range(tangent_len*0.5, tangent_len*1.5)
-		curve.add_point(waypoint, -curve_dir, curve_dir)
-
-	curve.add_point(point_b, -main_dir * tangent_len, main_dir * tangent_len)
-	
+		# SI AUCUN CHEMIN N'EST TROUVÉ (plateau isolé, falaise)
+		if grid_path.size() == 0:
+			var dir_to_a = (point_a - point_b).normalized()
+			var test_dist = 20.0
+			var max_dist = point_b.distance_to(point_a)
+			
+			while grid_path.size() == 0 and test_dist < max_dist:
+				var test_b = point_b + dir_to_a * test_dist
+				var test_end_cell = Vector2i(
+					clamp((test_b.x - map_min_x) / c_size, 0, astar_grid.region.size.x - 1),
+					clamp((test_b.y - map_min_z) / c_size, 0, astar_grid.region.size.y - 1)
+				)
+				# On s'assure que la nouvelle case de test n'est pas bloquée
+				var prev_solid = astar_grid.is_point_solid(test_end_cell)
+				astar_grid.set_point_solid(test_end_cell, false)
+				
+				grid_path = astar_grid.get_point_path(start_cell, test_end_cell)
+				
+				if grid_path.size() > 0:
+					point_b = test_b
+					print("DEBUG PATH : Point inaccessible (plateau). Déplacé de ", test_dist, "m vers la vallée !")
+					break
+					
+				astar_grid.set_point_solid(test_end_cell, prev_solid)
+				test_dist += 20.0
+		
+		if grid_path.size() > 1:
+			path_found = true
+			# print("DEBUG PATH : AStar OK (", grid_path.size(), " pts) de ", point_a, " à ", point_b)
+			var waypoints = []
+			
+			# On ne saute que très peu de points pour respecter le chemin de l'AStar (1 point tous les 16m)
+			var step = 2
+			for i in range(0, grid_path.size(), step):
+				waypoints.append(Vector2(grid_path[i].x + map_min_x, grid_path[i].y + map_min_z))
+				
+			if waypoints.size() == 0 or waypoints[-1].distance_to(point_b) > (c_size * 2):
+				waypoints.append(point_b)
+			waypoints[0] = point_a
+			
+			# Ajout des waypoints à la courbe avec des tangentes douces
+			for i in range(waypoints.size()):
+				var wp = waypoints[i]
+				var dir = Vector2.ZERO
+				
+				var dist_prev = 0.0
+				var dist_next = 0.0
+				
+				if i > 0: dist_prev = wp.distance_to(waypoints[i-1])
+				if i < waypoints.size() - 1: dist_next = wp.distance_to(waypoints[i+1])
+				
+				if i == 0 and waypoints.size() > 1:
+					dir = (waypoints[1] - wp).normalized()
+				elif i == waypoints.size() - 1 and waypoints.size() > 1:
+					dir = (wp - waypoints[i-1]).normalized()
+				elif i > 0 and i < waypoints.size() - 1:
+					dir = (waypoints[i+1] - waypoints[i-1]).normalized()
+					
+				# La tangente NE DOIT PAS dépasser la moitié de la distance entre les points
+				# sinon la courbe fait des loopings immenses hors de la zone sûre !
+				var tangent_len = min(dist_prev, dist_next) * 0.35
+				if i == 0: tangent_len = dist_next * 0.35
+				elif i == waypoints.size() - 1: tangent_len = dist_prev * 0.35
+				
+				curve.add_point(wp, -dir * tangent_len, dir * tangent_len)
+		else:
+			printerr("ERREUR CRITIQUE PATH : L'AStar a ÉCHOUÉ entre ", point_a, " et ", point_b, ". La map est scindée en deux !")
+				
+	# Fallback si l'AStar échoue (ligne directe avec zigzags)
+	if not path_found:
+		printerr("ERREUR CRITIQUE PATH : Utilisation du FALLBACK (ligne droite) ! Ce chemin va ignorer le relief et tracer tout droit.")
+		var main_dir = (point_b - point_a).normalized()
+		var perp_dir = main_dir.rotated(PI / 2.0)
+		var dist_ab = point_a.distance_to(point_b)
+		var tangent_len = min(150.0, dist_ab * 0.3)
+		
+		curve.add_point(point_a, -main_dir * tangent_len, main_dir * tangent_len)
+		
+		var num_waypoints = rng.randi_range(1, 3)
+		for i in range(1, num_waypoints + 1):
+			var t = float(i) / float(num_waypoints + 1)
+			var base_point = point_a.lerp(point_b, t)
+			var zigzag_strength = rng.randf_range(-dist_ab*0.3, dist_ab*0.3)
+			var waypoint = base_point + (perp_dir * zigzag_strength)
+			waypoint.x = clamp(waypoint.x, map_min_x + 100, map_max_x - 100)
+			waypoint.y = clamp(waypoint.y, map_min_z + 100, map_max_z - 100)
+			var curve_dir = main_dir * rng.randf_range(tangent_len*0.5, tangent_len*1.5)
+			curve.add_point(waypoint, -curve_dir, curve_dir)
+			
+		curve.add_point(point_b, -main_dir * tangent_len, main_dir * tangent_len)
+		
 	curve.bake_interval = 50.0
 	var baked_points = curve.get_baked_points()
 	
@@ -179,21 +349,44 @@ func _find_closest_point_on_segments(p: Vector2, segs: Array) -> Vector2:
 	var min_dist = 999999.0
 	var closest_point = p
 	for seg in segs:
-		var a: Vector2 = seg["start"]
-		var b: Vector2 = seg["end"]
+		var a = seg["start"]
+		var b = seg["end"]
 		var l2 = a.distance_squared_to(b)
-		var proj: Vector2
-		if l2 == 0.0:
-			proj = a
-		else:
-			var t = max(0.0, min(1.0, (p - a).dot(b - a) / l2))
+		var proj = p
+		if l2 != 0.0:
+			var t = max(0, min(1, (p - a).dot(b - a) / l2))
 			proj = a + t * (b - a)
-			
 		var dist = p.distance_to(proj)
 		if dist < min_dist:
 			min_dist = dist
 			closest_point = proj
 	return closest_point
+
+# Helper pour l'AStar : Cherche le point navigable le plus proche (Spirale)
+func _get_closest_valid_point(p: Vector2, min_x: float, min_z: float) -> Vector2:
+	if astar_grid == null: return p
+	
+	var c_size = astar_grid.cell_size.x
+	var cx = int(clamp((p.x - min_x) / c_size, 0, astar_grid.region.size.x - 1))
+	var cy = int(clamp((p.y - min_z) / c_size, 0, astar_grid.region.size.y - 1))
+	
+	var cell = Vector2i(cx, cy)
+	if not astar_grid.is_point_solid(cell):
+		return p
+		
+	# Spirale pour trouver la case navigable la plus proche
+	for radius in range(1, 30):
+		for dx in range(-radius, radius + 1):
+			for dy in range(-radius, radius + 1):
+				if abs(dx) == radius or abs(dy) == radius:
+					var test_cell = cell + Vector2i(dx, dy)
+					if astar_grid.is_in_boundsv(test_cell) and not astar_grid.is_point_solid(test_cell):
+						var new_p = Vector2(test_cell.x * c_size + min_x, test_cell.y * c_size + min_z)
+						print("DEBUG PATH : Point stratégique déplacé d'une montagne ", p, " -> ", new_p)
+						return new_p
+						
+	print("DEBUG PATH : ERREUR FATALE - Impossible de déplacer le point ", p)
+	return p # Si tout est bloqué
 
 func get_min_distance_to_segments(point: Vector2, segs: Array) -> float:
 	var min_dist = 999999.0

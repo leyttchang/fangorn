@@ -16,8 +16,9 @@ extends Node3D
 		_create_grid()
 
 
-## Distance between instances
-@export_range(0.125, 2.0, 0.015625) var instance_spacing: float = 0.5:
+@export_group("Grid")
+## Distance in meters between instances
+@export_range(0.125, 2.0, 0.015625) var instance_spacing: float = 0.4:
 	set(value):
 		instance_spacing = clamp(round(value * 64.0) * 0.015625, 0.125, 2.0)
 		rows = maxi(int(cell_width / instance_spacing), 1)
@@ -25,8 +26,8 @@ extends Node3D
 		_set_offsets()
 
 
-## Width of an individual cell of the grid
-@export_range(8.0, 256.0, 1.0) var cell_width: float = 32.0:
+## The size of a block of particles
+@export_range(8.0, 256.0, 1.0) var cell_width: float = 24.0:
 	set(value):
 		cell_width = clamp(value, 8.0, 256.0)
 		rows = maxi(int(cell_width / instance_spacing), 1)
@@ -45,8 +46,6 @@ extends Node3D
 		_set_offsets()
 
 
-## Grid width. Must be odd. 
-## Higher values cull slightly better, draw further out.
 @export_range(1, 15, 2) var grid_width: int = 9:
 	set(value):
 		grid_width = value
@@ -98,6 +97,25 @@ extends Node3D
 			p.material_override = mesh_material_override
 
 
+@export_group("Scale")
+## Multiplicateur global (1.0 = taille normale, 0.5 = 2x plus petit)
+@export_range(0.1, 5.0, 0.05) var grass_scale: float = 1.0:
+	set(value):
+		grass_scale = value
+		_update_process_parameters()
+
+## Taille minimum de base (proportions)
+@export var min_scale: Vector3 = Vector3(0.125, 0.5, 0.125):
+	set(value):
+		min_scale = value
+		_update_process_parameters()
+
+## Taille maximum de base (proportions)
+@export var max_scale: Vector3 = Vector3(0.125, 1.0, 0.125):
+	set(value):
+		max_scale = value
+		_update_process_parameters()
+
 @export_group("Info")
 ## The minimum distance that particles will be drawn upto
 ## If using fade out effects like pixel alpha this is the limit to use.
@@ -132,15 +150,21 @@ func _notification(what: int) -> void:
 		_destroy_grid()
 
 
+var _grid_initialized: bool = false
+
+
 func _physics_process(delta: float) -> void:
 	if terrain:
-		var camera: Camera3D = terrain.get_camera()
+		var camera: Camera3D = get_viewport().get_camera_3d()
 		if camera:
-			if last_pos.distance_squared_to(camera.global_position) > 1.0:
-				var pos: Vector3 = camera.global_position.snapped(Vector3.ONE)
+			var cam_pos = camera.global_position
+			RenderingServer.material_set_param(process_material.get_rid(), "camera_position", cam_pos)
+			
+			if not _grid_initialized or last_pos.distance_squared_to(cam_pos) > (cell_width * cell_width):
+				var pos: Vector3 = cam_pos.snapped(Vector3.ONE)
 				_position_grid(pos)
-				RenderingServer.material_set_param(process_material.get_rid(), "camera_position", pos )
-				last_pos = camera.global_position
+				last_pos = pos
+				_grid_initialized = true
 		_update_process_parameters()
 	else:
 		set_physics_process(false)
@@ -152,12 +176,11 @@ func _create_grid() -> void:
 		return
 	set_physics_process(true)
 	_set_offsets()
-	var hr: Vector2 = terrain.data.get_height_range()
-	var height: float = hr.x - hr.y
+	var height: float = 2000.0
 	var aabb: AABB = AABB()
 	aabb.size = Vector3(cell_width, height, cell_width)
 	aabb.position = aabb.size * -0.5
-	aabb.position.y = hr.y
+	aabb.position.y = -1000.0
 	var half_grid: int = grid_width / 2
 	# Iterating the array like this allows identifying grid position, in case setting
 	# different mesh or materials is desired for LODs etc.
@@ -214,7 +237,7 @@ func _position_grid(pos: Vector3) -> void:
 		var snap = Vector3(pos.x, 0, pos.z).snapped(Vector3.ONE) + offsets[i]
 		node.global_position = (snap / instance_spacing).round() * instance_spacing
 		node.reset_physics_interpolation()
-		node.restart(true) # keep the same seed.
+		node.restart(true) # keep the same seed
 
 
 func _update_process_parameters() -> void:
@@ -235,3 +258,5 @@ func _update_process_parameters() -> void:
 			RenderingServer.material_set_param(process_rid, "instance_spacing", instance_spacing)
 			RenderingServer.material_set_param(process_rid, "instance_rows", rows)
 			RenderingServer.material_set_param(process_rid, "max_dist", min_draw_distance)
+			RenderingServer.material_set_param(process_rid, "min_scale", min_scale * grass_scale)
+			RenderingServer.material_set_param(process_rid, "max_scale", max_scale * grass_scale)
