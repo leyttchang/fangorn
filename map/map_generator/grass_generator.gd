@@ -30,9 +30,9 @@ signal grass_ready
 @export var max_draw_distance: float = 100.0
 
 @export_category("Routes")
-## Distance (depuis le bord de la route) où l'herbe commence à se clairsemer
+## Distance (depuis le bord de la route) où l'herbe commence à se clairsemer (mise à l'échelle automatique selon la largeur de chaque chemin)
 @export var road_fade_distance: float = 4.0
-## Distance (depuis le bord de la route) où il n'y a plus AUCUNE herbe (0%)
+## Distance (depuis le bord de la route) où il n'y a plus AUCUNE herbe (0%) (mise à l'échelle automatique selon la largeur de chaque chemin)
 @export var road_margin: float = 1.0
 
 @export_category("Actions")
@@ -108,16 +108,26 @@ func generate_grass() -> void:
 		if "map_height_chunks" in map_generator and "region_size" in map_generator:
 			map_h = float(map_generator.map_height_chunks * map_generator.region_size)
 			
+	# Récupération de la largeur de base des chemins (pour le calcul du ratio)
+	var base_path_width: float = 15.0
+	if path_generator != null and "path_width" in path_generator:
+		base_path_width = float(path_generator.path_width)
+	if base_path_width <= 0.0:
+		base_path_width = 15.0
+		
 	# Grille spatiale ultra rapide pour éviter la route (Road avoidance)
-	var max_road_check = maxf(0.0, maxf(road_margin, road_fade_distance))
 	var road_grid = {}
 	if path_generator != null and "segments" in path_generator and path_generator.segments.size() > 0:
 		var cell_size = 128.0
 		for seg in path_generator.segments:
-			var min_cx = int(floor((seg.min_x - max_road_check) / cell_size))
-			var max_cx = int(floor((seg.max_x + max_road_check) / cell_size))
-			var min_cz = int(floor((seg.min_y - max_road_check) / cell_size))
-			var max_cz = int(floor((seg.max_y + max_road_check) / cell_size))
+			var seg_w = float(seg.get("width", base_path_width))
+			var ratio = seg_w / base_path_width
+			var max_seg_check = maxf(0.0, maxf(road_margin * ratio, road_fade_distance * ratio))
+			var check_dist = seg_w + max_seg_check
+			var min_cx = int(floor((seg.min_x - check_dist) / cell_size))
+			var max_cx = int(floor((seg.max_x + check_dist) / cell_size))
+			var min_cz = int(floor((seg.min_y - check_dist) / cell_size))
+			var max_cz = int(floor((seg.max_y + check_dist) / cell_size))
 			for cz in range(min_cz, max_cz + 1):
 				for cx in range(min_cx, max_cx + 1):
 					var key = Vector2i(cx, cz)
@@ -141,8 +151,8 @@ func generate_grass() -> void:
 			var px = x + rng.randf_range(-jitter, jitter)
 			var pz = z + rng.randf_range(-jitter, jitter)
 			
-			# Filtrage Route
-			var min_dist_to_road = 999999.0
+			# Filtrage Route avec scaling proportionnel à la largeur de chaque chemin
+			var min_grass_prob = 1.0
 			if not road_grid.is_empty():
 				var r_key = Vector2i(int(floor(px / 128.0)), int(floor(pz / 128.0)))
 				if road_grid.has(r_key):
@@ -160,19 +170,33 @@ func generate_grass() -> void:
 							var ex = px - (ax + t * dx); var ey = pz - (ay + t * dy)
 							dist_sq = ex * ex + ey * ey
 							
-						# On calcule la distance exacte par rapport au BORD de la route (seg.width)
-						var actual_dist = sqrt(dist_sq) - seg.width
-						if actual_dist < min_dist_to_road:
-							min_dist_to_road = actual_dist
-							
+						var seg_w = float(seg.get("width", base_path_width))
+						# Ratio de taille du chemin (ex: 1.0 pour la route principale, 0.4 pour les chemins secondaires)
+						var ratio = seg_w / base_path_width
+						var seg_margin = road_margin * ratio
+						var seg_fade = road_fade_distance * ratio
+						
+						# Distance par rapport au bord de la route
+						var actual_dist = sqrt(dist_sq) - seg_w
+						
+						# Zone 0% d'herbe pour ce chemin
+						if actual_dist < seg_margin:
+							min_grass_prob = 0.0
+							break
+						# Zone de transition / fondu progressif
+						elif actual_dist < seg_fade:
+							var fade_range = maxf(0.01, seg_fade - seg_margin)
+							var prob = (actual_dist - seg_margin) / fade_range
+							if prob < min_grass_prob:
+								min_grass_prob = prob
+								
 			# Rejet complet si on est dans la zone 0%
-			if min_dist_to_road < road_margin:
+			if min_grass_prob <= 0.0:
 				z += spacing
 				continue
 			# Rejet probabiliste (fondu progressif)
-			elif min_dist_to_road < road_fade_distance:
-				var prob = (min_dist_to_road - road_margin) / maxf(0.01, road_fade_distance - road_margin)
-				if rng.randf() > prob:
+			elif min_grass_prob < 1.0:
+				if rng.randf() > min_grass_prob:
 					z += spacing
 					continue
 				

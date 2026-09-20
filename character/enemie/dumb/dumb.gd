@@ -192,6 +192,22 @@ func _physics_process(delta: float) -> void:
 # ==========================================================
 # LOGIQUE DES COMPORTEMENTS (Le Cerveau)
 # ==========================================================
+var _is_pack_walking: bool = false
+
+func _set_pack_walking(is_walking: bool) -> void:
+	if _is_pack_walking == is_walking: return
+	_is_pack_walking = is_walking
+	if is_multiplayer_authority():
+		rpc("_rpc_set_pack_walking", is_walking)
+
+@rpc("authority", "call_local", "unreliable")
+func _rpc_set_pack_walking(is_walking: bool) -> void:
+	if current_state != State.IDLE: return
+	if is_walking:
+		anim_playback.travel("Walk2")
+	else:
+		anim_playback.travel("Stand")
+
 func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 	if target != null:
 		var distance = global_position.distance_to(target.global_position)
@@ -199,8 +215,22 @@ func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 			change_state(State.ATTACK)
 		else:
 			change_state(State.CHASE)
+		_set_pack_walking(false)
+		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+		
+	# Déplacement de meute hors-combat (patrouille / roam)
+	if navigation_comp and navigation_comp.has_pack_destination:
+		var dir = navigation_comp.get_pack_roam_direction()
+		if dir != Vector3.ZERO:
+			movement_comp.rotate_towards_direction(dir, behavior, delta)
+			var roam_speed = base_movement_speed * navigation_comp.pack_speed_mult * stats_component.get_stat_value("movement_speed")
+			_set_pack_walking(true)
+			return movement_comp.accelerate_to_direction(vitesse_horiz, dir, roam_speed, behavior, delta)
+		else:
+			_set_pack_walking(false)
 			
-	# En Idle, on demande au composant de nous freiner
+	# En Idle sans destination, on demande au composant de nous freiner
+	_set_pack_walking(false)
 	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 
 func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) -> Vector2:

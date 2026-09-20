@@ -97,9 +97,21 @@ func _physics_process(delta: float) -> void:
 	var current_rot = rotation.y
 	rpc("_rpc_apply_state", current_state, anim_name, current_rot)
 
+var _is_pack_walking: bool = false
+
 func _process_state(delta: float) -> void:
 	if target == null:
 		change_state(State.IDLE)
+		if navigation_comp and navigation_comp.has_pack_destination:
+			var dir = navigation_comp.get_pack_roam_direction()
+			if dir != Vector3.ZERO:
+				_is_pack_walking = true
+				_move_to(navigation_comp.pack_destination, slow_speed, delta)
+				return
+			else:
+				_is_pack_walking = false
+		else:
+			_is_pack_walking = false
 		_stop_movement(delta)
 		return
 		

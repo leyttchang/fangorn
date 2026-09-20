@@ -6,6 +6,8 @@ static var current_game_mode: GameMode = GameMode.WAVE
 static var current_seed: int = 50122
 
 static var player_pseudos: Dictionary = {}
+## Nombre de joueurs au lancement de la partie (fixé au début, ne change pas en cours de partie)
+static var starting_player_count: int = 1
 
 const PERCENT_STATS: Array[String] = [
 	"attack_speed",

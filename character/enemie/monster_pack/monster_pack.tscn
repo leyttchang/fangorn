@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bwugply6etcqh"]
+
+[ext_resource type="Script" uid="uid://ke7l7yd6e8ec" path="res://character/enemie/monster_pack/monster_pack.gd" id="1_uy01r"]
+
+[node name="MonsterPack" type="Node3D" unique_id=1315388334]
+script = ExtResource("1_uy01r")

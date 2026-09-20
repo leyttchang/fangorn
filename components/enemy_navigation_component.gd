@@ -8,6 +8,15 @@ extends Node
 @export var default_detection_radius: float = 25.0
 ## Distance par défaut de perte d'aggro en mode NORMAL (si non définie dans behavior)
 @export var default_lose_aggro_radius: float = 35.0
+## Surcharge de détection (utilisée par exemple par MonsterPack pour embuscade ou patrouille)
+@export var detection_range_override: float = -1.0
+## Surcharge de perte d'aggro
+@export var lose_aggro_override: float = -1.0
+
+# --- GESTION PACK / HORS-COMBAT ---
+var pack_destination: Vector3 = Vector3.INF
+var has_pack_destination: bool = false
+var pack_speed_mult: float = 0.55
 
 var frames_since_path_update: int = 999
 var next_path_update_frame: int = 0
@@ -71,6 +80,11 @@ func acquire_target(current_target: Node3D = null) -> Node3D:
 		if "lose_aggro_range" in _parent_body.behavior and _parent_body.behavior.lose_aggro_range > 0.0:
 			lose_range = _parent_body.behavior.lose_aggro_range
 			
+	if detection_range_override > 0.0:
+		det_range = detection_range_override
+	if lose_aggro_override > 0.0:
+		lose_range = lose_aggro_override
+			
 	var max_range = lose_range if (current_target != null and is_instance_valid(current_target)) else det_range
 	if min_dist_sq <= (max_range * max_range):
 		return closest
@@ -107,3 +121,26 @@ func get_direction_to_target(target_position: Vector3) -> Vector3:
 		return direct.normalized()
 		
 	return Vector3.ZERO
+
+# --- CONTRÔLE DE DESTINATION DE MEUTE (HORS-COMBAT) ---
+func set_pack_destination(dest: Vector3, speed_mult: float = 0.55) -> void:
+	pack_destination = dest
+	has_pack_destination = true
+	pack_speed_mult = speed_mult
+
+func clear_pack_destination() -> void:
+	has_pack_destination = false
+	pack_destination = Vector3.INF
+
+func get_pack_roam_direction() -> Vector3:
+	if not has_pack_destination or _parent_body == null:
+		return Vector3.ZERO
+		
+	var my_pos = _parent_body.global_position
+	# Vérifie la distance 2D (XZ) pour éviter les blocages dus au décalage d'altitude avec le NavMesh
+	var dist_2d_sq = Vector2(my_pos.x - pack_destination.x, my_pos.z - pack_destination.z).length_squared()
+	if dist_2d_sq <= 4.0: # Arrivé à moins de 2m
+		clear_pack_destination()
+		return Vector3.ZERO
+		
+	return get_direction_to_target(pack_destination)

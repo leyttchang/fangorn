@@ -163,13 +163,16 @@ func _on_leave_lobby_pressed() -> void:
 
 func _on_launch_pressed() -> void:
 	if multiplayer.is_server():
-		rpc("rpc_launch_game", GameData.current_game_mode, GameData.current_seed)
+		var player_count = max(1, GameData.player_pseudos.size())
+		rpc("rpc_launch_game", GameData.current_game_mode, GameData.current_seed, player_count)
 
 @rpc("authority", "call_local", "reliable")
-func rpc_launch_game(mode: int, seed_val: int) -> void:
-	# TOUS les joueurs mettent à jour leur mode de jeu et la graine
+func rpc_launch_game(mode: int, seed_val: int, player_count: int = 1) -> void:
+	# TOUS les joueurs mettent à jour leur mode de jeu, la graine et le nombre de joueurs au départ
 	GameData.current_game_mode = mode as GameData.GameMode
 	GameData.current_seed = seed_val
+	GameData.starting_player_count = max(1, player_count)
+	print("Menu: Partie lancée avec ", GameData.starting_player_count, " joueur(s) (Seed = ", GameData.current_seed, ")")
 	# TOUS les joueurs changent de scene en meme temps
 	get_tree().change_scene_to_file("res://lvl/game.tscn")
 
@@ -182,6 +185,7 @@ func _on_singleplayer_pressed() -> void:
 
 func _on_solo_normal_pressed() -> void:
 	GameData.current_game_mode = GameData.GameMode.NORMAL
+	GameData.starting_player_count = 1
 	var s_text = solo_seed_input.text.strip_edges() if solo_seed_input else ""
 	if s_text != "" and s_text.is_valid_int():
 		GameData.current_seed = s_text.to_int()
@@ -192,6 +196,7 @@ func _on_solo_normal_pressed() -> void:
 
 func _on_solo_wave_pressed() -> void:
 	GameData.current_game_mode = GameData.GameMode.WAVE
+	GameData.starting_player_count = 1
 	get_tree().change_scene_to_file("res://lvl/game.tscn")
 
 func _on_solo_retour_pressed() -> void:

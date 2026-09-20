@@ -112,6 +112,8 @@ func clear_terrain() -> void:
 			current.clear_grass()
 		if current != self and current.has_method("clear_encounters"):
 			current.clear_encounters()
+		if current != self and current.has_method("clear_monster_packs"):
+			current.clear_monster_packs()
 		stack.append_array(current.get_children())
 			
 	var time_clean = Time.get_ticks_msec() - time_start
@@ -505,3 +507,10 @@ func _bake_navmesh() -> void:
 				print("MapGenerator: Caméra active liée au Terrain3D -> ", active_cam.name)
 	
 	terrain_ready.emit()
+	
+	# Génération automatique des meutes de monstres si le générateur est présent
+	var pack_gen = find_child("MonsterPackGenerator", true, false)
+	if pack_gen == null:
+		pack_gen = find_child("MonsterPacks", true, false)
+	if pack_gen and pack_gen.has_method("generate_monster_packs"):
+		pack_gen.generate_monster_packs(world_seed)

@@ -187,6 +187,17 @@ func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 			change_state(State.ATTACK)
 		else:
 			change_state(State.CHASE)
+		if movement_comp and behavior:
+			return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+		return Vector2.ZERO
+		
+	# Déplacement de meute hors-combat (patrouille / roam)
+	if navigation_comp and navigation_comp.has_pack_destination:
+		var dir = navigation_comp.get_pack_roam_direction()
+		if dir != Vector3.ZERO:
+			movement_comp.rotate_towards_direction(dir, behavior, delta)
+			var roam_speed = base_movement_speed * navigation_comp.pack_speed_mult * (stats_component.get_stat_value("movement_speed") if stats_component else 1.0)
+			return movement_comp.accelerate_to_direction(vitesse_horiz, dir, roam_speed, behavior, delta)
 			
 	if movement_comp and behavior:
 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
