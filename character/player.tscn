@@ -93,6 +93,9 @@ properties/6/replication_mode = 1
 properties/7/path = NodePath("Camera3D/MainDroite/wrist:position")
 properties/7/spawn = true
 properties/7/replication_mode = 1
+properties/8/path = NodePath(".:nominal_speed")
+properties/8/spawn = true
+properties/8/replication_mode = 1
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 

@@ -23,6 +23,22 @@ signal player_hit_enemy
 @export var custom_footstep_sound: AudioStream # Optionnel : Glisser un fichier .wav / .ogg
 @export var step_interval: float = 2.8 # Distance en mÃ¨tres entre deux bruits de pas
 
+@export_group("Bonus de Route (Convoi)")
+## Vitesse nominale synchronisée pour que les alliés connaissent notre vitesse de pointe
+@export var nominal_speed: float = 6.0
+## Bonus passif accordé sur la route (+20% par défaut)
+@export var road_base_bonus: float = 1.20
+## Rayon de détection des alliés sur la route pour le convoi (en mètres)
+@export var road_squad_radius: float = 35.0
+## Accélération progressive vers la vitesse du plus rapide (en m/s²)
+@export var road_squad_acceleration: float = 2.5
+## Décélération progressive quand on quitte la route (en m/s²)
+@export var road_squad_deceleration: float = 4.0
+
+var is_on_road: bool = false
+var _current_road_percent_bonus: float = 0.0
+var _path_generator: PathGenerator = null
+
 var _footstep_distance: float = 0.0
 var last_weapon_switch_time: int = 0
 
@@ -116,6 +132,71 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
+	# Vitesse de base brute (stats/équipement/arbre passif SANS le buff de route)
+	var my_unbuffed_mult = stats_component.get_stat_value_excluding("movement_speed", "road_buff")
+	var my_base_speed = base_movement_speed * my_unbuffed_mult
+	nominal_speed = my_base_speed
+
+	# Recherche paresseuse du PathGenerator s'il n'est pas encore en mémoire
+	if _path_generator == null:
+		_path_generator = get_tree().get_first_node_in_group("PathGenerator") as PathGenerator
+
+	# Détection de la route (on conserve l'état en l'air pour préserver le momentum du saut)
+	var was_on_road = is_on_road
+	if is_on_floor():
+		if _path_generator != null:
+			is_on_road = _path_generator.is_point_on_path(Vector2(global_position.x, global_position.z))
+		else:
+			is_on_road = false
+
+	if is_on_road != was_on_road:
+		if is_on_road:
+			print("[VITESSE ROUTE] Actif ! (Bonus +20% / Convoi)")
+		else:
+			print("[VITESSE ROUTE] Desactive ! (Hors de la route)")
+
+	var target_percent = 0.0
+
+	if is_on_road:
+		# 1. Bonus passif de base sur la route : +20%
+		target_percent = road_base_bonus - 1.0
+
+		# 2. Effet convoi : chercher le joueur le plus rapide à proximité qui est AUSSI sur la route
+		var highest_squad_nominal = my_base_speed
+		for other_p in get_tree().get_nodes_in_group("Player"):
+			if other_p == self or not is_instance_valid(other_p):
+				continue
+			var dist = global_position.distance_to(other_p.global_position)
+			if dist <= road_squad_radius:
+				var other_pos_2d = Vector2(other_p.global_position.x, other_p.global_position.z)
+				if _path_generator != null and _path_generator.is_point_on_path(other_pos_2d):
+					var other_nom = other_p.nominal_speed if "nominal_speed" in other_p else other_p.base_movement_speed
+					if other_nom > highest_squad_nominal:
+						highest_squad_nominal = other_nom
+
+		# 3. Si un allié proche est plus rapide, calculer le pourcentage nécessaire pour atteindre son allure
+		if my_base_speed > 0.0:
+			var leader_road_speed = highest_squad_nominal * road_base_bonus
+			var convoi_percent = (leader_road_speed / my_base_speed) - 1.0
+			if convoi_percent > target_percent:
+				target_percent = convoi_percent
+
+		# 4. Accélération progressive du pourcentage de buff dans le StatsComponent
+		var rate = (road_squad_acceleration / my_base_speed) if my_base_speed > 0.0 else 0.5
+		_current_road_percent_bonus = move_toward(_current_road_percent_bonus, target_percent, rate * delta)
+		stats_component.set_or_update_modifier("movement_speed", StatModifier.Type.PERCENT, _current_road_percent_bonus, "road_buff")
+	else:
+		# En dehors de la route, décélération progressive vers 0%
+		if _current_road_percent_bonus > 0.0:
+			var decel_rate = (road_squad_deceleration / my_base_speed) if my_base_speed > 0.0 else 0.8
+			_current_road_percent_bonus = move_toward(_current_road_percent_bonus, 0.0, decel_rate * delta)
+			if _current_road_percent_bonus <= 0.001:
+				_current_road_percent_bonus = 0.0
+				stats_component.remove_modifier_by_source("road_buff")
+			else:
+				stats_component.set_or_update_modifier("movement_speed", StatModifier.Type.PERCENT, _current_road_percent_bonus, "road_buff")
+
+	# La vitesse finale découle 100% de StatsComponent (affiché directement dans l'UI des stats !)
 	var current_speed = base_movement_speed * stats_component.get_stat_value("movement_speed")
 
 	if main_droite != null and main_droite.is_attacking:

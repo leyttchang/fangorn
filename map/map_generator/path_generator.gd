@@ -17,6 +17,12 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 var astar_grid: AStarGrid2D = null
 
+var road_grid: Dictionary = {}
+var grid_cell_size: float = 64.0
+
+func _ready() -> void:
+	add_to_group("PathGenerator")
+
 func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float, path_seed: int = 0):
 	segments.clear()
 	rng.seed = path_seed
@@ -195,6 +201,7 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 		
 	var path_time = Time.get_ticks_msec() - time_start
 	print(segments.size(), " segments totaux avec les accès aux Encounters générés en ", path_time, " ms !")
+	_build_spatial_grid()
 
 func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_max_x: float, map_min_z: float, map_max_z: float, custom_width: float = -1.0):
 	if custom_width < 0.0: custom_width = path_width
@@ -395,3 +402,45 @@ func get_min_distance_to_segments(point: Vector2, segs: Array) -> float:
 		if dist < min_dist:
 			min_dist = dist
 	return min_dist
+
+## Construit une grille spatiale des segments de route pour des requêtes en O(1)
+func _build_spatial_grid() -> void:
+	road_grid.clear()
+	for seg in segments:
+		var half_w = seg["width"] * 0.5 + 4.0
+		var min_cx = int(floor((seg["min_x"] - half_w) / grid_cell_size))
+		var max_cx = int(floor((seg["max_x"] + half_w) / grid_cell_size))
+		var min_cy = int(floor((seg["min_y"] - half_w) / grid_cell_size))
+		var max_cy = int(floor((seg["max_y"] + half_w) / grid_cell_size))
+		
+		for cy in range(min_cy, max_cy + 1):
+			for cx in range(min_cx, max_cx + 1):
+				var key = Vector2i(cx, cy)
+				if not road_grid.has(key):
+					road_grid[key] = []
+				road_grid[key].append(seg)
+
+## Teste ultra-rapidement si un point 2D (x, z) est sur la route
+func is_point_on_path(point: Vector2, tolerance: float = 2.0) -> bool:
+	if segments.is_empty():
+		return false
+		
+	if not road_grid.is_empty():
+		var cell = Vector2i(int(floor(point.x / grid_cell_size)), int(floor(point.y / grid_cell_size)))
+		if not road_grid.has(cell):
+			return false
+		var cell_segments = road_grid[cell]
+		for seg in cell_segments:
+			var allowed_dist = (seg["width"] * 0.5) + tolerance
+			if distance_to_segment(point, seg["start"], seg["end"]) <= allowed_dist:
+				return true
+		return false
+	else:
+		# Fallback direct si la grille spatiale n'a pas encore été construite
+		for seg in segments:
+			var half_w = (seg["width"] * 0.5) + tolerance
+			if point.x < seg["min_x"] - half_w or point.x > seg["max_x"] + half_w or point.y < seg["min_y"] - half_w or point.y > seg["max_y"] + half_w:
+				continue
+			if distance_to_segment(point, seg["start"], seg["end"]) <= half_w:
+				return true
+		return false

@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://5a3li3aq5r8t" path="res://character/enemie/spider/IKtarget.gd" id="3_24dvt"]
 [ext_resource type="Script" uid="uid://bka72yatm4jem" path="res://character/enemie/spider/step_ray.gd" id="3_ae8y7"]
 [ext_resource type="Script" uid="uid://0eox54r5tf38" path="res://character/enemie/spider/step_target_container.gd" id="4_vlvqd"]
+[ext_resource type="PackedScene" uid="uid://02dsjiylcsxd" path="res://components/loot_drop_component.tscn" id="6_mmuap"]
 
 [node name="spider" type="Node3D" unique_id=1015881093]
 
@@ -209,5 +210,8 @@ script = ExtResource("3_ae8y7")
 step_target = NodePath("L_4_target2")
 
 [node name="L_4_target2" type="Marker3D" parent="step_target_container/RayCast_L_4" unique_id=475990915]
+
+[node name="LootDropComponent" parent="." unique_id=1408863819 instance=ExtResource("6_mmuap")]
+drop_chance = 5.4
 
 [editable path="Sketchfab_Scene"]

@@ -181,7 +181,7 @@ max_slope_degrees = 30.0
 script = ExtResource("13_ugmv5")
 weather_presets = Array[PackedScene]([ExtResource("14_3mir5")])
 
-[node name="@Node3D@80635" type="Node3D" parent="Meteo" unique_id=1381402426 instance=ExtResource("14_3mir5")]
+[node name="@Node3D@80635" parent="Meteo" unique_id=1381402426 instance=ExtResource("14_3mir5")]
 
 [node name="Encounters" type="Node3D" parent="." unique_id=1546825630]
 script = ExtResource("15_6laye")

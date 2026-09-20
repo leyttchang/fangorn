@@ -34,3 +34,18 @@ func get_value() -> float:
 			
 	# On applique le pourcentage total à la fin
 	return final_value * (1.0 + percent_multiplier)
+
+## Calcule la valeur finale en ignorant un modificateur spécifique (ex: bonus temporaire de route)
+func get_value_excluding(excluded_id: String) -> float:
+	var final_value = base_value
+	var percent_multiplier = 0.0
+	
+	for mod in modifiers:
+		if mod.id == excluded_id:
+			continue
+		if mod.type == StatModifier.Type.FLAT:
+			final_value += mod.value
+		elif mod.type == StatModifier.Type.PERCENT:
+			percent_multiplier += mod.value
+			
+	return final_value * (1.0 + percent_multiplier)

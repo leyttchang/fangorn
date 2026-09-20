@@ -40,6 +40,7 @@
 [ext_resource type="AudioStream" uid="uid://lij60mhnigeg" path="res://assets/sound_effects/Human/belch_2.wav" id="39_vhgsy"]
 [ext_resource type="AudioStream" uid="uid://d28g7j4vbcf31" path="res://assets/sound_effects/Human/belch_3.wav" id="40_0x4wk"]
 [ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="40_holf7"]
+[ext_resource type="PackedScene" uid="uid://02dsjiylcsxd" path="res://components/loot_drop_component.tscn" id="41_g26vk"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
 radius = 0.37402344
@@ -248,6 +249,8 @@ replication_config = SubResource("SceneReplicationConfig_holf7")
 [node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("40_holf7")]
 stats_component = NodePath("../StatsComponent")
 health_component = NodePath("../HealthComponent")
+
+[node name="LootDropComponent" parent="." unique_id=1408863819 instance=ExtResource("41_g26vk")]
 
 [editable path="Orc"]
 [editable path="Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent"]

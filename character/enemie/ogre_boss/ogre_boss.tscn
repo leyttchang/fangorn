@@ -64,6 +64,7 @@
 [ext_resource type="AudioStream" uid="uid://lij60mhnigeg" path="res://assets/sound_effects/Human/belch_2.wav" id="50_li0bq"]
 [ext_resource type="AudioStream" uid="uid://d28g7j4vbcf31" path="res://assets/sound_effects/Human/belch_3.wav" id="51_dtipg"]
 [ext_resource type="PackedScene" uid="uid://c76swiptbrjbq" path="res://components/status_effect_componant.tscn" id="52_t4pu4"]
+[ext_resource type="PackedScene" uid="uid://02dsjiylcsxd" path="res://components/loot_drop_component.tscn" id="65_hrppj"]
 
 [sub_resource type="Resource" id="Resource_hlie2"]
 script = ExtResource("2_j5vgy")
@@ -433,6 +434,15 @@ parameters/jumping_attack/TimeScale/scale = 1.0
 [node name="height_detector" type="RayCast3D" parent="." unique_id=1397227723]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.09998834)
 target_position = Vector3(0, -200, 0)
+
+[node name="LootDropComponent" parent="." unique_id=1408863819 instance=ExtResource("65_hrppj")]
+drop_chance = 100.0
+max_drops = 3
+extra_drop_chance = 30.0
+weight_common = 30
+weight_magic = 38
+weight_rare = 20
+weight_legendary = 13
 
 [editable path="Stable Sword Outward Slash"]
 [editable path="Stable Sword Outward Slash/Skeleton3D/right_hand/wrist/Club2/AttackComponent"]

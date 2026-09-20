@@ -78,3 +78,24 @@ func remove_modifier_by_source(source_id: String) -> void:
 			# NOUVEAU : Si la stat a chang aprs le retrait, on prvient le jeu
 			if stat.get_value() != old_value:
 				stat_changed.emit(stat_name, stat.get_value())
+
+## Récupère la valeur d'une stat en ignorant un modificateur spécifique
+func get_stat_value_excluding(stat_name: String, excluded_source_id: String) -> float:
+	if _stats.has(stat_name):
+		var stat = _stats[stat_name]
+		if stat.has_method("get_value_excluding"):
+			return stat.get_value_excluding(excluded_source_id)
+		return stat.get_value()
+	return 0.0
+
+## Met à jour la valeur d'un modificateur existant ou l'ajoute s'il n'existe pas
+func set_or_update_modifier(stat_name: String, mod_type: int, value: float, source_id: String) -> void:
+	var stat = get_stat(stat_name)
+	if stat != null:
+		for mod in stat.modifiers:
+			if mod.id == source_id:
+				if not is_equal_approx(mod.value, value):
+					mod.value = value
+					stat_changed.emit(stat_name, stat.get_value())
+				return
+		add_modifier(stat_name, mod_type, value, source_id)

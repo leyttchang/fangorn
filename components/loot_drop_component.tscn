@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://02dsjiylcsxd"]
+
+[ext_resource type="Script" uid="uid://r5qepuq01urv" path="res://components/loot_drop_component.gd" id="1_hx5pp"]
+
+[node name="LootDropComponent" type="Node3D" unique_id=1408863819]
+script = ExtResource("1_hx5pp")

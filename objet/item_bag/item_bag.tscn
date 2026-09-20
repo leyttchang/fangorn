@@ -4,6 +4,11 @@
 [ext_resource type="Texture2D" uid="uid://clwmoo5t5kv0u" path="res://assets/LeLu's Noise Pack/T_Noise1_tiled.png" id="1_v8fdx"]
 [ext_resource type="Texture2D" uid="uid://ddsimec20xmux" path="res://assets/LeLu's Noise Pack/T_Noise_6Yu1.png" id="2_ph55c"]
 [ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="4_2hgqd"]
+[ext_resource type="PackedScene" uid="uid://dx1ah7ha24ido" path="res://objet/item_bag/vfx_legendary_loot.tscn" id="5_ieq8l"]
+[ext_resource type="PackedScene" uid="uid://djte7qnwtd4jv" path="res://objet/item_bag/vfx_rare_loot.tscn" id="6_3enkr"]
+[ext_resource type="PackedScene" uid="uid://cbppywoacdm31" path="res://objet/item_bag/vfx_magic_loot.tscn" id="7_6mhl5"]
+[ext_resource type="PackedScene" uid="uid://cafv4mqgqv2g" path="res://objet/item_bag/vfx_unique_loot.tscn" id="8_l1cna"]
+[ext_resource type="PackedScene" uid="uid://dfgt0k7jv3yph" path="res://objet/item_bag/vfx_normal_loot.tscn" id="9_6tcam"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_hlie2"]
 radius = 0.8862702
@@ -107,6 +112,9 @@ properties/2/replication_mode = 2
 properties/3/path = NodePath(".:angular_velocity")
 properties/3/spawn = true
 properties/3/replication_mode = 2
+properties/4/path = NodePath(".:rarity")
+properties/4/spawn = true
+properties/4/replication_mode = 1
 
 [node name="item_bag" type="RigidBody3D" unique_id=12136432]
 angular_damp = 10.0
@@ -130,9 +138,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0769763, -0.012190342, 0)
 shape = SubResource("SphereShape3D_ieq8l")
 
 [node name="Label3D" parent="InteractionComponent" index="1" unique_id=987654323]
+visible = false
+outline_render_priority = 0
 text = "Press E to pick up"
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1773209645]
 replication_config = SubResource("SceneReplicationConfig_2hgqd")
+
+[node name="Vfx_normal_loot" parent="." unique_id=531894085 instance=ExtResource("9_6tcam")]
+visible = false
+
+[node name="Vfx_unique_loot" parent="." unique_id=629099476 instance=ExtResource("8_l1cna")]
+visible = false
+
+[node name="Vfx_magic_loot" parent="." unique_id=968419113 instance=ExtResource("7_6mhl5")]
+visible = false
+
+[node name="Vfx_rare_loot" parent="." unique_id=204150483 instance=ExtResource("6_3enkr")]
+visible = false
+
+[node name="Vfx_legendary_loot" parent="." unique_id=334124525 instance=ExtResource("5_ieq8l")]
+visible = false
 
 [editable path="InteractionComponent"]
