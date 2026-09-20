@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://df6v41t5y2m0p"]
+
+[ext_resource type="Script" path="res://components/enemy_optimizer_component.gd" id="1_opt"]
+
+[node name="EnemyOptimizerComponent" type="Node"]
+script = ExtResource("1_opt")

@@ -25,6 +25,7 @@ var flee_time: float = 0.0
 var rest_time: float = 0.0
 var is_tired: bool = false
 var _target_update_timer: float = 0.0
+var is_anim_culled: bool = false
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var target: Node3D = null
@@ -41,6 +42,11 @@ func _ready() -> void:
 	var hitbox = find_child("HitboxComponent*", true, false)
 	if hitbox and hitbox.has_signal("aggro_requested"):
 		hitbox.aggro_requested.connect(_on_aggro_requested)
+
+	if not has_node("EnemyOptimizerComponent"):
+		var opt = EnemyOptimizerComponent.new()
+		opt.name = "EnemyOptimizerComponent"
+		add_child(opt)
 	
 	call_deferred("actor_setup")
 
@@ -59,9 +65,17 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
+	if anim_tree:
+		if is_anim_culled:
+			if anim_tree.active:
+				anim_tree.active = false
+		elif not anim_tree.active:
+			anim_tree.active = true
+
 	if current_state == State.DEAD:
 		_stop_movement(delta)
-		move_and_slide()
+		if not velocity.is_zero_approx() or not is_on_floor():
+			move_and_slide()
 		return
 		
 	_target_update_timer += delta
@@ -80,18 +94,21 @@ func _physics_process(delta: float) -> void:
 	else:
 		rest_time = 0.0
 	
-	move_and_slide()
+	if not velocity.is_zero_approx() or not is_on_floor():
+		move_and_slide()
 	
 	# Synchro reseau pour les autres clients (Mouvement / Animations)
-	var anim_name = "crouching_walk"
+	var anim_name = "crouch_idle"
 	if current_state == State.CHARGE:
 		anim_name = "run_fast"
 	elif current_state == State.FLEE:
 		anim_name = "tired_walk" if is_tired else "run_fast"
 	elif current_state == State.ATTACK:
 		anim_name = "stab"
-	elif current_state == State.IDLE:
+	elif current_state == State.SNEAK or current_state == State.APPROACH:
 		anim_name = "crouching_walk"
+	elif current_state == State.IDLE:
+		anim_name = "crouching_walk" if _is_pack_walking else "crouch_idle"
 		
 	# Synchronisation de la rotation
 	var current_rot = rotation.y
@@ -105,13 +122,24 @@ func _process_state(delta: float) -> void:
 		if navigation_comp and navigation_comp.has_pack_destination:
 			var dir = navigation_comp.get_pack_roam_direction()
 			if dir != Vector3.ZERO:
-				_is_pack_walking = true
-				_move_to(navigation_comp.pack_destination, slow_speed, delta)
+				if not _is_pack_walking:
+					_is_pack_walking = true
+					if anim_playback: anim_playback.travel("crouching_walk")
+				var vel_2d = Vector2(velocity.x, velocity.z)
+				var roam_speed = slow_speed * navigation_comp.pack_speed_mult * (stats_component.get_stat_value("movement_speed") if stats_component else 1.0)
+				vel_2d = movement_comp.accelerate_to_direction(vel_2d, dir, roam_speed, behavior, delta)
+				velocity.x = vel_2d.x
+				velocity.z = vel_2d.y
+				movement_comp.rotate_towards_direction(dir, behavior, delta)
 				return
 			else:
-				_is_pack_walking = false
+				if _is_pack_walking:
+					_is_pack_walking = false
+					if anim_playback: anim_playback.travel("crouch_idle")
 		else:
-			_is_pack_walking = false
+			if _is_pack_walking:
+				_is_pack_walking = false
+				if anim_playback: anim_playback.travel("crouch_idle")
 		_stop_movement(delta)
 		return
 		
@@ -183,9 +211,12 @@ func _process_state(delta: float) -> void:
 			movement_comp.rotate_towards_direction(dir, behavior, delta, 2.0)
 
 func _move_to(target_pos: Vector3, speed: float, delta: float) -> void:
+	var final_speed = speed
+	if stats_component:
+		final_speed *= stats_component.get_stat_value("movement_speed")
 	var dir = navigation_comp.get_direction_to_target(target_pos)
 	var vel_2d = Vector2(velocity.x, velocity.z)
-	vel_2d = movement_comp.accelerate_to_direction(vel_2d, dir, speed, behavior, delta)
+	vel_2d = movement_comp.accelerate_to_direction(vel_2d, dir, final_speed, behavior, delta)
 	velocity.x = vel_2d.x
 	velocity.z = vel_2d.y
 	movement_comp.rotate_towards_direction(dir, behavior, delta)
@@ -212,7 +243,10 @@ func change_state(new_state: State) -> void:
 		elif new_state == State.ATTACK:
 			anim_playback.travel("stab")
 		elif new_state == State.IDLE:
-			anim_playback.travel("crouching_walk")
+			if _is_pack_walking:
+				anim_playback.travel("crouching_walk")
+			else:
+				anim_playback.travel("crouch_idle")
 
 # --- CONDITIONS DE VISION ---
 

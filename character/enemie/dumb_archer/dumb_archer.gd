@@ -27,6 +27,7 @@ var target: Node3D = null
 
 # --- SÉCURITÉ ---
 var _attack_anim_started: bool = false
+var is_anim_culled: bool = false
 
 func _ready() -> void:
 	if behavior == null:
@@ -34,6 +35,11 @@ func _ready() -> void:
 		
 	anim_tree.active = true
 	health_component.died.connect(_on_died)
+
+	if not has_node("EnemyOptimizerComponent"):
+		var opt = EnemyOptimizerComponent.new()
+		opt.name = "EnemyOptimizerComponent"
+		add_child(opt)
 	
 	call_deferred("actor_setup")
 
@@ -109,8 +115,11 @@ func _physics_process(delta: float) -> void:
 	if stats_component != null:
 		action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
 		
-	# --- STUN TOTAL ---
-	if action_speed <= 0.0:
+	# --- STUN TOTAL & CULLING ANIMATION ---
+	if is_anim_culled:
+		if anim_tree.active:
+			anim_tree.active = false
+	elif action_speed <= 0.0:
 		if not is_on_floor():
 			velocity.y -= gravity * delta
 		velocity.x = move_toward(velocity.x, 0, 10.0 * delta)
@@ -120,11 +129,8 @@ func _physics_process(delta: float) -> void:
 		# On fige l'arbre d'animation !
 		if anim_tree.active:
 			anim_tree.active = false
-		
-
 		return
-		
-	if not anim_tree.active:
+	elif not anim_tree.active:
 		anim_tree.active = true
 
 	# Recherche / actualisation de cible selon le mode de jeu
@@ -167,7 +173,8 @@ func _physics_process(delta: float) -> void:
 	velocity.x = vitesse_horizontale.x
 	velocity.z = vitesse_horizontale.y
 
-	move_and_slide()
+	if not vitesse_horizontale.is_zero_approx() or not is_on_floor() or velocity.y != 0.0:
+		move_and_slide()
 
 
 # ==========================================================

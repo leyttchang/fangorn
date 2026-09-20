@@ -6,6 +6,7 @@ extends Node3D
 
 class ActiveEffect:
 	var data: StatusEffectData
+	var total_duration: float = 0.0
 	var time_remaining: float = 0.0
 	var next_tick_time: float = 0.0
 	var visual_instance: Node = null
@@ -19,8 +20,11 @@ func apply_effect(data: StatusEffectData, duration: float) -> void:
 		push_error("StatusEffectData n'a pas de resource_path! (Sauvegarde-le en .tres)")
 		return
 		
-	if is_multiplayer_authority():
-		_apply_effect_broadcast.rpc(data.resource_path, duration)
+	if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority():
+		if multiplayer.has_multiplayer_peer():
+			_apply_effect_broadcast.rpc(data.resource_path, duration)
+		else:
+			_internal_apply_effect(data, duration)
 	else:
 		_request_apply_effect.rpc_id(get_multiplayer_authority(), data.resource_path, duration)
 
@@ -42,6 +46,7 @@ func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 	# Si l'effet existe deja, on refresh la duree
 	if _active_effects.has(data.effect_id):
 		var eff = _active_effects[data.effect_id]
+		eff.total_duration = max(eff.total_duration, duration)
 		eff.time_remaining = max(eff.time_remaining, duration)
 		# Appel de la fonction custom meme en cas de refresh
 		data.on_apply(get_parent(), self, true)
@@ -49,6 +54,7 @@ func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 		
 	var new_effect = ActiveEffect.new()
 	new_effect.data = data
+	new_effect.total_duration = duration
 	new_effect.time_remaining = duration
 	new_effect.next_tick_time = data.tick_interval
 	
@@ -82,15 +88,21 @@ func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 
 # --- MULTIJOUEUR : REMOVE ---
 func remove_effect(effect_id: String) -> void:
-	if is_multiplayer_authority():
-		_remove_effect_broadcast.rpc(effect_id)
+	if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority():
+		if multiplayer.has_multiplayer_peer():
+			_remove_effect_broadcast.rpc(effect_id)
+		else:
+			_internal_remove_effect(effect_id)
 	else:
 		_request_remove_effect.rpc_id(get_multiplayer_authority(), effect_id)
 
 @rpc("any_peer", "call_remote", "reliable")
 func _request_remove_effect(effect_id: String) -> void:
-	if not is_multiplayer_authority(): return
-	_remove_effect_broadcast.rpc(effect_id)
+	if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority():
+		if multiplayer.has_multiplayer_peer():
+			_remove_effect_broadcast.rpc(effect_id)
+		else:
+			_internal_remove_effect(effect_id)
 
 @rpc("authority", "call_local", "reliable")
 func _remove_effect_broadcast(effect_id: String) -> void:
@@ -135,15 +147,18 @@ func _process(delta: float) -> void:
 			eff.next_tick_time -= delta
 			if eff.next_tick_time <= 0.0:
 				eff.next_tick_time = eff.data.tick_interval
-				if is_multiplayer_authority(): # ONLY HOST INFLIGE DEGATS
+				if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority(): # ONLY HOST INFLIGE DEGATS
 					if health_component != null and health_component.has_method("take_damage"):
 						health_component.take_damage(eff.data.tick_damage)
 		
 		# Duree
 		eff.time_remaining -= delta
 		if eff.time_remaining <= 0.0:
-			if is_multiplayer_authority(): # ONLY HOST DECIDE DE LA FIN
+			if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority(): # ONLY HOST DECIDE DE LA FIN
 				remove_effect(key)
+		else:
+			if eff.data != null and eff.data.has_method("on_process"):
+				eff.data.on_process(get_parent(), self, delta, eff.time_remaining, eff.total_duration)
 
 # --- FONCTIONS POUR SHADERS ---
 func _apply_overlay_material(node: Node, mat: Material) -> void:

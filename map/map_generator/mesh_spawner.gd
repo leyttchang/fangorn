@@ -76,6 +76,7 @@ const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 # RIDs internes si use_physics_server est actif
 var _physics_body_rids: Array[RID] = []
 var _is_generating: bool = false
+var spawned_tree_instances: Array[Dictionary] = []
 var _cached_tree_shape: Shape3D = null
 var _cached_tree_mesh: Mesh = null
 var _cached_tree_material: Material = null
@@ -111,6 +112,7 @@ func _connect_to_map_generator() -> void:
 ## Nettoie tous les arbres (MultiMesh et collisions)
 func clear_trees() -> void:
 	_clear_physics_server_bodies()
+	spawned_tree_instances.clear()
 	
 	var colliders_node = get_node_or_null("TreeColliders")
 	if colliders_node:
@@ -331,11 +333,18 @@ func generate_trees() -> void:
 			var visual_pos: Vector3 = tree_pos + rot_basis * (v_data["mesh_offset"] * s)
 			
 			variation_transforms[pick_idx].append(Transform3D(visual_basis, visual_pos))
-			variation_instances[pick_idx].append({
+			
+			var trunk_r: float = v_data["trunk_radius"] * s
+			var shape_world_offset: Vector3 = rot_basis * (v_data["shape_offset"] * s)
+			var tree_info = {
 				"pos": tree_pos,
+				"trunk_pos": tree_pos + shape_world_offset,
 				"rot_y": rot_y,
-				"scale": s
-			})
+				"scale": s,
+				"trunk_radius": trunk_r
+			}
+			variation_instances[pick_idx].append(tree_info)
+			spawned_tree_instances.append(tree_info)
 			total_spawned += 1
 			
 			x += spacing
@@ -615,6 +624,24 @@ func clear_trees_near_positions(positions: Array, radius: Variant = 35.0) -> int
 		print("MeshSpawner: ", removed_count, " arbre(s) retiré(s) autour des encounters.")
 	return removed_count
 
+## Recherche l'arbre le plus proche d'un point de route situé dans une couronne de distance [min_dist, max_dist]
+## Retourne un dictionnaire contenant pos, trunk_pos, scale, trunk_radius, ou un Dict vide si introuvable.
+func find_tree_near_road(road_pos: Vector3, min_dist: float = 10.0, max_dist: float = 28.0) -> Dictionary:
+	var best_tree: Dictionary = {}
+	var best_dist: float = INF
+	var road_pos_2d = Vector2(road_pos.x, road_pos.z)
+	
+	for tree in spawned_tree_instances:
+		var t_pos: Vector3 = tree.get("trunk_pos", tree.get("pos", Vector3.ZERO))
+		var t_pos_2d = Vector2(t_pos.x, t_pos.z)
+		var d = road_pos_2d.distance_to(t_pos_2d)
+		if d >= min_dist and d <= max_dist:
+			if d < best_dist:
+				best_dist = d
+				best_tree = tree
+				
+	return best_tree
+
 ## Configure les collisions (PhysicsServer3D C++ direct ou StaticBody3D)
 func _setup_collisions(instances: Array[Dictionary], tree_data: Dictionary) -> void:
 	if tree_data.shape == null:
@@ -718,8 +745,6 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 			result.collision_mask = n.collision_mask
 		elif n is CollisionShape3D and result.shape == null:
 			result.shape = n.shape
-			if n.shape is CylinderShape3D:
-				result.trunk_radius = (n.shape as CylinderShape3D).radius
 			var curr: Node = n
 			var rel_t: Transform3D = Transform3D.IDENTITY
 			while curr != null and curr != inst:
@@ -727,6 +752,14 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 					rel_t = curr.transform * rel_t
 				curr = curr.get_parent()
 			result.shape_offset = rel_t.origin
+			var node_scale: float = rel_t.basis.get_scale().x
+			if n.shape is CylinderShape3D:
+				result.trunk_radius = (n.shape as CylinderShape3D).radius * node_scale
+			elif n.shape is CapsuleShape3D:
+				result.trunk_radius = (n.shape as CapsuleShape3D).radius * node_scale
+			elif n.shape is BoxShape3D:
+				var b_sz = (n.shape as BoxShape3D).size
+				result.trunk_radius = maxf(b_sz.x * rel_t.basis.get_scale().x, b_sz.z * rel_t.basis.get_scale().z) * 0.5
 		elif n is Marker3D:
 			# Marker3D dans la scène : indique exactement où le sol doit couper le tronc !
 			var curr: Node = n

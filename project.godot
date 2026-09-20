@@ -165,6 +165,7 @@ show_info={
 jolt_physics_3d/limits/max_bodies=65536
 jolt_physics_3d/limits/max_body_pairs=131072
 jolt_physics_3d/limits/max_contact_constraints=65536
+jolt_physics_3d/memory/temp_buffer_size=67108864
 common/physics_interpolation=true
 
 [rendering]

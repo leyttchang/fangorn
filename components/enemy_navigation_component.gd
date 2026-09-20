@@ -17,6 +17,8 @@ extends Node
 var pack_destination: Vector3 = Vector3.INF
 var has_pack_destination: bool = false
 var pack_speed_mult: float = 0.55
+var current_pack_path: PackedVector3Array = PackedVector3Array()
+var current_path_index: int = 0
 
 var frames_since_path_update: int = 999
 var next_path_update_frame: int = 0
@@ -30,11 +32,8 @@ func _ready() -> void:
 	if nav_agent == null:
 		push_error("EnemyNavigationComponent sur " + get_parent().name + " : NavigationAgent3D manquant !")
 	else:
-		# TRÈS IMPORTANT : On augmente la distance pour valider un point de passage.
-		# Comme le sol (NavMesh) est à 1.6m sous les pieds du Scout, l'agent bloquait 
-		# indéfiniment en essayant d'atteindre ce point sous terre.
-		nav_agent.path_desired_distance = 3.0
-		nav_agent.target_desired_distance = 3.0
+		nav_agent.path_desired_distance = 1.0
+		nav_agent.target_desired_distance = 0.5
 
 func acquire_target(current_target: Node3D = null) -> Node3D:
 	if _parent_body == null:
@@ -97,28 +96,50 @@ func get_direction_to_target(target_position: Vector3) -> Vector3:
 	
 	frames_since_path_update += 1
 	
-	if frames_since_path_update >= next_path_update_frame:
+	var my_pos = _parent_body.global_position
+	var to_target_2d = Vector2(target_position.x - my_pos.x, target_position.z - my_pos.z)
+	var dist_to_target = to_target_2d.length()
+	
+	# Priorité corps-à-corps / champ proche (<= 3.5m) :
+	# Fonce directement sur la cible en ligne droite sans subir de seuil d'arrêt NavMesh !
+	if dist_to_target <= 3.5:
+		if dist_to_target > 0.05:
+			var dir_2d = to_target_2d.normalized()
+			return Vector3(dir_2d.x, 0.0, dir_2d.y)
+		return Vector3.ZERO
+	
+	# Ne recalculer le chemin vers la cible mobile que si elle a bougé significativement (> 1.5m) ou après délai
+	var target_moved = nav_agent.target_position.distance_squared_to(target_position) > 2.25
+	if target_moved or frames_since_path_update >= next_path_update_frame:
 		nav_agent.target_position = target_position
 		frames_since_path_update = 0
-		next_path_update_frame = randi_range(20, 40)
+		next_path_update_frame = randi_range(15, 25)
+		
+	if nav_agent.is_navigation_finished():
+		if dist_to_target > 0.05:
+			var dir_2d = to_target_2d.normalized()
+			return Vector3(dir_2d.x, 0.0, dir_2d.y)
+		return Vector3.ZERO
 		
 	var next_path_pos = nav_agent.get_next_path_position()
+	var to_next_2d = Vector2(next_path_pos.x - my_pos.x, next_path_pos.z - my_pos.z)
 	
-	# On ignore la diffrence de hauteur (axe Y) pour la direction, 
-	# sinon si le NavMesh est lgrement plus bas que le monstre, 
-	# la direction pointe vers le bas et sa vitesse horizontale devient 0 !
-	var direction = (next_path_pos - _parent_body.global_position)
-	direction.y = 0.0
-	
-	if direction.length_squared() > 0.001:
-		return direction.normalized()
+	# Si le point retourné par NavAgent est sous nos pieds (index 0 non validé à cause de la hauteur Y)
+	if to_next_2d.length() < 1.0:
+		var p = nav_agent.get_current_navigation_path()
+		var idx = nav_agent.get_current_navigation_path_index()
+		if idx < p.size() - 1:
+			next_path_pos = p[idx + 1]
+			to_next_2d = Vector2(next_path_pos.x - my_pos.x, next_path_pos.z - my_pos.z)
+			
+	if to_next_2d.length_squared() > 0.001:
+		var dir = to_next_2d.normalized()
+		return Vector3(dir.x, 0.0, dir.y)
 		
-	# Fallback direct vers la cible si le NavAgent considère la cible atteinte
-	# ou si aucun point suivant n'est calculé
-	var direct = (target_position - _parent_body.global_position)
-	direct.y = 0.0
-	if direct.length_squared() > 0.001:
-		return direct.normalized()
+	# Fallback direct vers la cible
+	if dist_to_target > 0.05:
+		var dir_2d = to_target_2d.normalized()
+		return Vector3(dir_2d.x, 0.0, dir_2d.y)
 		
 	return Vector3.ZERO
 
@@ -127,20 +148,93 @@ func set_pack_destination(dest: Vector3, speed_mult: float = 0.55) -> void:
 	pack_destination = dest
 	has_pack_destination = true
 	pack_speed_mult = speed_mult
+	current_pack_path.clear()
+	current_path_index = 0
+	if nav_agent != null:
+		nav_agent.target_position = dest
+	_refresh_pack_path()
 
 func clear_pack_destination() -> void:
 	has_pack_destination = false
 	pack_destination = Vector3.INF
+	current_pack_path.clear()
+	current_path_index = 0
+
+func _refresh_pack_path() -> void:
+	if not has_pack_destination:
+		return
+	if _parent_body == null:
+		_parent_body = get_parent() as Node3D
+	if not is_instance_valid(_parent_body):
+		return
+		
+	var world_3d = _parent_body.get_world_3d()
+	if world_3d:
+		var nav_map = world_3d.navigation_map
+		if nav_map.is_valid():
+			var p = NavigationServer3D.map_get_path(nav_map, _parent_body.global_position, pack_destination, true)
+			if not p.is_empty():
+				current_pack_path = p
+				current_path_index = 0
+				return
+				
+	if nav_agent != null:
+		nav_agent.target_position = pack_destination
+		var p = nav_agent.get_current_navigation_path()
+		if not p.is_empty():
+			current_pack_path = p
+			current_path_index = 0
 
 func get_pack_roam_direction() -> Vector3:
-	if not has_pack_destination or _parent_body == null:
+	if not has_pack_destination:
+		return Vector3.ZERO
+	if _parent_body == null:
+		_parent_body = get_parent() as Node3D
+	if not is_instance_valid(_parent_body):
 		return Vector3.ZERO
 		
 	var my_pos = _parent_body.global_position
-	# Vérifie la distance 2D (XZ) pour éviter les blocages dus au décalage d'altitude avec le NavMesh
-	var dist_2d_sq = Vector2(my_pos.x - pack_destination.x, my_pos.z - pack_destination.z).length_squared()
-	if dist_2d_sq <= 4.0: # Arrivé à moins de 2m
+	var my_pos_2d = Vector2(my_pos.x, my_pos.z)
+	var final_dest_2d = Vector2(pack_destination.x, pack_destination.z)
+	
+	# 1. Vérifie si on est arrivé à la destination finale (2.2m en 2D XZ)
+	if my_pos_2d.distance_to(final_dest_2d) <= 2.2:
 		clear_pack_destination()
 		return Vector3.ZERO
 		
-	return get_direction_to_target(pack_destination)
+	# 2. Si le chemin est vide, on tente de le rafraîchir
+	if current_pack_path.is_empty():
+		_refresh_pack_path()
+		
+	# Si le chemin reste vide (ex: NavMesh pas encore prêt ou hors carte), cap direct vers la destination
+	if current_pack_path.is_empty():
+		var direct_2d = final_dest_2d - my_pos_2d
+		if direct_2d.length_squared() <= 4.84: # <= 2.2m
+			clear_pack_destination()
+			return Vector3.ZERO
+		var direct_dir = direct_2d.normalized()
+		return Vector3(direct_dir.x, 0.0, direct_dir.y)
+		
+	# 3. Progression le long des waypoints du chemin en 2D (XZ uniquement !)
+	# L'index 0 est la position de départ sur le NavMesh, on avance dès qu'on s'approche en 2D (<= 2.0m)
+	while current_path_index < current_pack_path.size() - 1:
+		var wp = current_pack_path[current_path_index]
+		var wp_2d = Vector2(wp.x, wp.z)
+		if current_path_index == 0 or my_pos_2d.distance_to(wp_2d) <= 2.0:
+			current_path_index += 1
+		else:
+			break
+			
+	var target_wp = current_pack_path[current_path_index]
+	var to_target_2d = Vector2(target_wp.x - my_pos.x, target_wp.z - my_pos.z)
+	
+	# Si c'est le dernier waypoint et qu'on y est arrivé en 2D
+	if current_path_index == current_pack_path.size() - 1 and to_target_2d.length() <= 2.2:
+		clear_pack_destination()
+		return Vector3.ZERO
+		
+	if to_target_2d.length_squared() > 0.001:
+		var dir = to_target_2d.normalized()
+		return Vector3(dir.x, 0.0, dir.y)
+		
+	return Vector3.ZERO

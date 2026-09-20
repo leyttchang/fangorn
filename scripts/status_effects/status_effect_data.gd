@@ -18,8 +18,11 @@ extends Resource
 @export var overlay_material: Material # Applique un Shader/Material sur le modele 3D du monstre (Glace, Feu, etc.)
 
 # Fonction virtuelle pour les effets complexes (Chill -> Freeze, etc.)
-func on_apply(target: Node, component: Node, is_refresh: bool) -> void:
+func on_apply(_target: Node, _component: Node, _is_refresh: bool) -> void:
 	pass
 
-func on_remove(target: Node, component: Node) -> void:
+func on_remove(_target: Node, _component: Node) -> void:
+	pass
+
+func on_process(_target: Node, _component: Node, _delta: float, _time_remaining: float, _total_duration: float) -> void:
 	pass

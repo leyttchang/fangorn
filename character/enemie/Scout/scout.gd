@@ -55,6 +55,7 @@ var _is_rotation_locked: bool = false
 
 var _last_hitbox_disabled: bool = true
 var _recent_distances: Array[float] = []
+var is_anim_culled: bool = false
 
 func _ready() -> void:
 	if behavior == null:
@@ -77,6 +78,11 @@ func _ready() -> void:
 	
 	if attack_shape != null:
 		attack_shape.disabled = true
+
+	if not has_node("EnemyOptimizerComponent"):
+		var opt = EnemyOptimizerComponent.new()
+		opt.name = "EnemyOptimizerComponent"
+		add_child(opt)
 	
 	call_deferred("actor_setup")
 
@@ -205,7 +211,7 @@ func _process(delta: float) -> void:
 	
 	if stats_component != null and anim_tree != null:
 		var action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
-		if action_speed <= 0.0:
+		if is_anim_culled or action_speed <= 0.0:
 			if anim_tree.active: anim_tree.active = false
 		else:
 			if not anim_tree.active: anim_tree.active = true
@@ -284,7 +290,8 @@ func _physics_process(delta: float) -> void:
 	velocity.x = vitesse_horizontale.x
 	velocity.z = vitesse_horizontale.y
 	
-	move_and_slide()
+	if not vitesse_horizontale.is_zero_approx() or not is_on_floor() or velocity.y != 0.0:
+		move_and_slide()
 	
 var _is_pack_walking: bool = false
 

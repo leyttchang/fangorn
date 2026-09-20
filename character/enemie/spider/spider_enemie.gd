@@ -9,6 +9,7 @@ enum State {
 
 var current_state: State = State.IDLE
 var target: Node3D = null
+var is_anim_culled: bool = false
 
 @export var behavior: EnemyBehaviorData
 @export var base_movement_speed: float = 4.0
@@ -61,6 +62,11 @@ func _ready() -> void:
 		
 	if attack_shape:
 		attack_shape.disabled = true
+
+	if not has_node("EnemyOptimizerComponent"):
+		var opt = EnemyOptimizerComponent.new()
+		opt.name = "EnemyOptimizerComponent"
+		add_child(opt)
 	
 	call_deferred("actor_setup")
 
@@ -177,7 +183,8 @@ func _physics_process(delta: float) -> void:
 	velocity.x = vitesse_horizontale.x
 	velocity.z = vitesse_horizontale.y
 
-	move_and_slide()
+	if not vitesse_horizontale.is_zero_approx() or not is_on_floor() or velocity.y != 0.0:
+		move_and_slide()
 
 
 func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:

@@ -31,6 +31,22 @@ enum PackState {
 ## Pack Mind : si un monstre repère un joueur ou prend des dégâts, toute la meute est alertée !
 @export var aggro_link: bool = true
 
+@export_category("Ambush Settings (Mode AMBUSH)")
+## Point surveillé sur la route (déclencheur principal d'embuscade)
+@export var road_ambush_point: Vector3 = Vector3.INF
+## Rayon de déclenchement autour du point de la route
+@export var road_trigger_radius: float = 22.0
+## Direction vers la route que la meute surveille
+@export var ambush_road_direction: Vector3 = Vector3.ZERO
+## Distance maximale de détection en vision vers la route (en mètres)
+@export var ambush_view_distance: float = 35.0
+## Cône de vision vers la route (cosinus de l'angle : 0.17 = ~80° de chaque côté, soit 160° face à la route)
+@export var ambush_view_fov_cos: float = 0.17
+## Indique si l'embuscade a déjà été déclenchée
+@export var is_ambush_triggered: bool = false
+## Buff de vitesse appliqué lors de l'embuscade (80% -> 50% sur 5s, 50% sur 5-10s)
+@export var ambush_status_effect: StatusEffectData = preload("res://scripts/status_effects/ambush_speed_buff.tres")
+
 @export_category("Membres")
 ## Références manuelles aux monstres (si vide, détecte automatiquement les enfants CharacterBody3D !)
 @export var members: Array[CharacterBody3D] = []
@@ -127,10 +143,17 @@ func _on_child_entered_tree(node: Node) -> void:
 # API MAP GENERATOR & SCRIPTING
 # ==========================================================
 
-## Configure le pack en mode EMBUSCADE (immobile, caché, détection personnalisée)
-func setup_ambush(custom_detection: float = 8.0) -> void:
+## Configure le pack en mode EMBUSCADE (immobile, caché derrière un arbre, guettant la route)
+func setup_ambush(road_target: Vector3 = Vector3.INF, trigger_radius: float = 22.0, custom_detection: float = 8.0, look_dir: Vector3 = Vector3.ZERO) -> void:
 	role = PackRole.AMBUSH
+	road_ambush_point = road_target
+	road_trigger_radius = trigger_radius
 	detection_range = custom_detection
+	is_ambush_triggered = false
+	if look_dir != Vector3.ZERO:
+		ambush_road_direction = look_dir.normalized()
+	elif road_target.is_finite():
+		ambush_road_direction = (road_target - global_position).normalized()
 	_update_all_members_detection()
 
 ## Configure le pack en mode RÔDEUR (vadrouille en forêt autour du point)
@@ -138,6 +161,7 @@ func setup_roam(custom_radius: float = 20.0, custom_detection: float = 20.0) -> 
 	role = PackRole.ROAM
 	roam_radius = custom_radius
 	detection_range = custom_detection
+	spawn_origin = global_position
 	_update_all_members_detection()
 
 ## Configure le pack en mode PATROUILLE avec un itinéraire
@@ -153,17 +177,17 @@ func set_patrol_route(points: Variant, loop: bool = true) -> void:
 	loop_patrol = loop
 	waypoints.clear()
 	waypoint_positions.clear()
-	_current_waypoint_index = 0
+	_current_waypoint_index = 1 if (points is Array and points.size() > 1) else 0
 	_patrol_direction_forward = true
 	
 	if points is Array:
 		for p in points:
 			if p is Vector3:
-				waypoint_positions.append(p)
+				waypoint_positions.append(_project_on_navmesh(p))
 			elif p is Vector2:
 				# Coordonnée 2D (x, z) tirée de la route / map_generator
 				var y_pos = _sample_ground_height(p.x, p.y)
-				waypoint_positions.append(Vector3(p.x, y_pos, p.y))
+				waypoint_positions.append(_project_on_navmesh(Vector3(p.x, y_pos, p.y)))
 			elif p is Node3D:
 				waypoints.append(p)
 
@@ -203,7 +227,9 @@ func _physics_process(delta: float) -> void:
 	if active_combat_target != null:
 		if current_pack_state != PackState.COMBAT:
 			current_pack_state = PackState.COMBAT
-			if aggro_link:
+			if role == PackRole.AMBUSH and not is_ambush_triggered:
+				trigger_ambush(active_combat_target)
+			elif aggro_link:
 				alert_pack(active_combat_target)
 		_combat_cooldown = 3.0
 		return
@@ -222,8 +248,10 @@ func _physics_process(delta: float) -> void:
 	# 4. Machine à états hors combat
 	match role:
 		PackRole.AMBUSH:
-			# En embuscade, les monstres restent immobiles et attendent
-			pass
+			if not is_ambush_triggered:
+				_process_ambush_detection()
+			else:
+				_process_roam_role(delta)
 		PackRole.ROAM:
 			_process_roam_role(delta)
 		PackRole.PATROL:
@@ -232,6 +260,113 @@ func _physics_process(delta: float) -> void:
 # ==========================================================
 # LOGIQUE DES RÔLES
 # ==========================================================
+func _process_ambush_detection() -> void:
+	var players = get_tree().get_nodes_in_group("Player")
+	if players.is_empty():
+		return
+		
+	var road_target_sq = road_trigger_radius * road_trigger_radius
+	var local_det_sq = detection_range * detection_range
+	var has_road_pt = road_ambush_point.is_finite()
+	var has_look_dir = ambush_road_direction.length_squared() > 0.01
+	var look_dir_2d = Vector2(ambush_road_direction.x, ambush_road_direction.z).normalized() if has_look_dir else Vector2.ZERO
+	var view_dist_sq = ambush_view_distance * ambush_view_distance
+	
+	for p in players:
+		if not is_instance_valid(p): continue
+		if p.has_method("is_dead") and p.is_dead(): continue
+		if p.get("is_dead") == true: continue
+		
+		var p_pos = p.global_position
+		
+		# 1. Déclencheur direct sur la zone de route surveillée
+		if has_road_pt:
+			var dist_sq_road = Vector2(p_pos.x - road_ambush_point.x, p_pos.z - road_ambush_point.z).length_squared()
+			if dist_sq_road <= road_target_sq:
+				trigger_ambush(p)
+				return
+				
+		# 2. Déclencheur "Regarder spécifiquement le chemin" :
+		# Détecte le joueur dans le cône ouvert (160°) faisant face à la route jusqu'à 35 mètres
+		if has_look_dir:
+			var to_player_2d = Vector2(p_pos.x - global_position.x, p_pos.z - global_position.z)
+			var d_sq = to_player_2d.length_squared()
+			if d_sq <= view_dist_sq and d_sq > 0.01:
+				var dot = look_dir_2d.dot(to_player_2d.normalized())
+				if dot >= ambush_view_fov_cos:
+					trigger_ambush(p)
+					return
+					
+		# 3. Déclencheur de proximité / dos (si un joueur s'approche par surprise à moins de 8m)
+		var dist_sq_pack = Vector2(p_pos.x - global_position.x, p_pos.z - global_position.z).length_squared()
+		if dist_sq_pack <= local_det_sq:
+			trigger_ambush(p)
+			return
+			
+		for m in members:
+			if not is_instance_valid(m): continue
+			var dist_sq_m = Vector2(p_pos.x - m.global_position.x, p_pos.z - m.global_position.z).length_squared()
+			if dist_sq_m <= local_det_sq:
+				trigger_ambush(p)
+				return
+
+## Déclenche l'embuscade : alerte toute la meute et active le buff de vitesse progressif (80% -> 50% sur 5s, 50% sur 5-10s) via StatusEffectComponent
+func trigger_ambush(target_player: Node3D = null) -> void:
+	if is_ambush_triggered:
+		return
+	is_ambush_triggered = true
+	current_pack_state = PackState.COMBAT
+	_combat_cooldown = 4.0
+	
+	if target_player == null or not is_instance_valid(target_player):
+		target_player = _find_closest_player()
+		
+	# Restaurer une portée normale de poursuite pour tous les membres
+	for member in members:
+		if not is_instance_valid(member): continue
+		var nav_comp = member.get_node_or_null("EnemyNavigationComponent") as EnemyNavigationComponent
+		if nav_comp:
+			nav_comp.detection_range_override = -1.0
+			nav_comp.lose_aggro_override = -1.0
+			
+	# Activer le buff de vitesse d'embuscade via StatusEffectComponent sur chaque monstre
+	var effect_to_apply = ambush_status_effect
+	if effect_to_apply == null:
+		effect_to_apply = load("res://scripts/status_effects/ambush_speed_buff.tres") as StatusEffectData
+		
+	if effect_to_apply != null:
+		for member in members:
+			if not is_instance_valid(member): continue
+			var status_comp = member.get_node_or_null("status_effect_componant")
+			if status_comp != null and status_comp.has_method("apply_effect"):
+				status_comp.apply_effect(effect_to_apply, 10.0)
+			else:
+				var stats = member.get_node_or_null("StatsComponent") as StatsComponent
+				if stats:
+					stats.set_or_update_modifier("movement_speed", StatModifier.Type.PERCENT, 0.80, "STATUS_ambush_speed_buff")
+	
+	# Donner l'ordre d'attaque immédiat à tous les membres
+	if target_player != null:
+		alert_pack(target_player)
+		print("[MonsterPack] EMBUSCADE DÉCLENCHÉE (%s) sur %s ! (Buff sprint via StatusEffect actif pour 10s)" % [
+			name,
+			target_player.name
+		])
+
+func _find_closest_player() -> Node3D:
+	var players = get_tree().get_nodes_in_group("Player")
+	var closest: Node3D = null
+	var min_dist_sq: float = INF
+	for p in players:
+		if not is_instance_valid(p): continue
+		if p.has_method("is_dead") and p.is_dead(): continue
+		if p.get("is_dead") == true: continue
+		var d = global_position.distance_squared_to(p.global_position)
+		if d < min_dist_sq:
+			min_dist_sq = d
+			closest = p
+	return closest
+
 func _process_roam_role(delta: float) -> void:
 	match current_pack_state:
 		PackState.IDLE_WAIT:
@@ -258,16 +393,20 @@ func _process_patrol_role(delta: float) -> void:
 			_idle_timer -= delta
 			if _idle_timer <= 0.0:
 				var target_pos = _get_patrol_point_position(_current_waypoint_index)
+				print("[PATROL_DISPATCH] %s -> Waypoint %d/%d : %s" % [name, _current_waypoint_index, total_points, target_pos])
 				dispatch_pack_to_position(target_pos)
 				current_pack_state = PackState.MOVING
-				_move_timeout = 25.0
+				var dist = global_position.distance_to(target_pos)
+				_move_timeout = maxf(45.0, dist / 0.8 + 15.0)
 				
 		PackState.MOVING:
 			_move_timeout -= delta
 			if _are_all_members_arrived() or _move_timeout <= 0.0:
+				var reason = "ARRIVED" if _are_all_members_arrived() else "TIMEOUT"
 				_advance_waypoint(total_points)
 				current_pack_state = PackState.IDLE_WAIT
 				_idle_timer = waypoint_wait_time + randf_range(-0.5, 0.5)
+				print("[PATROL_ADVANCE] %s (%s) -> Prochain Waypoint %d/%d (wait: %.1fs)" % [name, reason, _current_waypoint_index, total_points, _idle_timer])
 
 func _advance_waypoint(total_points: int) -> void:
 	if total_points <= 1: return
@@ -384,7 +523,9 @@ func alert_pack(target_node: Node3D) -> void:
 					member.change_state(chase_state)
 
 func _on_member_aggro_requested(attacker: Node3D) -> void:
-	if aggro_link and attacker != null:
+	if role == PackRole.AMBUSH and not is_ambush_triggered:
+		trigger_ambush(attacker)
+	elif aggro_link and attacker != null:
 		alert_pack(attacker)
 
 func _find_active_target_in_pack() -> Node3D:
@@ -406,10 +547,14 @@ func _configure_member(member: CharacterBody3D) -> void:
 	# Surcharge de la portée de détection
 	var nav_comp = member.get_node_or_null("EnemyNavigationComponent") as EnemyNavigationComponent
 	if nav_comp:
-		if detection_range > 0.0:
-			nav_comp.detection_range_override = detection_range
-		if lose_aggro_range > 0.0:
-			nav_comp.lose_aggro_override = lose_aggro_range
+		if role == PackRole.AMBUSH and is_ambush_triggered:
+			nav_comp.detection_range_override = -1.0
+			nav_comp.lose_aggro_override = -1.0
+		else:
+			if detection_range > 0.0:
+				nav_comp.detection_range_override = detection_range
+			if lose_aggro_range > 0.0:
+				nav_comp.lose_aggro_override = lose_aggro_range
 			
 	# Écoute de prise d'aggro / coups reçus
 	var hitbox = member.find_child("HitboxComponent*", true, false)
@@ -423,6 +568,12 @@ func _configure_member(member: CharacterBody3D) -> void:
 		if not health_comp.died.is_connected(_on_member_died.bind(member)):
 			health_comp.died.connect(_on_member_died.bind(member))
 
+	# Optimisation automatique des performances (LOD, distance, culling d'animation)
+	if not member.has_node("EnemyOptimizerComponent"):
+		var opt = EnemyOptimizerComponent.new()
+		opt.name = "EnemyOptimizerComponent"
+		member.add_child(opt)
+
 func _on_member_died(dead_member: CharacterBody3D) -> void:
 	remove_member(dead_member)
 
@@ -432,10 +583,14 @@ func _update_all_members_detection() -> void:
 		if not is_instance_valid(member): continue
 		var nav_comp = member.get_node_or_null("EnemyNavigationComponent") as EnemyNavigationComponent
 		if nav_comp:
-			if detection_range > 0.0:
-				nav_comp.detection_range_override = detection_range
-			if lose_aggro_range > 0.0:
-				nav_comp.lose_aggro_override = lose_aggro_range
+			if role == PackRole.AMBUSH and is_ambush_triggered:
+				nav_comp.detection_range_override = -1.0
+				nav_comp.lose_aggro_override = -1.0
+			else:
+				if detection_range > 0.0:
+					nav_comp.detection_range_override = detection_range
+				if lose_aggro_range > 0.0:
+					nav_comp.lose_aggro_override = lose_aggro_range
 
 func _cleanup_invalid_members() -> void:
 	for i in range(members.size() - 1, -1, -1):
@@ -462,9 +617,10 @@ func _spawn_configured_scenes() -> void:
 # OUTILS GÉOMÉTRIQUES & NAVMESH
 # ==========================================================
 func _pick_random_roam_point() -> Vector3:
+	var origin = spawn_origin if spawn_origin != Vector3.ZERO else global_position
 	var angle = randf_range(0.0, TAU)
 	var dist = randf_range(3.0, roam_radius)
-	var candidate = spawn_origin + Vector3(cos(angle) * dist, 0.0, sin(angle) * dist)
+	var candidate = origin + Vector3(cos(angle) * dist, 0.0, sin(angle) * dist)
 	return _project_on_navmesh(candidate)
 
 func _project_on_navmesh(point: Vector3) -> Vector3:
@@ -474,7 +630,7 @@ func _project_on_navmesh(point: Vector3) -> Vector3:
 	if not nav_map.is_valid(): return point
 	
 	var nav_pt = NavigationServer3D.map_get_closest_point(nav_map, point)
-	if nav_pt.is_finite() and nav_pt != Vector3.ZERO:
+	if nav_pt.is_finite() and (point.length_squared() < 100.0 or nav_pt.distance_to(point) < 35.0):
 		return nav_pt
 	return point
 

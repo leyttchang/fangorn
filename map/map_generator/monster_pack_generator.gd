@@ -178,7 +178,8 @@ func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 	var segments = path_gen.segments
 	var spawned_count = 0
 	var attempts = 0
-	var max_attempts = count * 10
+	var max_attempts = count * 15
+	var mesh_spawner = _get_mesh_spawner()
 	
 	while spawned_count < count and attempts < max_attempts:
 		attempts += 1
@@ -189,15 +190,46 @@ func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 		if dir.length_squared() < 0.001:
 			continue
 		
-		var t = rng.randf_range(0.2, 0.8)
-		var road_pt = start_pt.lerp(end_pt, t)
-		var side = 1.0 if rng.randf() < 0.5 else -1.0
-		var perp = Vector2(-dir.y, dir.x) * side
+		var t = rng.randf_range(0.15, 0.85)
+		var road_pt_2d = start_pt.lerp(end_pt, t)
+		var road_y = _get_terrain_height_at(road_pt_2d.x, road_pt_2d.y)
+		var road_pos_3d = Vector3(road_pt_2d.x, road_y, road_pt_2d.y)
 		
-		var half_w = float(seg.get("width", 15.0)) * 0.5
-		var ambush_pos_2d = road_pt + perp * (half_w + ambush_road_offset + rng.randf_range(-1.0, 2.5))
-		var ground_y = _get_terrain_height_at(ambush_pos_2d.x, ambush_pos_2d.y)
-		var spawn_pos = Vector3(ambush_pos_2d.x, ground_y, ambush_pos_2d.y)
+		# Recherche d'un arbre bordant ce segment de route
+		var chosen_tree: Dictionary = {}
+		if mesh_spawner and mesh_spawner.has_method("find_tree_near_road"):
+			chosen_tree = mesh_spawner.find_tree_near_road(road_pos_3d, 10.0, 32.0)
+			
+		var spawn_pos: Vector3 = Vector3.ZERO
+		var behind_dir_2d: Vector2 = Vector2.ZERO
+		var trunk_radius: float = 1.0
+		
+		if not chosen_tree.is_empty():
+			# Arbre trouvé : on cache la meute derrière le tronc par rapport à la route
+			var trunk_pos: Vector3 = chosen_tree.get("trunk_pos", chosen_tree.get("pos", road_pos_3d))
+			trunk_radius = float(chosen_tree.get("trunk_radius", 1.2))
+			
+			var from_road_to_tree_2d = Vector2(trunk_pos.x - road_pt_2d.x, trunk_pos.z - road_pt_2d.y)
+			if from_road_to_tree_2d.length_squared() > 0.01:
+				behind_dir_2d = from_road_to_tree_2d.normalized()
+			else:
+				var side = 1.0 if rng.randf() < 0.5 else -1.0
+				behind_dir_2d = Vector2(-dir.y, dir.x) * side
+				
+			# On tient compte de la largeur réelle du tronc (rayon + marge de 1.2m à 1.8m)
+			var dist_behind = trunk_radius + rng.randf_range(1.2, 1.8)
+			var ambush_center_2d = Vector2(trunk_pos.x, trunk_pos.z) + behind_dir_2d * dist_behind
+			var ground_y = _get_terrain_height_at(ambush_center_2d.x, ambush_center_2d.y)
+			spawn_pos = Vector3(ambush_center_2d.x, ground_y, ambush_center_2d.y)
+		else:
+			# Repli si aucun arbre à proximité (clairière / plaine)
+			var side = 1.0 if rng.randf() < 0.5 else -1.0
+			var perp = Vector2(-dir.y, dir.x) * side
+			behind_dir_2d = perp
+			var half_w = float(seg.get("width", 15.0)) * 0.5
+			var ambush_center_2d = road_pt_2d + perp * (half_w + ambush_road_offset + rng.randf_range(-1.0, 2.5))
+			var ground_y = _get_terrain_height_at(ambush_center_2d.x, ambush_center_2d.y)
+			spawn_pos = Vector3(ambush_center_2d.x, ground_y, ambush_center_2d.y)
 		
 		# Instanciation du contrôleur de pack
 		var pack: MonsterPack = pack_scene.instantiate() as MonsterPack
@@ -206,12 +238,18 @@ func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 			pack.owner = get_tree().edited_scene_root
 		pack.global_position = spawn_pos
-		pack.setup_ambush(ambush_detection_range + rng.randf_range(-1.0, 1.5))
+		
+		# Configuration de l'embuscade avec la zone de détection centrée sur la route et orientée vers le chemin
+		var look_dir_3d = (road_pos_3d - spawn_pos).normalized()
+		var road_radius = maxf(float(seg.get("width", 15.0)) * 0.5 + 8.0, 22.0)
+		pack.setup_ambush(road_pos_3d, road_radius, ambush_detection_range, look_dir_3d)
 		_spawned_packs.append(pack)
 		
-		# Instanciation des monstres
+		# Instanciation des monstres cachés derrière l'arbre
 		var parent_for_monsters = _get_parent_for_monsters(pack)
 		var mob_count = rng.randi_range(min_m, max_m)
+		var lateral_dir_2d = Vector2(-behind_dir_2d.y, behind_dir_2d.x)
+		
 		for m_idx in range(mob_count):
 			var scn = valid_monsters[rng.randi_range(0, valid_monsters.size() - 1)]
 			var mob = scn.instantiate() as CharacterBody3D
@@ -221,10 +259,21 @@ func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 			if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 				mob.owner = get_tree().edited_scene_root
 				
-			var mx = spawn_pos.x + rng.randf_range(-2.0, 2.0)
-			var mz = spawn_pos.z + rng.randf_range(-2.0, 2.0)
+			# Dispersion contenue dans l'ombre du tronc (largeur du tronc + petit recul)
+			var lat_spread = rng.randf_range(-0.5, 0.5) * (trunk_radius + 0.4)
+			var depth_spread = rng.randf_range(0.0, 1.4)
+			var mob_pos_2d = Vector2(spawn_pos.x, spawn_pos.z) + (lateral_dir_2d * lat_spread) + (behind_dir_2d * depth_spread)
+			
+			var mx = mob_pos_2d.x
+			var mz = mob_pos_2d.y
 			var my = _get_terrain_height_at(mx, mz) + spawn_height_offset
 			mob.global_position = Vector3(mx, my, mz)
+			
+			# Orienter le monstre vers la route surveillée pour qu'il guette l'arrivée des joueurs
+			var look_target = Vector3(road_pos_3d.x, my, road_pos_3d.z)
+			if not mob.global_position.is_equal_approx(look_target):
+				mob.look_at(look_target, Vector3.UP)
+				
 			_spawned_monsters.append(mob)
 			pack.add_member(mob)
 			
@@ -256,7 +305,8 @@ func _spawn_patrol_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 			pack.owner = get_tree().edited_scene_root
 		pack.global_position = route_3d[0]
-		pack.setup_patrol(route_3d, true, patrol_wait_time + rng.randf_range(-0.5, 0.5))
+		# loop = false : patrouille en aller-retour (ping-pong 0 -> 1 -> 2 -> 1 -> 0) le long de la route
+		pack.setup_patrol(route_3d, false, patrol_wait_time + rng.randf_range(-0.5, 0.5))
 		_spawned_packs.append(pack)
 		
 		var parent_for_monsters = _get_parent_for_monsters(pack)
@@ -285,6 +335,7 @@ func _build_road_patrol_route(segments: Array[Dictionary], num_points: int, rng:
 	var route_3d: Array[Vector3] = []
 	if segments.is_empty(): return route_3d
 	
+	# Chercher une chaîne de segments continus le long de la même route
 	var start_idx = rng.randi_range(0, segments.size() - 1)
 	var curr_pt: Vector2 = segments[start_idx]["start"]
 	var pt_y = _get_terrain_height_at(curr_pt.x, curr_pt.y)
@@ -294,14 +345,25 @@ func _build_road_patrol_route(segments: Array[Dictionary], num_points: int, rng:
 	var current_idx = start_idx
 	
 	for step in range(num_points - 1):
-		# On avance le long des segments
 		if current_idx < segments.size():
 			var seg = segments[current_idx]
-			var next_pt: Vector2 = seg["end"]
-			var y = _get_terrain_height_at(next_pt.x, next_pt.y)
-			route_3d.append(Vector3(next_pt.x, y, next_pt.y))
-			last_pt = next_pt
-			current_idx += 1
+			var seg_start: Vector2 = seg.get("start", Vector2.ZERO)
+			var seg_end: Vector2 = seg.get("end", Vector2.ZERO)
+			
+			# Vérifier la continuité (le segment doit être connecté au point précédent)
+			if last_pt.distance_to(seg_start) <= 5.0:
+				var y = _get_terrain_height_at(seg_end.x, seg_end.y)
+				route_3d.append(Vector3(seg_end.x, y, seg_end.y))
+				last_pt = seg_end
+				current_idx += 1
+			elif last_pt.distance_to(seg_end) <= 5.0:
+				var y = _get_terrain_height_at(seg_start.x, seg_start.y)
+				route_3d.append(Vector3(seg_start.x, y, seg_start.y))
+				last_pt = seg_start
+				current_idx += 1
+			else:
+				# Si le segment suivant appartient à une autre branche, on stoppe la chaîne ici
+				break
 		else:
 			break
 			
@@ -421,6 +483,15 @@ func _get_path_generator() -> PathGenerator:
 		var pg = map_gen.find_child("path_generator", true, false)
 		if pg is PathGenerator:
 			return pg
+	return null
+
+func _get_mesh_spawner() -> Node:
+	var map_gen = get_parent()
+	if map_gen != null:
+		var ms = map_gen.find_child("MeshSpawner", true, false)
+		if ms == null:
+			ms = map_gen.find_child("mesh_spawner", true, false)
+		return ms
 	return null
 
 func _get_terrain_height_at(x: float, z: float) -> float:

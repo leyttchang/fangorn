@@ -185,6 +185,17 @@ func _get_active_curve() -> Curve:
 	return default_curve
 
 func get_terrain_height_at(x: float, z: float) -> float:
+	var terrain_data = null
+	if terrain != null:
+		if "storage" in terrain and terrain.storage:
+			terrain_data = terrain.storage
+		elif "data" in terrain and terrain.data:
+			terrain_data = terrain.data
+	if terrain_data != null and terrain_data.has_method("get_height"):
+		var h: float = terrain_data.get_height(Vector3(x, 0.0, z))
+		if not is_nan(h):
+			return h
+
 	if noise == null: return 0.0
 	var n: float = noise.get_noise_2d(x, z) * 0.5 + 0.5
 	var t_contrasted: float = clampf((n - 0.5) * contrast + 0.5, 0.0, 1.0)

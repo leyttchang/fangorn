@@ -26,6 +26,7 @@ var target: Node3D = null
 
 # Sécurité pour l'AnimationTree
 var _attack_anim_started: bool = false
+var is_anim_culled: bool = false
 
 func _ready() -> void:
 	if behavior == null:
@@ -51,6 +52,11 @@ func _ready() -> void:
 	# On s'assure qu'elle est bien désactivée au lancement
 	if attack_shape != null:
 		attack_shape.disabled = true
+
+	if not has_node("EnemyOptimizerComponent"):
+		var opt = EnemyOptimizerComponent.new()
+		opt.name = "EnemyOptimizerComponent"
+		add_child(opt)
 	
 	call_deferred("actor_setup")
 
@@ -58,6 +64,8 @@ func actor_setup() -> void:
 	await get_tree().physics_frame
 	_update_closest_target()
 	change_state(State.IDLE)
+	if anim_playback:
+		anim_playback.travel("Stand")
 	
 	# On s'abonne au signal pour l'aggro si on se fait taper
 	var hitbox = find_child("HitboxComponent*", true, false)
@@ -99,21 +107,28 @@ func change_state(new_state: State) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _rpc_apply_state(new_state: int) -> void:
-	if current_state == State.DEAD or current_state == new_state:
+	if current_state == State.DEAD:
 		return 
+	if current_state == new_state and new_state != State.IDLE:
+		return
 		
 	current_state = new_state
 	
 	match current_state:
 		State.IDLE:
-			anim_playback.travel("Stand")
+			_is_pack_walking = false
+			if anim_playback:
+				anim_playback.travel("Stand")
 		State.CHASE:
-			anim_playback.travel("Walk2")
+			if anim_playback:
+				anim_playback.travel("Walk2")
 		State.ATTACK:
-			anim_playback.travel("Punch")
+			if anim_playback:
+				anim_playback.travel("Punch")
 			_attack_anim_started = false 
 		State.DEAD:
-			anim_playback.travel("Death")
+			if anim_playback:
+				anim_playback.travel("Death")
 
 
 # ==========================================================
@@ -126,8 +141,11 @@ func _physics_process(delta: float) -> void:
 	if stats_component != null:
 		action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
 		
-	# --- STUN TOTAL ---
-	if action_speed <= 0.0:
+	# --- STUN TOTAL & CULLING ANIMATION ---
+	if is_anim_culled:
+		if anim_tree.active:
+			anim_tree.active = false
+	elif action_speed <= 0.0:
 		if not is_on_floor():
 			velocity.y -= gravity * delta
 		velocity.x = move_toward(velocity.x, 0, 10.0 * delta)
@@ -142,8 +160,7 @@ func _physics_process(delta: float) -> void:
 		if attack_shape != null and not attack_shape.disabled:
 			attack_shape.disabled = true
 		return
-		
-	if not anim_tree.active:
+	elif not anim_tree.active:
 		anim_tree.active = true
 
 	# Recherche / actualisation de cible selon le mode de jeu
@@ -186,7 +203,8 @@ func _physics_process(delta: float) -> void:
 	velocity.x = vitesse_horizontale.x
 	velocity.z = vitesse_horizontale.y
 
-	move_and_slide()
+	if not vitesse_horizontale.is_zero_approx() or not is_on_floor() or velocity.y != 0.0:
+		move_and_slide()
 
 
 # ==========================================================

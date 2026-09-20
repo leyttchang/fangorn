@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AmbushSpeedBuffData" format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/ambush_speed_buff_data.gd" id="1_gvdf4"]
+[ext_resource type="Script" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_nvgki"]
+
+[resource]
+script = ExtResource("1_gvdf4")
+effect_id = "ambush_speed_buff"
+is_buff = true

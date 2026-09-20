@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://dv7nas64by0xg" path="res://character/enemie/creep/creep.gd" id="1_kqj36"]
 [ext_resource type="Resource" uid="uid://dlif4cyu3gmeq" path="res://character/enemie/creep/creep_behaviour.tres" id="2_2olxm"]
 [ext_resource type="Animation" uid="uid://svplqkl4cnxo" path="res://assets/3D_models/body/goblin/death.res" id="3_3od1q"]
+[ext_resource type="Animation" path="res://assets/3D_models/body/goblin/crouch_idle.res" id="3_crouch_idle"]
 [ext_resource type="Texture2D" uid="uid://de1sady4emqhe" path="res://assets/3D_models/body/goblin/Textures/Diffuse.png" id="4_gpqa7"]
 [ext_resource type="Animation" uid="uid://bxqwlympj3tke" path="res://assets/3D_models/body/goblin/crouching_walk.res" id="4_iqf77"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="4_ya2es"]
@@ -216,6 +217,7 @@ properties/2/replication_mode = 1
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_eghwk"]
 _data = {
+&"crouch_idle": ExtResource("3_crouch_idle"),
 &"crouching_walk": ExtResource("4_iqf77"),
 &"death": ExtResource("3_3od1q"),
 &"run_fast": ExtResource("55_dlyjh"),

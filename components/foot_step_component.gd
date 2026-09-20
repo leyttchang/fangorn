@@ -33,6 +33,12 @@ func _physics_process(delta: float) -> void:
 	if character_body == null:
 		return
 
+	# Optimisation : si le joueur / caméra est trop loin pour entendre le son, on ne calcule rien
+	var cam = get_viewport().get_camera_3d() if get_viewport() else null
+	if cam != null and global_position.distance_squared_to(cam.global_position) > (max_distance + 6.0) * (max_distance + 6.0):
+		_accumulated_distance = 0.0
+		return
+
 	# Ne jouer les bruits de pas que si le personnage est au sol
 	if not character_body.is_on_floor():
 		_accumulated_distance = 0.0
