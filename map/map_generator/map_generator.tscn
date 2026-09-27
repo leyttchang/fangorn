@@ -18,26 +18,16 @@
 [ext_resource type="Script" uid="uid://qx5bvmndeok3" path="res://map/map_generator/grass_generator.gd" id="15_oxtf5"]
 [ext_resource type="PackedScene" uid="uid://dhy0afb5tipy7" path="res://map/encounters/pnj_encounter/pnj_encounter.tscn" id="16_dxy7m"]
 [ext_resource type="PackedScene" uid="uid://cgoas4qdur4vj" path="res://map/grass/grass_2.tscn" id="16_oxtf5"]
-[ext_resource type="Script" uid="uid://cuvsnt7gurnj" path="res://map/encounters/pnj_encounter/pnj_encounter.gd" id="17_ura6b"]
 [ext_resource type="Script" uid="uid://c66c3apgrr4u8" path="res://map/map_generator/monster_pack_generator.gd" id="18_1f0ee"]
 [ext_resource type="PackedScene" uid="uid://bwugply6etcqh" path="res://character/enemie/monster_pack/monster_pack.tscn" id="19_j5v0o"]
 [ext_resource type="Shader" uid="uid://nlkoocory7ca" path="res://particule/shader/tree.gdshader" id="19_lif16"]
 [ext_resource type="Texture2D" uid="uid://u6elekb2jt0k" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet Tree Cold.png" id="20_fp7s0"]
-[ext_resource type="Script" uid="uid://ke7l7yd6e8ec" path="res://character/enemie/monster_pack/monster_pack.gd" id="20_tkt8r"]
 [ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="24_ura6b"]
-[ext_resource type="Script" uid="uid://dsmxnl63fw7pr" path="res://character/enemie/dumb_archer/dumb_archer.gd" id="25_hw2ia"]
-[ext_resource type="PackedScene" uid="uid://dw8bplvo56b74" path="res://character/enemie/dumb_archer/fire_arrow.tscn" id="26_ndlmv"]
-[ext_resource type="Resource" uid="uid://bd3teeku7vdx" path="res://character/enemie/dumb_archer/dumb_archer_behavior_data.tres" id="27_ggrof"]
 [ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="28_lrhu7"]
-[ext_resource type="Script" uid="uid://0qnvwktnl8px" path="res://character/enemie/Scout/scout.gd" id="29_68hhs"]
-[ext_resource type="Resource" uid="uid://cyxabp20gwl2m" path="res://character/enemie/Scout/scout_behavior_data.tres" id="30_u6qt0"]
-[ext_resource type="PackedScene" uid="uid://c616syg183bcn" path="res://character/enemie/Scout/scout_slam.tscn" id="31_b3sry"]
+[ext_resource type="PackedScene" uid="uid://isvrwyq6u3mx" path="res://map/meteo/raining/rain.tscn" id="29_dxy7m"]
 [ext_resource type="PackedScene" uid="uid://bwv7mkwsym0an" path="res://character/enemie/spider/spider_enemie.tscn" id="32_5k7cj"]
-[ext_resource type="Script" uid="uid://cqlvtv5jutfkd" path="res://character/enemie/spider/spider_enemie.gd" id="33_1xir5"]
 [ext_resource type="Script" uid="uid://0gemtrlg1hbh" path="res://character/enemie/EnemyBehaviorData.gd" id="34_86nbc"]
 [ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="35_wmwyp"]
-[ext_resource type="Script" uid="uid://c7m43l7f012hv" path="res://character/enemie/dumb/dumb.gd" id="36_7yt1c"]
-[ext_resource type="Resource" uid="uid://chn30d83iiq3w" path="res://character/enemie/dumb/dumb_behavior_data.tres" id="37_ff1in"]
 [ext_resource type="Script" uid="uid://cumjoo3uh1k6x" path="res://map/map_generator/border_tree_wall.gd" id="38_wall"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_f1fk6"]
@@ -350,7 +340,7 @@ max_slope_degrees = 30.0
 script = ExtResource("13_ugmv5")
 weather_presets = Array[PackedScene]([ExtResource("14_3mir5")])
 
-[node name="night_time" type="Node3D" parent="Meteo" unique_id=1381402426 instance=ExtResource("14_3mir5")]
+[node name="night_time" parent="Meteo" unique_id=1381402426 instance=ExtResource("14_3mir5")]
 
 [node name="Encounters" type="Node3D" parent="." unique_id=1546825630]
 script = ExtResource("15_6laye")
@@ -362,53 +352,37 @@ possible_encounters = Array[PackedScene]([ExtResource("15_gkrpf"), ExtResource("
 [node name="encounter_1" type="Marker3D" parent="Encounters" unique_id=1900000557]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 558.7557, 1.4884613, 408.55862)
 
-[node name="pnj_encounter" type="Node3D" parent="Encounters/encounter_1" unique_id=38991826 node_paths=PackedStringArray("cage_node", "spawner", "pnj", "plateau_haut", "ground_raycast", "armature_node", "chaine_node") instance=ExtResource("16_dxy7m")]
+[node name="pnj_encounter" parent="Encounters/encounter_1" unique_id=38991826 instance=ExtResource("16_dxy7m")]
 transform = Transform3D(0.3624487, 0, 0.93200374, 0, 1, 0, -0.93200374, 0, 0.3624487, 0, 0, 0)
-script = ExtResource("17_ura6b")
-cage_node = NodePath("cage")
-spawner = NodePath("mob_raycast_spawner")
-pnj = NodePath("Pnj_buff_choice")
-plateau_haut = NodePath("cage/plateau_haut")
-ground_raycast = NodePath("ground_raycast")
-armature_node = NodePath("armature")
-chaine_node = NodePath("chaine")
 
 [node name="encounter_2" type="Marker3D" parent="Encounters" unique_id=617336623]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 289.45908, 36.124203, 756.9278)
 
-[node name="orc_village" type="Node3D" parent="Encounters/encounter_2" unique_id=1992368361 instance=ExtResource("15_gkrpf")]
+[node name="orc_village" parent="Encounters/encounter_2" unique_id=1992368361 instance=ExtResource("15_gkrpf")]
 transform = Transform3D(0.44418868, 0, -0.8959333, 0, 1, 0, 0.8959333, 0, 0.44418868, 0, 0, 0)
 
 [node name="@Marker3D@84783" type="Marker3D" parent="Encounters" unique_id=1908483534]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 762.18835, 42.408653, 762.1818)
 
-[node name="orc_village" type="Node3D" parent="Encounters/@Marker3D@84783" unique_id=661294165 instance=ExtResource("15_gkrpf")]
+[node name="orc_village" parent="Encounters/@Marker3D@84783" unique_id=661294165 instance=ExtResource("15_gkrpf")]
 transform = Transform3D(-0.9500048, 0, 0.31223533, 0, 1, 0, -0.31223533, 0, -0.9500048, 0, 0, 0)
 
 [node name="@Marker3D@84784" type="Marker3D" parent="Encounters" unique_id=175309451]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 261.67896, 23.854416, 449.89325)
 
-[node name="orc_village" type="Node3D" parent="Encounters/@Marker3D@84784" unique_id=426016265 instance=ExtResource("15_gkrpf")]
+[node name="orc_village" parent="Encounters/@Marker3D@84784" unique_id=426016265 instance=ExtResource("15_gkrpf")]
 transform = Transform3D(-0.9798089, 0, 0.19993606, 0, 1, 0, -0.19993606, 0, -0.9798089, 0, 0, 0)
 
 [node name="encounter_5" type="Marker3D" parent="Encounters" unique_id=1706876786]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 551.43555, 14.114647, 657.4077)
 
-[node name="pnj_encounter" type="Node3D" parent="Encounters/encounter_5" unique_id=206602115 node_paths=PackedStringArray("cage_node", "spawner", "pnj", "plateau_haut", "ground_raycast", "armature_node", "chaine_node") instance=ExtResource("16_dxy7m")]
+[node name="pnj_encounter" parent="Encounters/encounter_5" unique_id=206602115 instance=ExtResource("16_dxy7m")]
 transform = Transform3D(0.99990726, 0, -0.013619781, 0, 1, 0, 0.013619781, 0, 0.99990726, 0, 0, 0)
-script = ExtResource("17_ura6b")
-cage_node = NodePath("cage")
-spawner = NodePath("mob_raycast_spawner")
-pnj = NodePath("Pnj_buff_choice")
-plateau_haut = NodePath("cage/plateau_haut")
-ground_raycast = NodePath("ground_raycast")
-armature_node = NodePath("armature")
-chaine_node = NodePath("chaine")
 
 [node name="encounter_6" type="Marker3D" parent="Encounters" unique_id=1634080507]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 752.6327, 22.739437, 313.2633)
 
-[node name="orc_village" type="Node3D" parent="Encounters/encounter_6" unique_id=1806802 instance=ExtResource("15_gkrpf")]
+[node name="orc_village" parent="Encounters/encounter_6" unique_id=1806802 instance=ExtResource("15_gkrpf")]
 transform = Transform3D(0.9649567, 0, -0.26240915, 0, 1, 0, 0.26240915, 0, 0.9649567, 0, 0, 0)
 
 [node name="grass_generator" type="Node3D" parent="." unique_id=638116187 node_paths=PackedStringArray("map_generator", "terrain", "path_generator")]
@@ -509,891 +483,512 @@ patrol_pack_count = 10
 roam_pack_count = 10
 difficulty_scale_per_extra_player = 0.5
 
-[node name="AmbushPack_1" type="Node3D" parent="MonsterPackGenerator" unique_id=1315388334 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_1" parent="MonsterPackGenerator" unique_id=1315388334 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 531.10376, 20.666714, 797.8389)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(514.6559, 21.969042, 825.3118)
 ambush_road_direction = Vector3(-0.51324767, 0.04063849, 0.8572779)
 members = [NodePath("dumb_archer"), NodePath("spider_enemie"), NodePath("dumb_archer2")]
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_1" unique_id=1437418324 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/AmbushPack_1" unique_id=1437418324 instance=ExtResource("24_ura6b")]
 transform = Transform3D(-0.8450665, 0, 0.53466123, 0, 1, 0, -0.53466123, 0, -0.8450665, 1.1295776, 3.0688267, -0.3093872)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_1" unique_id=1214796846 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_1" unique_id=1214796846 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.842334, 0, 0.5389559, 0, 1, 0, -0.5389559, 0, -0.842334, 1.2368164, 3.0875988, -0.1665039)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_1" unique_id=288171165 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer2" parent="MonsterPackGenerator/AmbushPack_1" unique_id=288171165 instance=ExtResource("24_ura6b")]
 transform = Transform3D(-0.85137916, 0, 0.52455074, 0, 1, 0, -0.52455074, 0, -0.85137916, 0.40716553, 3.0406933, 0.11608887)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="AmbushPack_2" type="Node3D" parent="MonsterPackGenerator" unique_id=1070983239 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_2" parent="MonsterPackGenerator" unique_id=1070983239 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 942.3814, 59.86851, 230.23831)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(942.3814, 61.75846, 220)
 ambush_road_direction = Vector3(0, 0.18152891, -0.9833856)
 members = [NodePath("Scout")]
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_2" unique_id=1082760754 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/AmbushPack_2" unique_id=1082760754 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(0.9996436, 0, 0.02669539, 0, 1, 0, -0.02669539, 0, 0.9996436, 0.27563477, 3.1587753, 0.08319092)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="AmbushPack_3" type="Node3D" parent="MonsterPackGenerator" unique_id=2009080305 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_3" parent="MonsterPackGenerator" unique_id=2009080305 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 847.90704, 37.463432, 375.43433)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(838.60767, 37.59431, 370.78464)
 ambush_road_direction = Vector3(-0.8943563, 0.012587075, -0.44717816)
 members = [NodePath("dumb"), NodePath("spider_enemie"), NodePath("dumb2"), NodePath("dumb3")]
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_3" unique_id=888204308 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/AmbushPack_3" unique_id=888204308 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(0.42820233, 0, 0.9036829, 0, 1, 0, -0.9036829, 0, 0.42820233, 0.536499, 2.9897003, 0.010955811)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_3" unique_id=1604867095 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_3" unique_id=1604867095 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(0.48558363, 0, 0.8741902, 0, 1, 0, -0.8741902, 0, 0.48558363, 0.6723633, 2.9827118, 0.8892822)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_3" unique_id=346808948 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/AmbushPack_3" unique_id=346808948 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(0.47599682, 0, 0.879447, 0, 1, 0, -0.879447, 0, 0.47599682, 0.28009033, 2.9919853, 0.53515625)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb3" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_3" unique_id=401357595 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb3" parent="MonsterPackGenerator/AmbushPack_3" unique_id=401357595 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(0.45445898, 0, 0.8907677, 0, 1, 0, -0.8907677, 0, 0.45445898, 1.0438232, 2.9769402, 0.6272888)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="AmbushPack_4" type="Node3D" parent="MonsterPackGenerator" unique_id=1471392715 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_4" parent="MonsterPackGenerator" unique_id=1471392715 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 379.25345, 37.173695, 212.848)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(404.37775, 37.594437, 211.62225)
 ambush_road_direction = Vector3(0.9986723, 0.016724186, -0.048722807)
 members = [NodePath("dumb"), NodePath("dumb2"), NodePath("spider_enemie")]
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_4" unique_id=1772358454 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/AmbushPack_4" unique_id=1772358454 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(0.049662374, 0, -0.99876606, 0, 1, 0, 0.99876606, 0, 0.049662374, -0.5230713, 2.9940796, 0.04953003)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_4" unique_id=1025222620 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/AmbushPack_4" unique_id=1025222620 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(-0.018044014, 0, -0.9998372, 0, 1, 0, 0.9998372, 0, -0.018044014, -0.20111084, 2.983158, -1.6828003)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_4" unique_id=1480644006 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_4" unique_id=1480644006 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(0.07989996, 0, -0.99680287, 0, 1, 0, 0.99680287, 0, 0.07989996, -0.016571045, 3.0088844, 0.78944397)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="AmbushPack_5" type="Node3D" parent="MonsterPackGenerator" unique_id=547680128 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_5" parent="MonsterPackGenerator" unique_id=547680128 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 595.4526, 2.3428235, 379.8045)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(556, 1.4903023, 393.84283)
 ambush_road_direction = Vector3(-0.94193846, -0.020354122, 0.33516806)
 members = [NodePath("spider_enemie"), NodePath("spider_enemie2"), NodePath("Scout")]
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_5" unique_id=345042538 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_5" unique_id=345042538 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.24745978, 0, 0.9688982, 0, 1, 0, -0.9688982, 0, -0.24745978, 1.4777222, 3.0614076, 3.5845947)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_5" unique_id=40476365 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/AmbushPack_5" unique_id=40476365 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.2591123, 0, 0.9658472, 0, 1, 0, -0.9658472, 0, -0.2591123, 2.1757202, 3.084375, 2.870514)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_5" unique_id=825534674 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/AmbushPack_5" unique_id=825534674 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(-0.25695053, 0, 0.9664246, 0, 1, 0, -0.9664246, 0, -0.25695053, 1.8259888, 3.0722218, 3.0632935)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="AmbushPack_6" type="Node3D" parent="MonsterPackGenerator" unique_id=2124103766 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_6" parent="MonsterPackGenerator" unique_id=2124103766 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 169.87962, 30.25209, 489.253)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(154.54007, 30.321709, 502.54007)
 ambush_road_direction = Vector3(-0.75586027, 0.003430455, 0.65472406)
 members = [NodePath("spider_enemie"), NodePath("dumb_archer"), NodePath("spider_enemie2")]
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_6" unique_id=1686834756 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_6" unique_id=1686834756 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.7334524, 0, 0.67974085, 0, 1, 0, -0.67974085, 0, -0.7334524, -1.1502991, 3.250557, -2.0233765)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_6" unique_id=727677388 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/AmbushPack_6" unique_id=727677388 instance=ExtResource("24_ura6b")]
 transform = Transform3D(-0.68726647, 0, 0.72640544, 0, 1, 0, -0.72640544, 0, -0.68726647, -0.24649048, 3.099411, -0.99276733)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_6" unique_id=1063493033 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/AmbushPack_6" unique_id=1063493033 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.668146, 0, 0.7440302, 0, 1, 0, -0.7440302, 0, -0.668146, 0.47029114, 3.0404892, -0.91030884)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="AmbushPack_7" type="Node3D" parent="MonsterPackGenerator" unique_id=2021282817 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_7" parent="MonsterPackGenerator" unique_id=2021282817 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 439.77695, 37.238686, 125.97296)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(463.0137, 37.594685, 121.9726)
 ambush_road_direction = Vector3(0.98539025, 0.015096683, -0.16964135)
 members = [NodePath("spider_enemie"), NodePath("dumb"), NodePath("dumb2"), NodePath("spider_enemie2"), NodePath("spider_enemie3")]
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_7" unique_id=778704958 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_7" unique_id=778704958 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(0.104596, 0, -0.9945148, 0, 1, 0, 0.9945148, 0, 0.104596, -1.4382324, 2.9589424, -1.40522)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_7" unique_id=350942846 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/AmbushPack_7" unique_id=350942846 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(0.18404321, 0, -0.98291814, 0, 1, 0, 0.98291814, 0, 0.18404321, -1.0534668, 2.9856873, 0.5477829)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_7" unique_id=1984234395 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/AmbushPack_7" unique_id=1984234395 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(0.19084042, 0, -0.9816211, 0, 1, 0, 0.9816211, 0, 0.19084042, -0.8468323, 2.9909286, 0.6818161)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_7" unique_id=915427036 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/AmbushPack_7" unique_id=915427036 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(0.2524987, 0, -0.96759725, 0, 1, 0, 0.96759725, 0, 0.2524987, -0.10827637, 3.0190468, 2.091629)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie3" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_7" unique_id=1764162772 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie3" parent="MonsterPackGenerator/AmbushPack_7" unique_id=1764162772 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(0.10578539, 0, -0.994389, 0, 1, 0, 0.994389, 0, 0.10578539, -1.5092468, 2.9579773, -1.3678207)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="AmbushPack_8" type="Node3D" parent="MonsterPackGenerator" unique_id=80342786 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_8" parent="MonsterPackGenerator" unique_id=80342786 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 439.17743, 2.6366868, 574.9628)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(419.92233, 3.3150826, 587.9223)
 ambush_road_direction = Vector3(-0.82924736, 0.029216051, 0.5581176)
 members = [NodePath("Scout"), NodePath("spider_enemie"), NodePath("spider_enemie2")]
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_8" unique_id=3395016 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/AmbushPack_8" unique_id=3395016 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(-0.5121966, 0, 0.85886824, 0, 1, 0, -0.85886824, 0, -0.5121966, 1.4492493, 3.0113273, 0.6121826)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_8" unique_id=2003352209 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_8" unique_id=2003352209 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.50316036, 0, 0.8641931, 0, 1, 0, -0.8641931, 0, -0.50316036, 0.9597473, 3.0302815, 1.1897583)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_8" unique_id=1999077864 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/AmbushPack_8" unique_id=1999077864 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.5490058, 0, 0.8358185, 0, 1, 0, -0.8358185, 0, -0.5490058, 0.20205688, 3.004231, 0.17907715)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="AmbushPack_9" type="Node3D" parent="MonsterPackGenerator" unique_id=107708374 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_9" parent="MonsterPackGenerator" unique_id=107708374 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 285.97757, 37.421837, 317.28192)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(290.66928, 37.593918, 326.66537)
 ambush_road_direction = Vector3(0.4471523, 0.0164005, 0.8943075)
 members = [NodePath("spider_enemie"), NodePath("dumb_archer"), NodePath("dumb"), NodePath("spider_enemie2")]
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_9" unique_id=1813377272 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/AmbushPack_9" unique_id=1813377272 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.91613424, 0, -0.40087166, 0, 1, 0, 0.40087166, 0, -0.91613424, 0.4213562, 2.999054, -0.37582397)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_9" unique_id=1491173279 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/AmbushPack_9" unique_id=1491173279 instance=ExtResource("24_ura6b")]
 transform = Transform3D(-0.90873206, 0, -0.41738, 0, 1, 0, 0.41738, 0, -0.90873206, -0.14120483, 2.9744644, -1.138916)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_9" unique_id=3981 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/AmbushPack_9" unique_id=3981 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(-0.88142973, 0, -0.47231522, 0, 1, 0, 0.47231522, 0, -0.88142973, -0.6525574, 2.9776, -0.5899658)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_9" unique_id=1964984882 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/AmbushPack_9" unique_id=1964984882 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(-0.89662206, 0, -0.44279662, 0, 1, 0, 0.44279662, 0, -0.89662206, 0.017456055, 2.9987144, -0.08148193)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="AmbushPack_10" type="Node3D" parent="MonsterPackGenerator" unique_id=584487673 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="AmbushPack_10" parent="MonsterPackGenerator" unique_id=584487673 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 392.55136, 2.9715946, 524.35175)
-script = ExtResource("20_tkt8r")
 role = 0
 detection_range = 8.0
 road_ambush_point = Vector3(364.72723, 4.607313, 536)
 ambush_road_direction = Vector3(-0.92107654, 0.05414804, 0.3855982)
 members = [NodePath("dumb_archer"), NodePath("dumb_archer2")]
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_10" unique_id=1034518730 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/AmbushPack_10" unique_id=1034518730 instance=ExtResource("24_ura6b")]
 transform = Transform3D(-0.40467566, 0, 0.9144603, 0, 1, 0, -0.9144603, 0, -0.40467566, 0.01184082, 2.9992425, -0.6699829)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb_archer2" type="CharacterBody3D" parent="MonsterPackGenerator/AmbushPack_10" unique_id=595806406 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer2" parent="MonsterPackGenerator/AmbushPack_10" unique_id=595806406 instance=ExtResource("24_ura6b")]
 transform = Transform3D(-0.35399708, 0, 0.9352465, 0, 1, 0, -0.9352465, 0, -0.35399708, 1.0877991, 2.9483993, 0.704895)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="PatrolPack_1" type="Node3D" parent="MonsterPackGenerator" unique_id=403652090 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_1" parent="MonsterPackGenerator" unique_id=403652090 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 896, 40.38685, 220)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("dumb_archer"), NodePath("spider_enemie"), NodePath("dumb_archer2")]
 waypoint_positions = Array[Vector3]([Vector3(896, 40.38685, 220), Vector3(904, 42.63854, 220), Vector3(912, 45.501648, 220), Vector3(920, 49.014793, 220)])
 loop_patrol = false
 waypoint_wait_time = 2.497254103422165
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_1" unique_id=1147712157 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_1" unique_id=1147712157 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.300415, 3.1645699, 1.9174194)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_1" unique_id=703291872 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/PatrolPack_1" unique_id=703291872 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5493164, 3.3147812, 0.75445557)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_1" unique_id=1581713481 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer2" parent="MonsterPackGenerator/PatrolPack_1" unique_id=1581713481 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9163208, 3.5982666, -1.4769287)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="PatrolPack_2" type="Node3D" parent="MonsterPackGenerator" unique_id=1548778178 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_2" parent="MonsterPackGenerator" unique_id=1548778178 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 144, 36.970596, 428)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("Scout"), NodePath("spider_enemie")]
 waypoint_positions = Array[Vector3]([Vector3(144, 36.970596, 428), Vector3(152, 37.26855, 420), Vector3(160, 37.462894, 412), Vector3(168, 37.5589, 404)])
 loop_patrol = false
 waypoint_wait_time = 2.271718591451645
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_2" unique_id=1624977786 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/PatrolPack_2" unique_id=1624977786 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.94493103, 2.9329987, 1.2265625)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_2" unique_id=560623140 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/PatrolPack_2" unique_id=560623140 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0910797, 2.9406128, 1.040802)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="PatrolPack_3" type="Node3D" parent="MonsterPackGenerator" unique_id=41706696 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_3" parent="MonsterPackGenerator" unique_id=41706696 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 712, 37.12507, 760)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("Scout")]
 waypoint_positions = Array[Vector3]([Vector3(712, 37.12507, 760), Vector3(720, 37.164124, 760), Vector3(728, 37.413685, 760), Vector3(736, 37.927025, 760)])
 loop_patrol = false
 waypoint_wait_time = 2.709934413433075
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_3" unique_id=632366327 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/PatrolPack_3" unique_id=632366327 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.31866455, 3.0017166, 1.6536255)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="PatrolPack_4" type="Node3D" parent="MonsterPackGenerator" unique_id=958660547 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_4" parent="MonsterPackGenerator" unique_id=958660547 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 188, 37.592495, 392)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("dumb_archer"), NodePath("dumb_archer2")]
 waypoint_positions = Array[Vector3]([Vector3(188, 37.592495, 392), Vector3(180, 37.594692, 392), Vector3(172, 37.59371, 396), Vector3(164, 37.592495, 400)])
 loop_patrol = false
 waypoint_wait_time = 2.1736595034599304
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_4" unique_id=1789425251 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_4" unique_id=1789425251 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.50283813, 3.0003586, -0.29467773)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb_archer2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_4" unique_id=1477314789 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer2" parent="MonsterPackGenerator/PatrolPack_4" unique_id=1477314789 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0744781, 2.9987755, 1.2487488)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="PatrolPack_5" type="Node3D" parent="MonsterPackGenerator" unique_id=1261771416 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_5" parent="MonsterPackGenerator" unique_id=1261771416 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 764, 25.38679, 312)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("dumb_archer"), NodePath("spider_enemie"), NodePath("spider_enemie2")]
 waypoint_positions = Array[Vector3]([Vector3(764, 25.38679, 312), Vector3(756, 23.523514, 312)])
 loop_patrol = false
 waypoint_wait_time = 2.4304685294628143
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_5" unique_id=428468458 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_5" unique_id=428468458 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6174927, 3.368204, -1.2340088)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_5" unique_id=1603131084 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/PatrolPack_5" unique_id=1603131084 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8764038, 2.561821, -0.14221191)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_5" unique_id=1216406838 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/PatrolPack_5" unique_id=1216406838 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77978516, 3.1861172, 1.6372375)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="PatrolPack_6" type="Node3D" parent="MonsterPackGenerator" unique_id=820665864 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_6" parent="MonsterPackGenerator" unique_id=820665864 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 424, 37.59514, 184)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("spider_enemie"), NodePath("dumb_archer"), NodePath("spider_enemie2")]
 waypoint_positions = Array[Vector3]([Vector3(424, 37.59514, 184), Vector3(432, 37.592957, 176), Vector3(436, 37.594055, 168), Vector3(440, 37.59502, 160)])
 loop_patrol = false
 waypoint_wait_time = 2.377835065126419
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_6" unique_id=1529108922 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/PatrolPack_6" unique_id=1529108922 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.48583984, 2.9990005, 0.97605896)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_6" unique_id=1202053333 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_6" unique_id=1202053333 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6363525, 2.9936905, 1.4961853)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_6" unique_id=453017277 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/PatrolPack_6" unique_id=453017277 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5935364, 2.9988747, 1.0368652)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="PatrolPack_7" type="Node3D" parent="MonsterPackGenerator" unique_id=833065701 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_7" parent="MonsterPackGenerator" unique_id=833065701 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 280, 37.23242, 764)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("spider_enemie"), NodePath("spider_enemie2"), NodePath("dumb"), NodePath("dumb_archer")]
 waypoint_positions = Array[Vector3]([Vector3(280, 37.23242, 764), Vector3(288, 36.18957, 756)])
 loop_patrol = false
 waypoint_wait_time = 2.4225740134716034
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1481585275 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1481585275 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7215576, 2.8716583, -0.6779785)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1034822479 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1034822479 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6802063, 2.8222237, -1.692688)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1951455549 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1951455549 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4098511, 2.9314537, 0.15808105)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1515376776 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_7" unique_id=1515376776 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.71521, 2.8549042, -1.0136108)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="PatrolPack_8" type="Node3D" parent="MonsterPackGenerator" unique_id=1593761842 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_8" parent="MonsterPackGenerator" unique_id=1593761842 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 216, 37.59463, 376)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("Scout")]
 waypoint_positions = Array[Vector3]([Vector3(216, 37.59463, 376), Vector3(224, 37.594326, 372), Vector3(232, 37.593807, 368), Vector3(240, 37.593086, 364)])
 loop_patrol = false
 waypoint_wait_time = 2.5096707
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_8" unique_id=1191935457 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/PatrolPack_8" unique_id=1191935457 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4113922, 2.9951515, -1.1406555)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="PatrolPack_9" type="Node3D" parent="MonsterPackGenerator" unique_id=1519366683 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_9" parent="MonsterPackGenerator" unique_id=1519366683 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 312, 37.594707, 308)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("dumb_archer"), NodePath("spider_enemie"), NodePath("spider_enemie2")]
 waypoint_positions = Array[Vector3]([Vector3(312, 37.594707, 308), Vector3(320, 37.59228, 304), Vector3(328, 37.592934, 296), Vector3(336, 37.59341, 288)])
 loop_patrol = false
 waypoint_wait_time = 2.4971319437026978
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_9" unique_id=628959087 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_9" unique_id=628959087 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.52130127, 2.9984283, -0.13806152)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_9" unique_id=1978261352 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/PatrolPack_9" unique_id=1978261352 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1184387, 2.9985008, 0.34039307)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_9" unique_id=1398587438 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/PatrolPack_9" unique_id=1398587438 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29455566, 2.9995346, 0.52075195)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="PatrolPack_10" type="Node3D" parent="MonsterPackGenerator" unique_id=706866436 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="PatrolPack_10" parent="MonsterPackGenerator" unique_id=706866436 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 348, 37.593773, 276)
-script = ExtResource("20_tkt8r")
 role = 2
 members = [NodePath("dumb_archer"), NodePath("dumb"), NodePath("dumb2")]
 waypoint_positions = Array[Vector3]([Vector3(348, 37.593773, 276), Vector3(340, 37.593575, 284), Vector3(332, 37.593193, 292), Vector3(324, 37.59263, 300)])
 loop_patrol = false
 waypoint_wait_time = 2.3417523
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_10" unique_id=1538249400 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/PatrolPack_10" unique_id=1538249400 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5120544, 2.9977608, -0.58361816)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_10" unique_id=1657830047 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/PatrolPack_10" unique_id=1657830047 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.50234985, 3.0000916, 0.37557983)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/PatrolPack_10" unique_id=74617096 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/PatrolPack_10" unique_id=74617096 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9760132, 2.9996796, -0.5567322)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="RoamPack_1" type="Node3D" parent="MonsterPackGenerator" unique_id=1323050354 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_1" parent="MonsterPackGenerator" unique_id=1323050354 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 266.56262, 38.780495, 856.3023)
-script = ExtResource("20_tkt8r")
 members = [NodePath("spider_enemie"), NodePath("dumb_archer"), NodePath("dumb")]
 roam_radius = 28.838434
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_1" unique_id=530090385 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/RoamPack_1" unique_id=530090385 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5073242, 2.7823105, -0.46661377)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_1" unique_id=1845055213 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/RoamPack_1" unique_id=1845055213 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1478577, 2.7248611, -1.7078857)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_1" unique_id=1392377404 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_1" unique_id=1392377404 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38479614, 3.0218925, -0.29656982)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="RoamPack_2" type="Node3D" parent="MonsterPackGenerator" unique_id=1815254072 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_2" parent="MonsterPackGenerator" unique_id=1815254072 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 712.71027, 37.52887, 70.54875)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb"), NodePath("dumb2"), NodePath("dumb3")]
 roam_radius = 25.288715
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_2" unique_id=1314464922 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_2" unique_id=1314464922 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.16687, 2.9575691, 0.93943024)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_2" unique_id=1703845213 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/RoamPack_2" unique_id=1703845213 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34918213, 2.9947357, 0.73007965)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb3" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_2" unique_id=919023886 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb3" parent="MonsterPackGenerator/RoamPack_2" unique_id=919023886 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5753174, 2.967945, 0.84765625)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="RoamPack_3" type="Node3D" parent="MonsterPackGenerator" unique_id=1157799290 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_3" parent="MonsterPackGenerator" unique_id=1157799290 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 660.01263, 30.382318, 596.3331)
-script = ExtResource("20_tkt8r")
 members = [NodePath("spider_enemie"), NodePath("dumb_archer"), NodePath("dumb"), NodePath("spider_enemie2")]
 roam_radius = 28.425209
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_3" unique_id=1078175974 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/RoamPack_3" unique_id=1078175974 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6052856, 2.7111263, 0.5905762)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_3" unique_id=2065995134 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/RoamPack_3" unique_id=2065995134 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.012329102, 3.0673885, 0.6095581)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_3" unique_id=384400605 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_3" unique_id=384400605 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34210205, 2.969164, -0.9926758)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_3" unique_id=541205295 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/RoamPack_3" unique_id=541205295 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0045776, 2.5990849, 0.36895752)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="RoamPack_4" type="Node3D" parent="MonsterPackGenerator" unique_id=1742890091 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_4" parent="MonsterPackGenerator" unique_id=1742890091 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 957.02893, 109.99225, 656.74426)
-script = ExtResource("20_tkt8r")
 members = [NodePath("Scout"), NodePath("spider_enemie")]
 roam_radius = 27.660225
 
-[node name="Scout" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_4" unique_id=532338910 node_paths=PackedStringArray("attack_shape") groups=["Enemie"] instance=ExtResource("28_lrhu7")]
+[node name="Scout" parent="MonsterPackGenerator/RoamPack_4" unique_id=532338910 instance=ExtResource("28_lrhu7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.814209, 3.1172714, -1.9381714)
-collision_layer = 256
-collision_mask = 3
-script = ExtResource("29_68hhs")
-base_movement_speed = 5.5
-behavior = ExtResource("30_u6qt0")
-heavy_attack_close_distance = 2.285
-heavy_attack_far_distance = 2.32
-heavy_attack_far_probability = 0.1
-heavy_attack_mid_probability = 0.1
-slam_scene = ExtResource("31_b3sry")
-attack_shape = NodePath("Great Sword Run/Skeleton3D/BoneAttachment3D/hand/AttackComponent/CollisionShape3D")
-ragdoll_knockback_multiplier = 1.3
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_4" unique_id=1386842708 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/RoamPack_4" unique_id=1386842708 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.890564, 3.3295517, -0.6409912)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="RoamPack_5" type="Node3D" parent="MonsterPackGenerator" unique_id=1311005116 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_5" parent="MonsterPackGenerator" unique_id=1311005116 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 302.85468, 89.06543, 82.56381)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb"), NodePath("dumb_archer"), NodePath("dumb2")]
 roam_radius = 25.295382
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_5" unique_id=2128334465 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_5" unique_id=2128334465 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85147095, 2.7769165, -1.6156158)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_5" unique_id=521269433 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/RoamPack_5" unique_id=521269433 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2184753, 4.436348, -2.4770355)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_5" unique_id=520820773 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/RoamPack_5" unique_id=520820773 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1695862, 3.4056625, 1.3977814)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="RoamPack_6" type="Node3D" parent="MonsterPackGenerator" unique_id=1365592257 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_6" parent="MonsterPackGenerator" unique_id=1365592257 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 636.51495, 29.576244, 92.8711)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb"), NodePath("dumb2"), NodePath("dumb_archer")]
 roam_radius = 25.321098
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_6" unique_id=620106078 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_6" unique_id=620106078 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1219482, 2.8298302, 0.662117)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_6" unique_id=1189341206 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/RoamPack_6" unique_id=1189341206 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2401733, 3.0515022, -0.97367096)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_6" unique_id=492738681 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/RoamPack_6" unique_id=492738681 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.26953125, 3.2984352, -1.8414612)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="RoamPack_7" type="Node3D" parent="MonsterPackGenerator" unique_id=2112153895 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_7" parent="MonsterPackGenerator" unique_id=2112153895 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 135.918, 37.565998, 666.79236)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb_archer"), NodePath("dumb_archer2"), NodePath("spider_enemie")]
 roam_radius = 21.736609
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_7" unique_id=1529524442 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/RoamPack_7" unique_id=1529524442 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4469147, 3.0179405, 0.80029297)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="dumb_archer2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_7" unique_id=595855308 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer2" parent="MonsterPackGenerator/RoamPack_7" unique_id=595855308 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8367615, 3.0078316, 0.91815186)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_7" unique_id=1096659632 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/RoamPack_7" unique_id=1096659632 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6455231, 2.968872, -1.6414185)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="RoamPack_8" type="Node3D" parent="MonsterPackGenerator" unique_id=977041249 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_8" parent="MonsterPackGenerator" unique_id=977041249 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 935.8095, 129.96834, 954.85254)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb"), NodePath("dumb2"), NodePath("dumb3")]
 roam_radius = 29.267296
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_8" unique_id=540669184 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_8" unique_id=540669184 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8859253, 2.916092, -1.6068115)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_8" unique_id=1573137804 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/RoamPack_8" unique_id=1573137804 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2296753, 3.1253662, -1.1123657)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="dumb3" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_8" unique_id=188218688 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb3" parent="MonsterPackGenerator/RoamPack_8" unique_id=188218688 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1542969, 2.8651886, 0.044311523)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="RoamPack_9" type="Node3D" parent="MonsterPackGenerator" unique_id=1877400810 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_9" parent="MonsterPackGenerator" unique_id=1877400810 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 245.62128, 97.47006, 150.35779)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb_archer"), NodePath("spider_enemie"), NodePath("spider_enemie2"), NodePath("spider_enemie3")]
 roam_radius = 27.582312
 
-[node name="dumb_archer" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_9" unique_id=605574264 groups=["Enemie"] instance=ExtResource("24_ura6b")]
+[node name="dumb_archer" parent="MonsterPackGenerator/RoamPack_9" unique_id=605574264 instance=ExtResource("24_ura6b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.194046, 2.733284, 1.8744965)
-collision_layer = 257
-script = ExtResource("25_hw2ia")
-arrow_scene = ExtResource("26_ndlmv")
-behavior = ExtResource("27_ggrof")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_9" unique_id=99191075 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/RoamPack_9" unique_id=99191075 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0405273, 2.1509552, 1.3229675)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_9" unique_id=917882274 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/RoamPack_9" unique_id=917882274 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8946075, 3.6322784, 0.06150818)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="spider_enemie3" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_9" unique_id=1070767271 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie3" parent="MonsterPackGenerator/RoamPack_9" unique_id=1070767271 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5765839, 1.7140198, 1.9876862)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="RoamPack_10" type="Node3D" parent="MonsterPackGenerator" unique_id=1741875303 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
+[node name="RoamPack_10" parent="MonsterPackGenerator" unique_id=1741875303 node_paths=PackedStringArray("members") instance=ExtResource("19_j5v0o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.637634, 58.725216, 233.05109)
-script = ExtResource("20_tkt8r")
 members = [NodePath("dumb"), NodePath("spider_enemie"), NodePath("dumb2"), NodePath("spider_enemie2")]
 roam_radius = 19.701197
 
-[node name="dumb" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_10" unique_id=1527408929 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb" parent="MonsterPackGenerator/RoamPack_10" unique_id=1527408929 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5211487, 3.2152672, -2.2484894)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_10" unique_id=1480076779 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie" parent="MonsterPackGenerator/RoamPack_10" unique_id=1480076779 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3543167, 3.177147, -0.92381287)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
-[node name="dumb2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_10" unique_id=1074358303 groups=["Enemie"] instance=ExtResource("35_wmwyp")]
+[node name="dumb2" parent="MonsterPackGenerator/RoamPack_10" unique_id=1074358303 instance=ExtResource("35_wmwyp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.08358, 3.5754204, -0.7435303)
-collision_layer = 257
-script = ExtResource("36_7yt1c")
-behavior = ExtResource("37_ff1in")
 
-[node name="spider_enemie2" type="CharacterBody3D" parent="MonsterPackGenerator/RoamPack_10" unique_id=1238406179 groups=["Enemie"] instance=ExtResource("32_5k7cj")]
+[node name="spider_enemie2" parent="MonsterPackGenerator/RoamPack_10" unique_id=1238406179 instance=ExtResource("32_5k7cj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4095154, 4.387104, -2.0075073)
-collision_layer = 256
-collision_mask = 257
-script = ExtResource("33_1xir5")
 behavior = SubResource("Resource_3vwuf")
 
 [node name="NavRegions" type="Node3D" parent="." unique_id=271709850]
@@ -1401,3 +996,5 @@ visible = false
 
 [node name="NavRegion_0_0" type="NavigationRegion3D" parent="NavRegions" unique_id=759548526]
 navigation_mesh = SubResource("NavigationMesh_1xir5")
+
+[node name="rain" parent="." unique_id=1720964247 instance=ExtResource("29_dxy7m")]

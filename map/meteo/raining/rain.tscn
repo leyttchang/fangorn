@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://isvrwyq6u3mx"]
 
 [ext_resource type="Texture2D" uid="uid://b5litb73ddl7e" path="res://assets/LeLu's Noise Pack/T_VFX_Glo31.png" id="1_c5trl"]
+[ext_resource type="Script" uid="uid://d4m8fsf7tr7ao" path="res://map/meteo/raining/rain.gd" id="1_mq065"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="2_8c0hh"]
+[ext_resource type="PackedScene" uid="uid://cqc5bu642m1wa" path="res://particule/lightning/spraks.tscn" id="3_mq065"]
 
 [sub_resource type="Curve" id="Curve_c5trl"]
 _data = [Vector2(0, 0.38095236), 0.0, 2.3070607, 0, 0, Vector2(1, 0.99999994), 0.0, 0.0, 0, 0]
@@ -14,20 +17,28 @@ particle_flag_align_y = true
 emission_shape = 6
 emission_ring_axis = Vector3(0, 1, 0)
 emission_ring_height = 1.0
-emission_ring_radius = 100.0
+emission_ring_radius = 80.0
 emission_ring_inner_radius = 0.0
 emission_ring_cone_angle = 90.0
 direction = Vector3(0, -1, 0)
-spread = 0.0
-initial_velocity_min = 50.0
-initial_velocity_max = 100.0
-turbulence_enabled = true
-turbulence_noise_strength = 0.3
+spread = 3.0
+initial_velocity_min = 22.0
+initial_velocity_max = 28.0
+gravity = Vector3(0, -14, 0)
+color = Color(0.9053082, 1.0492249, 1.1109034, 1)
+turbulence_noise_strength = 0.2
 turbulence_noise_scale = 3.311
 turbulence_noise_speed_random = 0.1
-turbulence_influence_min = 0.010000001
-turbulence_influence_max = 0.020000001
+turbulence_influence_min = 0.01
+turbulence_influence_max = 0.02
 turbulence_influence_over_life = SubResource("CurveTexture_ku4ic")
+collision_mode = 2
+sub_emitter_mode = 3
+sub_emitter_amount_at_collision = 4
+
+[sub_resource type="Curve" id="Curve_hlie2"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.04318937, 0.43478256), 3.5867956, 3.5867956, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_as728"]
 transparency = 1
@@ -35,24 +46,86 @@ blend_mode = 1
 cull_mode = 2
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(2.2520573, 2.6529844, 3.1111865, 1)
 albedo_texture = ExtResource("1_c5trl")
 billboard_keep_scale = true
+use_particle_trails = true
 
 [sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_yqkk6"]
 material = SubResource("StandardMaterial3D_as728")
 shape = 0
-size = 0.2
-sections = 20
-section_length = 0.5
+size = 0.4
+sections = 6
+section_length = 2.0
+curve = SubResource("Curve_hlie2")
 
-[node name="rain" type="Node3D" unique_id=1720964247]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lxj50"]
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("2_8c0hh")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=290459491]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 52.958336, 0)
-amount = 5000
-lifetime = 5.0
+[sub_resource type="Curve" id="Curve_8c0hh"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.14441416, 0.8482759), 0.0, 0.0, 0, 0, Vector2(0.28337875, 0), 0.0, 0.0, 0, 0, Vector2(0.36239782, 1), 0.0, 0.0, 0, 0, Vector2(0.46321523, 0.79310346), 0.0, 0.0, 0, 0, Vector2(0.5667575, 0.24137932), 0.0, 0.0, 0, 0, Vector2(0.6948229, 0.006896615), 0.0, 0.0, 0, 0, Vector2(0.70844686, 1), 0.0, 0.0, 0, 0, Vector2(0.79564035, 0.027586222), 0.0, 0.0, 0, 0, Vector2(0.8610354, 0.7172414), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 11
+
+[sub_resource type="CurveTexture" id="CurveTexture_mq065"]
+curve = SubResource("Curve_8c0hh")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mk3nk"]
+lifetime_randomness = 0.2
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.2
+emission_ring_radius = 0.3
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 60.0
+initial_velocity_min = 3.0
+initial_velocity_max = 7.0
+gravity = Vector3(0, -14, 0)
+scale_min = 0.04
+scale_max = 0.09
+scale_curve = SubResource("CurveTexture_mq065")
+color = Color(1.8247963, 1.8247963, 1.8247963, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_dkpeg"]
+
+[node name="rain" type="Node3D" unique_id=1720964247 node_paths=PackedStringArray("rain_particles")]
+script = ExtResource("1_mq065")
+rain_particles = NodePath("rain_P")
+
+[node name="rain_P" type="GPUParticles3D" parent="." unique_id=290459491]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 45, 0)
+amount = 10000
+sub_emitter = NodePath("../spraks")
+lifetime = 2.2
+randomness = 0.05
+fixed_fps = 120
+collision_base_size = 0.25
+visibility_aabb = AABB(-120, -150, -120, 240, 200, 240)
 trail_enabled = true
-trail_lifetime = 0.38
+trail_lifetime = 0.12
 process_material = SubResource("ParticleProcessMaterial_hlie2")
 draw_pass_1 = SubResource("RibbonTrailMesh_yqkk6")
+
+[node name="GPUParticlesCollisionHeightField3D" type="GPUParticlesCollisionHeightField3D" parent="." unique_id=1710758035]
+cull_mask = 4293918721
+size = Vector3(200, 250, 200)
+
+[node name="spraks" parent="." unique_id=350757358 instance=ExtResource("3_mq065")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_lxj50")
+emitting = false
+amount = 12000
+lifetime = 0.25
+explosiveness = 1.0
+visibility_aabb = AABB(-120, -100, -120, 240, 150, 240)
+process_material = SubResource("ParticleProcessMaterial_mk3nk")
+draw_pass_1 = SubResource("QuadMesh_dkpeg")
