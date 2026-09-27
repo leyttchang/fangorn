@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="24_ura6b"]
 [ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="28_lrhu7"]
 [ext_resource type="PackedScene" uid="uid://isvrwyq6u3mx" path="res://map/meteo/raining/rain.tscn" id="29_dxy7m"]
+[ext_resource type="Script" uid="uid://ch4v15ofn4dvm" path="res://map/map_generator/timer_sys.gd" id="30_31r8i"]
 [ext_resource type="PackedScene" uid="uid://bwv7mkwsym0an" path="res://character/enemie/spider/spider_enemie.tscn" id="32_5k7cj"]
 [ext_resource type="Script" uid="uid://0gemtrlg1hbh" path="res://character/enemie/EnemyBehaviorData.gd" id="34_86nbc"]
 [ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="35_wmwyp"]
@@ -998,3 +999,6 @@ visible = false
 navigation_mesh = SubResource("NavigationMesh_1xir5")
 
 [node name="rain" parent="." unique_id=1720964247 instance=ExtResource("29_dxy7m")]
+
+[node name="timer_sys" type="Node3D" parent="." unique_id=553831581]
+script = ExtResource("30_31r8i")
