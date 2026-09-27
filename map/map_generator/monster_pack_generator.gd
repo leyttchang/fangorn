@@ -471,7 +471,7 @@ func clear_monster_packs() -> void:
 # UTILITAIRES TERRAIN & MONDE
 # ==========================================================
 func _get_parent_for_monsters(pack: MonsterPack) -> Node:
-	if not Engine.is_editor_hint():
+	if not Engine.is_editor_hint() and is_inside_tree() and get_tree() != null and get_tree().current_scene != null:
 		var net_obj = get_tree().current_scene.get_node_or_null("NetworkObjects")
 		if net_obj != null:
 			return net_obj

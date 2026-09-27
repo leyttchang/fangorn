@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bjpvlflywckyu"]
+
+[ext_resource type="Script" uid="uid://b40l5vp2b45eu" path="res://mob_raycast_spawner.gd" id="1_ercvi"]
+
+[node name="mob_raycast_spawner" type="Node3D" unique_id=603506095]
+script = ExtResource("1_ercvi")

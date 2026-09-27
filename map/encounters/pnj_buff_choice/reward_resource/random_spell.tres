@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardData" format=3]
+
+[ext_resource type="Script" path="res://map/encounters/pnj_buff_choice/reward_data.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+id = "random_spell"
+title = "Arcane Knowledge"
+description = "Unlocks a random new spell in your spellbook."
+card_color = Color(0.85, 0.4, 1, 1)
+button_text = "Choose"
+weight = 1.0
+reward_type = 1

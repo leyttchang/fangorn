@@ -50,14 +50,36 @@ func _on_equipment_changed(changed_slot_name: String, item: ItemData) -> void:
 
 var current_item: ItemData = null
 
+func _get_inventory_ui() -> InventoryUI:
+	var current_node = get_parent()
+	while current_node != null:
+		if current_node is InventoryUI:
+			return current_node as InventoryUI
+		current_node = current_node.get_parent()
+	return null
+
 func _update_visual(item: ItemData) -> void:
 	current_item = item
 	if item == null:
 		icon_rect.texture = null
 		tooltip_text = "" # Désactive le tooltip
+		_stop_glow()
 	else:
 		icon_rect.texture = item.icon
 		tooltip_text = " " # Active le tooltip
+		var inv_ui = _get_inventory_ui()
+		if inv_ui != null and inv_ui.is_selection_mode and inv_ui.is_item_selectable(item):
+			_start_glow()
+		else:
+			_stop_glow()
+
+func _gui_input(event: InputEvent) -> void:
+	var inv_ui = _get_inventory_ui()
+	if inv_ui != null and inv_ui.is_selection_mode:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			if current_item != null and inv_ui.is_item_selectable(current_item):
+				inv_ui.select_item(current_item)
+				accept_event()
 
 # ==========================================
 # TOOLTIP PERSONNALISÉ
@@ -78,6 +100,10 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 	return hbox
 
 func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+	var inv_ui = _get_inventory_ui()
+	if inv_ui != null and inv_ui.is_selection_mode:
+		return false
+
 	if typeof(data) == TYPE_DICTIONARY and data.has("type") and data["type"] == "inventory_item":
 		var item: ItemData = data["item"]
 		var item_type_string = ItemData.ItemType.keys()[item.item_type]

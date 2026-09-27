@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardData" format=3]
+
+[ext_resource type="Script" path="res://map/encounters/pnj_buff_choice/reward_data.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+id = "upgrade_item_rarity"
+title = "Rarity Ascension"
+description = "Upgrades a chosen piece of equipment to the next rarity tier (Normal -> Magic -> Rare -> Legendary) based on its ilvl, rolling a new unique affix."
+card_color = Color(0.9, 0.35, 1, 1)
+button_text = "Transmute"
+weight = 1.0
+reward_type = 4

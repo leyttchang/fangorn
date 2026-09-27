@@ -28,6 +28,10 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 ## Longueur de la carte (en nombre de chunks de 1024m)
 @export var map_height_chunks: int = 3
 
+@export_category("Bordures du Monde")
+## Largeur de la marge plate entourant la carte (en mètres). Le mur d'arbres se placera le long de cette limite.
+@export var border_margin: float = 35.0
+
 @export_category("Élévation & Relief (Méthode 3)")
 ## Hauteur minimale du terrain (ex: 0.0m pour les plaines de base / niveau de l'eau)
 @export var min_height: float = 0.0
@@ -57,6 +61,8 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
+		if is_standalone_scene():
+			GameData.current_game_mode = GameData.GameMode.NORMAL
 		# Ne détruire la caméra spectateur que si on est dans le vrai jeu (ex: sous game.tscn)
 		if not is_standalone_scene():
 			var cam2 = find_child("*Camera*", true, false)
@@ -114,6 +120,8 @@ func clear_terrain() -> void:
 			current.clear_encounters()
 		if current != self and current.has_method("clear_monster_packs"):
 			current.clear_monster_packs()
+		if current != self and current.has_method("clear_wall"):
+			current.clear_wall()
 		stack.append_array(current.get_children())
 			
 	var time_clean = Time.get_ticks_msec() - time_start
@@ -329,8 +337,8 @@ func generate_terrain_async() -> void:
 					var global_x = chunk_min_x + lx
 					var gx: float = float(global_x)
 					
-					# Marge plate de 15m aux bords de la map
-					var margin: float = 15.0
+					# Marge plate aux bords de la map
+					var margin: float = border_margin
 					var safe_gx = clampf(gx, margin, float(total_w) - margin)
 					var safe_gz = clampf(gz, margin, float(total_h) - margin)
 					
@@ -384,6 +392,11 @@ func generate_terrain_async() -> void:
 	_place_encounter_markers(terrain_data)
 	
 	
+	# Génère automatiquement le mur d'arbres de bordure s'il y a un BorderTreeWall
+	var border_wall = find_child("BorderTreeWall", true, false)
+	if border_wall and border_wall.has_method("generate_wall"):
+		border_wall.call_deferred("generate_wall")
+		
 	# Génère automatiquement les arbres s'il y a un MeshSpawner
 	var mesh_spawner = find_child("MeshSpawner", true, false)
 	if mesh_spawner and mesh_spawner.has_method("generate_trees"):
@@ -519,9 +532,10 @@ func _bake_navmesh() -> void:
 	
 	terrain_ready.emit()
 	
-	# Génération automatique des meutes de monstres si le générateur est présent
-	var pack_gen = find_child("MonsterPackGenerator", true, false)
-	if pack_gen == null:
-		pack_gen = find_child("MonsterPacks", true, false)
-	if pack_gen and pack_gen.has_method("generate_monster_packs"):
-		pack_gen.generate_monster_packs(world_seed)
+	# En éditeur, appel direct de la génération des meutes (en jeu, c'est géré via le signal terrain_ready)
+	if Engine.is_editor_hint():
+		var pack_gen = find_child("MonsterPackGenerator", true, false)
+		if pack_gen == null:
+			pack_gen = find_child("MonsterPacks", true, false)
+		if pack_gen and pack_gen.has_method("generate_monster_packs"):
+			pack_gen.generate_monster_packs(world_seed)

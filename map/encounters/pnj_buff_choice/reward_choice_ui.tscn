@@ -1,0 +1,228 @@
+[gd_scene format=3 uid="uid://cx8y7r6q2b3p1"]
+
+[ext_resource type="Script" uid="uid://2ew87frcm5mk" path="res://map/encounters/pnj_buff_choice/reward_choice_ui.gd" id="1_reward_ui"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_main"]
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 28.0
+bg_color = Color(0.101961, 0.105882, 0.129412, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85098, 0.686275, 0.270588, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 26
+font_color = Color(1, 0.862745, 0.431373, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 0.9)
+
+[sub_resource type="LabelSettings" id="LabelSettings_subtitle"]
+font_size = 14
+font_color = Color(0.8, 0.819608, 0.862745, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 16.0
+content_margin_top = 18.0
+content_margin_right = 16.0
+content_margin_bottom = 18.0
+bg_color = Color(0.141176, 0.145098, 0.180392, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.352941, 0.364706, 0.45098, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_card_title"]
+font_size = 18
+font_color = Color(1, 0.901961, 0.65098, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 0.8)
+
+[sub_resource type="LabelSettings" id="LabelSettings_card_desc"]
+font_size = 13
+font_color = Color(0.88, 0.88, 0.92, 1)
+
+[node name="RewardChoiceUI" type="CanvasLayer" unique_id=1895574541 node_paths=PackedStringArray("title_label", "subtitle_label", "close_button", "card_1_panel", "card_1_title", "card_1_desc", "card_1_button", "card_2_panel", "card_2_title", "card_2_desc", "card_2_button", "card_3_panel", "card_3_title", "card_3_desc", "card_3_button")]
+layer = 50
+script = ExtResource("1_reward_ui")
+title_label = NodePath("CenterContainer/MainPanel/VBoxContainer/TitleLabel")
+subtitle_label = NodePath("CenterContainer/MainPanel/VBoxContainer/SubtitleLabel")
+close_button = NodePath("CenterContainer/MainPanel/VBoxContainer/CloseButton")
+card_1_panel = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1")
+card_1_title = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox/Card1Title")
+card_1_desc = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox/Card1Desc")
+card_1_button = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox/Card1Button")
+card_2_panel = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2")
+card_2_title = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox/Card2Title")
+card_2_desc = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox/Card2Desc")
+card_2_button = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox/Card2Button")
+card_3_panel = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3")
+card_3_title = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox/Card3Title")
+card_3_desc = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox/Card3Desc")
+card_3_button = NodePath("CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox/Card3Button")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=172417958]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.06, 0.72)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=901266994]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CenterContainer" unique_id=1028336886]
+custom_minimum_size = Vector2(760, 420)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_main")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MainPanel" unique_id=32353144]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer" unique_id=320855028]
+layout_mode = 2
+text = "SURVIVOR'S BLESSING"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer" unique_id=684331786]
+layout_mode = 2
+text = "As a token of gratitude, choose one of the following 3 rewards:"
+label_settings = SubResource("LabelSettings_subtitle")
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MainPanel/VBoxContainer" unique_id=733395286]
+layout_mode = 2
+
+[node name="CardsContainer" type="HBoxContainer" parent="CenterContainer/MainPanel/VBoxContainer" unique_id=313164081]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="Card1" type="PanelContainer" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer" unique_id=752630006]
+custom_minimum_size = Vector2(215, 270)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1" unique_id=1087215134]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Card1Title" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox" unique_id=79969955]
+layout_mode = 2
+text = "Skill Point"
+label_settings = SubResource("LabelSettings_card_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox" unique_id=992237864]
+layout_mode = 2
+
+[node name="Card1Desc" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox" unique_id=29715228]
+layout_mode = 2
+size_flags_vertical = 3
+text = "+1 skill point to spend in your passive skill tree."
+label_settings = SubResource("LabelSettings_card_desc")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Card1Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card1/VBox" unique_id=706497309]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Choose"
+
+[node name="Card2" type="PanelContainer" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer" unique_id=1590808595]
+custom_minimum_size = Vector2(215, 270)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2" unique_id=2013941575]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Card2Title" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox" unique_id=1968834674]
+layout_mode = 2
+text = "Precious Gear"
+label_settings = SubResource("LabelSettings_card_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox" unique_id=486037023]
+layout_mode = 2
+
+[node name="Card2Desc" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox" unique_id=461998281]
+layout_mode = 2
+size_flags_vertical = 3
+text = "A piece of gear guaranteed Rare (75%) or Legendary (25%), with a chance of Unique."
+label_settings = SubResource("LabelSettings_card_desc")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Card2Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card2/VBox" unique_id=1944705709]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Choose"
+
+[node name="Card3" type="PanelContainer" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer" unique_id=1137683828]
+custom_minimum_size = Vector2(215, 270)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3" unique_id=1709547725]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Card3Title" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox" unique_id=582402996]
+layout_mode = 2
+text = "Arcane Knowledge"
+label_settings = SubResource("LabelSettings_card_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox" unique_id=215792059]
+layout_mode = 2
+
+[node name="Card3Desc" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox" unique_id=1172841463]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Unlocks a random new spell in your spellbook."
+label_settings = SubResource("LabelSettings_card_desc")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Card3Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer/CardsContainer/Card3/VBox" unique_id=1559492954]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Choose"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/MainPanel/VBoxContainer" unique_id=625748222]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="CenterContainer/MainPanel/VBoxContainer" unique_id=1148288176]
+custom_minimum_size = Vector2(170, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Close (Later)"

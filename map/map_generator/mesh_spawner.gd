@@ -239,7 +239,12 @@ func generate_trees() -> void:
 		print("MeshSpawner: Évitement actif pour ", encounter_positions.size(), " encounter(s) (rayon: ", rad, "m).")
 		
 	var total_spawned: int = 0
-	var margin: float = spacing
+	var b_margin: float = 35.0
+	if map_generator != null and "border_margin" in map_generator:
+		b_margin = float(map_generator.border_margin)
+	elif get_parent() != null and "border_margin" in get_parent():
+		b_margin = float(get_parent().border_margin)
+	var margin: float = maxf(spacing, b_margin + 12.0)
 	var row_counter: int = 0
 	
 	var z: float = margin

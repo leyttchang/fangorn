@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RewardData" format=3]
+
+[ext_resource type="Script" path="res://map/encounters/pnj_buff_choice/reward_data.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+id = "random_weapon_above_rare"
+title = "Elite Weapon"
+description = "A random weapon guaranteed Rare (75%) or Legendary (25%), with a chance of Unique."
+card_color = Color(1, 0.5, 0.2, 1)
+button_text = "Choose"
+weight = 1.0
+reward_type = 2
+target_item_type = 0
+rarity_weights = {
+2: 75,
+3: 25
+}

@@ -138,16 +138,22 @@ func generate_grass() -> void:
 	var chunk_size = 64.0
 	var chunks = {}
 	
-	var x = 0.0
+	var b_margin: float = 35.0
+	if map_generator != null and "border_margin" in map_generator:
+		b_margin = float(map_generator.border_margin)
+	elif get_parent() != null and "border_margin" in get_parent():
+		b_margin = float(get_parent().border_margin)
+		
+	var x = b_margin
 	var row_count = 0
 	
-	while x < map_w:
+	while x < map_w - b_margin:
 		row_count += 1
 		if row_count % 16 == 0:
 			await get_tree().process_frame
 			
-		var z = 0.0
-		while z < map_h:
+		var z = b_margin
+		while z < map_h - b_margin:
 			var px = x + rng.randf_range(-jitter, jitter)
 			var pz = z + rng.randf_range(-jitter, jitter)
 			

@@ -20,7 +20,13 @@ func update_slot(item: ItemData, quantity: int, index: int) -> void:
 	if item != null:
 		icon_rect.texture = item.icon
 		tooltip_text = " " # Active la détection de tooltip
-		if highlight_rect:
+		var inv_ui = _get_inventory_ui()
+		if inv_ui != null and inv_ui.is_selection_mode and inv_ui.is_item_selectable(item):
+			if highlight_rect:
+				highlight_rect.visible = true
+				highlight_rect.border_color = Color(1.0, 0.85, 0.2, 1.0)
+		elif highlight_rect:
+			highlight_rect.border_color = Color(0.2, 0.8, 1.0, 1.0)
 			highlight_rect.visible = item.is_new_item
 	else:
 		icon_rect.texture = null
@@ -28,11 +34,22 @@ func update_slot(item: ItemData, quantity: int, index: int) -> void:
 		if highlight_rect:
 			highlight_rect.visible = false
 
+func _get_inventory_ui() -> InventoryUI:
+	var current_node = get_parent()
+	while current_node != null:
+		if current_node is InventoryUI:
+			return current_node as InventoryUI
+		current_node = current_node.get_parent()
+	return null
+
 func _on_mouse_entered() -> void:
 	# Dès qu'on passe la souris dessus, ce n'est plus "nouveau"
 	if current_item != null and current_item.is_new_item:
 		current_item.is_new_item = false
-		if highlight_rect:
+		var inv_ui = _get_inventory_ui()
+		if inv_ui != null and inv_ui.is_selection_mode and inv_ui.is_item_selectable(current_item):
+			pass
+		elif highlight_rect:
 			highlight_rect.visible = false
 
 # ==========================================
@@ -85,6 +102,10 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 # DÉBUT DU GLISSER (DRAG)
 # ==========================================
 func _get_drag_data(at_position: Vector2) -> Variant:
+	var inv_ui = _get_inventory_ui()
+	if inv_ui != null and inv_ui.is_selection_mode:
+		return null
+		
 	# S'il n'y a pas d'objet dans cette case, on ne fait rien
 	if current_item == null:
 		return null 
@@ -172,6 +193,14 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 # CLIC DROIT : MENU CONTEXTUEL (JETER)
 # ==========================================
 func _gui_input(event: InputEvent) -> void:
+	var inv_ui = _get_inventory_ui()
+	if inv_ui != null and inv_ui.is_selection_mode:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			if current_item != null and inv_ui.is_item_selectable(current_item):
+				inv_ui.select_item(current_item)
+				accept_event()
+		return
+
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		if current_item != null:
 			if Input.is_key_pressed(KEY_SHIFT):

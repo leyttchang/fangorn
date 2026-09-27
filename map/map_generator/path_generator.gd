@@ -8,6 +8,12 @@ class_name PathGenerator
 
 var encounter_positions: Array[Vector2] = []
 var start_pos: Vector2 = Vector2.ZERO
+var exit_west: Vector2 = Vector2.ZERO
+var exit_east: Vector2 = Vector2.ZERO
+var exit_north: Vector2 = Vector2.ZERO
+
+func get_border_exits() -> Array[Vector2]:
+	return [start_pos, exit_west, exit_east, exit_north]
 
 # Contient tous les segments de notre route (des dictionnaires avec start et end)
 var segments: Array[Dictionary] = []
@@ -78,13 +84,19 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 	print("=> Grille AStar (" , grid_w * grid_h, " cellules) générée en ", time_astar, " ms.")
 	# ------------------------------------------------------
 	
-	# Coordonnées du Spawn (Milieu de la face Sud, 15m à l'intérieur)
-	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - 15.0)
+	var b_margin: float = 35.0
+	if map_gen and "border_margin" in map_gen:
+		b_margin = float(map_gen.border_margin)
+	# Les chemins s'arrêtent à l'intérieur de la zone de jeu, avant la marge et le mur d'arbres
+	var road_border_offset: float = b_margin + 15.0
 	
-	# Coordonnées des 3 Sorties (Rentrées de 15m aussi)
-	var exit_west = Vector2(map_min_x + 15.0, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	var exit_east = Vector2(map_max_x - 15.0, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	var exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + 15.0)
+	# Coordonnées du Spawn (Milieu de la face Sud)
+	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - road_border_offset)
+	
+	# Coordonnées des 3 Sorties
+	exit_west = Vector2(map_min_x + road_border_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	exit_east = Vector2(map_max_x - road_border_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + road_border_offset)
 	
 	# Coordonnées des 2 embranchements
 	var fork1_y = lerp(map_max_z, map_min_z, rng.randf_range(0.3, 0.45))

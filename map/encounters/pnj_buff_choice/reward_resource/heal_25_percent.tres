@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RewardData" format=3]
+
+[ext_resource type="Script" path="res://map/encounters/pnj_buff_choice/reward_data.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+id = "heal_25_percent"
+title = "Restorative Elixir"
+description = "Instantly restores 25% of your maximum health."
+card_color = Color(0.3, 1, 0.45, 1)
+button_text = "Drink"
+weight = 1.0
+reward_type = 5
+heal_percent = 0.25

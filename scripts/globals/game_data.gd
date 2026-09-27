@@ -74,6 +74,13 @@ static func get_all_bases() -> Array[EquipmentItem]:
 		]
 	return _all_bases
 
+static func get_bases_by_type(target_type: ItemData.ItemType) -> Array[EquipmentItem]:
+	var result: Array[EquipmentItem] = []
+	for b in get_all_bases():
+		if b != null and b.item_type == target_type:
+			result.append(b)
+	return result
+
 static var _all_spells: Array[AbilityData] = []
 
 static func get_all_spells() -> Array[AbilityData]:

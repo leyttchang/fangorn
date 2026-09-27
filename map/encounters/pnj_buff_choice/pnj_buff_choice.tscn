@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c5if6kfbecjch"]
+
+[ext_resource type="Script" uid="uid://dctfib50d10o6" path="res://map/encounters/pnj_buff_choice/pnj_buff_choice.gd" id="1_se1eh"]
+[ext_resource type="PackedScene" uid="uid://ce2yoffik0e26" path="res://map/encounters/characterMedium.fbx" id="1_smxnx"]
+[ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="3_o4mo6"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hlie2"]
+radius = 0.390625
+height = 3.9550781
+
+[node name="Pnj_buff_choice" type="StaticBody3D" unique_id=1588798652]
+script = ExtResource("1_se1eh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=714654844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8092777, 0)
+shape = SubResource("CapsuleShape3D_hlie2")
+
+[node name="characterMedium" parent="." unique_id=1879266682 instance=ExtResource("1_smxnx")]
+
+[node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("3_o4mo6")]
+prompt_text = "Press [E] to choose your blessing"

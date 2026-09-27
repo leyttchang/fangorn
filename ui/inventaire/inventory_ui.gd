@@ -159,10 +159,130 @@ func _format_stat(stat_name: String, value: float) -> String:
 		return clean_name + " : " + str(int(round(value)))
 
 
+# --- MODE SÉLECTION D'OBJET (AMÉLIORATION / FORGE) ---
+var is_selection_mode: bool = false
+var selection_filter: Callable
+var selection_on_selected: Callable
+var selection_on_cancel: Callable
+var selection_banner: PanelContainer = null
+var selection_prompt_label: Label = null
+
+func open_for_item_selection(prompt_text: String, filter_callable: Callable, on_selected: Callable, on_cancel: Callable = Callable()) -> void:
+	is_selection_mode = true
+	selection_filter = filter_callable
+	selection_on_selected = on_selected
+	selection_on_cancel = on_cancel
+	
+	_show_selection_banner(prompt_text)
+	open_inventory()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+	# Mettre à jour l'état de l'UI manager si présent
+	var parent_node = get_parent()
+	while parent_node != null:
+		if "current_state" in parent_node:
+			parent_node.current_state = 1 # UIState.INVENTORY
+			break
+		parent_node = parent_node.get_parent()
+		
+	update_ui()
+	_update_equipment_visuals()
+
+func cancel_item_selection() -> void:
+	if not is_selection_mode:
+		return
+	close_inventory()
+
+func select_item(item: ItemData) -> void:
+	if not is_selection_mode:
+		return
+	var cb = selection_on_selected
+	is_selection_mode = false
+	_hide_selection_banner()
+	selection_filter = Callable()
+	selection_on_selected = Callable()
+	selection_on_cancel = Callable()
+	update_ui()
+	_update_equipment_visuals()
+	close_inventory()
+	if cb.is_valid():
+		cb.call(item)
+
+func is_item_selectable(item: ItemData) -> bool:
+	if not is_selection_mode or item == null:
+		return false
+	if selection_filter.is_valid():
+		return selection_filter.call(item)
+	return true
+
+func _show_selection_banner(prompt_text: String) -> void:
+	if selection_banner == null:
+		selection_banner = PanelContainer.new()
+		selection_banner.name = "SelectionBanner"
+		selection_banner.set_anchors_preset(Control.PRESET_TOP_WIDE)
+		selection_banner.offset_left = 180
+		selection_banner.offset_right = -180
+		selection_banner.offset_top = 20
+		selection_banner.offset_bottom = 75
+		
+		var sb = StyleBoxFlat.new()
+		sb.bg_color = Color(0.12, 0.14, 0.22, 0.95)
+		sb.border_color = Color(1.0, 0.85, 0.2, 1.0)
+		sb.border_width_left = 2
+		sb.border_width_top = 2
+		sb.border_width_right = 2
+		sb.border_width_bottom = 2
+		sb.corner_radius_top_left = 8
+		sb.corner_radius_top_right = 8
+		sb.corner_radius_bottom_left = 8
+		sb.corner_radius_bottom_right = 8
+		selection_banner.add_theme_stylebox_override("panel", sb)
+		
+		var hbox = HBoxContainer.new()
+		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		hbox.add_theme_constant_override("separation", 25)
+		selection_banner.add_child(hbox)
+		
+		selection_prompt_label = Label.new()
+		selection_prompt_label.add_theme_font_size_override("font_size", 18)
+		selection_prompt_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
+		selection_prompt_label.text = prompt_text
+		hbox.add_child(selection_prompt_label)
+		
+		var cancel_btn = Button.new()
+		cancel_btn.text = "Cancel"
+		cancel_btn.custom_minimum_size = Vector2(100, 35)
+		cancel_btn.pressed.connect(cancel_item_selection)
+		hbox.add_child(cancel_btn)
+		
+		add_child(selection_banner)
+	else:
+		if selection_prompt_label != null:
+			selection_prompt_label.text = prompt_text
+		selection_banner.visible = true
+
+func _hide_selection_banner() -> void:
+	if selection_banner != null:
+		selection_banner.visible = false
+
+func _update_equipment_visuals() -> void:
+	for slot in find_children("*", "EquipmentSlot", true, false):
+		if slot is EquipmentSlot and slot.current_item != null:
+			slot._update_visual(slot.current_item)
+
 func open_inventory() -> void:
 	visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 func close_inventory() -> void:
+	if is_selection_mode:
+		is_selection_mode = false
+		_hide_selection_banner()
+		if selection_on_cancel.is_valid():
+			selection_on_cancel.call()
+		selection_filter = Callable()
+		selection_on_selected = Callable()
+		selection_on_cancel = Callable()
 	visible = false
 	if loot_panel:
 		loot_panel.visible = false
@@ -170,7 +290,19 @@ func close_inventory() -> void:
 		if current_chest_inventory.inventory_changed.is_connected(_update_loot_ui):
 			current_chest_inventory.inventory_changed.disconnect(_update_loot_ui)
 		current_chest_inventory = null
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	var parent_node = get_parent()
+	while parent_node != null:
+		if "current_state" in parent_node:
+			parent_node.current_state = 0 # UIState.NONE
+			break
+		parent_node = parent_node.get_parent()
 	inventory_closed.emit()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and (event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.physical_keycode == KEY_ESCAPE and event.pressed)):
+		close_inventory()
+		get_viewport().set_input_as_handled()
 
 func open_with_chest(chest_inv: InventoryComponent) -> void:
 	# Si on ouvrait déjà un autre coffre juste avant (ou en même temps à cause d'une superposition)
