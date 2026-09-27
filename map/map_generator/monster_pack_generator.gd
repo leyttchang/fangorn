@@ -19,6 +19,22 @@ extends Node3D
 	preload("res://character/enemie/dumb_archer/dumb_archer.tscn"),
 	preload("res://character/enemie/spider/spider_enemie.tscn")
 ]
+## Monster costs corresponding to available_monsters index. Leave empty to use GameData defaults.
+@export var monster_costs: Array[int] = []
+## Monster spawn weights corresponding to available_monsters index. Leave empty to use GameData defaults.
+@export var monster_weights: Array[float] = []
+
+@export_category("Système de Crédits des Meutes")
+## Crédits minimums alloués à une meute (solo)
+@export var min_pack_credits: int = 25
+## Crédits maximums alloués à une meute (solo)
+@export var max_pack_credits: int = 40
+## Niveau des meutes / de la zone (ajoute des crédits par niveau)
+@export var pack_level: int = 1
+## Crédits ajoutés par niveau au-delà du niveau 1 (+20 crédits / lvl)
+@export var credits_per_level: int = 20
+## Multiplicateur de crédits par joueur supplémentaire au-delà du 1er (+50% par joueur supplémentaire)
+@export var player_credit_multiplier: float = 0.5
 
 @export_category("Quantités de Base (Mode Solo)")
 ## Nombre de meutes en embuscade le long des routes
@@ -28,17 +44,12 @@ extends Node3D
 ## Nombre de meutes rôdeurs dans la forêt / nature
 @export var roam_pack_count: int = 6
 
-## Nombre minimum de monstres par meute (solo)
-@export var min_monsters_per_pack: int = 2
-## Nombre maximum de monstres par meute (solo)
-@export var max_monsters_per_pack: int = 4
-
 @export_category("Scaling Multijoueur")
-## Pente d'augmentation du nombre de monstres par joueur supplémentaire au-delà du 1er.
+## Pente d'augmentation du nombre de meutes par joueur supplémentaire au-delà du 1er.
 ## À 0.3333 : 1 joueur = x1.0, 4 joueurs = x2.0 (multiplié par 2 à 4 joueurs, comme demandé).
 ## À 0.5000 : +50% par joueur supplémentaire (1J = x1.0, 2J = x1.5, 4J = x2.5).
 @export var difficulty_scale_per_extra_player: float = 0.3333
-## Si activé, augmente aussi légèrement la taille des packs pour les grands groupes (ex: +1 monstre à 3+ joueurs)
+## Si activé, augmente la puissance en crédits de chaque pack selon les joueurs connectés
 @export var scale_pack_size_with_players: bool = true
 
 @export_category("Paramètres Embuscades (AMBUSH)")
@@ -62,8 +73,8 @@ extends Node3D
 @export var roam_detection_range: float = 20.0
 
 @export_category("Sécurité du Terrain")
-## Hauteur au-dessus du sol lors du spawn (évite de traverser le terrain ou de spawner dans la géométrie)
-@export var spawn_height_offset: float = 1.5
+## Hauteur au-dessus du sol lors du spawn (3 mètres au-dessus du sol pour éviter de traverser le relief ou les pentes)
+@export var spawn_height_offset: float = 3.0
 
 @export_category("Actions (Éditeur)")
 @export var spawn_now: bool = false:
@@ -106,11 +117,90 @@ func _on_terrain_ready() -> void:
 	generate_monster_packs(seed_to_use)
 
 # ==========================================================
-# CALCUL DU MULTIPLICATEUR MULTIJOUEUR
 # ==========================================================
+# CALCUL DU MULTIPLICATEUR MULTIJOUEUR & SYSTÈME DE CRÉDITS
+# ==========================================================
+func _get_player_count() -> int:
+	var count = max(1, GameData.starting_player_count)
+	if is_inside_tree():
+		var players = get_tree().get_nodes_in_group("Player")
+		var valid_players = 0
+		for p in players:
+			if is_instance_valid(p) and not p.is_queued_for_deletion():
+				valid_players += 1
+		if valid_players > 0:
+			count = maxi(count, valid_players)
+	return count
+
 func get_player_count_multiplier() -> float:
-	var player_count = max(1, GameData.starting_player_count)
+	var player_count = _get_player_count()
 	return 1.0 + float(player_count - 1) * difficulty_scale_per_extra_player
+
+func _calculate_pack_credits(rng: RandomNumberGenerator) -> int:
+	var base_credits = rng.randi_range(min_pack_credits, max_pack_credits)
+	var level_bonus = (maxi(pack_level, 1) - 1) * credits_per_level
+	var player_count = _get_player_count()
+	var player_mult = 1.0
+	if scale_pack_size_with_players and player_count > 1:
+		player_mult += float(player_count - 1) * player_credit_multiplier
+	return maxi(int(float(base_credits + level_bonus) * player_mult), 1)
+
+func _get_affordable_monsters(credits_left: int) -> Array[Dictionary]:
+	var affordable: Array[Dictionary] = []
+	for i in range(available_monsters.size()):
+		var scn = available_monsters[i]
+		if scn == null:
+			continue
+			
+		var cost = GameData.get_monster_cost(scn, 10)
+		if i < monster_costs.size() and monster_costs[i] > 0:
+			cost = monster_costs[i]
+			
+		var weight = GameData.get_monster_weight(scn, 1.0)
+		if i < monster_weights.size() and monster_weights[i] > 0.0:
+			weight = monster_weights[i]
+			
+		if cost <= credits_left and weight > 0.0:
+			affordable.append({"scene": scn, "cost": cost, "weight": weight})
+	return affordable
+
+func _pick_weighted_random(options: Array[Dictionary], rng: RandomNumberGenerator) -> Dictionary:
+	if options.is_empty():
+		return {}
+	var total_weight: float = 0.0
+	for opt in options:
+		total_weight += float(opt.get("weight", 1.0))
+		
+	if total_weight <= 0.0:
+		return options[0]
+		
+	var roll = rng.randf_range(0.0, total_weight)
+	var accumulated: float = 0.0
+	for opt in options:
+		accumulated += float(opt.get("weight", 1.0))
+		if roll <= accumulated:
+			return opt
+	return options[options.size() - 1]
+
+func _roll_monsters_for_pack(credits: int, rng: RandomNumberGenerator) -> Array[PackedScene]:
+	var chosen: Array[PackedScene] = []
+	var credits_left = credits
+	
+	while credits_left > 0:
+		var affordable = _get_affordable_monsters(credits_left)
+		if affordable.is_empty():
+			break
+			
+		var entry = _pick_weighted_random(affordable, rng)
+		var scn: PackedScene = entry.get("scene") as PackedScene
+		var cost: int = entry.get("cost", 10)
+		if scn == null:
+			break
+			
+		chosen.append(scn)
+		credits_left -= cost
+		
+	return chosen
 
 # ==========================================================
 # GÉNÉRATION COMPLÈTE
@@ -136,29 +226,29 @@ func generate_monster_packs(pack_seed: int = 0) -> void:
 		rng.randomize()
 		
 	var mult = get_player_count_multiplier()
-	var player_count = max(1, GameData.starting_player_count)
-	print("[MonsterPackGenerator] Génération des meutes (Joueurs au départ: ", player_count, " | Multiplicateur: x", snapped(mult, 0.01), ")")
+	var player_count = _get_player_count()
+	print("[MonsterPackGenerator] Génération des meutes (Joueurs: %d | Multiplicateur meutes: x%.2f | Crédits/pack: %d-%d)" % [
+		player_count,
+		mult,
+		min_pack_credits,
+		max_pack_credits
+	])
 	
 	# Nombre effectif de packs après scaling
 	var effective_ambush = int(round(float(ambush_pack_count) * mult))
 	var effective_patrol = int(round(float(patrol_pack_count) * mult))
 	var effective_roam = int(round(float(roam_pack_count) * mult))
 	
-	# Bonus éventuel de monstres par pack pour les grands groupes (ex: 3 ou 4 joueurs)
-	var extra_per_pack = (1 if player_count >= 3 else 0) if scale_pack_size_with_players else 0
-	var min_m = min_monsters_per_pack + extra_per_pack
-	var max_m = max_monsters_per_pack + extra_per_pack
-	
 	var path_gen = _get_path_generator()
 	
 	# 1. Génération des Embuscades sur les routes
-	var actual_ambush = _spawn_ambush_packs(effective_ambush, valid_monsters, min_m, max_m, rng, path_gen)
+	var actual_ambush = _spawn_ambush_packs(effective_ambush, rng, path_gen)
 	
 	# 2. Génération des Patrouilles le long des routes
-	var actual_patrol = _spawn_patrol_packs(effective_patrol, valid_monsters, min_m, max_m, rng, path_gen)
+	var actual_patrol = _spawn_patrol_packs(effective_patrol, rng, path_gen)
 	
 	# 3. Génération des Rôdeurs dans la forêt
-	var actual_roam = _spawn_roam_packs(effective_roam, valid_monsters, min_m, max_m, rng, path_gen)
+	var actual_roam = _spawn_roam_packs(effective_roam, rng, path_gen)
 	
 	print("[MonsterPackGenerator] Terminé ! %d meutes créées (Rôdeurs: %d, Embuscades: %d, Patrouilles: %d) | Total monstres : %d." % [
 		_spawned_packs.size(),
@@ -171,7 +261,7 @@ func generate_monster_packs(pack_seed: int = 0) -> void:
 # ==========================================================
 # GÉNÉRATION DES EMBSUCADES (AMBUSH)
 # ==========================================================
-func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: int, max_m: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
+func _spawn_ambush_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
 	if path_gen == null or path_gen.segments.is_empty() or count <= 0:
 		return 0
 		
@@ -245,13 +335,13 @@ func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 		pack.setup_ambush(road_pos_3d, road_radius, ambush_detection_range, look_dir_3d)
 		_spawned_packs.append(pack)
 		
-		# Instanciation des monstres cachés derrière l'arbre
+		# Instanciation des monstres cachés derrière l'arbre avec le système de crédits
 		var parent_for_monsters = _get_parent_for_monsters(pack)
-		var mob_count = rng.randi_range(min_m, max_m)
+		var pack_credits = _calculate_pack_credits(rng)
+		var chosen_monsters = _roll_monsters_for_pack(pack_credits, rng)
 		var lateral_dir_2d = Vector2(-behind_dir_2d.y, behind_dir_2d.x)
 		
-		for m_idx in range(mob_count):
-			var scn = valid_monsters[rng.randi_range(0, valid_monsters.size() - 1)]
+		for scn in chosen_monsters:
 			var mob = scn.instantiate() as CharacterBody3D
 			if mob == null: continue
 			
@@ -284,7 +374,7 @@ func _spawn_ambush_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 # ==========================================================
 # GÉNÉRATION DES PATROUILLES (PATROL)
 # ==========================================================
-func _spawn_patrol_packs(count: int, valid_monsters: Array[PackedScene], min_m: int, max_m: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
+func _spawn_patrol_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
 	if path_gen == null or path_gen.segments.is_empty() or count <= 0:
 		return 0
 		
@@ -310,9 +400,9 @@ func _spawn_patrol_packs(count: int, valid_monsters: Array[PackedScene], min_m: 
 		_spawned_packs.append(pack)
 		
 		var parent_for_monsters = _get_parent_for_monsters(pack)
-		var mob_count = rng.randi_range(min_m, max_m)
-		for m_idx in range(mob_count):
-			var scn = valid_monsters[rng.randi_range(0, valid_monsters.size() - 1)]
+		var pack_credits = _calculate_pack_credits(rng)
+		var chosen_monsters = _roll_monsters_for_pack(pack_credits, rng)
+		for scn in chosen_monsters:
 			var mob = scn.instantiate() as CharacterBody3D
 			if mob == null: continue
 			
@@ -372,7 +462,7 @@ func _build_road_patrol_route(segments: Array[Dictionary], num_points: int, rng:
 # ==========================================================
 # GÉNÉRATION DES RÔDEURS (ROAM)
 # ==========================================================
-func _spawn_roam_packs(count: int, valid_monsters: Array[PackedScene], min_m: int, max_m: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
+func _spawn_roam_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
 	if count <= 0: return 0
 	
 	var bounds = _get_map_bounds()
@@ -422,9 +512,9 @@ func _spawn_roam_packs(count: int, valid_monsters: Array[PackedScene], min_m: in
 		_spawned_packs.append(pack)
 		
 		var parent_for_monsters = _get_parent_for_monsters(pack)
-		var mob_count = rng.randi_range(min_m, max_m)
-		for m_idx in range(mob_count):
-			var scn = valid_monsters[rng.randi_range(0, valid_monsters.size() - 1)]
+		var pack_credits = _calculate_pack_credits(rng)
+		var chosen_monsters = _roll_monsters_for_pack(pack_credits, rng)
+		for scn in chosen_monsters:
 			var mob = scn.instantiate() as CharacterBody3D
 			if mob == null: continue
 			
@@ -505,6 +595,15 @@ func _get_terrain_height_at(x: float, z: float) -> float:
 	elif terrain and "data" in terrain and terrain.data:
 		return terrain.data.get_height(Vector3(x, 0, z))
 		
+	# Repli : raycast direct dans le PhysicsServer si le terrain utilise des collisions Mesh/StaticBody
+	if is_inside_tree() and get_world_3d() != null:
+		var space_state = get_world_3d().direct_space_state
+		if space_state != null:
+			var query = PhysicsRayQueryParameters3D.create(Vector3(x, 300.0, z), Vector3(x, -100.0, z), 1)
+			var hit = space_state.intersect_ray(query)
+			if not hit.is_empty():
+				return hit.position.y
+				
 	return 0.0
 
 func _get_slope_at(x: float, z: float) -> float:

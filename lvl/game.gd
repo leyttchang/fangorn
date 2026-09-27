@@ -5,6 +5,9 @@ const PROCEDURAL_MAP_SCENE = preload("res://map/map_generator/map_generator.tscn
 
 @onready var players_container = $Players
 
+var _pending_clients: Array[int] = []
+var _terrain_is_ready: bool = false
+
 func _ready() -> void:
 	if GameData.current_game_mode == GameData.GameMode.NORMAL:
 		# On supprime la carte de test / vagues
@@ -22,14 +25,21 @@ func _ready() -> void:
 		
 		# On attend que la carte soit générée avant de continuer
 		await map_gen.terrain_ready
+		_terrain_is_ready = true
 		
 		# On positionne le conteneur des joueurs au point de départ du chemin
 		if map_gen.has_method("get_spawn_point"):
 			players_container.global_position = map_gen.get_spawn_point() + Vector3(0, 30.0, 0)
 		else:
 			players_container.global_position = Vector3(0, 100, 0)
+			
+		for id in _pending_clients:
+			if not players_container.has_node(str(id)):
+				spawn_player(id)
+		_pending_clients.clear()
 	else:
 		# En mode Vague, on ne touche à rien, la map est déjà là.
+		_terrain_is_ready = true
 		players_container.global_position = Vector3(0, 26, 2)
 
 	# Si on est le Serveur (Celui qui a cliqué sur Héberger ou Jouer en Solo)
@@ -48,6 +58,10 @@ func _ready() -> void:
 func _rpc_client_ready() -> void:
 	if multiplayer.is_server():
 		var sender_id = multiplayer.get_remote_sender_id()
+		if not _terrain_is_ready:
+			if not _pending_clients.has(sender_id):
+				_pending_clients.append(sender_id)
+			return
 		if not players_container.has_node(str(sender_id)):
 			spawn_player(sender_id)
 
@@ -78,6 +92,7 @@ func _link_local_camera_to_terrain(player_node: Node) -> void:
 
 # Fonction appelée par le serveur quand quelqu'un quitte
 func remove_player(peer_id: int) -> void:
+	_pending_clients.erase(peer_id)
 	var player = players_container.get_node_or_null(str(peer_id))
 	if player:
 		player.queue_free()

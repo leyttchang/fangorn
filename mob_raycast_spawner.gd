@@ -12,19 +12,19 @@ signal all_mobs_defeated
 @export_category("Monster Configuration")
 ## List of candidate monster scenes to spawn (e.g. dumb.tscn, dumb_archer.tscn, scout.tscn, spider_enemie.tscn)
 @export var monster_scenes: Array[PackedScene] = []
-## Monster costs corresponding to monster_scenes index. Default fallback is 10.
-@export var monster_costs: Array[int] = [10, 15, 25, 8]
-## Monster spawn weights corresponding to monster_scenes index. Default fallback is 1.0.
-@export var monster_weights: Array[float] = [1.5, 1.0, 0.7, 1.2]
+## Monster costs corresponding to monster_scenes index. Leave empty to use GameData defaults.
+@export var monster_costs: Array[int] = []
+## Monster spawn weights corresponding to monster_scenes index. Leave empty to use GameData defaults.
+@export var monster_weights: Array[float] = []
 
 @export_category("Credit System & Scaling")
 ## Encounter level / Camp item level (scales credits available for spawning)
 @export var encounter_level: int = 1
 ## Base credits at level 1 for 1 player
 @export var base_credits: int = 40
-## Credits added per level above level 1
-@export var credits_per_level: int = 15
-## Extra multiplier per additional player (e.g. 0.5 = +50% credits per extra player: 1p = x1.0, 2p = x1.5, 3p = x2.0)
+## Credits added per level above level 1 (+20 credits / lvl)
+@export var credits_per_level: int = 20
+## Extra multiplier per additional player (0.5 = +50% credits per extra player: 1p = x1.0, 2p = x1.5, 3p = x2.0)
 @export var player_multiplier: float = 0.5
 
 @export_category("Spawn Area (Circle)")
@@ -200,7 +200,11 @@ func spawn_mobs() -> Array[Node3D]:
 	var total_credits = _calculate_total_credits()
 	var credits_left = total_credits
 	var spawned: Array[Node3D] = []
-	var target_container = mobs_container if mobs_container != null else self
+	var target_container = mobs_container
+	if target_container == null and not Engine.is_editor_hint() and is_inside_tree() and get_tree() != null and get_tree().current_scene != null:
+		target_container = get_tree().current_scene.get_node_or_null("NetworkObjects")
+	if target_container == null:
+		target_container = self
 	
 	var consecutive_failures = 0
 	const MAX_CONSECUTIVE_FAILURES = 10
@@ -232,7 +236,7 @@ func spawn_mobs() -> Array[Node3D]:
 		if mob_instance == null:
 			continue
 			
-		target_container.add_child(mob_instance)
+		target_container.add_child(mob_instance, true)
 		mob_instance.global_position = ground_info.position
 		
 		_apply_facing(mob_instance, rng)
@@ -296,12 +300,12 @@ func _get_affordable_monsters(credits_left: int) -> Array[Dictionary]:
 		if scn == null:
 			continue
 			
-		var cost = 10
-		if i < monster_costs.size():
+		var cost = GameData.get_monster_cost(scn, 10)
+		if i < monster_costs.size() and monster_costs[i] > 0:
 			cost = monster_costs[i]
 			
-		var weight = 1.0
-		if i < monster_weights.size():
+		var weight = GameData.get_monster_weight(scn, 1.0)
+		if i < monster_weights.size() and monster_weights[i] > 0.0:
 			weight = monster_weights[i]
 			
 		if cost <= credits_left and weight > 0.0:

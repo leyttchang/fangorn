@@ -102,3 +102,65 @@ static func get_all_spells() -> Array[AbilityData]:
 			preload("res://scripts/abilities/prismatic_blade/prismatic_blade.tres"),
 		]
 	return _all_spells
+
+# ==========================================================
+# CONFIGURATION CENTRALE DES MONSTRES (Crédits & Poids de spawn)
+# ==========================================================
+## Table par défaut associant chaque scène ou nom de monstre à son coût en crédits et son poids
+const DEFAULT_MONSTER_DATA: Dictionary = {
+	"dumb.tscn": { "cost": 10, "weight": 1.2 },
+	"dumb_archer.tscn": { "cost": 15, "weight": 1.0 },
+	"scout.tscn": { "cost": 25, "weight": 0.7 },
+	"spider_enemie.tscn": { "cost": 5, "weight": 1.2 },
+	"creep.tscn": { "cost": 20, "weight": 0.2 },
+	"ogre_boss.tscn": { "cost": 100, "weight": 1.0 }
+}
+
+## Récupère le dictionnaire de configuration d'un monstre
+static func get_monster_entry(scene_or_identifier: Variant) -> Dictionary:
+	var key_str: String = ""
+	if scene_or_identifier is PackedScene:
+		key_str = scene_or_identifier.resource_path.get_file().to_lower().trim_suffix(".remap")
+	elif scene_or_identifier is String:
+		key_str = scene_or_identifier.get_file().to_lower().trim_suffix(".remap")
+	elif scene_or_identifier is Node:
+		key_str = scene_or_identifier.name.to_lower()
+		
+	# 1. Correspondance exacte par nom de fichier
+	if DEFAULT_MONSTER_DATA.has(key_str):
+		return DEFAULT_MONSTER_DATA[key_str]
+		
+	# 2. Correspondance avec extension .tscn
+	if not key_str.ends_with(".tscn") and DEFAULT_MONSTER_DATA.has(key_str + ".tscn"):
+		return DEFAULT_MONSTER_DATA[key_str + ".tscn"]
+		
+	# 3. Détection par sous-chaîne
+	var lower = key_str.to_lower()
+	if "archer" in lower:
+		return DEFAULT_MONSTER_DATA.get("dumb_archer.tscn", {})
+	elif "scout" in lower:
+		return DEFAULT_MONSTER_DATA.get("scout.tscn", {})
+	elif "spider" in lower:
+		return DEFAULT_MONSTER_DATA.get("spider_enemie.tscn", {})
+	elif "creep" in lower:
+		return DEFAULT_MONSTER_DATA.get("creep.tscn", {})
+	elif "dumb" in lower or "orc" in lower:
+		return DEFAULT_MONSTER_DATA.get("dumb.tscn", {})
+	elif "ogre" in lower:
+		return DEFAULT_MONSTER_DATA.get("ogre_boss.tscn", {})
+		
+	return {}
+
+## Retourne le coût en crédits d'un monstre (défaut: default_cost)
+static func get_monster_cost(scene_or_identifier: Variant, default_cost: int = 10) -> int:
+	var entry = get_monster_entry(scene_or_identifier)
+	if entry.has("cost"):
+		return int(entry["cost"])
+	return default_cost
+
+## Retourne le poids relatif de spawn d'un monstre (défaut: default_weight)
+static func get_monster_weight(scene_or_identifier: Variant, default_weight: float = 1.0) -> float:
+	var entry = get_monster_entry(scene_or_identifier)
+	if entry.has("weight"):
+		return float(entry["weight"])
+	return default_weight

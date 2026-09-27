@@ -180,8 +180,19 @@ func _get_ground_y() -> float:
 	# Fallback ultime : niveau d'origine du nœud encounter
 	return global_position.y
 
-## Méthode principale : fait glisser la cage jusqu'au sol puis la fait exploser après un court délai
+## Méthode publique : déclenche l'ouverture de la cage (synchronisée via RPC en multijoueur)
 func open_cage() -> void:
+	if multiplayer.has_multiplayer_peer() and multiplayer.is_server():
+		rpc("_rpc_open_cage")
+	else:
+		_do_open_cage()
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_open_cage() -> void:
+	_do_open_cage()
+
+## Méthode interne : fait glisser la cage jusqu'au sol puis la fait exploser après un court délai
+func _do_open_cage() -> void:
 	if is_cage_opened or not is_inside_tree() or is_queued_for_deletion():
 		return
 	is_cage_opened = true
@@ -317,8 +328,10 @@ func _explode_cage() -> void:
 				for item in impulse_targets:
 					var b: RigidBody3D = item["body"]
 					if is_instance_valid(b) and b.is_inside_tree() and not b.is_queued_for_deletion():
-						b.apply_central_impulse(item["central"])
-						b.apply_torque_impulse(item["torque"])
+						var direct_state = PhysicsServer3D.body_get_direct_state(b.get_rid())
+						if direct_state != null:
+							b.apply_central_impulse(item["central"])
+							b.apply_torque_impulse(item["torque"])
 						
 	# 3. Libération du PNJ (en jeu uniquement)
 	if not Engine.is_editor_hint():

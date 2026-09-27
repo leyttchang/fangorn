@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://isvrwyq6u3mx"]
+
+[ext_resource type="Texture2D" uid="uid://b5litb73ddl7e" path="res://assets/LeLu's Noise Pack/T_VFX_Glo31.png" id="1_c5trl"]
+
+[sub_resource type="Curve" id="Curve_c5trl"]
+_data = [Vector2(0, 0.38095236), 0.0, 2.3070607, 0, 0, Vector2(1, 0.99999994), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_ku4ic"]
+curve = SubResource("Curve_c5trl")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hlie2"]
+particle_flag_align_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.0
+emission_ring_radius = 100.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+turbulence_enabled = true
+turbulence_noise_strength = 0.3
+turbulence_noise_scale = 3.311
+turbulence_noise_speed_random = 0.1
+turbulence_influence_min = 0.010000001
+turbulence_influence_max = 0.020000001
+turbulence_influence_over_life = SubResource("CurveTexture_ku4ic")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_as728"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(2.2520573, 2.6529844, 3.1111865, 1)
+albedo_texture = ExtResource("1_c5trl")
+billboard_keep_scale = true
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_yqkk6"]
+material = SubResource("StandardMaterial3D_as728")
+shape = 0
+size = 0.2
+sections = 20
+section_length = 0.5
+
+[node name="rain" type="Node3D" unique_id=1720964247]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=290459491]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 52.958336, 0)
+amount = 5000
+lifetime = 5.0
+trail_enabled = true
+trail_lifetime = 0.38
+process_material = SubResource("ParticleProcessMaterial_hlie2")
+draw_pass_1 = SubResource("RibbonTrailMesh_yqkk6")

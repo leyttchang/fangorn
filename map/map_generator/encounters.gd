@@ -77,6 +77,13 @@ func spawn_encounters(encounter_seed: int = 0) -> void:
 		for subchild in marker.get_children():
 			subchild.queue_free()
 			
+	# Faire disparaître les arbres autour de chaque encounter (sur serveur et client)
+	_clear_trees_around_markers(markers)
+
+	# En multijoueur, seul le serveur instancie les encounters (répliqués via MultiplayerSpawner)
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
+			
 	var rng = RandomNumberGenerator.new()
 	var seed_to_use = encounter_seed
 	if seed_to_use == 0:
@@ -89,21 +96,29 @@ func spawn_encounters(encounter_seed: int = 0) -> void:
 	else:
 		rng.randomize()
 		
+	var net_obj: Node = null
+	if not Engine.is_editor_hint() and is_inside_tree() and get_tree() != null and get_tree().current_scene != null:
+		net_obj = get_tree().current_scene.get_node_or_null("NetworkObjects")
+
 	for marker in markers:
 		var random_index = rng.randi_range(0, valid_scenes.size() - 1)
 		var scn: PackedScene = valid_scenes[random_index]
 		var instance = scn.instantiate()
 		
-		marker.add_child(instance)
-		
-		if randomize_rotation and instance is Node3D:
-			instance.rotation.y = rng.randf_range(0.0, TAU)
+		if instance is Node3D:
+			instance.global_position = marker.global_position
+			if randomize_rotation:
+				instance.rotation.y = rng.randf_range(0.0, TAU)
+				
+		if net_obj != null:
+			net_obj.add_child(instance, true)
+			if instance is Node3D:
+				instance.global_position = marker.global_position
+		else:
+			marker.add_child(instance)
 			
 		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 			instance.owner = get_tree().edited_scene_root
-			
-	# Faire disparaître les arbres autour de chaque encounter
-	_clear_trees_around_markers(markers)
 	
 	print("Encounters: ", markers.size(), " encounter(s) généré(s) avec succès !")
 

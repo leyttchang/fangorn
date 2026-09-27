@@ -130,18 +130,19 @@ func start_next_wave() -> void:
 func _get_affordable_monsters() -> Array:
 	var affordable = []
 	for i in range(monster_types.size()):
-		if monster_types[i] == null: continue
+		var scn = monster_types[i]
+		if scn == null: continue
 		
-		var cost = 10
-		if i < monster_costs.size():
+		var cost = GameData.get_monster_cost(scn, 10)
+		if i < monster_costs.size() and monster_costs[i] > 0:
 			cost = monster_costs[i]
 			
-		var weight = 1.0
-		if i < monster_weights.size():
+		var weight = GameData.get_monster_weight(scn, 1.0)
+		if i < monster_weights.size() and monster_weights[i] > 0.0:
 			weight = monster_weights[i]
 		
 		if cost <= credits_left_to_spawn and weight > 0.0:
-			affordable.append({"scene": monster_types[i], "cost": cost, "weight": weight})
+			affordable.append({"scene": scn, "cost": cost, "weight": weight})
 	return affordable
 
 func _pick_weighted_random(options: Array) -> Dictionary:
