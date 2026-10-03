@@ -4,7 +4,9 @@ var folders_to_scan = [
 	"res://scripts/abilities",
 	"res://scripts/status_effects",
 	"res://particule",
-	"res://assets"
+	"res://assets",
+	"res://objet",
+	"res://map/grass"
 ]
 
 @onready var container = Node3D.new()
@@ -60,6 +62,13 @@ func _ready():
 			_create_dummy_mesh(res, container, dummy_mesh)
 			dummy_mesh_count += 1
 			
+		elif res is Shader:
+			# Si c'est un fichier de shader libre (.gdshader)
+			var sm = ShaderMaterial.new()
+			sm.shader = res
+			_create_dummy_mesh(sm, container, dummy_mesh)
+			dummy_mesh_count += 1
+			
 		elif res is Resource:
 			# Si c'est un StatusEffectData ou autre, on cherche dedans
 			_extract_materials_from_resource(res, container, dummy_mesh)
@@ -87,7 +96,7 @@ func _find_files_recursively(path: String, result: Array):
 			if dir.current_is_dir():
 				_find_files_recursively(path + "/" + file_name, result)
 			else:
-				if file_name.ends_with(".tscn") or file_name.ends_with(".tres") or file_name.ends_with(".material"):
+				if file_name.ends_with(".tscn") or file_name.ends_with(".tres") or file_name.ends_with(".material") or file_name.ends_with(".gdshader"):
 					result.append(path + "/" + file_name)
 			file_name = dir.get_next()
 

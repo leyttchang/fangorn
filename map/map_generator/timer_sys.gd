@@ -42,6 +42,7 @@ var _rain_has_peaked: bool = false
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
+		set_process(false)
 		return
 	_resolve_references()
 	_update_weather(true)
@@ -94,11 +95,25 @@ func _update_weather(is_initial: bool = false) -> void:
 			_rain_particles.amount_ratio = 0.0
 			if is_initial:
 				_rain_particles.restart()
+		# Mise en sommeil complet du nœud de pluie et du heightfield collision
+		if rain_node != null and rain_node.process_mode != Node.PROCESS_MODE_DISABLED:
+			rain_node.process_mode = Node.PROCESS_MODE_DISABLED
+			rain_node.visible = false
+		
+		# Vent en mode calme (0 à 5 minutes)
+		var wind_node = get_node_or_null("/root/Wind")
+		if wind_node != null and wind_node.has_method("set_storm_progress"):
+			wind_node.set_storm_progress(0.0)
+
 		_rain_has_started = false
 		_rain_has_peaked = false
 		return
 
 	# Phase 2 : Déclenchement de la pluie à 5 minutes
+	if rain_node != null and rain_node.process_mode == Node.PROCESS_MODE_DISABLED:
+		rain_node.process_mode = Node.PROCESS_MODE_INHERIT
+		rain_node.visible = true
+
 	if not _rain_particles.emitting:
 		_rain_particles.emitting = true
 
@@ -111,6 +126,11 @@ func _update_weather(is_initial: bool = false) -> void:
 	var progress: float = clampf((elapsed_time - rain_start_time) / (rain_max_time - rain_start_time), 0.0, 1.0)
 	var current_particles: float = lerpf(float(min_rain_particles), float(max_rain_particles), progress)
 	
+	# Mise à jour synchronisée de la tempête de vent (augmente de 5 à 15 min)
+	var wind_storm = get_node_or_null("/root/Wind")
+	if wind_storm != null and wind_storm.has_method("set_storm_progress"):
+		wind_storm.set_storm_progress(progress)
+
 	# Mise à jour fluide du ratio sans redémarrer le système de particules
 	_rain_particles.amount_ratio = clampf(current_particles / float(max_rain_particles), 0.0, 1.0)
 

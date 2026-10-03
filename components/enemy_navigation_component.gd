@@ -35,13 +35,27 @@ func _ready() -> void:
 		nav_agent.path_desired_distance = 1.0
 		nav_agent.target_desired_distance = 0.5
 
+static var _cached_players: Array[Node] = []
+static var _cached_players_frame: int = -1
+
+func _get_players() -> Array[Node]:
+	var current_frame = Engine.get_process_frames()
+	if current_frame == _cached_players_frame:
+		return _cached_players
+	_cached_players_frame = current_frame
+	if is_inside_tree() and get_tree() != null:
+		_cached_players = get_tree().get_nodes_in_group("Player")
+	else:
+		_cached_players = []
+	return _cached_players
+
 func acquire_target(current_target: Node3D = null) -> Node3D:
 	if _parent_body == null:
 		_parent_body = get_parent() as Node3D
 	if not is_instance_valid(_parent_body):
 		return null
 		
-	var players = get_tree().get_nodes_in_group("Player")
+	var players = _get_players()
 	if players.is_empty():
 		return null
 		

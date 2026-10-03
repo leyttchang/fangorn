@@ -41,16 +41,15 @@ func _update_scale() -> void:
 		$InteractionComponent.scale = Vector3(bag_scale, bag_scale, bag_scale)
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		set_process(false)
+		set_physics_process(false)
 	_update_scale()
 	if item_data != null and "rarity" in item_data and rarity == -1:
 		rarity = item_data.rarity
 	_update_vfx()
 
 func _process(_delta: float) -> void:
-	if Engine.is_editor_hint(): return
-	_keep_vfx_upright()
-
-func _physics_process(_delta: float) -> void:
 	if Engine.is_editor_hint(): return
 	_keep_vfx_upright()
 

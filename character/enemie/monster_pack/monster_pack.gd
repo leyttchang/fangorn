@@ -108,6 +108,7 @@ func _ready() -> void:
 	
 	# La logique IA et le pathing ne tournent QUE sur le serveur en jeu réel
 	if Engine.is_editor_hint() or not multiplayer.is_server():
+		set_physics_process(false)
 		return
 		
 	# 1. Spawner d'éventuelles scènes automatiques
@@ -213,8 +214,17 @@ func remove_member(enemy: CharacterBody3D) -> void:
 # ==========================================================
 # BOUCLE PRINCIPALE (SERVEUR EXCLUSIF)
 # ==========================================================
+var _pack_tick_timer: float = 0.0
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint() or not multiplayer.is_server(): return
+
+	_pack_tick_timer += delta
+	# Throttling IA haut niveau à 10 Hz (économise 85% de CPU sans impacter les monstres)
+	if _pack_tick_timer < 0.1:
+		return
+	var dt: float = _pack_tick_timer
+	_pack_tick_timer = 0.0
 	
 	# 1. Nettoyage des membres morts ou libérés
 	_cleanup_invalid_members()
@@ -235,7 +245,7 @@ func _physics_process(delta: float) -> void:
 		return
 	elif current_pack_state == PackState.COMBAT:
 		# Plus aucun membre n'a de cible active
-		_combat_cooldown -= delta
+		_combat_cooldown -= dt
 		if _combat_cooldown <= 0.0:
 			# Combat terminé : reprise du calme
 			current_pack_state = PackState.IDLE_WAIT
@@ -243,7 +253,7 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	# 3. Traitement des départs échelonnés (stagger delays)
-	_process_pending_dispatches(delta)
+	_process_pending_dispatches(dt)
 	
 	# 4. Machine à états hors combat
 	match role:
@@ -251,11 +261,11 @@ func _physics_process(delta: float) -> void:
 			if not is_ambush_triggered:
 				_process_ambush_detection()
 			else:
-				_process_roam_role(delta)
+				_process_roam_role(dt)
 		PackRole.ROAM:
-			_process_roam_role(delta)
+			_process_roam_role(dt)
 		PackRole.PATROL:
-			_process_patrol_role(delta)
+			_process_patrol_role(dt)
 
 # ==========================================================
 # LOGIQUE DES RÔLES

@@ -122,14 +122,26 @@ func _get_target_position() -> Vector3:
 
 	return global_position
 
-func _apply_wind(delta: float) -> void:
-	_time += delta * wind_change_speed
-	
-	# Échantillonnage fluide du bruit Simplex : valeur entre -1.0 et 1.0
-	# Multiplié par max_wind (30.0) -> oscille de manière totalement continue entre -30 et +30
-	var wind_x = _noise.get_noise_1d(_time * 100.0) * max_wind
-	var wind_z = _noise.get_noise_1d((_time * 100.0) + 10000.0) * max_wind
+var _wind_timer: float = 0.0
 
+func _apply_wind(delta: float) -> void:
+	_wind_timer += delta
+	# Throttling à 15 Hz (suffisant pour une brise fluide sans réécrire les uniforms GPU à chaque frame)
+	if _wind_timer < 0.066:
+		return
+	_wind_timer = 0.0
+	
 	var mat = rain_particles.process_material as ParticleProcessMaterial
-	if mat != null:
+	if mat == null:
+		return
+
+	# Récupération de la gravité synchronisée avec la direction et la force du vent global
+	var wind_singleton = get_node_or_null("/root/Wind")
+	if wind_singleton != null and wind_singleton.has_method("get_rain_gravity"):
+		mat.gravity = wind_singleton.get_rain_gravity(base_gravity_y)
+	elif _noise != null:
+		# Fallback local autonome
+		_time += delta * wind_change_speed
+		var wind_x = _noise.get_noise_1d(_time * 100.0) * max_wind
+		var wind_z = _noise.get_noise_1d((_time * 100.0) + 10000.0) * max_wind
 		mat.gravity = Vector3(wind_x, base_gravity_y, wind_z)

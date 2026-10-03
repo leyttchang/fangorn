@@ -223,8 +223,9 @@ func generate_wall() -> void:
 		if tree_data["material"] != null:
 			mmi.material_override = tree_data["material"]
 			
-		mmi.visibility_range_end = 450.0
-		mmi.visibility_range_end_margin = 50.0
+		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mmi.visibility_range_end = 250.0
+		mmi.visibility_range_end_margin = 30.0
 		
 	# Création des collisions
 	if tree_data["shape"] != null:

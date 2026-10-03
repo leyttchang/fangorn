@@ -97,6 +97,15 @@ func generate_grass() -> void:
 		push_error("GrassGenerator: Impossible de trouver un MeshInstance3D dans ta scène d'herbe !")
 		_is_generating = false
 		return
+
+	# Si aucun material_override n'est défini, on récupère le matériau de surface du mesh
+	if grass_material == null and grass_mesh != null and grass_mesh.get_surface_count() > 0:
+		grass_material = grass_mesh.surface_get_material(0)
+		
+	# Enregistrement auprès du WindManager pour synchroniser le vent global
+	var wind_singleton = get_node_or_null("/root/Wind")
+	if wind_singleton != null and grass_material is ShaderMaterial:
+		wind_singleton.register_grass_material(grass_material)
 		
 	rng.seed = 123456 # Même seed que la map pour consistance
 	
@@ -210,6 +219,14 @@ func generate_grass() -> void:
 			if is_nan(h):
 				z += spacing
 				continue
+
+			# Filtrage des pentes raides (falaises et falaises rocheuses)
+			var h_east = terrain.data.get_height(Vector3(px + 1.0, 0.0, pz))
+			var h_south = terrain.data.get_height(Vector3(px, 0.0, pz + 1.0))
+			if not is_nan(h_east) and not is_nan(h_south):
+				if absf(h_east - h) > 0.8 or absf(h_south - h) > 0.8:
+					z += spacing
+					continue
 				
 			# Calcul de l'échelle (Scale) avec le Noise !
 			var s = 1.0
@@ -251,16 +268,29 @@ func generate_grass() -> void:
 		mm.transform_format = MultiMesh.TRANSFORM_3D
 		mm.mesh = grass_mesh
 		mm.instance_count = t_arr.size()
+		
+		var min_y = INF
+		var max_y = -INF
 		for i in range(t_arr.size()):
-			mm.set_instance_transform(i, t_arr[i])
+			var tform: Transform3D = t_arr[i]
+			mm.set_instance_transform(i, tform)
+			if tform.origin.y < min_y: min_y = tform.origin.y
+			if tform.origin.y > max_y: max_y = tform.origin.y
+
+		if min_y != INF:
+			var min_pos = Vector3(key.x * chunk_size, min_y - 0.5, key.y * chunk_size)
+			var max_pos = Vector3((key.x + 1) * chunk_size, max_y + 2.5, (key.y + 1) * chunk_size)
+			mm.custom_aabb = AABB(min_pos, max_pos - min_pos)
 			
 		mmi.multimesh = mm
 		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if grass_material != null:
 			mmi.material_override = grass_material
 			
-		mmi.visibility_range_end = max_draw_distance
-		mmi.visibility_range_end_margin = 20.0
+		# L'herbe disparaît en douceur par le shader jusqu'à max_draw_distance,
+		# le chunk est déchargé par Godot dès qu'il dépasse cette zone.
+		mmi.visibility_range_end = max_draw_distance + chunk_size
+		mmi.visibility_range_end_margin = 16.0
 		
 		add_child(mmi)
 		

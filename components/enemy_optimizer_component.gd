@@ -100,19 +100,32 @@ func _process(delta: float) -> void:
 		_timer = randf_range(0.18, 0.28)
 		_update_culling_state()
 
+static var _cached_cam: Node3D = null
+static var _cached_frame: int = -1
+
+func _get_active_camera() -> Node3D:
+	var current_frame = Engine.get_process_frames()
+	if current_frame == _cached_frame and is_instance_valid(_cached_cam):
+		return _cached_cam
+		
+	_cached_frame = current_frame
+	_cached_cam = null
+	
+	var vp = get_viewport()
+	if vp:
+		_cached_cam = vp.get_camera_3d()
+		
+	if _cached_cam == null and is_inside_tree() and get_tree() != null:
+		var players = get_tree().get_nodes_in_group("Player")
+		if not players.is_empty() and is_instance_valid(players[0]):
+			_cached_cam = players[0] as Node3D
+			
+	return _cached_cam
+
 func _update_culling_state() -> void:
 	if _parent_body == null or not is_instance_valid(_parent_body): return
 	
-	var cam: Node3D = null
-	var vp = get_viewport()
-	if vp:
-		cam = vp.get_camera_3d()
-		
-	if cam == null:
-		var players = get_tree().get_nodes_in_group("Player")
-		if not players.is_empty() and is_instance_valid(players[0]):
-			cam = players[0] as Node3D
-			
+	var cam: Node3D = _get_active_camera()
 	var dist_sq = 999999.0
 	if cam != null and is_instance_valid(cam):
 		dist_sq = _parent_body.global_position.distance_squared_to(cam.global_position)
@@ -135,6 +148,7 @@ func set_anim_culled(culled: bool) -> void:
 		_parent_body.is_anim_culled = culled
 		
 	if culled:
+		_parent_body.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		if _anim_tree and _anim_tree.active:
 			_anim_tree.active = false
 		if _anim_player and _anim_tree == null and _anim_player.is_playing():
@@ -145,6 +159,7 @@ func set_anim_culled(culled: bool) -> void:
 		for ray in _raycast_nodes:
 			ray.enabled = false
 	else:
+		_parent_body.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_INHERIT
 		if _anim_tree and not _anim_tree.active:
 			_anim_tree.active = true
 		if _anim_player and _anim_tree == null and _was_anim_player_paused:

@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 SettingsManager="*res://scripts/globals/settings_manager.gd"
 VFXPool="*res://scripts/vfx_pool.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+Wind="*res://scripts/globals/wind_manager.gd"
 
 [display]
 
