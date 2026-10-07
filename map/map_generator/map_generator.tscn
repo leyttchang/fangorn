@@ -1002,3 +1002,4 @@ navigation_mesh = SubResource("NavigationMesh_1xir5")
 
 [node name="timer_sys" type="Node3D" parent="." unique_id=553831581]
 script = ExtResource("30_31r8i")
+wind_curve_power = 1.2

@@ -29,6 +29,20 @@ signal grass_ready
 ## Distance d'affichage maximum pour l'herbe (HLOD). 80m-120m est parfait pour 144 FPS.
 @export var max_draw_distance: float = 100.0
 
+@export_category("Placement naturel (patchs / touffes)")
+## Force des clairières naturelles (0 = herbe uniforme, 1 = grands patchs nus avec bords doux).
+@export_range(0.0, 1.0, 0.05) var patch_strength: float = 0.6
+## Taille des patchs (fréquence du bruit : plus petit = patchs plus grands).
+@export_range(0.002, 0.1, 0.002) var patch_frequency: float = 0.015
+## Hauteur ajoutée aux touffes situées au coeur des patchs (touffes hautes).
+@export_range(0.0, 3.0, 0.1) var clod_height_boost: float = 0.8
+## Variation de largeur indépendante de la hauteur (0 = brins homothétiques).
+@export_range(0.0, 1.0, 0.05) var width_variation: float = 0.25
+## Alignement des brins sur la pente du terrain (0 = toujours verticaux, 1 = perpendiculaires au sol).
+@export_range(0.0, 1.0, 0.05) var normal_align: float = 0.3
+## Inclinaison aléatoire max des brins, en radians (0.12 = ~7°).
+@export_range(0.0, 0.5, 0.01) var random_lean: float = 0.12
+
 @export_category("Routes")
 ## Distance (depuis le bord de la route) où l'herbe commence à se clairsemer (mise à l'échelle automatique selon la largeur de chaque chemin)
 @export var road_fade_distance: float = 4.0
@@ -48,6 +62,8 @@ signal grass_ready
 		clear_grass()
 
 var _is_generating: bool = false
+## Vrai quand l'herbe a fini d'être générée (utilisé par le MapGenerator pour attendre avant le spawn joueur)
+var grass_done: bool = false
 var rng := RandomNumberGenerator.new()
 
 func clear_grass() -> void:
@@ -74,6 +90,7 @@ func generate_grass() -> void:
 		return
 		
 	_is_generating = true
+	grass_done = false
 	clear_grass()
 	
 	print("GrassGenerator: Début de la génération de l'herbe...")
@@ -108,6 +125,13 @@ func generate_grass() -> void:
 		wind_singleton.register_grass_material(grass_material)
 		
 	rng.seed = 123456 # Même seed que la map pour consistance
+	
+	# Bruit dédié aux patchs / touffes (déterministe, indépendant de l'export `noise`)
+	var patch_noise := FastNoiseLite.new()
+	patch_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	patch_noise.seed = 123456
+	patch_noise.frequency = patch_frequency
+	patch_noise.fractal_octaves = 2
 	
 	var map_w: float = 2048.0
 	var map_h: float = 2048.0
@@ -158,7 +182,9 @@ func generate_grass() -> void:
 	
 	while x < map_w - b_margin:
 		row_count += 1
-		if row_count % 16 == 0:
+		# En jeu : génération d'une traite (pendant le chargement, avant le spawn du joueur) = le plus rapide.
+		# En éditeur seulement : on rend la main régulièrement pour ne pas figer l'éditeur.
+		if Engine.is_editor_hint() and row_count % 16 == 0:
 			await get_tree().process_frame
 			
 		var z = b_margin
@@ -215,6 +241,13 @@ func generate_grass() -> void:
 					z += spacing
 					continue
 				
+			# Patchs naturels : zones plus clairsemées avec bords doux (rejet probabiliste)
+			var patch_value: float = (patch_noise.get_noise_2d(px, pz) + 1.0) * 0.5
+			var patch_keep: float = lerpf(1.0, smoothstep(0.3, 0.5, patch_value), patch_strength)
+			if patch_keep < 1.0 and rng.randf() > patch_keep:
+				z += spacing
+				continue
+			
 			var h = terrain.data.get_height(Vector3(px, 0.0, pz))
 			if is_nan(h):
 				z += spacing
@@ -242,9 +275,29 @@ func generate_grass() -> void:
 			# Légère variation aléatoire par-dessus pour ne pas avoir un aspect "trop" parfait
 			s += rng.randf_range(-0.1, 0.1) * s
 			
-			var rot = rng.randf_range(0.0, PI * 2.0)
+			# --- Placement naturel (inspiré de l'exemple Terrain3D) ---
+			# Coeur des patchs = touffes plus hautes ; largeur et hauteur varient indépendamment
+			var clod: float = smoothstep(0.55, 0.8, patch_value)
+			var scale_w: float = s * (1.0 + rng.randf_range(-width_variation, width_variation))
+			var scale_h: float = s * (1.0 + clod * clod_height_boost) * (1.0 + rng.randf_range(-0.15, 0.15))
 			
-			var basis = Basis(Vector3.UP, rot).scaled(Vector3(s, s, s))
+			# Axe "haut" du brin : légèrement aligné sur la pente puis incliné au hasard
+			var up_dir: Vector3 = Vector3.UP
+			if not is_nan(h_east) and not is_nan(h_south):
+				var ground_normal := Vector3(h - h_east, 1.0, h - h_south).normalized()
+				up_dir = Vector3.UP.lerp(ground_normal, normal_align).normalized()
+			var lean_axis := Vector3(rng.randf_range(-1.0, 1.0), 0.0, rng.randf_range(-1.0, 1.0))
+			var lean_angle: float = rng.randf_range(0.0, random_lean)
+			if lean_axis.length_squared() > 0.0001:
+				up_dir = up_dir.rotated(lean_axis.normalized(), lean_angle).normalized()
+			
+			# Base orthonormée (X, Y=up_dir, Z) avec rotation aléatoire autour de l'axe du brin
+			var rot = rng.randf_range(0.0, PI * 2.0)
+			var x_axis := Vector3.RIGHT.rotated(Vector3.UP, rot)
+			x_axis = (x_axis - up_dir * x_axis.dot(up_dir)).normalized()
+			var z_axis := x_axis.cross(up_dir).normalized()
+			
+			var basis := Basis(x_axis * scale_w, up_dir * scale_h, z_axis * scale_w)
 			var tform = Transform3D(basis, Vector3(px, h, pz))
 			
 			var cx = int(floor(px / chunk_size))
@@ -296,4 +349,5 @@ func generate_grass() -> void:
 		
 	print("GrassGenerator: Génération terminée ! ", total_grass, " touffes d'herbes plantées dans ", chunks.size(), " chunks. Temps: ", Time.get_ticks_msec() - time_start, " ms.")
 	_is_generating = false
+	grass_done = true
 	grass_ready.emit()

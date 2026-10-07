@@ -171,5 +171,5 @@ jolt_physics_3d/memory/temp_buffer_size=67108864
 
 [rendering]
 
-rendering_device/driver.windows="d3d12"
+rendering_device/driver.windows="vulkan"
 occlusion_culling/use_occlusion_culling=true

@@ -32,6 +32,16 @@ signal rain_max_reached
 ## Nombre maximal de particules de pluie (à 15 min)
 @export var max_rain_particles: int = 10000
 
+@export_group("Progression du Vent")
+## Le vent reste très faible jusqu'à ce moment (en secondes, 1 minute = 60.0)
+@export var wind_start_time: float = 60.0
+## Le vent atteint son maximum à ce moment (en secondes, 15 minutes = 900.0)
+@export var wind_max_time: float = 900.0
+## Courbe de montée : 1.0 = linéaire, >1.0 = monte doucement puis s'accélère vers la fin
+@export_range(1.0, 3.0, 0.1) var wind_curve_power: float = 1.6
+## DEBUG : force le vent au maximum dès le début de la partie (désactiver pour retrouver la progression normale)
+@export var debug_max_wind: bool = true
+
 @export_group("Références")
 ## Nœud de pluie dans la scène (détecté automatiquement si non renseigné)
 @export var rain_node: Node3D
@@ -45,6 +55,7 @@ func _ready() -> void:
 		set_process(false)
 		return
 	_resolve_references()
+	_update_wind()
 	_update_weather(true)
 
 func _process(delta: float) -> void:
@@ -54,7 +65,17 @@ func _process(delta: float) -> void:
 		return
 
 	elapsed_time += delta * time_scale
+	_update_wind()
 	_update_weather(false)
+
+## Progression du vent : très faible jusqu'à wind_start_time, puis montée en courbe jusqu'à wind_max_time
+func _update_wind() -> void:
+	var wind_node = get_node_or_null("/root/Wind")
+	if wind_node == null or not wind_node.has_method("set_storm_progress"):
+		return
+	var span: float = maxf(1.0, wind_max_time - wind_start_time)
+	var linear: float = clampf((elapsed_time - wind_start_time) / span, 0.0, 1.0)
+	wind_node.set_storm_progress(1.0 if debug_max_wind else pow(linear, wind_curve_power))
 
 func _resolve_references() -> void:
 	if rain_node == null:
@@ -100,11 +121,6 @@ func _update_weather(is_initial: bool = false) -> void:
 			rain_node.process_mode = Node.PROCESS_MODE_DISABLED
 			rain_node.visible = false
 		
-		# Vent en mode calme (0 à 5 minutes)
-		var wind_node = get_node_or_null("/root/Wind")
-		if wind_node != null and wind_node.has_method("set_storm_progress"):
-			wind_node.set_storm_progress(0.0)
-
 		_rain_has_started = false
 		_rain_has_peaked = false
 		return
@@ -126,11 +142,6 @@ func _update_weather(is_initial: bool = false) -> void:
 	var progress: float = clampf((elapsed_time - rain_start_time) / (rain_max_time - rain_start_time), 0.0, 1.0)
 	var current_particles: float = lerpf(float(min_rain_particles), float(max_rain_particles), progress)
 	
-	# Mise à jour synchronisée de la tempête de vent (augmente de 5 à 15 min)
-	var wind_storm = get_node_or_null("/root/Wind")
-	if wind_storm != null and wind_storm.has_method("set_storm_progress"):
-		wind_storm.set_storm_progress(progress)
-
 	# Mise à jour fluide du ratio sans redémarrer le système de particules
 	_rain_particles.amount_ratio = clampf(current_particles / float(max_rain_particles), 0.0, 1.0)
 

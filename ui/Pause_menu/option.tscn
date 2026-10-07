@@ -39,15 +39,20 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 100
-theme_override_constants/margin_right = 50
-theme_override_constants/margin_bottom = 100
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 45
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 45
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=424013911]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer" unique_id=1849182371]
 layout_mode = 2
+horizontal_scroll_mode = 0
 
-[node name="screen_option" type="OptionButton" parent="MarginContainer/VBoxContainer" unique_id=1270024636]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer" unique_id=424013911]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="screen_option" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1270024636]
 unique_name_in_owner = true
 layout_mode = 2
 item_count = 3
@@ -58,20 +63,20 @@ popup/item_1/id = 1
 popup/item_2/text = "Borderless"
 popup/item_2/id = 2
 
-[node name="sensitivityLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=33904893]
+[node name="sensitivityLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=33904893]
 layout_mode = 2
 text = "Sensitivity"
 horizontal_alignment = 1
 
-[node name="sensitivity" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=533426938]
+[node name="sensitivity" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=533426938]
 layout_mode = 2
 
-[node name="Sensitivity_slider" type="HSlider" parent="MarginContainer/VBoxContainer/sensitivity" unique_id=601940212]
+[node name="Sensitivity_slider" type="HSlider" parent="MarginContainer/ScrollContainer/VBoxContainer/sensitivity" unique_id=601940212]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="sensitivity_text" type="Label" parent="MarginContainer/VBoxContainer/sensitivity" unique_id=1477098326]
+[node name="sensitivity_text" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/sensitivity" unique_id=1477098326]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
@@ -79,20 +84,20 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RenderScaleLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1552731518]
+[node name="RenderScaleLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1552731518]
 layout_mode = 2
 text = "Render scale"
 horizontal_alignment = 1
 
-[node name="RenderScale" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=902356131]
+[node name="RenderScale" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=902356131]
 layout_mode = 2
 
-[node name="RenderScale_slider" type="HSlider" parent="MarginContainer/VBoxContainer/RenderScale" unique_id=1388151942]
+[node name="RenderScale_slider" type="HSlider" parent="MarginContainer/ScrollContainer/VBoxContainer/RenderScale" unique_id=1388151942]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="RenderScale_text" type="Label" parent="MarginContainer/VBoxContainer/RenderScale" unique_id=1285398810]
+[node name="RenderScale_text" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/RenderScale" unique_id=1285398810]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
@@ -100,7 +105,7 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="fsr_option" type="OptionButton" parent="MarginContainer/VBoxContainer/RenderScale" unique_id=1622101815]
+[node name="fsr_option" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer/RenderScale" unique_id=1622101815]
 layout_mode = 2
 item_count = 3
 popup/item_0/text = "Bilinear"
@@ -110,11 +115,11 @@ popup/item_1/id = 1
 popup/item_2/text = "FSR 2.0"
 popup/item_2/id = 2
 
-[node name="FPs" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1423695865]
+[node name="FPs" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1423695865]
 layout_mode = 2
 alignment = 1
 
-[node name="fps_cap" type="Label" parent="MarginContainer/VBoxContainer/FPs" unique_id=1580491478]
+[node name="fps_cap" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=1580491478]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
@@ -122,21 +127,21 @@ text = "FPS cap:"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="fps_cap_text" type="LineEdit" parent="MarginContainer/VBoxContainer/FPs" unique_id=401354234]
+[node name="fps_cap_text" type="LineEdit" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=401354234]
 layout_mode = 2
 
-[node name="vsync" type="Label" parent="MarginContainer/VBoxContainer/FPs" unique_id=1224640734]
+[node name="vsync" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=1224640734]
 layout_mode = 2
 text = "Vsync :"
 
-[node name="Vsyinc_buton" type="CheckButton" parent="MarginContainer/VBoxContainer/FPs" unique_id=2102138559]
+[node name="Vsyinc_buton" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=2102138559]
 layout_mode = 2
 
-[node name="Shadow" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=292569579]
+[node name="Shadow" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=292569579]
 layout_mode = 2
 alignment = 1
 
-[node name="shadow" type="Label" parent="MarginContainer/VBoxContainer/Shadow" unique_id=1057188111]
+[node name="shadow" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/Shadow" unique_id=1057188111]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
@@ -144,25 +149,27 @@ text = "shadow :"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Shadow_selection" type="OptionButton" parent="MarginContainer/VBoxContainer/Shadow" unique_id=1549630038]
+[node name="Shadow_selection" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer/Shadow" unique_id=1549630038]
 layout_mode = 2
-item_count = 3
+item_count = 4
 popup/item_0/text = "High"
 popup/item_0/id = 0
-popup/item_1/text = "Low"
+popup/item_1/text = "Mid"
 popup/item_1/id = 1
-popup/item_2/text = "Off"
+popup/item_2/text = "Low"
 popup/item_2/id = 2
+popup/item_3/text = "Off"
+popup/item_3/id = 3
 
-[node name="render_distance" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=925910224]
+[node name="render_distance" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=925910224]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/render_distance" unique_id=1949723632]
+[node name="Label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/render_distance" unique_id=1949723632]
 layout_mode = 2
 text = "Render distance"
 
-[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/render_distance" unique_id=1994656819]
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer/render_distance" unique_id=1994656819]
 layout_mode = 2
 item_count = 3
 popup/item_0/text = "Far"
@@ -172,16 +179,74 @@ popup/item_1/id = 1
 popup/item_2/text = "Close"
 popup/item_2/id = 2
 
-[node name="Keybind" type="Button" parent="MarginContainer/VBoxContainer" unique_id=358060415]
+[node name="Graphics_sep" type="HSeparator" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010101]
+layout_mode = 2
+
+[node name="GraphicsLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010102]
+layout_mode = 2
+text = "--- Effets Graphiques (Coût GPU) ---"
+horizontal_alignment = 1
+
+[node name="SSIL" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010103]
+layout_mode = 2
+alignment = 1
+
+[node name="ssil_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/SSIL" unique_id=101010104]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SSIL (Lumière indirecte) :"
+
+[node name="ssil_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/SSIL" unique_id=101010105]
+layout_mode = 2
+
+[node name="SSAO" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010106]
+layout_mode = 2
+alignment = 1
+
+[node name="ssao_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/SSAO" unique_id=101010107]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SSAO (Ombrage ambiant) :"
+
+[node name="ssao_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/SSAO" unique_id=101010108]
+layout_mode = 2
+
+[node name="VFog" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010109]
+layout_mode = 2
+alignment = 1
+
+[node name="vfog_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/VFog" unique_id=101010110]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Brouillard volumétrique :"
+
+[node name="vfog_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/VFog" unique_id=101010111]
+layout_mode = 2
+
+[node name="Glow" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010112]
+layout_mode = 2
+alignment = 1
+
+[node name="glow_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/Glow" unique_id=101010113]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Glow / Bloom :"
+
+[node name="glow_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/Glow" unique_id=101010114]
+layout_mode = 2
+
+[node name="Graphics_sep2" type="HSeparator" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010115]
+layout_mode = 2
+
+[node name="Keybind" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=358060415]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Keybinds"
 
-[node name="return" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2146650173]
+[node name="return" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=2146650173]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Return
-"
+text = "Return"
 
 [node name="Panel" type="Panel" parent="." unique_id=1009347021]
 visible = false
@@ -231,5 +296,4 @@ script = ExtResource("4_hvten")
 
 [node name="return" type="Button" parent="Panel/MarginContainer2/VBoxContainer" unique_id=451598421]
 layout_mode = 2
-text = "Return
-"
+text = "Return"

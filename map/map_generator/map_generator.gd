@@ -44,6 +44,14 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 ## Intensité du lissage (0.0 = aucun, 1.0 = maximum). Lisse les petites déformations sans effacer les collines.
 @export_range(0.0, 1.0, 0.05) var smooth_factor: float = 0.3
 
+@export_category("Brouillard de Distance (Distance Fog)")
+## Active le brouillard masquant la fin de distance d'affichage des arbres (350m)
+@export var distance_fog_enabled: bool = true
+## Distance où le brouillard commence à apparaître (en mètres)
+@export var distance_fog_begin: float = 220.0
+## Distance où le brouillard atteint 100% d'opacité (en mètres, calé sur les 350m des arbres)
+@export var distance_fog_end: float = 350.0
+
 
 @export_category("Actions")
 ## Coche cette case pour nettoyer tout le terrain !
@@ -60,6 +68,7 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 			call_deferred("generate_terrain_async")
 
 func _ready() -> void:
+	_setup_distance_fog()
 	if not Engine.is_editor_hint():
 		if is_standalone_scene():
 			GameData.current_game_mode = GameData.GameMode.NORMAL
@@ -388,6 +397,8 @@ func generate_terrain_async() -> void:
 	if meteo_node and meteo_node.has_method("generate_weather"):
 		meteo_node.generate_weather(world_seed)
 	
+	_setup_distance_fog()
+	
 	# Placement des points d'intérêt (Encounters)
 	_place_encounter_markers(terrain_data)
 	
@@ -410,21 +421,23 @@ func generate_terrain_async() -> void:
 		# S'il n'y a pas d'arbres à générer, on lance le bake tout de suite
 		_bake_navmesh()
 		
-	var grass_gen = null
+	_grass_gen = null
 	# Recherche récursive de tous les descendants
 	var stack = [self]
 	while stack.size() > 0:
 		var current = stack.pop_back()
 		if current != self and current.has_method("generate_grass"):
-			grass_gen = current
+			_grass_gen = current
 			break
 		stack.append_array(current.get_children())
 			
-	if grass_gen:
-		print("Lancement de la génération d'herbe sur le noeud : ", grass_gen.name)
-		grass_gen.call_deferred("generate_grass")
+	if _grass_gen:
+		print("Lancement de la génération d'herbe sur le noeud : ", _grass_gen.name)
+		_grass_gen.call_deferred("generate_grass")
 	else:
 		print("ATTENTION: Aucun noeud avec le script grass_generator.gd n'a été trouvé dans l'arbre !")
+
+var _grass_gen: Node = null
 
 # ==========================================
 # GESTION DU NAVMESH PROCEDURAL (Terrain3D)
@@ -530,6 +543,12 @@ func _bake_navmesh() -> void:
 				terrain.set_camera(active_cam)
 				print("MapGenerator: Caméra active liée au Terrain3D -> ", active_cam.name)
 	
+	# L'herbe doit être entièrement générée AVANT terrain_ready (qui déclenche le spawn du joueur)
+	if not Engine.is_editor_hint() and _grass_gen != null and is_instance_valid(_grass_gen):
+		if "_is_generating" in _grass_gen and _grass_gen._is_generating:
+			print("MapGenerator: attente de la fin de génération de l'herbe avant le spawn...")
+			await _grass_gen.grass_ready
+	
 	terrain_ready.emit()
 	
 	# En éditeur, appel direct de la génération des meutes (en jeu, c'est géré via le signal terrain_ready)
@@ -539,3 +558,18 @@ func _bake_navmesh() -> void:
 			pack_gen = find_child("MonsterPacks", true, false)
 		if pack_gen and pack_gen.has_method("generate_monster_packs"):
 			pack_gen.generate_monster_packs(world_seed)
+
+## Configure le brouillard de profondeur pour qu'il masque parfaitement la limite de rendu des arbres
+func _setup_distance_fog() -> void:
+	if not distance_fog_enabled:
+		return
+	var env_nodes = find_children("*", "WorldEnvironment", true, false)
+	for we in env_nodes:
+		if we is WorldEnvironment and we.environment != null:
+			var env = we.environment
+			env.fog_enabled = true
+			env.fog_mode = Environment.FOG_MODE_DEPTH
+			env.fog_depth_begin = distance_fog_begin
+			env.fog_depth_end = distance_fog_end
+			env.volumetric_fog_length = distance_fog_end
+			print("MapGenerator: Brouillard de distance configuré (", distance_fog_begin, "m -> ", distance_fog_end, "m) calé sur les arbres.")

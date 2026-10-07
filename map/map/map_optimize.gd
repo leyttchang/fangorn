@@ -9,7 +9,7 @@ func _ready() -> void:
 		_on_render_distance_changed(settings.render_distance)
 
 func _on_shadow_quality_changed(quality: int) -> void:
-	var herbe_doit_projeter_ombre = (quality == 0)
+	var herbe_doit_projeter_ombre = (quality == 0 or quality == 1)
 	
 	var terrain = find_child("Terrain3D", true, false)
 	if terrain and terrain.assets:
@@ -19,13 +19,7 @@ func _on_shadow_quality_changed(quality: int) -> void:
 					
 	var soleils = get_tree().root.find_children("*", "DirectionalLight3D", true, false)
 	for soleil in soleils:
-		soleil.shadow_enabled = (quality != 2)
-	
-	var environnements = get_tree().root.find_children("*", "WorldEnvironment", true, false)
-	for env in environnements:
-		if env.environment:
-			env.environment.ssao_enabled = (quality == 0)
-			env.environment.ssil_enabled = (quality == 0)
+		soleil.shadow_enabled = (quality != 3)
 
 func _on_render_distance_changed(distance_mode: int) -> void:
 	var far_distance = 100.0

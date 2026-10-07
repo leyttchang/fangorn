@@ -23,20 +23,22 @@ signal wind_updated(direction: Vector2, strength: float, speed: float)
 	set(val):
 		storm_intensity = clampf(val, 0.0, 1.0)
 
-# Paramètres au calme (0 à 5 minutes)
-@export var calm_wind_strength: float = 0.14
-@export var calm_wind_speed: float = 1.8
-@export var calm_rain_force: float = 12.0
+# Paramètres au calme (début de partie : très peu de vent)
+@export var calm_wind_strength: float = 0.05
+@export var calm_wind_speed: float = 1.3
+@export var calm_rain_force: float = 6.0
 
-# Paramètres en pleine tempête (15 minutes)
-@export var storm_wind_strength: float = 0.42
-@export var storm_wind_speed: float = 3.6
-@export var storm_rain_force: float = 42.0
+# Paramètres en pleine tempête (15 minutes : énormément de vent)
+@export var storm_wind_strength: float = 1.1
+@export var storm_wind_speed: float = 4.2
+@export var storm_rain_force: float = 55.0
 
 # Variables internes pour le bruit Simplex fluide
 var _noise: FastNoiseLite
 var _time: float = 0.0
 var _update_timer: float = 0.0
+var _wind_time: float = 0.0
+var _wind_scroll: Vector2 = Vector2.ZERO
 var _grass_materials: Array[WeakRef] = []
 
 func _ready() -> void:
@@ -85,7 +87,7 @@ func _process(delta: float) -> void:
 	
 	# 2. Rafales et bourrasques naturelles (fluctuation d'amplitude)
 	var gust_noise: float = (_noise.get_noise_1d(_time * 25.0 + 500.0) + 1.0) * 0.5
-	var gust_mult: float = lerpf(0.85, 1.25, gust_noise)
+	var gust_mult: float = lerpf(0.9, 1.15 + 0.5 * storm_intensity, gust_noise)
 	
 	# 3. Interpolation selon la progression météo (0 à 15 min)
 	var target_strength = lerpf(calm_wind_strength, storm_wind_strength, storm_intensity) * gust_mult
@@ -96,11 +98,16 @@ func _process(delta: float) -> void:
 	current_wind_speed = lerpf(current_wind_speed, target_speed, delta * 3.0)
 	current_rain_wind_force = lerpf(current_rain_wind_force, target_rain_force, delta * 3.0)
 	
-	# 4. Envoi aux shaders à 15 Hz (économise les draw calls et écritures d'uniforms)
+	# 4. Phase et défilement INTÉGRÉS : si la vitesse ou la direction changent, la phase des ondes
+	# continue sans saut (sinon TIME * vitesse fait "sauter" les vagues => herbe qui tremble/saccade).
+	_wind_time += delta * current_wind_speed
+	_wind_scroll += current_wind_direction * (delta * current_wind_speed)
+	
+	# 5. Envoi aux shaders CHAQUE frame (1 seul matériau : coût négligeable, évite les paliers visibles)
+	_update_grass_materials()
 	_update_timer += delta
 	if _update_timer >= 0.066:
 		_update_timer = 0.0
-		_update_grass_materials()
 		wind_updated.emit(current_wind_direction, current_wind_strength, current_wind_speed)
 
 func _update_grass_materials() -> void:
@@ -115,3 +122,5 @@ func _update_single_grass_material(mat: ShaderMaterial) -> void:
 	mat.set_shader_parameter("wind_direction", current_wind_direction)
 	mat.set_shader_parameter("wind_strength", current_wind_strength)
 	mat.set_shader_parameter("wind_speed", current_wind_speed)
+	mat.set_shader_parameter("wind_time", _wind_time)
+	mat.set_shader_parameter("wind_scroll", _wind_scroll)
