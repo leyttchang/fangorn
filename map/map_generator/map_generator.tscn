@@ -106,7 +106,6 @@ lod0_range = 128.0
 name = "grass"
 albedo_texture = ExtResource("2_ghlbt")
 normal_texture = ExtResource("3_f1fk6")
-detiling_rotation = 0.083
 
 [sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_gd8ys"]
 name = "chemin"
@@ -168,6 +167,7 @@ shader_parameter/wind_height_end = 2.0
 shader_parameter/wind_speed = 2.385
 shader_parameter/wind_strength = 0.215
 shader_parameter/wind_direction = Vector2(1, 0.5)
+shader_parameter/wind_max_distance = 80.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ofypk"]
 resource_name = "_trees_normal"
@@ -393,9 +393,10 @@ terrain = NodePath("../Terrain3D")
 path_generator = NodePath("../path_generator")
 grass_scene = ExtResource("16_oxtf5")
 noise = SubResource("FastNoiseLite_2ivg0")
-min_scale = 0.5
-max_scale = 1.5
-max_draw_distance = 200.0
+min_scale = 0.7
+max_scale = 1.6
+spacing = 0.8
+max_draw_distance = 110.0
 road_fade_distance = -4.0
 road_margin = -6.0
 

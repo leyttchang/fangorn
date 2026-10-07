@@ -69,11 +69,11 @@ uniform bool enable_wind_distance_cutoff = true;
 uniform float wind_max_distance : hint_range(10.0, 200.0) = 60.0;
 
 group_uniforms distance;
-uniform float thin_start : hint_range(10.0, 100.0) = 35.0;
-uniform float thin_end : hint_range(50.0, 200.0) = 140.0;
+uniform float thin_start : hint_range(10.0, 100.0) = 30.0;
+uniform float thin_end : hint_range(50.0, 200.0) = 80.0;
 uniform float far_keep : hint_range(0.1, 1.0) = 0.35;
-uniform float fade_distance_min : hint_range(0.0, 500.0) = 140.0;
-uniform float fade_distance_max : hint_range(0.0, 500.0) = 200.0;
+uniform float fade_distance_min : hint_range(0.0, 500.0) = 80.0;
+uniform float fade_distance_max : hint_range(0.0, 500.0) = 110.0;
 
 varying vec3 noiseLevel;
 // x = hauteur sur le brin (0 base, 1 pointe), y = vague de vent, z = secheresse, w = force de la vague

@@ -342,7 +342,7 @@ func generate_grass() -> void:
 			
 		# L'herbe disparaît en douceur par le shader jusqu'à max_draw_distance,
 		# le chunk est déchargé par Godot dès qu'il dépasse cette zone.
-		mmi.visibility_range_end = max_draw_distance + chunk_size
+		mmi.visibility_range_end = max_draw_distance + chunk_size * 0.5
 		mmi.visibility_range_end_margin = 16.0
 		
 		add_child(mmi)

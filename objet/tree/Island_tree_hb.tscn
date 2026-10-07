@@ -28,6 +28,7 @@ shader_parameter/wind_height_end = 2.0
 shader_parameter/wind_speed = 2.385
 shader_parameter/wind_strength = 0.215
 shader_parameter/wind_direction = Vector2(1, 0.5)
+shader_parameter/wind_max_distance = 80.0
 
 [node name="island_tree" type="Node3D" unique_id=862277325]
 

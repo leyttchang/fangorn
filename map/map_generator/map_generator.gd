@@ -119,6 +119,10 @@ func clear_terrain() -> void:
 	var mesh_spawner = find_child("MeshSpawner", true, false)
 	if mesh_spawner and mesh_spawner.has_method("clear_trees"):
 		mesh_spawner.clear_trees()
+
+	var existing_occ = find_child("TerrainOccluder", true, false)
+	if existing_occ != null:
+		existing_occ.queue_free()
 		
 	var stack = [self]
 	while stack.size() > 0:
@@ -549,6 +553,9 @@ func _bake_navmesh() -> void:
 			print("MapGenerator: attente de la fin de génération de l'herbe avant le spawn...")
 			await _grass_gen.grass_ready
 	
+	# Génération d'un occluder de relief pour que les collines masquent les arbres/herbe lointains
+	_generate_terrain_occluder()
+	
 	terrain_ready.emit()
 	
 	# En éditeur, appel direct de la génération des meutes (en jeu, c'est géré via le signal terrain_ready)
@@ -558,6 +565,63 @@ func _bake_navmesh() -> void:
 			pack_gen = find_child("MonsterPacks", true, false)
 		if pack_gen and pack_gen.has_method("generate_monster_packs"):
 			pack_gen.generate_monster_packs(world_seed)
+
+## Génère un occluder basse résolution basé sur le relief du terrain
+## pour culler automatiquement les arbres, l'herbe et les monstres cachés derrière les collines
+func _generate_terrain_occluder() -> void:
+	var existing = find_child("TerrainOccluder", true, false)
+	if existing != null:
+		existing.queue_free()
+		
+	var map_w: float = float(map_width_chunks * region_size)
+	var map_h: float = float(map_height_chunks * region_size)
+	var step: float = 32.0
+	var nx: int = int(ceil(map_w / step)) + 1
+	var nz: int = int(ceil(map_h / step)) + 1
+	
+	var vertices := PackedVector3Array()
+	vertices.resize(nx * nz)
+	
+	# Abaisser légèrement de 2.5m sous la surface pour éviter de masquer le sol visible
+	var height_drop: float = 2.5
+	
+	for iz in range(nz):
+		var pz = minf(iz * step, map_h)
+		for ix in range(nx):
+			var px = minf(ix * step, map_w)
+			var h = get_terrain_height_at(px, pz)
+			if is_nan(h):
+				h = 0.0
+			var idx = iz * nx + ix
+			vertices[idx] = Vector3(px, h - height_drop, pz)
+			
+	var indices := PackedInt32Array()
+	indices.resize((nx - 1) * (nz - 1) * 6)
+	var i_idx = 0
+	for iz in range(nz - 1):
+		for ix in range(nx - 1):
+			var i0 = iz * nx + ix
+			var i1 = iz * nx + (ix + 1)
+			var i2 = (iz + 1) * nx + ix
+			var i3 = (iz + 1) * nx + (ix + 1)
+			
+			indices[i_idx] = i0
+			indices[i_idx + 1] = i2
+			indices[i_idx + 2] = i1
+			
+			indices[i_idx + 3] = i1
+			indices[i_idx + 4] = i2
+			indices[i_idx + 5] = i3
+			i_idx += 6
+			
+	var occluder = ArrayOccluder3D.new()
+	occluder.set_arrays(vertices, indices)
+	
+	var occluder_inst = OccluderInstance3D.new()
+	occluder_inst.name = "TerrainOccluder"
+	occluder_inst.occluder = occluder
+	add_child(occluder_inst)
+	print("MapGenerator: Occluder de terrain généré (", nx * nz, " sommets, ", indices.size() / 3, " triangles).")
 
 ## Configure le brouillard de profondeur pour qu'il masque parfaitement la limite de rendu des arbres
 func _setup_distance_fog() -> void:

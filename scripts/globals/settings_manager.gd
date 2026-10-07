@@ -83,9 +83,9 @@ func _ready() -> void:
 
 func _on_node_added(node: Node) -> void:
 	if node is WorldEnvironment:
-		call_deferred("_apply_environment_settings", node.environment)
+		_apply_environment_settings.call_deferred(node.environment)
 	elif node is Light3D:
-		call_deferred("_apply_shadow_to_light", node)
+		_apply_shadow_to_light.call_deferred(node)
 
 func _apply_environment_settings(target_env: Environment = null) -> void:
 	if target_env != null:
@@ -141,7 +141,7 @@ func _apply_shadow_quality() -> void:
 			if light is Light3D:
 				_apply_shadow_to_light(light)
 
-func _apply_shadow_to_light(light: Light3D) -> void:
+func _apply_shadow_to_light(light: Node) -> void:
 	if light == null or not is_instance_valid(light):
 		return
 	match shadow_quality:
