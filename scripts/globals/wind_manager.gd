@@ -3,19 +3,19 @@ extends Node
 
 ## Gestionnaire Global du Vent (Wind Manager - Autoload 'Wind')
 ## Centralise la direction, l'intensité et l'évolution temporelle du vent
-## pour synchroniser parfaitement l'herbe, la pluie et tout l'environnement.
+## pour synchroniser parfaitement l'herbe, les arbres, la pluie et tout l'environnement.
 
 signal wind_updated(direction: Vector2, strength: float, speed: float)
 
 @export_category("Paramètres Actuels du Vent")
 ## Direction 2D unifiée du vent (X, Z dans le monde)
 @export var current_wind_direction: Vector2 = Vector2(1.0, 0.5).normalized()
-## Force du vent pour le shader d'herbe (amplitude d'inclinaison)
+## Force du vent pour les shaders (amplitude d'inclinaison)
 @export var current_wind_strength: float = 0.15
 ## Vitesse de défilement de l'onde de vent
 @export var current_wind_speed: float = 2.0
 ## Force horizontale appliquée à la pluie (en m/s²)
-@export var current_rain_wind_force: float = 15.0
+@export var current_rain_wind_force: float = 3.0
 
 @export_category("Progression Tempête (0 à 15 min)")
 ## Intensité de la tempête (0.0 = beau temps / 0-5 min, 1.0 = tempête maximale / 15 min)
@@ -24,14 +24,34 @@ signal wind_updated(direction: Vector2, strength: float, speed: float)
 		storm_intensity = clampf(val, 0.0, 1.0)
 
 # Paramètres au calme (début de partie : très peu de vent)
-@export var calm_wind_strength: float = 0.05
-@export var calm_wind_speed: float = 1.3
-@export var calm_rain_force: float = 6.0
+@export var calm_wind_strength: float = 0.08
+@export var calm_wind_speed: float = 1.4
+@export var calm_rain_force: float = 2.0
 
-# Paramètres en pleine tempête (15 minutes : énormément de vent)
-@export var storm_wind_strength: float = 1.1
+# Paramètres en pleine tempête (15 minutes : vent violent mais pluie qui atteint bien le joueur)
+@export var storm_wind_strength: float = 1.15
 @export var storm_wind_speed: float = 4.2
-@export var storm_rain_force: float = 55.0
+@export var storm_rain_force: float = 10.0
+
+@export_category("Dynamique des Bourrasques et Accalmies")
+## Durée minimale d'une accalmie brève (en secondes, 1 à 2s)
+@export var lull_min_duration: float = 1.0
+## Durée maximale d'une accalmie brève (en secondes, max 3s)
+@export var lull_max_duration: float = 2.5
+## Force minimale du vent pendant l'accalmie (brise légère)
+@export var lull_wind_strength: float = 0.15
+## Durée minimale d'une bourrasque forte (en secondes, 90% du temps au max)
+@export var blast_min_duration: float = 18.0
+## Durée maximale d'une bourrasque forte (en secondes, 90% du temps au max)
+@export var blast_max_duration: float = 28.0
+
+@export_category("Changements de Direction")
+## Intervalle minimal entre deux changements de cap (en secondes, aléatoire entre 10 et 20s)
+@export var shift_min_interval: float = 10.0
+## Intervalle maximal entre deux changements de cap (en secondes, aléatoire entre 10 et 20s)
+@export var shift_max_interval: float = 20.0
+## Vitesse de pivot lors d'un coup de vent (environ 1.0 à 1.5s pour pivoter)
+@export var direction_turn_speed: float = 2.8
 
 # Variables internes pour le bruit Simplex fluide
 var _noise: FastNoiseLite
@@ -41,13 +61,29 @@ var _wind_time: float = 0.0
 var _wind_scroll: Vector2 = Vector2.ZERO
 var _grass_materials: Array[WeakRef] = []
 
+# Gestion de la direction et des virements
+var _current_target_angle: float = 0.65
+var _current_actual_angle: float = 0.65
+var _shift_timer: float = 0.0
+var _next_shift_duration: float = 14.0
+var _consecutive_turns: int = 0
+
+# Gestion du cycle bourrasque / accalmie
+var _cycle_timer: float = 0.0
+var _is_in_lull: bool = false
+var _current_phase_duration: float = 22.0
+var _lull_blend: float = 0.0
+
 func _ready() -> void:
 	_noise = FastNoiseLite.new()
 	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	_noise.frequency = 0.02
 	_noise.seed = randi()
 	
-	# Tentative d'auto-détection du matériau d'herbe du projet
+	_next_shift_duration = randf_range(shift_min_interval, shift_max_interval)
+	_current_phase_duration = randf_range(blast_min_duration, blast_max_duration)
+	
+	# Auto-détection du matériau d'herbe du projet
 	var default_mesh = load("res://assets/3D_models/grass/grass2.res") as ArrayMesh
 	if default_mesh != null and default_mesh.get_surface_count() > 0:
 		var mat = default_mesh.surface_get_material(0)
@@ -78,32 +114,108 @@ func get_rain_gravity(base_gravity_y: float = -14.0) -> Vector3:
 func _process(delta: float) -> void:
 	_time += delta * 0.15 # Vitesse d'évolution lente et organique de la météo
 	
-	# 1. Évolution douce et naturelle de la direction du vent :
-	# Direction générale Sud-Est (~0.65 rad) avec une dérive douce de +/- 65°
-	var base_angle: float = 0.65
-	var angle_variation: float = _noise.get_noise_1d(_time * 10.0) * 1.15
-	var final_angle: float = base_angle + angle_variation
-	current_wind_direction = Vector2(cos(final_angle), sin(final_angle)).normalized()
+	# Facteur de chaos de tempête :
+	# Inactif au début (0-7 min), monte progressivement à partir de 8-10 min (storm_intensity >= 0.35)
+	# À 15 min (ou si debug_max_wind est coché), chaos_factor = 1.0
+	var chaos_factor: float = clampf((storm_intensity - 0.35) / 0.65, 0.0, 1.0)
 	
-	# 2. Rafales et bourrasques naturelles (fluctuation d'amplitude)
+	# -------------------------------------------------------------
+	# 1. ÉVOLUTION DE LA DIRECTION DU VENT
+	# -------------------------------------------------------------
+	if chaos_factor <= 0.001:
+		# Début de partie (0-7 min) : dérive douce et lente autour de 0.65 rad (+/- 35°)
+		var base_angle: float = 0.65
+		var angle_variation: float = _noise.get_noise_1d(_time * 8.0) * 0.6
+		_current_target_angle = base_angle + angle_variation
+		_current_actual_angle = lerp_angle(_current_actual_angle, _current_target_angle, delta * 1.5)
+	else:
+		# Mode tempête chaotique : paliers aléatoires entre 10 et 20s, virages francs et 180° réguliers
+		_shift_timer += delta
+		
+		if _shift_timer >= _next_shift_duration:
+			_shift_timer = 0.0
+			_next_shift_duration = randf_range(shift_min_interval, shift_max_interval)
+			
+			# Décision : virage 180° (demi-tour) ou changement de cap franc (80° à 120°)
+			# Garantit un 180° au moins tous les 2 à 3 changements (~20 à 40 secondes max)
+			var is_reversal: bool = false
+			if _consecutive_turns >= 2 or (_consecutive_turns >= 1 and randf() < 0.55):
+				is_reversal = true
+				_consecutive_turns = 0
+			else:
+				_consecutive_turns += 1
+				
+			if is_reversal:
+				# RETOURNEMENT COMPLET (150° à 180°) : l'herbe se couche dans la direction opposée !
+				var sign_flip = 1.0 if randf() > 0.5 else -1.0
+				var flip_angle = deg_to_rad(randf_range(150.0, 180.0)) * sign_flip
+				_current_target_angle = wrapf(_current_target_angle + flip_angle, -PI, PI)
+			else:
+				# CHANGEMENT DE CAP FRANC (80° à 120°) : virage latéral bien net
+				var sign_turn = 1.0 if randf() > 0.5 else -1.0
+				var turn_angle = deg_to_rad(randf_range(80.0, 120.0)) * sign_turn
+				_current_target_angle = wrapf(_current_target_angle + turn_angle, -PI, PI)
+				
+		# Micro-turbulences dans la direction
+		var micro_wobble = _noise.get_noise_1d(_time * 15.0) * 0.12 * chaos_factor
+		
+		# Virement dynamique et franc (environ 1.0 à 1.5s pour pivoter de manière spectaculaire)
+		var turn_speed = direction_turn_speed * (0.8 + 0.4 * chaos_factor)
+		_current_actual_angle = lerp_angle(_current_actual_angle, _current_target_angle + micro_wobble, delta * turn_speed)
+
+	current_wind_direction = Vector2(cos(_current_actual_angle), sin(_current_actual_angle)).normalized()
+	
+	# -------------------------------------------------------------
+	# 2. CYCLE D'INTENSITÉ : BOURRASQUE (90% du temps) vs ACCALMIE (1-2s, max 3s)
+	# -------------------------------------------------------------
+	if chaos_factor > 0.001:
+		_cycle_timer += delta
+		if not _is_in_lull:
+			# En pleine bourrasque (dure 18 à 28s)
+			if _cycle_timer >= _current_phase_duration:
+				_is_in_lull = true
+				_cycle_timer = 0.0
+				_current_phase_duration = randf_range(lull_min_duration, lull_max_duration)
+		else:
+			# En accalmie brève (dure 1 à 2.5s, max 3s)
+			if _cycle_timer >= _current_phase_duration:
+				_is_in_lull = false
+				_cycle_timer = 0.0
+				_current_phase_duration = randf_range(blast_min_duration, blast_max_duration)
+				
+	var target_lull = 1.0 if (_is_in_lull and chaos_factor > 0.0) else 0.0
+	# Transition : descente douce vers l'accalmie (delta * 3.5), mais retour TRÈS RAPIDE au max (delta * 8.0)
+	var blend_speed = 3.5 if target_lull > _lull_blend else 8.0
+	_lull_blend = lerpf(_lull_blend, target_lull, delta * blend_speed)
+	
+	# 3. Rafales légères pendant la bourrasque (maintient le vent au max avec pointes)
 	var gust_noise: float = (_noise.get_noise_1d(_time * 25.0 + 500.0) + 1.0) * 0.5
-	var gust_mult: float = lerpf(0.9, 1.15 + 0.5 * storm_intensity, gust_noise)
+	var gust_mult: float = lerpf(0.98, 1.15 + 0.10 * storm_intensity, gust_noise)
 	
-	# 3. Interpolation selon la progression météo (0 à 15 min)
-	var target_strength = lerpf(calm_wind_strength, storm_wind_strength, storm_intensity) * gust_mult
-	var target_speed = lerpf(calm_wind_speed, storm_wind_speed, storm_intensity)
-	var target_rain_force = lerpf(calm_rain_force, storm_rain_force, storm_intensity) * gust_mult
+	# 4. Intensité maximale selon le timer (10 min vs 15 min ont des max différents)
+	var peak_strength = lerpf(calm_wind_strength, storm_wind_strength, storm_intensity) * gust_mult
+	var current_lull_strength = lerpf(calm_wind_strength, lull_wind_strength, storm_intensity)
+	var target_strength = lerpf(peak_strength, current_lull_strength, _lull_blend * chaos_factor)
 	
-	current_wind_strength = lerpf(current_wind_strength, target_strength, delta * 3.0)
-	current_wind_speed = lerpf(current_wind_speed, target_speed, delta * 3.0)
-	current_rain_wind_force = lerpf(current_rain_wind_force, target_rain_force, delta * 3.0)
+	var peak_speed = lerpf(calm_wind_speed, storm_wind_speed, storm_intensity)
+	var current_lull_speed = lerpf(calm_wind_speed, calm_wind_speed * 1.3, storm_intensity)
+	var target_speed = lerpf(peak_speed, current_lull_speed, _lull_blend * chaos_factor)
 	
-	# 4. Phase et défilement INTÉGRÉS : si la vitesse ou la direction changent, la phase des ondes
-	# continue sans saut (sinon TIME * vitesse fait "sauter" les vagues => herbe qui tremble/saccade).
+	var peak_rain = lerpf(calm_rain_force, storm_rain_force, storm_intensity) * gust_mult
+	var current_lull_rain = lerpf(calm_rain_force, calm_rain_force * 1.5, storm_intensity)
+	var target_rain_force = lerpf(peak_rain, current_lull_rain, _lull_blend * chaos_factor)
+	
+	# Application vive et réactive pour claquer immédiatement au max après l'accalmie
+	var strength_lerp_speed = 3.5 if _is_in_lull else 6.0
+	current_wind_strength = lerpf(current_wind_strength, target_strength, delta * strength_lerp_speed)
+	current_wind_speed = lerpf(current_wind_speed, target_speed, delta * strength_lerp_speed)
+	current_rain_wind_force = lerpf(current_rain_wind_force, target_rain_force, delta * strength_lerp_speed)
+	
+	# 5. Phase et défilement INTÉGRÉS : évite tout saut d'onde dans les shaders
 	_wind_time += delta * current_wind_speed
 	_wind_scroll += current_wind_direction * (delta * current_wind_speed)
 	
-	# 5. Envoi aux shaders CHAQUE frame (1 seul matériau : coût négligeable, évite les paliers visibles)
+	# 6. Envoi aux shaders et signaux
 	_update_grass_materials()
 	_update_timer += delta
 	if _update_timer >= 0.066:

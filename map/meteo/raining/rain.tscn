@@ -17,7 +17,7 @@ particle_flag_align_y = true
 emission_shape = 6
 emission_ring_axis = Vector3(0, 1, 0)
 emission_ring_height = 1.0
-emission_ring_radius = 80.0
+emission_ring_radius = 265.08
 emission_ring_inner_radius = 0.0
 emission_ring_cone_angle = 90.0
 direction = Vector3(0, -1, 0)
@@ -102,10 +102,11 @@ script = ExtResource("1_mq065")
 rain_particles = NodePath("rain_P")
 
 [node name="rain_P" type="GPUParticles3D" parent="." unique_id=290459491]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 45, 0)
-amount = 10000
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 167.88062, 0)
+amount = 90000
 sub_emitter = NodePath("../spraks")
-lifetime = 2.2
+lifetime = 4.609999999999999
+preprocess = 0.76
 randomness = 0.05
 fixed_fps = 60
 collision_base_size = 0.25
@@ -116,8 +117,9 @@ process_material = SubResource("ParticleProcessMaterial_hlie2")
 draw_pass_1 = SubResource("RibbonTrailMesh_yqkk6")
 
 [node name="GPUParticlesCollisionHeightField3D" type="GPUParticlesCollisionHeightField3D" parent="." unique_id=1710758035]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 116.11505, 0)
 cull_mask = 4293918721
-size = Vector3(200, 250, 200)
+size = Vector3(200, 374, 200)
 
 [node name="spraks" parent="." unique_id=350757358 instance=ExtResource("3_mq065")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)

@@ -3,8 +3,8 @@ extends Node3D
 
 ## Gestionnaire de progression temporelle et météo (Timer Système)
 ## - 0 à 5 minutes : Jour normal par défaut (pas de pluie)
-## - À 5 minutes : Début de la pluie à 500 particules
-## - 5 à 15 minutes : Montée progressive jusqu'à 10 000 particules
+## - À 5 minutes : Début de la pluie (5% de la scène par défaut)
+## - 5 à 15 minutes : Montée progressive jusqu'à 100% de la scène
 
 signal rain_started
 signal rain_max_reached
@@ -26,11 +26,11 @@ signal rain_max_reached
 ## Moment où la pluie atteint son maximum (en secondes, 15 minutes = 900.0)
 @export var rain_max_time: float = 900.0
 
-## Nombre de particules au démarrage de la pluie (à 5 min)
-@export var min_rain_particles: int = 500
+## Ratio de particules au démarrage de la pluie à 5 min (en % du nombre défini dans la scène, ex: 0.05 = 5%)
+@export_range(0.0, 1.0, 0.01) var min_rain_ratio: float = 0.05
 
-## Nombre maximal de particules de pluie (à 15 min)
-@export var max_rain_particles: int = 10000
+## Ratio maximal de particules à 15 min (en % du nombre défini dans la scène, 1.0 = 100%)
+@export_range(0.0, 1.0, 0.01) var max_rain_ratio: float = 1.0
 
 @export_group("Progression du Vent")
 ## Le vent reste très faible jusqu'à ce moment (en secondes, 1 minute = 60.0)
@@ -105,10 +105,6 @@ func _update_weather(is_initial: bool = false) -> void:
 		if _rain_particles == null:
 			return
 
-	# S'assurer que le buffer est dimensionné pour accueillir le nombre maximal
-	if _rain_particles.amount < max_rain_particles:
-		_rain_particles.amount = max_rain_particles
-
 	# Phase 1 : 0 à 5 minutes (Plein jour par défaut, aucune pluie)
 	if elapsed_time < rain_start_time:
 		if _rain_particles.emitting or is_initial:
@@ -136,19 +132,16 @@ func _update_weather(is_initial: bool = false) -> void:
 	if not _rain_has_started:
 		_rain_has_started = true
 		rain_started.emit()
-		print("[TimerSys] 5 minutes : La pluie commence à %d particules." % min_rain_particles)
+		print("[TimerSys] 5 minutes : La pluie commence à %.0f%% de la scène (%d / %d particules)." % [min_rain_ratio * 100.0, get_current_particles_count(), _rain_particles.amount])
 
-	# Phase 3 : Montée progressive de 500 à 10 000 particules entre 5 min et 15 min
+	# Phase 3 : Montée progressive en pourcentage de min_rain_ratio (5%) à max_rain_ratio (100% de la scène)
 	var progress: float = clampf((elapsed_time - rain_start_time) / (rain_max_time - rain_start_time), 0.0, 1.0)
-	var current_particles: float = lerpf(float(min_rain_particles), float(max_rain_particles), progress)
-	
-	# Mise à jour fluide du ratio sans redémarrer le système de particules
-	_rain_particles.amount_ratio = clampf(current_particles / float(max_rain_particles), 0.0, 1.0)
+	_rain_particles.amount_ratio = clampf(lerpf(min_rain_ratio, max_rain_ratio, progress), 0.0, 1.0)
 
 	if progress >= 1.0 and not _rain_has_peaked:
 		_rain_has_peaked = true
 		rain_max_reached.emit()
-		print("[TimerSys] 15 minutes : La pluie atteint son intensité maximale (%d particules)." % max_rain_particles)
+		print("[TimerSys] 15 minutes : La pluie atteint son intensité maximale (100%%, %d particules)." % _rain_particles.amount)
 
 ## Retourne le nombre estimé de particules actuellement émises
 func get_current_particles_count() -> int:
