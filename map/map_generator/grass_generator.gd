@@ -177,139 +177,168 @@ func generate_grass() -> void:
 	elif get_parent() != null and "border_margin" in get_parent():
 		b_margin = float(get_parent().border_margin)
 		
-	var x = b_margin
-	var row_count = 0
+	# Passes de plantation : la map (rectangle hors marge), puis l'intérieur de chaque arène de boss
+	var passes: Array = [{"poly": PackedVector2Array(), "min_x": b_margin, "max_x": map_w - b_margin, "min_z": b_margin, "max_z": map_h - b_margin}]
+	if map_generator != null and map_generator.has_method("get_arena_grass_polygons"):
+		for apoly: PackedVector2Array in map_generator.get_arena_grass_polygons():
+			if apoly.size() < 3:
+				continue
+			var a_min := Vector2(INF, INF)
+			var a_max := Vector2(-INF, -INF)
+			for av in apoly:
+				a_min = a_min.min(av)
+				a_max = a_max.max(av)
+			passes.append({"poly": apoly, "min_x": a_min.x, "max_x": a_max.x, "min_z": a_min.y, "max_z": a_max.y})
 	
-	while x < map_w - b_margin:
-		row_count += 1
-		# En jeu : génération d'une traite (pendant le chargement, avant le spawn du joueur) = le plus rapide.
-		# En éditeur seulement : on rend la main régulièrement pour ne pas figer l'éditeur.
-		if Engine.is_editor_hint() and row_count % 16 == 0:
-			await get_tree().process_frame
-			
-		var z = b_margin
-		while z < map_h - b_margin:
-			var px = x + rng.randf_range(-jitter, jitter)
-			var pz = z + rng.randf_range(-jitter, jitter)
-			
-			# Filtrage Route avec scaling proportionnel à la largeur de chaque chemin
-			var min_grass_prob = 1.0
-			if not road_grid.is_empty():
-				var r_key = Vector2i(int(floor(px / 128.0)), int(floor(pz / 128.0)))
-				if road_grid.has(r_key):
-					for seg in road_grid[r_key]:
-						var ax = seg.start.x; var ay = seg.start.y
-						var bx = seg.end.x;   var by = seg.end.y
-						var dx = bx - ax;     var dy = by - ay
-						var l2 = dx * dx + dy * dy
-						var dist_sq = 0.0
-						if l2 < 0.0001:
-							var ex = px - ax; var ey = pz - ay
-							dist_sq = ex * ex + ey * ey
-						else:
-							var t = clampf(((px - ax) * dx + (pz - ay) * dy) / l2, 0.0, 1.0)
-							var ex = px - (ax + t * dx); var ey = pz - (ay + t * dy)
-							dist_sq = ex * ex + ey * ey
-							
-						var seg_w = float(seg.get("width", base_path_width))
-						# Ratio de taille du chemin (ex: 1.0 pour la route principale, 0.4 pour les chemins secondaires)
-						var ratio = seg_w / base_path_width
-						var seg_margin = road_margin * ratio
-						var seg_fade = road_fade_distance * ratio
-						
-						# Distance par rapport au bord de la route
-						var actual_dist = sqrt(dist_sq) - seg_w
-						
-						# Zone 0% d'herbe pour ce chemin
-						if actual_dist < seg_margin:
-							min_grass_prob = 0.0
-							break
-						# Zone de transition / fondu progressif
-						elif actual_dist < seg_fade:
-							var fade_range = maxf(0.01, seg_fade - seg_margin)
-							var prob = (actual_dist - seg_margin) / fade_range
-							if prob < min_grass_prob:
-								min_grass_prob = prob
+	var row_count = 0
+	for pass_data in passes:
+		var arena_poly: PackedVector2Array = pass_data["poly"]
+		var in_arena: bool = arena_poly.size() >= 3
+		var x: float = pass_data["min_x"]
+		
+		while x < pass_data["max_x"]:
+			row_count += 1
+			# En jeu : génération d'une traite (pendant le chargement, avant le spawn du joueur) = le plus rapide.
+			# En éditeur seulement : on rend la main régulièrement pour ne pas figer l'éditeur.
+			if Engine.is_editor_hint() and row_count % 16 == 0:
+				await get_tree().process_frame
+				
+			var z: float = pass_data["min_z"]
+			while z < pass_data["max_z"]:
+				var px = x + rng.randf_range(-jitter, jitter)
+				var pz = z + rng.randf_range(-jitter, jitter)
+				
+				if in_arena:
+					# Passe arène : uniquement à l'intérieur du contour, et pas là où la passe principale a déjà planté
+					if not Geometry2D.is_point_in_polygon(Vector2(px, pz), arena_poly) or (px >= b_margin and px < map_w - b_margin and pz >= b_margin and pz < map_h - b_margin):
+						z += spacing
+						continue
+				
+				# Filtrage Route avec scaling proportionnel à la largeur de chaque chemin
+				var min_grass_prob = 1.0
+				if not road_grid.is_empty():
+					var r_key = Vector2i(int(floor(px / 128.0)), int(floor(pz / 128.0)))
+					if road_grid.has(r_key):
+						for seg in road_grid[r_key]:
+							var ax = seg.start.x; var ay = seg.start.y
+							var bx = seg.end.x;   var by = seg.end.y
+							var dx = bx - ax;     var dy = by - ay
+							var l2 = dx * dx + dy * dy
+							var dist_sq = 0.0
+							if l2 < 0.0001:
+								var ex = px - ax; var ey = pz - ay
+								dist_sq = ex * ex + ey * ey
+							else:
+								var t = clampf(((px - ax) * dx + (pz - ay) * dy) / l2, 0.0, 1.0)
+								var ex = px - (ax + t * dx); var ey = pz - (ay + t * dy)
+								dist_sq = ex * ex + ey * ey
 								
-			# Rejet complet si on est dans la zone 0%
-			if min_grass_prob <= 0.0:
-				z += spacing
-				continue
-			# Rejet probabiliste (fondu progressif)
-			elif min_grass_prob < 1.0:
-				if rng.randf() > min_grass_prob:
+							var seg_w = float(seg.get("width", base_path_width))
+							# Ratio de taille du chemin (ex: 1.0 pour la route principale, 0.4 pour les chemins secondaires)
+							var ratio = seg_w / base_path_width
+							var seg_margin = road_margin * ratio
+							var seg_fade = road_fade_distance * ratio
+							
+							# Distance par rapport au bord de la route
+							var actual_dist = sqrt(dist_sq) - seg_w
+							
+							# Zone 0% d'herbe pour ce chemin
+							if actual_dist < seg_margin:
+								min_grass_prob = 0.0
+								break
+							# Zone de transition / fondu progressif
+							elif actual_dist < seg_fade:
+								var fade_range = maxf(0.01, seg_fade - seg_margin)
+								var prob = (actual_dist - seg_margin) / fade_range
+								if prob < min_grass_prob:
+									min_grass_prob = prob
+									
+				# Rejet complet si on est dans la zone 0%
+				if min_grass_prob <= 0.0:
+					z += spacing
+					continue
+				# Rejet probabiliste (fondu progressif)
+				elif min_grass_prob < 1.0:
+					if rng.randf() > min_grass_prob:
+						z += spacing
+						continue
+					
+				# Patchs naturels : zones plus clairsemées avec bords doux (rejet probabiliste)
+				var patch_value: float = (patch_noise.get_noise_2d(px, pz) + 1.0) * 0.5
+				var patch_keep: float = lerpf(1.0, smoothstep(0.3, 0.5, patch_value), patch_strength)
+				if patch_keep < 1.0 and rng.randf() > patch_keep:
 					z += spacing
 					continue
 				
-			# Patchs naturels : zones plus clairsemées avec bords doux (rejet probabiliste)
-			var patch_value: float = (patch_noise.get_noise_2d(px, pz) + 1.0) * 0.5
-			var patch_keep: float = lerpf(1.0, smoothstep(0.3, 0.5, patch_value), patch_strength)
-			if patch_keep < 1.0 and rng.randf() > patch_keep:
-				z += spacing
-				continue
-			
-			var h = terrain.data.get_height(Vector3(px, 0.0, pz))
-			if is_nan(h):
-				z += spacing
-				continue
+				var h = terrain.data.get_height(Vector3(px, 0.0, pz))
+				if is_nan(h) and in_arena and map_generator != null and map_generator.has_method("get_terrain_height_at"):
+					h = map_generator.get_terrain_height_at(px, pz)
+				if is_nan(h):
+					z += spacing
+					continue
 
-			# Filtrage des pentes raides (falaises et falaises rocheuses)
-			var h_east = terrain.data.get_height(Vector3(px + 1.0, 0.0, pz))
-			var h_south = terrain.data.get_height(Vector3(px, 0.0, pz + 1.0))
-			if not is_nan(h_east) and not is_nan(h_south):
-				if absf(h_east - h) > 0.8 or absf(h_south - h) > 0.8:
-					z += spacing
-					continue
+				# Filtrage des pentes raides (falaises et falaises rocheuses)
+				var h_east = terrain.data.get_height(Vector3(px + 1.0, 0.0, pz))
+				var h_south = terrain.data.get_height(Vector3(px, 0.0, pz + 1.0))
+				if in_arena and map_generator != null and map_generator.has_method("get_terrain_height_at"):
+					if is_nan(h_east):
+						h_east = map_generator.get_terrain_height_at(px + 1.0, pz)
+					if is_nan(h_south):
+						h_south = map_generator.get_terrain_height_at(px, pz + 1.0)
+				if not is_nan(h_east) and not is_nan(h_south):
+					if absf(h_east - h) > 0.8 or absf(h_south - h) > 0.8:
+						z += spacing
+						continue
+					
+				# Calcul de l'échelle (Scale) avec le Noise !
+				var s = 1.0
+				if noise != null:
+					# get_noise_2d renvoie entre -1.0 et 1.0. On le ramène entre 0.0 et 1.0
+					var n_val = (noise.get_noise_2d(px, pz) + 1.0) * 0.5
+					# On interpole entre min_scale et max_scale
+					s = lerp(min_scale, max_scale, n_val)
+				else:
+					# Si pas de noise, taille aléatoire
+					s = rng.randf_range(min_scale, max_scale)
+					
+				# Légère variation aléatoire par-dessus pour ne pas avoir un aspect "trop" parfait
+				s += rng.randf_range(-0.1, 0.1) * s
 				
-			# Calcul de l'échelle (Scale) avec le Noise !
-			var s = 1.0
-			if noise != null:
-				# get_noise_2d renvoie entre -1.0 et 1.0. On le ramène entre 0.0 et 1.0
-				var n_val = (noise.get_noise_2d(px, pz) + 1.0) * 0.5
-				# On interpole entre min_scale et max_scale
-				s = lerp(min_scale, max_scale, n_val)
-			else:
-				# Si pas de noise, taille aléatoire
-				s = rng.randf_range(min_scale, max_scale)
+				# --- Placement naturel (inspiré de l'exemple Terrain3D) ---
+				# Coeur des patchs = touffes plus hautes ; largeur et hauteur varient indépendamment
+				var clod: float = smoothstep(0.55, 0.8, patch_value)
+				var scale_w: float = s * (1.0 + rng.randf_range(-width_variation, width_variation))
+				var scale_h: float = s * (1.0 + clod * clod_height_boost) * (1.0 + rng.randf_range(-0.15, 0.15))
 				
-			# Légère variation aléatoire par-dessus pour ne pas avoir un aspect "trop" parfait
-			s += rng.randf_range(-0.1, 0.1) * s
-			
-			# --- Placement naturel (inspiré de l'exemple Terrain3D) ---
-			# Coeur des patchs = touffes plus hautes ; largeur et hauteur varient indépendamment
-			var clod: float = smoothstep(0.55, 0.8, patch_value)
-			var scale_w: float = s * (1.0 + rng.randf_range(-width_variation, width_variation))
-			var scale_h: float = s * (1.0 + clod * clod_height_boost) * (1.0 + rng.randf_range(-0.15, 0.15))
-			
-			# Axe "haut" du brin : légèrement aligné sur la pente puis incliné au hasard
-			var up_dir: Vector3 = Vector3.UP
-			if not is_nan(h_east) and not is_nan(h_south):
-				var ground_normal := Vector3(h - h_east, 1.0, h - h_south).normalized()
-				up_dir = Vector3.UP.lerp(ground_normal, normal_align).normalized()
-			var lean_axis := Vector3(rng.randf_range(-1.0, 1.0), 0.0, rng.randf_range(-1.0, 1.0))
-			var lean_angle: float = rng.randf_range(0.0, random_lean)
-			if lean_axis.length_squared() > 0.0001:
-				up_dir = up_dir.rotated(lean_axis.normalized(), lean_angle).normalized()
-			
-			# Base orthonormée (X, Y=up_dir, Z) avec rotation aléatoire autour de l'axe du brin
-			var rot = rng.randf_range(0.0, PI * 2.0)
-			var x_axis := Vector3.RIGHT.rotated(Vector3.UP, rot)
-			x_axis = (x_axis - up_dir * x_axis.dot(up_dir)).normalized()
-			var z_axis := x_axis.cross(up_dir).normalized()
-			
-			var basis := Basis(x_axis * scale_w, up_dir * scale_h, z_axis * scale_w)
-			var tform = Transform3D(basis, Vector3(px, h, pz))
-			
-			var cx = int(floor(px / chunk_size))
-			var cz = int(floor(pz / chunk_size))
-			var key = Vector2i(cx, cz)
-			
-			if not chunks.has(key):
-				chunks[key] = []
-			chunks[key].append(tform)
-			
-			z += spacing
-		x += spacing
+				# Axe "haut" du brin : légèrement aligné sur la pente puis incliné au hasard
+				var up_dir: Vector3 = Vector3.UP
+				if not is_nan(h_east) and not is_nan(h_south):
+					var ground_normal := Vector3(h - h_east, 1.0, h - h_south).normalized()
+					up_dir = Vector3.UP.lerp(ground_normal, normal_align).normalized()
+				var lean_axis := Vector3(rng.randf_range(-1.0, 1.0), 0.0, rng.randf_range(-1.0, 1.0))
+				var lean_angle: float = rng.randf_range(0.0, random_lean)
+				if lean_axis.length_squared() > 0.0001:
+					up_dir = up_dir.rotated(lean_axis.normalized(), lean_angle).normalized()
+				
+				# Base orthonormée (X, Y=up_dir, Z) avec rotation aléatoire autour de l'axe du brin
+				var rot = rng.randf_range(0.0, PI * 2.0)
+				var x_axis := Vector3.RIGHT.rotated(Vector3.UP, rot)
+				x_axis = (x_axis - up_dir * x_axis.dot(up_dir)).normalized()
+				var z_axis := x_axis.cross(up_dir).normalized()
+				
+				var basis := Basis(x_axis * scale_w, up_dir * scale_h, z_axis * scale_w)
+				var tform = Transform3D(basis, Vector3(px, h, pz))
+				
+				var cx = int(floor(px / chunk_size))
+				var cz = int(floor(pz / chunk_size))
+				var key = Vector2i(cx, cz)
+				
+				if not chunks.has(key):
+					chunks[key] = []
+				chunks[key].append(tform)
+				
+				z += spacing
+			x += spacing
 		
 	var total_grass = 0
 	for key in chunks.keys():

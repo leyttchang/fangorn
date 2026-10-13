@@ -6,14 +6,64 @@ class_name PathGenerator
 ## La largeur de la route
 @export var path_width: float = 15.0
 
+@export_category("Boss Arena")
+## Distance en mètres depuis la bordure Nord où est placée la Boss Arena (par défaut aligné sur le mur d'arbres border_margin = 35.0m)
+@export var boss_arena_border_offset: float = 35.0
+## Si vrai, la bordure Nord reste scellée par le mur d'arbres derrière l'arène (l'arène est un cul-de-sac)
+@export var close_boss_arena_border: bool = true
+
 var encounter_positions: Array[Vector2] = []
 var start_pos: Vector2 = Vector2.ZERO
 var exit_west: Vector2 = Vector2.ZERO
 var exit_east: Vector2 = Vector2.ZERO
 var exit_north: Vector2 = Vector2.ZERO
+var boss_arena_pos: Vector2 = Vector2.ZERO
+var boss_arena_dir: Vector2 = Vector2(0, -1)
 
+## Retourne les sorties qui restent ouvertes sur la bordure de la carte (pour découper les ouvertures dans le mur d'arbres)
 func get_border_exits() -> Array[Vector2]:
-	return [start_pos, exit_west, exit_east, exit_north]
+	# Une sortie n'est ouverte dans le mur d'arbres que si son slot d'arène (Nord / Ouest / Est) en contient une.
+	# Sans ArenaGenerator, toutes les sorties restent ouvertes (comportement historique).
+	var map_gen = get_parent()
+	var arena_gen = map_gen.get_arena_generator() if (map_gen != null and map_gen.has_method("get_arena_generator")) else null
+	var result: Array[Vector2] = [start_pos]
+	if exit_west != Vector2.ZERO and (arena_gen == null or arena_gen.is_slot_active(1)):
+		result.append(exit_west)
+	if exit_east != Vector2.ZERO and (arena_gen == null or arena_gen.is_slot_active(2)):
+		result.append(exit_east)
+	if exit_north != Vector2.ZERO and (arena_gen == null or arena_gen.is_slot_active(0)):
+		result.append(exit_north)
+	return result
+
+## Calcule la direction d'arrivée de la route vers un point de sortie (tangente des derniers segments)
+func get_exit_incoming_direction(exit_pos: Vector2, default_dir: Vector2 = Vector2(0, -1)) -> Vector2:
+	var best_dist_sq: float = 999999.0
+	var dir: Vector2 = default_dir
+	for seg in segments:
+		var d2: float = seg["end"].distance_squared_to(exit_pos)
+		if d2 < best_dist_sq and d2 < 36.0:
+			best_dist_sq = d2
+			var diff: Vector2 = seg["end"] - seg["start"]
+			if diff.length_squared() > 0.0001:
+				dir = diff.normalized()
+	return dir
+
+## Retourne les coordonnées de sortie selon l'emplacement demandé (0=NORTH, 1=WEST, 2=EAST)
+func get_exit_for_location(loc_idx: int) -> Vector2:
+	match loc_idx:
+		0: return exit_north # NORTH
+		1: return exit_west  # WEST
+		2: return exit_east  # EAST
+	return Vector2.ZERO
+
+## Retourne la direction normale vers l'extérieur selon l'emplacement (0=NORTH, 1=WEST, 2=EAST)
+func get_direction_for_location(loc_idx: int) -> Vector2:
+	match loc_idx:
+		0: return Vector2(0, -1) # NORTH : vers le Nord (extérieur)
+		1: return Vector2(-1, 0) # WEST  : vers l'Ouest (extérieur)
+		2: return Vector2(1, 0)  # EAST  : vers l'Est (extérieur)
+	return Vector2(0, -1)
+
 
 # Contient tous les segments de notre route (des dictionnaires avec start et end)
 var segments: Array[Dictionary] = []
@@ -87,16 +137,34 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 	var b_margin: float = 35.0
 	if map_gen and "border_margin" in map_gen:
 		b_margin = float(map_gen.border_margin)
-	# Les chemins s'arrêtent à l'intérieur de la zone de jeu, avant la marge et le mur d'arbres
-	var road_border_offset: float = b_margin + 15.0
+	# Les sorties sur les bordures Nord, Ouest et Est se terminent exactement
+	# sur la ligne du mur d'arbres de bordure (b_margin) pour découper l'ouverture
+	# et y connecter l'entrée de l'arène.
+	var west_offset: float = b_margin
+	var east_offset: float = b_margin
+	var north_offset: float = b_margin
+	if boss_arena_border_offset != null and boss_arena_border_offset > 0.0 and boss_arena_border_offset != 35.0:
+		north_offset = boss_arena_border_offset
 	
-	# Coordonnées du Spawn (Milieu de la face Sud)
-	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - road_border_offset)
+	# Récupération automatique des décalages d'arènes configurées dans MapGenerator
+	var arena_gen = map_gen.get_arena_generator() if (map_gen != null and map_gen.has_method("get_arena_generator")) else null
+	if arena_gen != null:
+		var active_arenas = arena_gen._get_active_arenas()
+		for a in active_arenas:
+			var loc = a.get("location", 0)
+			var off = a.get("border_offset", b_margin)
+			match loc:
+				0: north_offset = off # NORTH
+				1: west_offset = off  # WEST
+				2: east_offset = off  # EAST
+				
+	# Coordonnées du Spawn (Sud, placé un peu en avant du mur pour le confort du joueur)
+	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - b_margin - 15.0)
 	
-	# Coordonnées des 3 Sorties
-	exit_west = Vector2(map_min_x + road_border_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	exit_east = Vector2(map_max_x - road_border_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + road_border_offset)
+	# Coordonnées des 3 Sorties (alignées sur le mur d'arbres de bordure)
+	exit_west = Vector2(map_min_x + west_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	exit_east = Vector2(map_max_x - east_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + north_offset)
 	
 	# Coordonnées des 2 embranchements
 	var fork1_y = lerp(map_max_z, map_min_z, rng.randf_range(0.3, 0.45))
@@ -105,13 +173,16 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 	var fork1 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork1_y)
 	var fork2 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork2_y)
 	
+	# Dégagement des obstacles AStar aux ouvertures de bordure pour garantir une route fluide jusqu'au mur
+	_clear_exit_obstacle_area(exit_north, 24.0, map_min_x, map_min_z)
+	_clear_exit_obstacle_area(exit_west, 24.0, map_min_x, map_min_z)
+	_clear_exit_obstacle_area(exit_east, 24.0, map_min_x, map_min_z)
+	_clear_exit_obstacle_area(spawn_pos, 24.0, map_min_x, map_min_z)
+	
 	# --- VALIDATION DES POINTS STRATÉGIQUES ---
-	# On décale les points s'ils tombent en plein sur une montagne !
+	# Seuls le spawn et les embranchements intérieurs sont replacés s'ils tombent sur une falaise
 	spawn_pos = _get_closest_valid_point(spawn_pos, map_min_x, map_min_z)
 	start_pos = spawn_pos
-	exit_west = _get_closest_valid_point(exit_west, map_min_x, map_min_z)
-	exit_east = _get_closest_valid_point(exit_east, map_min_x, map_min_z)
-	exit_north = _get_closest_valid_point(exit_north, map_min_x, map_min_z)
 	fork1 = _get_closest_valid_point(fork1, map_min_x, map_min_z)
 	fork2 = _get_closest_valid_point(fork2, map_min_x, map_min_z)
 	# -------------------------------------------
@@ -137,6 +208,11 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 		create_sub_path(fork2, exit_north, map_min_x, map_max_x, map_min_z, map_max_z)
 		create_sub_path(fork2, exit_west, map_min_x, map_max_x, map_min_z, map_max_z)
 		
+	# Position et orientation de la Boss Arena (terminaison du chemin Nord, alignée avec le trou du mur)
+	boss_arena_pos = exit_north
+	boss_arena_dir = Vector2(0, -1)
+
+				
 	print(segments.size(), " segments de route générés dans tout l'arbre !")
 	
 	# --- GÉNÉRATION DES ENCOUNTERS (POI) ---
@@ -381,9 +457,25 @@ func _find_closest_point_on_segments(p: Vector2, segs: Array) -> Vector2:
 			closest_point = proj
 	return closest_point
 
+## Dégage une zone de cellules dans l'AStar pour garantir qu'une sortie ou arène est accessible
+func _clear_exit_obstacle_area(p: Vector2, radius: float, min_x: float, min_z: float) -> void:
+	if astar_grid == null:
+		return
+	var c_size = astar_grid.cell_size.x
+	var r_cells = int(ceil(radius / c_size))
+	var cx = int(clamp((p.x - min_x) / c_size, 0, astar_grid.region.size.x - 1))
+	var cy = int(clamp((p.y - min_z) / c_size, 0, astar_grid.region.size.y - 1))
+	for dx in range(-r_cells, r_cells + 1):
+		for dy in range(-r_cells, r_cells + 1):
+			var test_cell = Vector2i(cx + dx, cy + dy)
+			if astar_grid.is_in_boundsv(test_cell):
+				astar_grid.set_point_solid(test_cell, false)
+				astar_grid.set_point_weight_scale(test_cell, 1.0)
+
 # Helper pour l'AStar : Cherche le point navigable le plus proche (Spirale)
 func _get_closest_valid_point(p: Vector2, min_x: float, min_z: float) -> Vector2:
 	if astar_grid == null: return p
+
 	
 	var c_size = astar_grid.cell_size.x
 	var cx = int(clamp((p.x - min_x) / c_size, 0, astar_grid.region.size.x - 1))

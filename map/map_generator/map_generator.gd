@@ -52,6 +52,34 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 ## Distance où le brouillard atteint 100% d'opacité (en mètres, calé sur les 350m des arbres)
 @export var distance_fog_end: float = 350.0
 
+## Composant ArenaGenerator (enfant de ce nœud) : gère les arènes de boss (slots Nord / Ouest / Est).
+var _arena_gen: Node = null
+
+func get_arena_generator() -> Node:
+	if _arena_gen == null or not is_instance_valid(_arena_gen):
+		_arena_gen = null
+		for child in get_children():
+			if child.has_method("select_arenas") and child.has_method("spawn_arenas"):
+				_arena_gen = child
+				break
+	return _arena_gen
+
+## Zones des arènes générées (utilisé par MeshSpawner pour éviter d'y placer des arbres)
+func get_arena_zones() -> Array[Dictionary]:
+	var ag: Node = get_arena_generator()
+	if ag == null:
+		var empty: Array[Dictionary] = []
+		return empty
+	return ag.get_zones()
+
+## Contours intérieurs des arènes (utilisé par GrassGenerator pour y planter de l'herbe)
+func get_arena_grass_polygons() -> Array[PackedVector2Array]:
+	var ag: Node = get_arena_generator()
+	if ag == null:
+		var empty: Array[PackedVector2Array] = []
+		return empty
+	return ag.arena_grass_polygons
+
 
 @export_category("Actions")
 ## Coche cette case pour nettoyer tout le terrain !
@@ -136,6 +164,11 @@ func clear_terrain() -> void:
 		if current != self and current.has_method("clear_wall"):
 			current.clear_wall()
 		stack.append_array(current.get_children())
+		
+	# Nettoyer toutes les arènes (et les régions Terrain3D ajoutées sous elles)
+	var arena_gen: Node = get_arena_generator()
+	if arena_gen != null:
+		arena_gen.clear_arenas()
 			
 	var time_clean = Time.get_ticks_msec() - time_start
 	print("Terrain nettoyé en ", time_clean, " ms !")
@@ -190,6 +223,25 @@ func _place_encounter_markers(terrain_data) -> void:
 	if encounters_node.has_method("spawn_encounters"):
 		encounters_node.call_deferred("spawn_encounters", world_seed)
 
+func _get_map_rect() -> Rect2:
+	return Rect2(0.0, 0.0, float(map_width_chunks * region_size), float(map_height_chunks * region_size))
+
+
+## Hauteur réelle du Terrain3D ou, tant qu'il n'a pas de données, celle du bruit (avec marge de bordure plate)
+func _sample_edge_height(x: float, z: float) -> float:
+	var terrain_data = null
+	if terrain != null:
+		if "storage" in terrain and terrain.storage:
+			terrain_data = terrain.storage
+		elif "data" in terrain and terrain.data:
+			terrain_data = terrain.data
+	if terrain_data != null and terrain_data.has_method("get_height"):
+		var h: float = terrain_data.get_height(Vector3(x, 0.0, z))
+		if not is_nan(h):
+			return h
+	return get_map_border_height(x, z)
+
+
 func _get_active_curve() -> Curve:
 	if height_curve != null:
 		return height_curve
@@ -205,22 +257,27 @@ func _get_active_curve() -> Curve:
 	default_curve.bake()
 	return default_curve
 
-func get_terrain_height_at(x: float, z: float) -> float:
-	var terrain_data = null
-	if terrain != null:
-		if "storage" in terrain and terrain.storage:
-			terrain_data = terrain.storage
-		elif "data" in terrain and terrain.data:
-			terrain_data = terrain.data
-	if terrain_data != null and terrain_data.has_method("get_height"):
-		var h: float = terrain_data.get_height(Vector3(x, 0.0, z))
-		if not is_nan(h):
-			return h
-
-	if noise == null: return 0.0
-	var n: float = noise.get_noise_2d(x, z) * 0.5 + 0.5
+## Hauteur du relief généré (bruit) avec la marge de bordure plate (exactement comme à la génération des chunks).
+## Sert de repli tant que Terrain3D n'a pas de données.
+func get_map_border_height(gx: float, gz: float) -> float:
+	if noise == null:
+		return 0.0
+	var rect: Rect2 = _get_map_rect()
+	var sx: float = clampf(gx, border_margin, rect.end.x - border_margin)
+	var sz: float = clampf(gz, border_margin, rect.end.y - border_margin)
+	var n: float = noise.get_noise_2d(sx, sz) * 0.5 + 0.5
 	var t_contrasted: float = clampf((n - 0.5) * contrast + 0.5, 0.0, 1.0)
-	return lerp(min_height, max_height, _get_active_curve().sample_baked(t_contrasted))
+	return lerpf(min_height, max_height, _get_active_curve().sample_baked(t_contrasted))
+
+## Hauteur du sol en un point monde : Terrain3D dans la map, prolongement lisse du bord en dehors (sous l'arène)
+func get_terrain_height_at(x: float, z: float) -> float:
+	var rect: Rect2 = _get_map_rect()
+	if x < rect.position.x or x > rect.end.x or z < rect.position.y or z > rect.end.y:
+		var ag: Node = get_arena_generator()
+		if ag != null:
+			return ag.get_arena_ground_height(x, z)
+		return _sample_edge_height(clampf(x, rect.position.x + 0.5, rect.end.x - 0.5), clampf(z, rect.position.y + 0.5, rect.end.y - 0.5))
+	return _sample_edge_height(x, z)
 
 # Génération asynchrone pour ne JAMAIS faire crasher l'éditeur Godot !
 func generate_terrain_async() -> void:
@@ -232,6 +289,11 @@ func generate_terrain_async() -> void:
 	# Applique la seed sur le bruit de relief du terrain
 	noise.seed = world_seed
 	clear_terrain()
+	
+	# Tirage au hasard d'UNE arène par slot (Nord / Ouest / Est) : doit précéder la génération des routes
+	var arena_gen: Node = get_arena_generator()
+	if arena_gen != null:
+		arena_gen.select_arenas(world_seed)
 	
 	# Pause d'une frame pour laisser Godot respirer après le nettoyage
 	await get_tree().process_frame
@@ -261,8 +323,11 @@ func generate_terrain_async() -> void:
 	if path_generator != null:
 		path_generator.generate_branching_path(map_min_x, map_max_x, map_min_z, map_max_z, world_seed)
 
-		
+	# Initialisation des sols plats pour toutes les arènes actives (Nord, Ouest, Est, etc.)
 	var active_curve: Curve = _get_active_curve()
+	if arena_gen != null:
+		arena_gen.init_zones()
+		
 	var chunks_generated: int = 0
 	var ctrl_default: int = ((0 & 0x1F) << 27) | ((1 & 0x1F) << 22) | (1 << 1)
 	var h_smooth_radius: float = 5.0
@@ -289,7 +354,6 @@ func generate_terrain_async() -> void:
 					if not (chunk_max_x < seg.min_x - w or chunk_min_x > seg.max_x + w or chunk_max_z < seg.min_y - w or chunk_min_z > seg.max_y + w):
 						chunk_segments.append(seg)
 			var seg_count: int = chunk_segments.size()
-			
 			# ===== PHASE 1 : Rasterisation des chemins (segment-first) =====
 			var path_blend_array: PackedFloat32Array = PackedFloat32Array()
 			path_blend_array.resize(region_size * region_size)
@@ -405,6 +469,10 @@ func generate_terrain_async() -> void:
 	
 	# Placement des points d'intérêt (Encounters)
 	_place_encounter_markers(terrain_data)
+	
+	# Placement et génération de toutes les arènes configurées
+	if arena_gen != null:
+		arena_gen.spawn_arenas()
 	
 	
 	# Génère automatiquement le mur d'arbres de bordure s'il y a un BorderTreeWall

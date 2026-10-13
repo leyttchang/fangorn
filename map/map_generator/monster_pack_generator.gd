@@ -476,10 +476,16 @@ func _spawn_roam_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGen
 	var attempts = 0
 	var max_attempts = count * 15
 	
+	var b_margin: float = 35.0
+	var map_gen = get_parent()
+	if map_gen and "border_margin" in map_gen:
+		b_margin = float(map_gen.border_margin)
+	var spawn_margin: float = maxf(60.0, b_margin + 25.0)
+	
 	while spawned_count < count and attempts < max_attempts:
 		attempts += 1
-		var rx = rng.randf_range(min_x + 60.0, max_x - 60.0)
-		var rz = rng.randf_range(min_z + 60.0, max_z - 60.0)
+		var rx = rng.randf_range(min_x + spawn_margin, max_x - spawn_margin)
+		var rz = rng.randf_range(min_z + spawn_margin, max_z - spawn_margin)
 		var c = Vector2(rx, rz)
 		
 		# 1. Éviter les routes principales (rester dans la forêt)

@@ -518,6 +518,47 @@ func _get_encounter_positions() -> Array[Vector2]:
 				if not already_present:
 					positions.append(p2)
 					
+	# Évitement de toutes les arènes actives (Nord, Ouest, Est, etc.)
+	if map_generator != null and map_generator.has_method("get_arena_zones"):
+		for zone in map_generator.get_arena_zones():
+			var arena_c: Vector2 = zone.get("center", Vector2.ZERO)
+			if arena_c != Vector2.ZERO:
+				var already: bool = false
+				for ep in positions:
+					if ep.distance_squared_to(arena_c) < 16.0:
+						already = true
+						break
+				if not already:
+					positions.append(arena_c)
+					
+	# Fallback d'évitement historique
+	if path_generator != null and "boss_arena_pos" in path_generator and path_generator.boss_arena_pos != Vector2.ZERO:
+		var arena_pos = path_generator.boss_arena_pos
+		var arena_dir = path_generator.boss_arena_dir if "boss_arena_dir" in path_generator else Vector2(0, -1)
+		var arena_center = arena_pos + arena_dir * 7.5
+		var already = false
+		for ep in positions:
+			if ep.distance_squared_to(arena_center) < 16.0:
+				already = true
+				break
+		if not already:
+			positions.append(arena_center)
+			
+	var boss_arena_node = null
+	if map_generator != null:
+		boss_arena_node = map_generator.find_child("Boss_arena", true, false)
+	if boss_arena_node == null and get_parent() != null:
+		boss_arena_node = get_parent().find_child("Boss_arena", true, false)
+	if boss_arena_node != null and is_instance_valid(boss_arena_node):
+		var p_arena = Vector2(boss_arena_node.global_position.x, boss_arena_node.global_position.z)
+		var already = false
+		for ep in positions:
+			if ep.distance_squared_to(p_arena) < 16.0:
+				already = true
+				break
+		if not already:
+			positions.append(p_arena)
+					
 	return positions
 
 ## Vérifie si un point (px, pz) est dans le rayon de dégagement d'un encounter

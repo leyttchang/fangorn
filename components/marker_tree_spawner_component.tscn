@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dlgah7gunxiqi"]
+
+[ext_resource type="Script" uid="uid://con7i6k1g431o" path="res://components/marker_tree_spawner_component.gd" id="1_spawner"]
+[ext_resource type="PackedScene" uid="uid://dmt1gbe4mnsjl" path="res://objet/tree/Island_tree_hb.tscn" id="2_370ih"]
+[ext_resource type="PackedScene" uid="uid://c5gdrmuh4i2tb" path="res://objet/tree/dead_tree.tscn" id="3_jn6qd"]
+
+[sub_resource type="Curve3D" id="Curve3D_866kh"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -10.607712, 0, -0.251175, 0, 0, 0, 0, 0, 0, -14.577801, -0.007817372, -1.0192041, 0, 0, 0, 0, 0, 0, -16.767258, -0.012245178, -1.4525208, 0, 0, 0, 0, 0, 0, -19.171741, -0.09458637, -1.9512444, 0, 0, 0, 0, 0, 0, -62.2788, -0.13860607, -7.8044224, 0, 0, 0, 0, 0, 0, -89.60685, -0.078409195, -38.04152, 0, 0, 0, 0, 0, 0, -115.59685, -0.030114174, -73.277855, 0, 0, 0, 0, 0, 0, -129.71191, 0.068730354, -118.06977, 0, 0, 0, 0, 0, 0, -91.76872, 0.21493912, -158.01741, 0, 0, 0, 0, 0, 0, -33.150238, 0.304883, -178.74011, 0, 0, 0, 0, 0, 0, -2.3440819, 0.24450302, -127.321236, 0, 0, 0, 0, 0, 0, 41.02858, 0.2098856, -178.30078, 0, 0, 0, 0, 0, 0, 78.22102, 0.21510792, -189.79283, 0, 0, 0, 0, 0, 0, 109.13373, 0.1692915, -171.46971, 0, 0, 0, 0, 0, 0, 116.92734, 0.2871418, -139.02519, 0, 0, 0, 0, 0, 0, 122.546814, 0.3768444, -117.19819, 0, 0, 0, 0, 0, 0, 122.33652, 0.25680637, -67.47179, 0, 0, 0, 0, 0, 0, 86.76871, 0.06930542, -14.017907, 0, 0, 0, 0, 0, 0, 63.48484, -0.008164406, -4.36362, 0, 0, 0, 0, 0, 0, 19.762726, -0.10973263, -2.1115196, 0, 0, 0, 0, 0, 0, 17.532223, -0.13831806, -0.70487773, 0, 0, 0, 0, 0, 0, 15.516881, -0.030126572, -1.2735213, 0, 0, 0, 0, 0, 0, 13.282771, 0.23629475, -0.144808),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, -0.0038860652, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 23
+
+[node name="MarkerTreeSpawnerComponent" type="Node3D" unique_id=184920110 node_paths=PackedStringArray("wall_path_3d")]
+script = ExtResource("1_spawner")
+tree_scenes = Array[PackedScene]([ExtResource("2_370ih"), ExtResource("3_jn6qd")])
+wall_path_3d = NodePath("Path3D")
+smoothing_iterations = 1
+
+[node name="Path3D" type="Path3D" parent="." unique_id=1679988932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 0, 0.027028322)
+curve = SubResource("Curve3D_866kh")
