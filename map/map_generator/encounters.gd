@@ -106,7 +106,6 @@ func spawn_encounters(encounter_seed: int = 0) -> void:
 		var instance = scn.instantiate()
 		
 		if instance is Node3D:
-			instance.global_position = marker.global_position
 			if randomize_rotation:
 				instance.rotation.y = rng.randf_range(0.0, TAU)
 				

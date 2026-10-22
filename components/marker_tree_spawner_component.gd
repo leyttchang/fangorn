@@ -18,17 +18,12 @@ const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 @export_category("Marqueurs Ponctuels (Marker3D)")
 ## Nœud conteneur optionnel des Marker3D. Si vide, recherche parmi les enfants de ce composant.
 @export var markers_container: Node3D = null
-## Masquer automatiquement les Marker3D et Line2D au lancement du jeu
+## Masquer automatiquement les Marker3D au lancement du jeu
 @export var hide_markers_in_game: bool = true
 
-@export_category("Mur d'Arbres le long d'une Ligne")
-## Nœud Line2D pour tracer un mur d'arbres. Si vide, cherche un nœud Line2D enfant.
-## Les coordonnées (X, Y) de la Line2D correspondent aux axes (X, Z) dans l'espace 3D.
-@export var wall_line_2d: Line2D = null
-## Nœud Path3D alternatif si tu préfères tracer une courbe 3D directement dans la vue 3D
+@export_category("Mur d'Arbres le long d'une Courbe")
+## Nœud Path3D qui trace le mur d'arbres (courbe dessinée directement dans la vue 3D)
 @export var wall_path_3d: Path3D = null
-## Points 2D saisis directement dans l'inspecteur (si tu ne souhaites pas créer de nœud Line2D)
-@export var wall_points_2d: PackedVector2Array = []
 ## Boucler le mur (relie automatiquement le dernier point au premier point)
 @export var close_wall_loop: bool = false
 ## Espacement automatique calculé selon l'épaisseur exacte du tronc de chaque arbre
@@ -65,8 +60,6 @@ const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 @export var height_offset: float = 0.0
 ## Rayon de sonde pour compenser les pentes (enfonce légèrement le tronc pour éviter qu'il flotte)
 @export var ground_slope_compensation: bool = true
-## Référence explicite au Terrain3D (détecté automatiquement dans la scène si non renseigné)
-@export var terrain: Node3D = null
 
 @export_category("Physique & Collisions")
 ## Activer les collisions physiques sur les arbres générés
@@ -106,9 +99,10 @@ const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 			clear_now = false
 			clear_spawned_trees()
 
-## Fournisseur de hauteur optionnel (Callable(x, z) -> float). Prioritaire sur Terrain3D / raycast :
-## permet de poser les arbres pile sur un sol personnalisé (ex : sol d'arène hors de la map).
+## Fournisseur de hauteur (Callable(x, z) -> float), SEULE source de hauteur du sol quand snap_to_ground est actif :
+## il est défini par l'ArenaGenerator (MapGenerator.get_terrain_height_at) et pose les arbres pile sur le sol, même hors de la map.
 var height_provider: Callable = Callable()
+var _ground_error_reported: bool = false
 
 var _physics_body_rids: Array[RID] = []
 var _spawned_instances_data: Array[Dictionary] = []
@@ -137,7 +131,7 @@ func spawn_trees() -> void:
 		push_warning("[MarkerTreeSpawnerComponent] Aucun modèle d'arbre valide disponible.")
 		return
 	
-	_resolve_terrain()
+	_ground_error_reported = false
 	
 	var rng = RandomNumberGenerator.new()
 	if random_seed > 0:
@@ -339,21 +333,18 @@ func _add_tree_instance(pos_xz: Vector3, final_scale: float, rot_y: float, pick_
 	var trunk_radius: float = v_data["trunk_radius"] * final_scale
 	
 	if snap_to_ground:
-		var detected_y = _get_ground_height(pos_xz.x, pos_xz.z, pos_xz.y)
-		if not is_nan(detected_y):
-			ground_y = detected_y
-			if ground_slope_compensation and trunk_radius > 0.0:
-				var tr = trunk_radius
-				var h_n = _get_ground_height(pos_xz.x, pos_xz.z + tr, ground_y)
-				var h_s = _get_ground_height(pos_xz.x, pos_xz.z - tr, ground_y)
-				var h_e = _get_ground_height(pos_xz.x + tr, pos_xz.z, ground_y)
-				var h_w = _get_ground_height(pos_xz.x - tr, pos_xz.z, ground_y)
-				var min_h = ground_y
-				if not is_nan(h_n): min_h = minf(min_h, h_n)
-				if not is_nan(h_s): min_h = minf(min_h, h_s)
-				if not is_nan(h_e): min_h = minf(min_h, h_e)
-				if not is_nan(h_w): min_h = minf(min_h, h_w)
-				ground_y = min_h - 0.15
+		var detected_y: float = _get_ground_height(pos_xz.x, pos_xz.z)
+		if is_nan(detected_y):
+			return # sol inconnu : pas d'arbre plutôt qu'un arbre à une hauteur arbitraire
+		ground_y = detected_y
+		if ground_slope_compensation and trunk_radius > 0.0:
+			var tr = trunk_radius
+			var min_h = ground_y
+			for probe in [Vector2(0.0, tr), Vector2(0.0, -tr), Vector2(tr, 0.0), Vector2(-tr, 0.0)]:
+				var h_probe: float = _get_ground_height(pos_xz.x + probe.x, pos_xz.z + probe.y)
+				if not is_nan(h_probe):
+					min_h = minf(min_h, h_probe)
+			ground_y = min_h - 0.15
 	
 	var final_y: float = ground_y - (v_data["ground_offset"] * final_scale) + height_offset
 	var tree_world_pos: Vector3 = Vector3(pos_xz.x, final_y, pos_xz.z)
@@ -414,43 +405,10 @@ func _collect_markers() -> Array[Marker3D]:
 
 func _collect_wall_points() -> Array[Vector3]:
 	var points_3d: Array[Vector3] = []
-	
-	# 1. Vérification Line2D (assigné ou enfant)
-	var line_node: Line2D = wall_line_2d
-	if line_node == null:
-		for child in find_children("*", "Line2D", true, false):
-			if child is Line2D:
-				line_node = child
-				break
-				
-	if line_node != null and not line_node.points.is_empty():
-		if hide_markers_in_game:
-			line_node.visible = false
-		for pt in line_node.points:
-			var off_x = line_node.position.x if line_node.has_method("get_position") else 0.0
-			var off_z = line_node.position.y if line_node.has_method("get_position") else 0.0
-			var local_3d = Vector3(off_x + pt.x, 0.0, off_z + pt.y)
-			points_3d.append(to_global(local_3d))
+	if wall_path_3d == null or wall_path_3d.curve == null:
 		return points_3d
-		
-	# 2. Vérification Path3D (assigné ou enfant)
-	var path_node: Path3D = wall_path_3d
-	if path_node == null:
-		for child in find_children("*", "Path3D", true, false):
-			if child is Path3D:
-				path_node = child
-				break
-	if path_node != null and path_node.curve != null:
-		var baked = path_node.curve.get_baked_points()
-		for pt in baked:
-			points_3d.append(path_node.to_global(pt))
-		return points_3d
-		
-	# 3. Points 2D saisis dans l'inspecteur
-	if not wall_points_2d.is_empty():
-		for pt in wall_points_2d:
-			points_3d.append(to_global(Vector3(pt.x, 0.0, pt.y)))
-			
+	for pt in wall_path_3d.curve.get_baked_points():
+		points_3d.append(wall_path_3d.to_global(pt))
 	return points_3d
 
 func _prepare_tree_models() -> Array[Dictionary]:
@@ -543,56 +501,19 @@ func _extract_model_data(scene: PackedScene) -> Dictionary:
 	inst.queue_free()
 	return result
 
-func _resolve_terrain() -> void:
-	if terrain != null:
-		return
-	if is_inside_tree():
-		if get_tree().current_scene != null:
-			var found = get_tree().current_scene.find_child("Terrain3D", true, false)
-			if found != null and found is Node3D:
-				terrain = found
-				return
-		var found_root = get_tree().root.find_child("Terrain3D", true, false)
-		if found_root != null and found_root is Node3D:
-			terrain = found_root
-
-func _get_ground_height(px: float, pz: float, default_y: float) -> float:
-	if height_provider.is_valid():
-		var provided = height_provider.call(px, pz)
-		if provided is float and not is_nan(provided):
-			return provided
-	if terrain != null:
-		if terrain.has_method("get_height"):
-			var th: float = terrain.get_height(Vector3(px, 0.0, pz))
-			if not is_nan(th):
-				return th
-		var terrain_data = null
-		if "storage" in terrain and terrain.storage:
-			terrain_data = terrain.storage
-		elif "data" in terrain and terrain.data:
-			terrain_data = terrain.data
-		if terrain_data != null and terrain_data.has_method("get_height"):
-			var h: float = terrain_data.get_height(Vector3(px, 0.0, pz))
-			if not is_nan(h):
-				return h
-
-	if is_inside_tree() and get_tree() != null:
-		var map_gen = get_tree().root.find_child("Map_generator", true, false)
-		if map_gen != null and map_gen.has_method("get_terrain_height_at"):
-			var gh: float = map_gen.get_terrain_height_at(px, pz)
-			if not is_nan(gh):
-				return gh
-
-	if is_inside_tree() and get_world_3d() != null:
-		var space_state = get_world_3d().direct_space_state
-		var start_ray = Vector3(px, default_y + 50.0, pz)
-		var end_ray = Vector3(px, default_y - 80.0, pz)
-		var query = PhysicsRayQueryParameters3D.create(start_ray, end_ray, 1)
-		var hit = space_state.intersect_ray(query)
-		if not hit.is_empty() and hit.has("position"):
-			return hit["position"].y
-			
-	return default_y
+## Hauteur du sol en (px, pz) fournie par `height_provider` (seule source). NAN + erreur (une seule fois) si le fournisseur
+## est absent/invalide ou ne connaît pas ce point : l'appelant ne plante alors pas l'arbre.
+func _get_ground_height(px: float, pz: float) -> float:
+	if not height_provider.is_valid():
+		if not _ground_error_reported:
+			_ground_error_reported = true
+			push_error("[MarkerTreeSpawnerComponent] height_provider non défini : impossible de poser les arbres au sol (le composant doit être piloté par l'ArenaGenerator).")
+		return NAN
+	var h: float = height_provider.call(px, pz)
+	if is_nan(h) and not _ground_error_reported:
+		_ground_error_reported = true
+		push_error("[MarkerTreeSpawnerComponent] hauteur de sol introuvable en (%.1f, %.1f)." % [px, pz])
+	return h
 
 func _setup_all_collisions(variation_instances: Array[Array], active_variations: Array[Dictionary]) -> void:
 	for vi in range(active_variations.size()):

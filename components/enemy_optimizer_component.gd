@@ -162,6 +162,8 @@ func set_anim_culled(culled: bool) -> void:
 		_parent_body.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_INHERIT
 		if _anim_tree and not _anim_tree.active:
 			_anim_tree.active = true
+			if _parent_body.has_method("_sync_animation_state"):
+				_parent_body._sync_animation_state()
 		if _anim_player and _anim_tree == null and _was_anim_player_paused:
 			_was_anim_player_paused = false
 			if _anim_player.current_animation != "":

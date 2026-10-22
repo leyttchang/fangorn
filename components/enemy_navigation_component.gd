@@ -104,6 +104,29 @@ func acquire_target(current_target: Node3D = null) -> Node3D:
 		
 	return null
 
+var _chase_path: PackedVector3Array = PackedVector3Array()
+var _chase_path_index: int = 0
+var _last_chase_target_pos: Vector3 = Vector3.INF
+
+func _refresh_chase_path(from_pos: Vector3, target_position: Vector3) -> void:
+	_last_chase_target_pos = target_position
+	if _parent_body != null and is_instance_valid(_parent_body):
+		var world_3d = _parent_body.get_world_3d()
+		if world_3d:
+			var nav_map = world_3d.navigation_map
+			if nav_map.is_valid():
+				var p = NavigationServer3D.map_get_path(nav_map, from_pos, target_position, true)
+				if not p.is_empty():
+					_chase_path = p
+					_chase_path_index = 1 if p.size() > 1 else 0
+					return
+	if nav_agent != null:
+		nav_agent.target_position = target_position
+		var p = nav_agent.get_current_navigation_path()
+		if not p.is_empty():
+			_chase_path = p
+			_chase_path_index = 1 if p.size() > 1 else 0
+
 # L'IA appelle juste cette fonction, le composant fait le reste !
 func get_direction_to_target(target_position: Vector3) -> Vector3:
 	if nav_agent == null or _parent_body == null: return Vector3.ZERO
@@ -111,6 +134,7 @@ func get_direction_to_target(target_position: Vector3) -> Vector3:
 	frames_since_path_update += 1
 	
 	var my_pos = _parent_body.global_position
+	var my_pos_2d = Vector2(my_pos.x, my_pos.z)
 	var to_target_2d = Vector2(target_position.x - my_pos.x, target_position.z - my_pos.z)
 	var dist_to_target = to_target_2d.length()
 	
@@ -122,33 +146,43 @@ func get_direction_to_target(target_position: Vector3) -> Vector3:
 			return Vector3(dir_2d.x, 0.0, dir_2d.y)
 		return Vector3.ZERO
 	
-	# Ne recalculer le chemin vers la cible mobile que si elle a bougé significativement (> 1.5m) ou après délai
-	var target_moved = nav_agent.target_position.distance_squared_to(target_position) > 2.25
-	if target_moved or frames_since_path_update >= next_path_update_frame:
-		nav_agent.target_position = target_position
+	# Recalculer le chemin si la cible a bougé (> 1.0m en 2D) ou après un court délai (8-14 frames)
+	var target_moved = not _last_chase_target_pos.is_finite() or Vector2(_last_chase_target_pos.x - target_position.x, _last_chase_target_pos.z - target_position.z).length_squared() > 1.0
+	if target_moved or frames_since_path_update >= next_path_update_frame or _chase_path.is_empty():
+		_refresh_chase_path(my_pos, target_position)
 		frames_since_path_update = 0
-		next_path_update_frame = randi_range(15, 25)
+		next_path_update_frame = randi_range(8, 14)
 		
-	if nav_agent.is_navigation_finished():
-		if dist_to_target > 0.05:
-			var dir_2d = to_target_2d.normalized()
-			return Vector3(dir_2d.x, 0.0, dir_2d.y)
-		return Vector3.ZERO
+	# Progression le long des waypoints en 2D (XZ uniquement, insensible aux écarts de hauteur Y)
+	while _chase_path_index < _chase_path.size() - 1:
+		var wp = _chase_path[_chase_path_index]
+		var wp_2d = Vector2(wp.x, wp.z)
+		var to_wp_2d = wp_2d - my_pos_2d
 		
-	var next_path_pos = nav_agent.get_next_path_position()
-	var to_next_2d = Vector2(next_path_pos.x - my_pos.x, next_path_pos.z - my_pos.z)
-	
-	# Si le point retourné par NavAgent est sous nos pieds (index 0 non validé à cause de la hauteur Y)
-	if to_next_2d.length() < 1.0:
-		var p = nav_agent.get_current_navigation_path()
-		var idx = nav_agent.get_current_navigation_path_index()
-		if idx < p.size() - 1:
-			next_path_pos = p[idx + 1]
-			to_next_2d = Vector2(next_path_pos.x - my_pos.x, next_path_pos.z - my_pos.z)
+		# 1. Waypoint atteint en 2D (<= 1.6m) ou index 0 (point de départ sous nos pieds)
+		if _chase_path_index == 0 or to_wp_2d.length_squared() <= 2.56:
+			_chase_path_index += 1
+			continue
 			
-	if to_next_2d.length_squared() > 0.001:
-		var dir = to_next_2d.normalized()
-		return Vector3(dir.x, 0.0, dir.y)
+		# 2. Anti-demi-tour (overshoot) : si on a déjà dépassé le plan du waypoint le long du segment entrant
+		var prev_wp = _chase_path[_chase_path_index - 1]
+		var in_seg_2d = wp_2d - Vector2(prev_wp.x, prev_wp.z)
+		if in_seg_2d.length_squared() > 0.001 and to_wp_2d.dot(in_seg_2d) <= 0.0 and to_wp_2d.length_squared() <= 9.0:
+			_chase_path_index += 1
+			continue
+			
+		break
+		
+	if _chase_path_index < _chase_path.size():
+		var target_wp = _chase_path[_chase_path_index]
+		var to_next_2d = Vector2(target_wp.x - my_pos.x, target_wp.z - my_pos.z)
+		# Si on est sur le dernier waypoint et très proche, viser directement la cible réelle
+		if _chase_path_index == _chase_path.size() - 1 and to_next_2d.length_squared() <= 2.56:
+			var dir_direct = to_target_2d.normalized()
+			return Vector3(dir_direct.x, 0.0, dir_direct.y)
+		if to_next_2d.length_squared() > 0.001:
+			var dir = to_next_2d.normalized()
+			return Vector3(dir.x, 0.0, dir.y)
 		
 	# Fallback direct vers la cible
 	if dist_to_target > 0.05:

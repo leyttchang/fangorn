@@ -7,12 +7,32 @@
 [ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="5_tntou"]
 [ext_resource type="PackedScene" uid="uid://bwv7mkwsym0an" path="res://character/enemie/spider/spider_enemie.tscn" id="6_slkff"]
 [ext_resource type="PackedScene" uid="uid://c5if6kfbecjch" path="res://map/encounters/pnj_buff_choice/pnj_buff_choice.tscn" id="7_kjnfc"]
+[ext_resource type="Texture2D" uid="uid://bmak41didxgqg" path="res://assets/texture/barrel_textures/wooden_barrel_diff_1k.jpg" id="7_ydhf4"]
+[ext_resource type="Texture2D" uid="uid://f37gd7aci07g" path="res://assets/texture/barrel_textures/wooden_barrel_arm_1k.jpg" id="8_u5cs5"]
+[ext_resource type="Texture2D" uid="uid://yixb63oqklq" path="res://assets/texture/barrel_textures/wooden_barrel_nor_gl_1k.jpg" id="9_3heln"]
+[ext_resource type="Texture2D" uid="uid://bs473jtd4ujuq" path="res://assets/texture/medieval_wood_textures/medieval_wood_diff_1k.jpg" id="10_uccwy"]
+[ext_resource type="Texture2D" uid="uid://cjg7pbu0oe4u7" path="res://assets/texture/medieval_wood_textures/medieval_wood_nor_gl_1k.jpg" id="11_p22uc"]
+[ext_resource type="Texture2D" uid="uid://cj8kt7bjf5spv" path="res://assets/texture/medieval_wood_textures/medieval_wood_rough_1k.jpg" id="12_m5eq2"]
+[ext_resource type="Texture2D" uid="uid://clo8lug1pq48h" path="res://assets/texture/rusty_metal_textures/rusty_metal_04_diff_1k.jpg" id="13_l8cer"]
+[ext_resource type="Texture2D" uid="uid://cgx5ogle5p6cq" path="res://assets/texture/rusty_metal_textures/rusty_metal_04_arm_1k.jpg" id="14_07c3q"]
+[ext_resource type="Texture2D" uid="uid://di54mobd6cot8" path="res://assets/texture/rusty_metal_textures/rusty_metal_04_nor_gl_1k.jpg" id="15_3tpdi"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5qft7"]
 resource_name = "bar"
 cull_mode = 2
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+albedo_texture = ExtResource("7_ydhf4")
+metallic = 1.0
+metallic_texture = ExtResource("8_u5cs5")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("8_u5cs5")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 1.5
+normal_texture = ExtResource("9_3heln")
+ao_enabled = true
+ao_texture = ExtResource("8_u5cs5")
+uv1_scale = Vector3(1, 5, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_nyayl"]
 _surfaces = [{
@@ -56,7 +76,12 @@ radius = 0.335
 resource_name = "cage"
 cull_mode = 2
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+albedo_texture = ExtResource("10_uccwy")
+albedo_texture_force_srgb = true
+roughness_texture = ExtResource("12_m5eq2")
+normal_enabled = true
+normal_texture = ExtResource("11_p22uc")
+uv1_scale = Vector3(2, 3, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_4eisc"]
 _surfaces = [{
@@ -133,13 +158,27 @@ shadow_mesh = SubResource("ArrayMesh_qiakg")
 resource_name = "screw"
 cull_mode = 2
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+albedo_texture = ExtResource("13_l8cer")
+metallic = 1.0
+metallic_texture = ExtResource("14_07c3q")
+metallic_texture_channel = 1
+roughness_texture = ExtResource("14_07c3q")
+roughness_texture_channel = 2
+normal_enabled = true
+normal_scale = 1.75
+normal_texture = ExtResource("15_3tpdi")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a4f2m"]
 resource_name = "wood"
 cull_mode = 2
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+albedo_texture = ExtResource("10_uccwy")
+albedo_texture_force_srgb = true
+roughness_texture = ExtResource("12_m5eq2")
+normal_enabled = true
+normal_scale = 0.6
+normal_texture = ExtResource("11_p22uc")
+uv1_scale = Vector3(15, 2, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_b2swx"]
 _surfaces = [{
@@ -201,7 +240,18 @@ shadow_mesh = SubResource("ArrayMesh_b2swx")
 resource_name = "chain"
 cull_mode = 2
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+albedo_texture = ExtResource("13_l8cer")
+metallic = 1.0
+metallic_texture = ExtResource("14_07c3q")
+metallic_texture_channel = 1
+roughness_texture = ExtResource("14_07c3q")
+roughness_texture_channel = 2
+normal_enabled = true
+normal_scale = 2.79
+normal_texture = ExtResource("15_3tpdi")
+ao_enabled = true
+ao_texture = ExtResource("14_07c3q")
+uv1_scale = Vector3(6, 1, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_wr7g3"]
 _surfaces = [{
@@ -389,6 +439,7 @@ mesh = SubResource("ArrayMesh_g8c0c")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="cage/bar11" unique_id=1232488289]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45523, 0)
+visible = false
 shape = SubResource("CylinderShape3D_bar")
 
 [node name="bar12" type="RigidBody3D" parent="cage" unique_id=1749488227]
@@ -401,6 +452,7 @@ mesh = SubResource("ArrayMesh_g8c0c")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="cage/bar12" unique_id=720730466]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45523, 0)
+visible = false
 shape = SubResource("CylinderShape3D_bar")
 
 [node name="plateau_haut" type="RigidBody3D" parent="cage" unique_id=280041468]
@@ -431,4 +483,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.105112, 4.59798, 0)
 target_position = Vector3(0, -35, 0)
 
 [node name="Pnj_buff_choice" parent="." unique_id=1588798652 instance=ExtResource("7_kjnfc")]
-transform = Transform3D(0.51, 0, 0, 0, 0.51, 0, 0, 0, 0.51, -0.105112, 4.59798, 0)
+transform = Transform3D(0.51, 0, 0, 0, 0.51, 0, 0, 0, 0.51, -0.100015745, 4.622636, 0.0047367364)

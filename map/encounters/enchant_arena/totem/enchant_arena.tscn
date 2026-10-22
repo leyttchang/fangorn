@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dyklit8jt5ry5"]
+
+[ext_resource type="Script" uid="uid://460hbg4kvijr" path="res://map/encounters/enchant_arena/totem/enchant_arena.gd" id="1_bhjao"]
+[ext_resource type="PackedScene" uid="uid://dlgah7gunxiqi" path="res://components/marker_tree_spawner_component.tscn" id="1_gh1lj"]
+[ext_resource type="PackedScene" uid="uid://bjpvlflywckyu" path="res://map/encounters/mob_raycast_spawner/mob_raycast_spawner.tscn" id="3_l614n"]
+[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="4_dumb"]
+[ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="5_archer"]
+[ext_resource type="PackedScene" uid="uid://bj37u0qrir8ld" path="res://character/enemie/Scout/scout.tscn" id="6_scout"]
+[ext_resource type="PackedScene" uid="uid://bwv7mkwsym0an" path="res://character/enemie/spider/spider_enemie.tscn" id="7_spider"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bmelk"]
+size = Vector3(57, 5, 7)
+
+[node name="enchant_arena" type="Node3D" unique_id=2038537605 node_paths=PackedStringArray("totem_spawn_marker", "mob_spawner")]
+script = ExtResource("1_bhjao")
+totem_spawn_marker = NodePath("enchant_totem_pos")
+mob_spawner = NodePath("mob_raycast_spawner")
+
+[node name="entry" type="Marker3D" parent="." unique_id=507703453]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8136554, 0, -0.026209831)
+
+[node name="MarkerTreeSpawnerComponent" parent="." unique_id=184920110 instance=ExtResource("1_gh1lj")]
+
+[node name="Boss_spawn_position" type="Marker3D" parent="." unique_id=578107317]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -107)
+
+[node name="reward_position" type="Marker3D" parent="." unique_id=1590267674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09410858, 0, -36.019608)
+
+[node name="entry_detection" type="Area3D" parent="." unique_id=620107321]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="entry_detection" unique_id=1331280826]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -3)
+shape = SubResource("BoxShape3D_bmelk")
+
+[node name="enchant_totem_pos" type="Marker3D" parent="." unique_id=2040589670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32635117, -1.5258789e-05, -84.654785)
+
+[node name="mob_raycast_spawner" parent="." unique_id=603506095 instance=ExtResource("3_l614n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.554604, -0.22628403, -88.04575)
+monster_scenes = Array[PackedScene]([ExtResource("4_dumb"), ExtResource("5_archer"), ExtResource("6_scout"), ExtResource("7_spider")])
+monster_costs = Array[int]([10, 15, 25, 5, 20])
+monster_weights = Array[float]([1.2, 1.0, 0.7, 1.2, 0.2])
+base_credits = 200
+spawn_radius = 67.5
+min_spawn_radius = 4.0
+
+[editable path="MarkerTreeSpawnerComponent"]

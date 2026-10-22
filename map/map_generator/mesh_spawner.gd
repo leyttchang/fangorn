@@ -15,8 +15,6 @@ const TreeSpawnEntry = preload("res://map/map_generator/tree_spawn_entry.gd")
 ## Liste des différentes espèces/variations d'arbres avec leur poids d'apparition.
 ## Tu peux y glisser des fichiers .tres ou créer de nouveaux TreeSpawnEntry directement ici !
 @export var tree_variations: Array[TreeSpawnEntry] = []
-## Scène d'arbre de repli (utilisée si tree_variations est vide)
-@export var tree_scene: PackedScene = preload("res://objet/tree/Island_tree_hb.tscn")
 
 @export_category("Bruit de Forêt (Densité)")
 ## FastNoiseLite pour gérer la répartition des massifs de forêts et des clairières
@@ -82,7 +80,6 @@ var _cached_tree_mesh: Mesh = null
 var _cached_tree_material: Material = null
 
 func _ready() -> void:
-	_ensure_default_noise()
 	_connect_to_map_generator()
 	
 
@@ -94,16 +91,7 @@ func _safe_await_frame() -> void:
 	if is_inside_tree() and get_tree() != null:
 		await get_tree().process_frame
 
-func _ensure_default_noise() -> void:
-	if forest_noise == null:
-		forest_noise = FastNoiseLite.new()
-		forest_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-		forest_noise.frequency = 0.005
-		forest_noise.fractal_octaves = 3
-
 func _connect_to_map_generator() -> void:
-	if map_generator == null and get_parent() != null and get_parent().name == "Map_generator":
-		map_generator = get_parent()
 	if terrain == null and map_generator and "terrain" in map_generator:
 		terrain = map_generator.terrain
 	if path_generator == null and map_generator and "path_generator" in map_generator:
@@ -135,12 +123,16 @@ func generate_trees() -> void:
 	_is_generating = true
 	
 	_connect_to_map_generator()
-	if map_generator != null and "world_seed" in map_generator:
-		spawn_seed = map_generator.world_seed
-	elif map_generator != null and "map_seed" in map_generator:
-		spawn_seed = map_generator.map_seed
-		
-	_ensure_default_noise()
+	if map_generator == null:
+		push_error("MeshSpawner: Aucun MapGenerator assigné !")
+		_is_generating = false
+		return
+	spawn_seed = map_generator.world_seed
+	
+	if forest_noise == null:
+		push_error("MeshSpawner: Aucun bruit de forêt (forest_noise) assigné !")
+		_is_generating = false
+		return
 	forest_noise.seed = spawn_seed + 101
 	
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -151,11 +143,7 @@ func generate_trees() -> void:
 		_is_generating = false
 		return
 
-		
-	var terrain_data = null
-	if "data" in terrain: terrain_data = terrain.data
-	elif "storage" in terrain: terrain_data = terrain.storage
-	
+	var terrain_data = terrain.data
 	if terrain_data == null:
 		push_error("MeshSpawner: Impossible d'accéder aux données de Terrain3D !")
 		_is_generating = false
@@ -182,18 +170,8 @@ func generate_trees() -> void:
 				else:
 					push_warning("MeshSpawner: Pas de MeshInstance3D valide dans '" + entry.name + "'")
 	
-	# Si aucune variation valide dans tree_variations, on utilise tree_scene en repli
 	if active_variations.is_empty():
-		if tree_scene != null:
-			var data = _extract_tree_model_data(tree_scene)
-			if data.mesh != null:
-				data["name"] = "DefaultTree"
-				data["weight"] = 1.0
-				data["scale_multiplier"] = 1.0
-				active_variations.append(data)
-				
-	if active_variations.is_empty():
-		push_error("MeshSpawner: Aucune variation d'arbre valide à générer !")
+		push_error("MeshSpawner: Aucune variation d'arbre valide dans tree_variations, aucun arbre généré !")
 		_is_generating = false
 		return
 		
@@ -519,45 +497,15 @@ func _get_encounter_positions() -> Array[Vector2]:
 					positions.append(p2)
 					
 	# Évitement de toutes les arènes actives (Nord, Ouest, Est, etc.)
-	if map_generator != null and map_generator.has_method("get_arena_zones"):
-		for zone in map_generator.get_arena_zones():
-			var arena_c: Vector2 = zone.get("center", Vector2.ZERO)
-			if arena_c != Vector2.ZERO:
-				var already: bool = false
-				for ep in positions:
-					if ep.distance_squared_to(arena_c) < 16.0:
-						already = true
-						break
-				if not already:
-					positions.append(arena_c)
-					
-	# Fallback d'évitement historique
-	if path_generator != null and "boss_arena_pos" in path_generator and path_generator.boss_arena_pos != Vector2.ZERO:
-		var arena_pos = path_generator.boss_arena_pos
-		var arena_dir = path_generator.boss_arena_dir if "boss_arena_dir" in path_generator else Vector2(0, -1)
-		var arena_center = arena_pos + arena_dir * 7.5
-		var already = false
+	for zone in map_generator.get_arena_zones():
+		var arena_c: Vector2 = zone["center"]
+		var already: bool = false
 		for ep in positions:
-			if ep.distance_squared_to(arena_center) < 16.0:
+			if ep.distance_squared_to(arena_c) < 16.0:
 				already = true
 				break
 		if not already:
-			positions.append(arena_center)
-			
-	var boss_arena_node = null
-	if map_generator != null:
-		boss_arena_node = map_generator.find_child("Boss_arena", true, false)
-	if boss_arena_node == null and get_parent() != null:
-		boss_arena_node = get_parent().find_child("Boss_arena", true, false)
-	if boss_arena_node != null and is_instance_valid(boss_arena_node):
-		var p_arena = Vector2(boss_arena_node.global_position.x, boss_arena_node.global_position.z)
-		var already = false
-		for ep in positions:
-			if ep.distance_squared_to(p_arena) < 16.0:
-				already = true
-				break
-		if not already:
-			positions.append(p_arena)
+			positions.append(arena_c)
 					
 	return positions
 

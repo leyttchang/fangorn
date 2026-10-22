@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dpnopmtribtg4" path="res://assets/texture/ground_37/ground_37_nrm_rgh.dds" id="5_ilvso"]
 [ext_resource type="Script" uid="uid://d1um2otic4npt" path="res://map/map_generator/mesh_spawner.gd" id="9_spwnr"]
 [ext_resource type="Script" uid="uid://cuxt4cock6soy" path="res://map/map_generator/tree_spawn_entry.gd" id="10_3mir5"]
+[ext_resource type="PackedScene" uid="uid://dyklit8jt5ry5" path="res://map/encounters/enchant_arena/totem/enchant_arena.tscn" id="10_syg1f"]
 [ext_resource type="PackedScene" uid="uid://dmt1gbe4mnsjl" path="res://objet/tree/Island_tree_hb.tscn" id="11_6laye"]
 [ext_resource type="PackedScene" uid="uid://c5gdrmuh4i2tb" path="res://objet/tree/dead_tree.tscn" id="12_oxtf5"]
 [ext_resource type="Script" uid="uid://cfjet45qxgxkj" path="res://map/map_generator/meteo.gd" id="13_ugmv5"]
@@ -23,7 +24,7 @@
 [ext_resource type="Script" uid="uid://ch4v15ofn4dvm" path="res://map/map_generator/timer_sys.gd" id="30_31r8i"]
 [ext_resource type="Script" uid="uid://cumjoo3uh1k6x" path="res://map/map_generator/border_tree_wall.gd" id="38_wall"]
 [ext_resource type="PackedScene" uid="uid://bl4ed2gewe8qv" path="res://map/encounters/Boss_arena/boss_arena.tscn" id="39_arena"]
-[ext_resource type="Script" path="res://map/map_generator/arena_generator.gd" id="40_arenagen"]
+[ext_resource type="Script" uid="uid://dx8s2wwe7qetm" path="res://map/map_generator/arena_generator.gd" id="40_arenagen"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_f1fk6"]
 noise_type = 3
@@ -161,8 +162,6 @@ map_height_chunks = 1
 max_height = 200.0
 contrast = 2.0
 height_curve = SubResource("Curve_bmxbe")
-smooth_factor = 1.0
-border_margin = 35.0
 
 [node name="Terrain3D" type="Terrain3D" parent="." unique_id=1489340855]
 data_directory = "res://map/map_generator/data_directorie"
@@ -178,12 +177,12 @@ script = ExtResource("2_6yjpd")
 [node name="path_generator" type="Node3D" parent="." unique_id=171877823]
 script = ExtResource("3_7ts6b")
 path_width = 10.0
-boss_arena_border_offset = 35.0
-close_boss_arena_border = true
 
-[node name="ArenaGenerator" type="Node3D" parent="."]
+[node name="ArenaGenerator" type="Node3D" parent="." unique_id=967461015]
 script = ExtResource("40_arenagen")
 north_arenas = Array[PackedScene]([ExtResource("39_arena")])
+west_arenas = Array[PackedScene]([ExtResource("10_syg1f")])
+east_arenas = Array[PackedScene]([ExtResource("10_syg1f")])
 
 [node name="MeshSpawner" type="Node3D" parent="." unique_id=1849204912 node_paths=PackedStringArray("map_generator", "terrain", "path_generator")]
 script = ExtResource("9_spwnr")

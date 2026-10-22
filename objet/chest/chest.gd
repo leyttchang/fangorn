@@ -16,6 +16,12 @@ extends Node3D
 @export var weight_rare: int = 30
 @export var weight_legendary: int = 10
 
+@export_group("Niveau & Enchantement (Boss / Event)")
+## Si > 0, force ce niveau (ilvl) pour les objets générés (ex: transmis par un Boss d'arène)
+@export var chest_ilvl: int = 0
+## Enchantement transmis par le boss (utilisé plus tard pour booster les affixes/loot du coffre)
+@export var chest_enchantment: Variant = null
+
 var is_open: bool = false
 var player_in_range: CharacterBody3D = null
 @onready var chest_inventory: InventoryComponent = $InventoryComponent
@@ -46,7 +52,7 @@ func open_chest() -> void:
 	# On ne génère le loot qu'une seule fois
 	if not has_generated_loot:
 		has_generated_loot = true
-		var ilvl = _get_ilvl_from_wave()
+		var ilvl = chest_ilvl if chest_ilvl > 0 else _get_ilvl_from_wave()
 		
 		var num_items = 1
 		if randf() * 100.0 <= chance_2nd_item:

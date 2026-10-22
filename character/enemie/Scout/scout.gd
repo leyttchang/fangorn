@@ -174,6 +174,21 @@ func change_state(new_state: State) -> void:
 
 		rpc("_rpc_apply_state", new_state, sync_anim, sync_float)
 
+func _sync_animation_state() -> void:
+	if not anim_playback:
+		return
+	match current_state:
+		State.IDLE:
+			anim_playback.travel("walk" if _is_pack_walking else "idle")
+		State.CHASE:
+			anim_playback.travel("run")
+		State.STRAFE:
+			anim_tree.set("parameters/strafe/TimeScale/scale", _strafe_dir)
+			anim_playback.travel("strafe")
+		State.ATTACK:
+			if _current_attack_anim != "":
+				anim_playback.travel(_current_attack_anim)
+
 @rpc("authority", "call_local", "reliable")
 func _rpc_apply_state(new_state: int, sync_anim: String = "", sync_float: float = 0.0) -> void:
 	if current_state == State.DEAD or current_state == new_state:
@@ -183,6 +198,7 @@ func _rpc_apply_state(new_state: int, sync_anim: String = "", sync_float: float 
 	
 	match current_state:
 		State.IDLE:
+			_is_pack_walking = false
 			anim_playback.travel("idle")
 		State.CHASE:
 			if is_multiplayer_authority():
@@ -214,7 +230,9 @@ func _process(delta: float) -> void:
 		if is_anim_culled or action_speed <= 0.0:
 			if anim_tree.active: anim_tree.active = false
 		else:
-			if not anim_tree.active: anim_tree.active = true
+			if not anim_tree.active:
+				anim_tree.active = true
+				_sync_animation_state()
 
 	if attack_shape != null:
 		if attack_shape.disabled != _last_hitbox_disabled:
@@ -355,6 +373,9 @@ func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) ->
 			change_state(State.STRAFE)
 			return vitesse_horiz
 		
+	if anim_tree.active and anim_playback and anim_playback.get_current_node() != "run":
+		anim_playback.travel("run")
+		
 	var direction = navigation_comp.get_direction_to_target(target.global_position)
 	movement_comp.rotate_towards_direction(direction, behavior, delta)
 	return movement_comp.accelerate_to_direction(vitesse_horiz, direction, speed, behavior, delta)
@@ -489,7 +510,7 @@ func _rpc_trigger_death(fatal_velocity: Vector3 = Vector3.ZERO) -> void:
 				child.apply_central_impulse(death_impulse * child.mass)
 		
 		if hips and hips is PhysicalBone3D:
-			hips.apply_central_impulse(Vector3(0, 4.0 * hips.mass, 0)) # Bond + Recul
+			hips.apply_central_impulse(Vector3(0, 1.5 * hips.mass, 0)) # Léger bond pour décoller du sol
 	elif skeleton != null and skeleton.has_method("physical_bones_start_simulation"):
 		skeleton.physical_bones_start_simulation()
 		

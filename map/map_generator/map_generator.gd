@@ -23,10 +23,10 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 
 # Taille d'une région (laisse 1024 pour Terrain3D)
 @export var region_size: int = 1024
-## Largeur de la carte (en nombre de chunks de 1024m)
-@export var map_width_chunks: int = 3
-## Longueur de la carte (en nombre de chunks de 1024m)
-@export var map_height_chunks: int = 3
+## Largeur de la carte (en nombre de chunks de 1024m, max 10 pour éviter les crashs)
+@export_range(1, 10) var map_width_chunks: int = 3
+## Longueur de la carte (en nombre de chunks de 1024m, max 10 pour éviter les crashs)
+@export_range(1, 10) var map_height_chunks: int = 3
 
 @export_category("Bordures du Monde")
 ## Largeur de la marge plate entourant la carte (en mètres). Le mur d'arbres se placera le long de cette limite.
@@ -41,8 +41,6 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 @export_range(0.5, 3.5, 0.1) var contrast: float = 1.6
 ## Courbe de relief : sculpte la forme du monde (plaines plates au début, montées douces, pics au sommet)
 @export var height_curve: Curve
-## Intensité du lissage (0.0 = aucun, 1.0 = maximum). Lisse les petites déformations sans effacer les collines.
-@export_range(0.0, 1.0, 0.05) var smooth_factor: float = 0.3
 
 @export_category("Brouillard de Distance (Distance Fog)")
 ## Active le brouillard masquant la fin de distance d'affichage des arbres (350m)
@@ -54,6 +52,16 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 
 ## Composant ArenaGenerator (enfant de ce nœud) : gère les arènes de boss (slots Nord / Ouest / Est).
 var _arena_gen: Node = null
+# Composants enfants requis, résolus et vérifiés par _validate_setup()
+var _mesh_spawner: Node = null
+var _grass_gen: Node = null
+var _border_wall: Node = null
+var _encounters: Node = null
+var _meteo: Node = null
+var _monster_packs: Node = null
+
+## Durée maximale d'attente de la cuisson du NavMesh avant abandon (en ms)
+const NAV_BAKE_TIMEOUT_MS: int = 300000
 
 func get_arena_generator() -> Node:
 	if _arena_gen == null or not is_instance_valid(_arena_gen):
@@ -66,19 +74,11 @@ func get_arena_generator() -> Node:
 
 ## Zones des arènes générées (utilisé par MeshSpawner pour éviter d'y placer des arbres)
 func get_arena_zones() -> Array[Dictionary]:
-	var ag: Node = get_arena_generator()
-	if ag == null:
-		var empty: Array[Dictionary] = []
-		return empty
-	return ag.get_zones()
+	return get_arena_generator().get_zones()
 
 ## Contours intérieurs des arènes (utilisé par GrassGenerator pour y planter de l'herbe)
 func get_arena_grass_polygons() -> Array[PackedVector2Array]:
-	var ag: Node = get_arena_generator()
-	if ag == null:
-		var empty: Array[PackedVector2Array] = []
-		return empty
-	return ag.arena_grass_polygons
+	return get_arena_generator().arena_grass_polygons
 
 
 @export_category("Actions")
@@ -100,189 +100,153 @@ func _ready() -> void:
 	if not Engine.is_editor_hint():
 		if is_standalone_scene():
 			GameData.current_game_mode = GameData.GameMode.NORMAL
-		# Ne détruire la caméra spectateur que si on est dans le vrai jeu (ex: sous game.tscn)
-		if not is_standalone_scene():
-			var cam2 = find_child("*Camera*", true, false)
-			if cam2 and cam2 is Camera3D:
-				cam2.queue_free()
+		else:
+			# Ne détruire la caméra spectateur que si on est dans le vrai jeu (ex: sous game.tscn)
+			var spectator_cam: Node = get_node_or_null("Camera3D")
+			if spectator_cam != null:
+				spectator_cam.queue_free()
 			
 		call_deferred("generate_terrain_async")
 
 func is_standalone_scene() -> bool:
-	if get_parent() == get_tree().root:
-		return true
-	if get_tree().current_scene == self or (get_tree().current_scene != null and get_tree().current_scene.name == "Map_generator"):
-		return true
-	return false
+	return get_tree().current_scene == self
 		
 func clear_terrain() -> void:
+	if not _validate_setup():
+		push_error("MapGenerator: nettoyage annulé (configuration incomplète).")
+		return
 	var time_start = Time.get_ticks_msec()
 	print("Nettoyage radical du terrain...")
-	var terrain_data = null
-	if "data" in terrain: terrain_data = terrain.data
-	elif "storage" in terrain: terrain_data = terrain.storage
 	
-	if terrain_data != null:
-		if terrain_data.has_method("get_region_offsets") and terrain_data.has_method("remove_region"):
-			var offsets = terrain_data.get_region_offsets()
-			for offset in offsets:
-				terrain_data.remove_region(offset)
-		elif terrain_data.has_method("clear_regions"):
-			terrain_data.clear_regions()
-			
-	if "data_directory" in terrain and terrain.data_directory != "":
-		var dir_path = terrain.data_directory
-		var dir = DirAccess.open(dir_path)
-		if dir:
-			dir.list_dir_begin()
-			var file_name = dir.get_next()
-			while file_name != "":
-				if file_name.ends_with(".res") or file_name.ends_with(".tres") or file_name.ends_with(".dat"):
-					dir.remove(file_name)
-				file_name = dir.get_next()
-			
-			terrain.data_directory = ""
-			terrain.data_directory = dir_path
-			
-	var mesh_spawner = find_child("MeshSpawner", true, false)
-	if mesh_spawner and mesh_spawner.has_method("clear_trees"):
-		mesh_spawner.clear_trees()
+	# Retire TOUTES les régions Terrain3D en mémoire (carte principale + extensions sous les arènes).
+	# Aucun fichier n'est touché sur le disque.
+	var terrain_data: Terrain3DData = terrain.data
+	for region: Terrain3DRegion in terrain_data.get_regions_active():
+		terrain_data.remove_region(region, false)
+	terrain_data.update_maps(Terrain3DRegion.TYPE_MAX, true, false)
+	
+	_mesh_spawner.clear_trees()
+	_grass_gen.clear_grass()
+	_encounters.clear_encounters()
+	_monster_packs.clear_monster_packs()
+	_border_wall.clear_wall()
 
 	var existing_occ = find_child("TerrainOccluder", true, false)
 	if existing_occ != null:
 		existing_occ.queue_free()
 		
-	var stack = [self]
-	while stack.size() > 0:
-		var current = stack.pop_back()
-		if current != self and current.has_method("clear_grass"):
-			current.clear_grass()
-		if current != self and current.has_method("clear_encounters"):
-			current.clear_encounters()
-		if current != self and current.has_method("clear_monster_packs"):
-			current.clear_monster_packs()
-		if current != self and current.has_method("clear_wall"):
-			current.clear_wall()
-		stack.append_array(current.get_children())
-		
-	# Nettoyer toutes les arènes (et les régions Terrain3D ajoutées sous elles)
-	var arena_gen: Node = get_arena_generator()
-	if arena_gen != null:
-		arena_gen.clear_arenas()
+	# Nettoyer toutes les arènes
+	get_arena_generator().clear_arenas()
 			
 	var time_clean = Time.get_ticks_msec() - time_start
 	print("Terrain nettoyé en ", time_clean, " ms !")
 
 func get_spawn_point() -> Vector3:
-	if path_generator and path_generator.start_pos != Vector2.ZERO:
-		var p2 = path_generator.start_pos
-		var ground_y = get_terrain_height_at(p2.x, p2.y)
-		print("DEBUG SPAWN: Point calculé = ", p2.x, ", ", ground_y, ", ", p2.y)
-		return Vector3(p2.x, ground_y, p2.y)
-	
-	print("DEBUG SPAWN: Fallback utilisé (0, 100, 0)")
-	# Fallback (centre de la map, hauteur arbitraire)
-	return Vector3(0, 100, 0)
+	if path_generator.start_pos == Vector2.ZERO:
+		push_error("MapGenerator: get_spawn_point() appelé avant la génération du chemin (start_pos non défini).")
+		return Vector3.ZERO
+	var p2: Vector2 = path_generator.start_pos
+	return Vector3(p2.x, get_terrain_height_at(p2.x, p2.y), p2.y)
 
-func _place_encounter_markers(terrain_data) -> void:
-	if path_generator == null or not ("encounter_positions" in path_generator):
-		return
-		
-	# On cherche ou on crée le nœud 'Encounters'
-	var encounters_node = find_child("Encounters", true, false)
-	if encounters_node == null:
-		encounters_node = Node3D.new()
-		encounters_node.name = "Encounters"
-		add_child(encounters_node)
-		if Engine.is_editor_hint():
-			encounters_node.owner = get_tree().edited_scene_root
-			
+func _place_encounter_markers() -> void:
 	# Nettoyer l'existant
-	for child in encounters_node.get_children():
+	for child in _encounters.get_children():
+		_encounters.remove_child(child)
 		child.queue_free()
 		
-	var positions = path_generator.encounter_positions
+	var positions: Array = path_generator.encounter_positions
+	var placed: int = 0
 	for i in range(positions.size()):
 		var pos2d: Vector2 = positions[i]
-		var marker = Marker3D.new()
-		marker.name = "encounter_" + str(i + 1)
 		
 		# Hauteur sur le terrain
-		var ground_y = 0.0
-		if terrain_data != null and terrain_data.has_method("get_height"):
-			ground_y = terrain_data.get_height(Vector3(pos2d.x, 0.0, pos2d.y))
-			if is_nan(ground_y): ground_y = 0.0
+		var ground_y: float = terrain.data.get_height(Vector3(pos2d.x, 0.0, pos2d.y))
+		if is_nan(ground_y):
+			push_error("MapGenerator: hauteur de terrain introuvable pour l'encounter %d en %s, marker ignoré." % [i + 1, pos2d])
+			continue
 			
+		var marker = Marker3D.new()
+		marker.name = "encounter_" + str(i + 1)
 		marker.position = Vector3(pos2d.x, ground_y, pos2d.y)
 		
-		encounters_node.add_child(marker)
+		_encounters.add_child(marker)
 		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 			marker.owner = get_tree().edited_scene_root
+		placed += 1
 			
-	print("Markers d'Encounters placés : ", positions.size())
-	if encounters_node.has_method("spawn_encounters"):
-		encounters_node.call_deferred("spawn_encounters", world_seed)
+	print("Markers d'Encounters placés : ", placed)
+	_encounters.call_deferred("spawn_encounters", world_seed)
 
 func _get_map_rect() -> Rect2:
 	return Rect2(0.0, 0.0, float(map_width_chunks * region_size), float(map_height_chunks * region_size))
 
 
-## Hauteur réelle du Terrain3D ou, tant qu'il n'a pas de données, celle du bruit (avec marge de bordure plate)
+## Hauteur réelle du Terrain3D (NaN si aucune donnée de terrain à cet endroit)
 func _sample_edge_height(x: float, z: float) -> float:
-	var terrain_data = null
-	if terrain != null:
-		if "storage" in terrain and terrain.storage:
-			terrain_data = terrain.storage
-		elif "data" in terrain and terrain.data:
-			terrain_data = terrain.data
-	if terrain_data != null and terrain_data.has_method("get_height"):
-		var h: float = terrain_data.get_height(Vector3(x, 0.0, z))
-		if not is_nan(h):
-			return h
-	return get_map_border_height(x, z)
+	return terrain.data.get_height(Vector3(x, 0.0, z))
 
 
-func _get_active_curve() -> Curve:
-	if height_curve != null:
-		return height_curve
-	# Profil géologique par défaut (plaqué au sol) :
-	# - Tout le bas (0% à 50% de bruit) reste collé à 0m (vraies plaines au sol, plus de plateau surélevé)
-	# - 50% à 80% : collines douces qui montent
-	# - 80% à 100% : hauts sommets et montagnes
-	var default_curve = Curve.new()
-	default_curve.add_point(Vector2(0.0, 0.0), 0.0, 0.0)
-	default_curve.add_point(Vector2(0.5, 0.0), 0.0, 0.2)
-	default_curve.add_point(Vector2(0.8, 0.4), 0.8, 1.5)
-	default_curve.add_point(Vector2(1.0, 1.0), 2.5, 0.0)
-	default_curve.bake()
-	return default_curve
-
-## Hauteur du relief généré (bruit) avec la marge de bordure plate (exactement comme à la génération des chunks).
-## Sert de repli tant que Terrain3D n'a pas de données.
-func get_map_border_height(gx: float, gz: float) -> float:
-	if noise == null:
-		return 0.0
+## Hauteur du relief généré (bruit + contraste + courbe) avec la marge de bordure plate, exactement comme
+## à la génération des chunks. C'est la source de hauteur AVANT que Terrain3D n'ait des données
+## (utilisée par le PathGenerator pour le calcul des routes).
+func get_base_height_at(gx: float, gz: float) -> float:
 	var rect: Rect2 = _get_map_rect()
 	var sx: float = clampf(gx, border_margin, rect.end.x - border_margin)
 	var sz: float = clampf(gz, border_margin, rect.end.y - border_margin)
 	var n: float = noise.get_noise_2d(sx, sz) * 0.5 + 0.5
 	var t_contrasted: float = clampf((n - 0.5) * contrast + 0.5, 0.0, 1.0)
-	return lerpf(min_height, max_height, _get_active_curve().sample_baked(t_contrasted))
+	return lerpf(min_height, max_height, height_curve.sample_baked(t_contrasted))
 
 ## Hauteur du sol en un point monde : Terrain3D dans la map, prolongement lisse du bord en dehors (sous l'arène)
 func get_terrain_height_at(x: float, z: float) -> float:
 	var rect: Rect2 = _get_map_rect()
-	if x < rect.position.x or x > rect.end.x or z < rect.position.y or z > rect.end.y:
-		var ag: Node = get_arena_generator()
-		if ag != null:
-			return ag.get_arena_ground_height(x, z)
-		return _sample_edge_height(clampf(x, rect.position.x + 0.5, rect.end.x - 0.5), clampf(z, rect.position.y + 0.5, rect.end.y - 0.5))
-	return _sample_edge_height(x, z)
+	if x < rect.position.x or x >= rect.end.x or z < rect.position.y or z >= rect.end.y:
+		return get_arena_generator().get_arena_ground_height(x, z)
+	var h: float = _sample_edge_height(x, z)
+	if is_nan(h):
+		return get_arena_generator().get_arena_ground_height(x, z)
+	return h
+
+## Vérifie que tout ce dont la génération a besoin est bien en place (exports + nœuds enfants).
+## Chaque élément manquant est signalé par un push_error explicite ; la génération est annulée si quoi que ce soit manque.
+func _validate_setup() -> bool:
+	var missing: Array[String] = []
+	if terrain == null:
+		missing.append("export 'terrain' (Terrain3D)")
+	elif terrain.data == null:
+		missing.append("Terrain3D.data")
+	elif terrain.assets == null or terrain.assets.get_texture_count() < 2:
+		missing.append("Terrain3D.assets : il faut au moins 2 textures (la route utilise la texture ID 1, sinon elle apparaît noire)")
+	if noise == null:
+		missing.append("export 'noise' (FastNoiseLite)")
+	if height_curve == null:
+		missing.append("export 'height_curve' (Curve)")
+	if path_generator == null:
+		missing.append("export 'path_generator'")
+	
+	_mesh_spawner = get_node_or_null("MeshSpawner")
+	_grass_gen = get_node_or_null("grass_generator")
+	_border_wall = get_node_or_null("BorderTreeWall")
+	_encounters = get_node_or_null("Encounters")
+	_meteo = get_node_or_null("Meteo")
+	_monster_packs = get_node_or_null("MonsterPackGenerator")
+	if _mesh_spawner == null: missing.append("nœud enfant 'MeshSpawner'")
+	if _grass_gen == null: missing.append("nœud enfant 'grass_generator'")
+	if _border_wall == null: missing.append("nœud enfant 'BorderTreeWall'")
+	if _encounters == null: missing.append("nœud enfant 'Encounters'")
+	if _meteo == null: missing.append("nœud enfant 'Meteo'")
+	if _monster_packs == null: missing.append("nœud enfant 'MonsterPackGenerator'")
+	if get_arena_generator() == null:
+		missing.append("nœud enfant 'ArenaGenerator'")
+	
+	for m in missing:
+		push_error("MapGenerator: élément requis manquant -> " + m)
+	return missing.is_empty()
 
 # Génération asynchrone pour ne JAMAIS faire crasher l'éditeur Godot !
 func generate_terrain_async() -> void:
-	if terrain == null or noise == null:
-		push_error("MapGenerator: Il manque le Terrain3D ou le Noise !")
+	if not _validate_setup():
+		push_error("MapGenerator: génération annulée (configuration incomplète).")
 		return
 		
 	print("Début de la génération du terrain (Seed: ", world_seed, ")...")
@@ -290,28 +254,15 @@ func generate_terrain_async() -> void:
 	noise.seed = world_seed
 	clear_terrain()
 	
-	# Tirage au hasard d'UNE arène par slot (Nord / Ouest / Est) : doit précéder la génération des routes
 	var arena_gen: Node = get_arena_generator()
-	if arena_gen != null:
-		arena_gen.select_arenas(world_seed)
+	# Tirage au hasard d'UNE arène par slot (Nord / Ouest / Est) : doit précéder la génération des routes
+	arena_gen.select_arenas(world_seed)
 	
 	# Pause d'une frame pour laisser Godot respirer après le nettoyage
 	await get_tree().process_frame
 	
-	var terrain_data = null
-	if "data" in terrain: terrain_data = terrain.data
-	elif "storage" in terrain: terrain_data = terrain.storage
-		
-	if terrain_data == null: return
+	var terrain_data: Terrain3DData = terrain.data
 	
-	if terrain.assets and terrain.assets.get_texture_count() < 2:
-		push_error("MapGenerator: TU N'AS QU'UNE SEULE TEXTURE DANS LE TERRAIN3D ! La route essaie d'utiliser la texture ID 1, mais elle n'existe pas, donc elle apparaît NOIRE. Ajoute une deuxième texture (ex: de la terre) dans l'inspecteur du Terrain3D -> Assets -> Textures.")
-		print("ERREUR CRITIQUE : Il manque la texture de route dans Godot.")
-	
-	# On restreint la taille max pour éviter les crashs (Max 10x10)
-	map_width_chunks = clamp(map_width_chunks, 1, 10)
-	map_height_chunks = clamp(map_height_chunks, 1, 10)
-		
 	var map_min_x = 0.0
 	var map_max_x = float(map_width_chunks * region_size)
 	var map_min_z = 0.0
@@ -320,19 +271,15 @@ func generate_terrain_async() -> void:
 	var total_w: int = map_width_chunks * region_size
 	var total_h: int = map_height_chunks * region_size
 	
-	if path_generator != null:
-		path_generator.generate_branching_path(map_min_x, map_max_x, map_min_z, map_max_z, world_seed)
+	path_generator.generate_branching_path(map_min_x, map_max_x, map_min_z, map_max_z, world_seed)
 
 	# Initialisation des sols plats pour toutes les arènes actives (Nord, Ouest, Est, etc.)
-	var active_curve: Curve = _get_active_curve()
-	if arena_gen != null:
-		arena_gen.init_zones()
+	var active_curve: Curve = height_curve
+	arena_gen.init_zones()
 		
 	var chunks_generated: int = 0
 	var ctrl_default: int = ((0 & 0x1F) << 27) | ((1 & 0x1F) << 22) | (1 << 1)
-	var h_smooth_radius: float = 5.0
-	if path_generator != null:
-		h_smooth_radius = maxf(1.0, path_generator.path_width * 0.3)
+	var h_smooth_radius: float = maxf(1.0, path_generator.path_width * 0.3)
 	
 	var time_chunks_start = Time.get_ticks_msec()
 	for cx in range(map_width_chunks):
@@ -348,11 +295,10 @@ func generate_terrain_async() -> void:
 			
 			# Pré-filtre des segments touchant ce chunk
 			var chunk_segments: Array = []
-			if path_generator != null:
-				for seg in path_generator.segments:
-					var w: float = seg.width + 10.0
-					if not (chunk_max_x < seg.min_x - w or chunk_min_x > seg.max_x + w or chunk_max_z < seg.min_y - w or chunk_min_z > seg.max_y + w):
-						chunk_segments.append(seg)
+			for seg in path_generator.segments:
+				var w: float = seg.width + 10.0
+				if not (chunk_max_x < seg.min_x - w or chunk_min_x > seg.max_x + w or chunk_max_z < seg.min_y - w or chunk_min_z > seg.max_y + w):
+					chunk_segments.append(seg)
 			var seg_count: int = chunk_segments.size()
 			# ===== PHASE 1 : Rasterisation des chemins (segment-first) =====
 			var path_blend_array: PackedFloat32Array = PackedFloat32Array()
@@ -458,58 +404,28 @@ func generate_terrain_async() -> void:
 	var time_chunks_total = Time.get_ticks_msec() - time_chunks_start
 	print("Génération terminée ! ", chunks_generated, " chunks créés en ", time_chunks_total, " ms.")
 	# Génération de la météo via le nœud dédié
-	var meteo_node = find_child("Meteo", true, false)
-	if meteo_node == null:
-		meteo_node = find_child("meteo", true, false)
-		
-	if meteo_node and meteo_node.has_method("generate_weather"):
-		meteo_node.generate_weather(world_seed)
+	_meteo.generate_weather(world_seed)
 	
 	_setup_distance_fog()
 	
 	# Placement des points d'intérêt (Encounters)
-	_place_encounter_markers(terrain_data)
+	_place_encounter_markers()
 	
 	# Placement et génération de toutes les arènes configurées
-	if arena_gen != null:
-		arena_gen.spawn_arenas()
+	arena_gen.spawn_arenas()
 	
+	# Génère automatiquement le mur d'arbres de bordure
+	_border_wall.call_deferred("generate_wall")
+		
+	# Génère automatiquement les arbres (le NavMesh est cuit une fois les arbres prêts)
+	if not _mesh_spawner.trees_ready.is_connected(_bake_navmesh):
+		_mesh_spawner.trees_ready.connect(_bake_navmesh)
+	_mesh_spawner.spawn_seed = world_seed
+	_mesh_spawner.call_deferred("generate_trees")
 	
-	# Génère automatiquement le mur d'arbres de bordure s'il y a un BorderTreeWall
-	var border_wall = find_child("BorderTreeWall", true, false)
-	if border_wall and border_wall.has_method("generate_wall"):
-		border_wall.call_deferred("generate_wall")
-		
-	# Génère automatiquement les arbres s'il y a un MeshSpawner
-	var mesh_spawner = find_child("MeshSpawner", true, false)
-	if mesh_spawner and mesh_spawner.has_method("generate_trees"):
-		if not mesh_spawner.trees_ready.is_connected(_bake_navmesh):
-			mesh_spawner.trees_ready.connect(_bake_navmesh)
-			
-		if "spawn_seed" in mesh_spawner:
-			mesh_spawner.spawn_seed = world_seed
-		mesh_spawner.call_deferred("generate_trees")
-	else:
-		# S'il n'y a pas d'arbres à générer, on lance le bake tout de suite
-		_bake_navmesh()
-		
-	_grass_gen = null
-	# Recherche récursive de tous les descendants
-	var stack = [self]
-	while stack.size() > 0:
-		var current = stack.pop_back()
-		if current != self and current.has_method("generate_grass"):
-			_grass_gen = current
-			break
-		stack.append_array(current.get_children())
-			
-	if _grass_gen:
-		print("Lancement de la génération d'herbe sur le noeud : ", _grass_gen.name)
-		_grass_gen.call_deferred("generate_grass")
-	else:
-		print("ATTENTION: Aucun noeud avec le script grass_generator.gd n'a été trouvé dans l'arbre !")
+	print("Lancement de la génération d'herbe sur le noeud : ", _grass_gen.name)
+	_grass_gen.call_deferred("generate_grass")
 
-var _grass_gen: Node = null
 
 # ==========================================
 # GESTION DU NAVMESH PROCEDURAL (Terrain3D)
@@ -573,28 +489,91 @@ func _bake_navmesh() -> void:
 			var chunk_z := float(cy * region_size)
 			var aabb := AABB(Vector3(chunk_x - 0.8, -100.0, chunk_z - 0.8), Vector3(float(region_size) + 1.6, max_height + 200.0, float(region_size) + 1.6))
 			
-			var has_faces := false
-			if terrain and terrain.has_method("generate_nav_mesh_source_geometry"):
-				var faces: PackedVector3Array = terrain.generate_nav_mesh_source_geometry(aabb)
-				if not faces.is_empty():
-					source_data.add_faces(faces, Transform3D.IDENTITY)
-					has_faces = true
+			var faces: PackedVector3Array = terrain.generate_nav_mesh_source_geometry(aabb)
+			if faces.is_empty():
+				push_error("MapGenerator: aucune géométrie de terrain pour le NavMesh du chunk (%d, %d)." % [cx, cy])
+				nav_region.queue_free()
+				continue
+			source_data.add_faces(faces, Transform3D.IDENTITY)
 			
-			if has_faces:
-				bake_state.pending += 1
-				
-				# Lambda asynchrone passée avec bind pour éviter les soucis de portée de boucle
-				var on_bake_done = (func(mesh: NavigationMesh, region: NavigationRegion3D, s: Dictionary):
-					region.set_navigation_mesh(null)
-					region.set_navigation_mesh(mesh)
-					s.pending -= 1
-				).bind(n_mesh, nav_region, bake_state)
-				
-				# Cuisson MULTI-THREAD en parallèle
-				NavigationServer3D.bake_from_source_geometry_data_async(n_mesh, source_data, on_bake_done)
-				
+			bake_state.pending += 1
+			
+			# Lambda asynchrone passée avec bind pour éviter les soucis de portée de boucle
+			var on_bake_done = (func(mesh: NavigationMesh, region: NavigationRegion3D, s: Dictionary):
+				region.set_navigation_mesh(null)
+				region.set_navigation_mesh(mesh)
+				s.pending -= 1
+			).bind(n_mesh, nav_region, bake_state)
+			
+			# Cuisson MULTI-THREAD en parallèle
+			NavigationServer3D.bake_from_source_geometry_data_async(n_mesh, source_data, on_bake_done)
+			
+	# Cuisson du NavMesh pour chaque arène située hors des chunks de la carte principale
+	var map_rect: Rect2 = _get_map_rect()
+	for zone in get_arena_zones():
+		var ax0: float = float(zone["min_x"])
+		var ax1: float = float(zone["max_x"])
+		var az0: float = float(zone["min_z"])
+		var az1: float = float(zone["max_z"])
+		var slot: int = int(zone.get("slot", 0))
+		
+		# Recouvrement de 0.8m sur la bordure de la carte pour connecter le NavMesh de l'arène au chunk voisin
+		if slot == ArenaGenerator.SLOT_NORTH:
+			az1 = minf(az1, map_rect.position.y + 0.8)
+		elif slot == ArenaGenerator.SLOT_WEST:
+			ax1 = minf(ax1, map_rect.position.x + 0.8)
+		elif slot == ArenaGenerator.SLOT_EAST:
+			ax0 = maxf(ax0, map_rect.end.x - 0.8)
+			
+		if ax1 <= ax0 or az1 <= az0:
+			continue
+			
+		var arena_nav_region := NavigationRegion3D.new()
+		arena_nav_region.name = "NavRegion_" + str(zone["name"])
+		
+		var arena_n_mesh := NavigationMesh.new()
+		arena_n_mesh.geometry_source_geometry_mode = NavigationMesh.SOURCE_GEOMETRY_ROOT_NODE_CHILDREN
+		arena_n_mesh.cell_size = 0.75
+		arena_n_mesh.cell_height = 0.25
+		arena_n_mesh.agent_radius = 0.75
+		arena_n_mesh.agent_height = 1.8
+		arena_n_mesh.agent_max_slope = 40.0
+		arena_n_mesh.agent_max_climb = 0.5
+		
+		arena_nav_region.navigation_mesh = arena_n_mesh
+		nav_parent.add_child(arena_nav_region)
+		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
+			arena_nav_region.owner = get_tree().edited_scene_root
+			
+		var arena_source_data := NavigationMeshSourceGeometryData3D.new()
+		NavigationServer3D.parse_source_geometry_data(arena_n_mesh, arena_source_data, arena_nav_region)
+		
+		var arena_aabb := AABB(
+			Vector3(ax0, -100.0, az0),
+			Vector3(ax1 - ax0, max_height + 200.0, az1 - az0)
+		)
+		var arena_faces: PackedVector3Array = terrain.generate_nav_mesh_source_geometry(arena_aabb)
+		if arena_faces.is_empty():
+			push_error("MapGenerator: aucune géométrie de terrain pour le NavMesh de l'arène '%s'." % str(zone["name"]))
+			arena_nav_region.queue_free()
+			continue
+		arena_source_data.add_faces(arena_faces, Transform3D.IDENTITY)
+		
+		bake_state.pending += 1
+		var on_arena_bake_done = (func(mesh: NavigationMesh, region: NavigationRegion3D, s: Dictionary):
+			region.set_navigation_mesh(null)
+			region.set_navigation_mesh(mesh)
+			s.pending -= 1
+		).bind(arena_n_mesh, arena_nav_region, bake_state)
+		
+		NavigationServer3D.bake_from_source_geometry_data_async(arena_n_mesh, arena_source_data, on_arena_bake_done)
+			
 	# On attend que tous les threads aient terminé
+	var wait_start: int = Time.get_ticks_msec()
 	while bake_state.pending > 0:
+		if Time.get_ticks_msec() - wait_start > NAV_BAKE_TIMEOUT_MS:
+			push_error("MapGenerator: timeout de la cuisson NavMesh (%d chunk(s) non terminé(s))." % bake_state.pending)
+			break
 		await get_tree().create_timer(0.1).timeout
 		
 	# On compte les polygones après la cuisson de tous les chunks
@@ -606,20 +585,19 @@ func _bake_navmesh() -> void:
 	var time_nav = Time.get_ticks_msec() - time_nav_start
 	print("NavMesh : Cuisson Asynchrone par chunks terminée en ", time_nav, " ms ! Polygones totaux : ", total_polygons)
 	
-	# Fix Terrain3D : synchroniser avec la caméra active locale si disponible
-	if not Engine.is_editor_hint() and terrain != null:
-		var vp = get_viewport()
-		if vp != null:
-			var active_cam = vp.get_camera_3d()
-			if active_cam != null and terrain.has_method("set_camera"):
-				terrain.set_camera(active_cam)
-				print("MapGenerator: Caméra active liée au Terrain3D -> ", active_cam.name)
+	# Fix Terrain3D : synchroniser avec la caméra active locale
+	if not Engine.is_editor_hint():
+		var active_cam: Camera3D = get_viewport().get_camera_3d()
+		if active_cam == null:
+			push_warning("MapGenerator: aucune caméra active, le Terrain3D ne suit aucune caméra.")
+		else:
+			terrain.set_camera(active_cam)
+			print("MapGenerator: Caméra active liée au Terrain3D -> ", active_cam.name)
 	
 	# L'herbe doit être entièrement générée AVANT terrain_ready (qui déclenche le spawn du joueur)
-	if not Engine.is_editor_hint() and _grass_gen != null and is_instance_valid(_grass_gen):
-		if "_is_generating" in _grass_gen and _grass_gen._is_generating:
-			print("MapGenerator: attente de la fin de génération de l'herbe avant le spawn...")
-			await _grass_gen.grass_ready
+	if not Engine.is_editor_hint() and _grass_gen.is_generating():
+		print("MapGenerator: attente de la fin de génération de l'herbe avant le spawn...")
+		await _grass_gen.grass_ready
 	
 	# Génération d'un occluder de relief pour que les collines masquent les arbres/herbe lointains
 	_generate_terrain_occluder()
@@ -628,11 +606,7 @@ func _bake_navmesh() -> void:
 	
 	# En éditeur, appel direct de la génération des meutes (en jeu, c'est géré via le signal terrain_ready)
 	if Engine.is_editor_hint():
-		var pack_gen = find_child("MonsterPackGenerator", true, false)
-		if pack_gen == null:
-			pack_gen = find_child("MonsterPacks", true, false)
-		if pack_gen and pack_gen.has_method("generate_monster_packs"):
-			pack_gen.generate_monster_packs(world_seed)
+		_monster_packs.generate_monster_packs(world_seed)
 
 ## Génère un occluder basse résolution basé sur le relief du terrain
 ## pour culler automatiquement les arbres, l'herbe et les monstres cachés derrière les collines
@@ -653,13 +627,15 @@ func _generate_terrain_occluder() -> void:
 	# Abaisser légèrement de 2.5m sous la surface pour éviter de masquer le sol visible
 	var height_drop: float = 2.5
 	
+	# Les échantillons sont limités à (taille - 1) : Terrain3D n'a pas de donnée pile sur le bord extérieur
 	for iz in range(nz):
-		var pz = minf(iz * step, map_h)
+		var pz: float = minf(iz * step, map_h - 1.0)
 		for ix in range(nx):
-			var px = minf(ix * step, map_w)
-			var h = get_terrain_height_at(px, pz)
+			var px: float = minf(ix * step, map_w - 1.0)
+			var h: float = get_terrain_height_at(px, pz)
 			if is_nan(h):
-				h = 0.0
+				push_error("MapGenerator: hauteur de terrain introuvable en (%.1f, %.1f), occluder non généré." % [px, pz])
+				return
 			var idx = iz * nx + ix
 			vertices[idx] = Vector3(px, h - height_drop, pz)
 			

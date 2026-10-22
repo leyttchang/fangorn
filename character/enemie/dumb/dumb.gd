@@ -62,10 +62,16 @@ func _ready() -> void:
 
 func actor_setup() -> void:
 	await get_tree().physics_frame
-	_update_closest_target()
-	change_state(State.IDLE)
-	if anim_playback:
-		anim_playback.travel("Stand")
+	if is_multiplayer_authority() and current_state == State.IDLE:
+		_update_closest_target()
+		if target != null:
+			var distance = global_position.distance_to(target.global_position)
+			if distance <= behavior.attack_range:
+				change_state(State.ATTACK)
+			else:
+				change_state(State.CHASE)
+		else:
+			change_state(State.IDLE)
 	
 	# On s'abonne au signal pour l'aggro si on se fait taper
 	var hitbox = find_child("HitboxComponent*", true, false)
@@ -105,6 +111,19 @@ func change_state(new_state: State) -> void:
 	if is_multiplayer_authority():
 		rpc("_rpc_apply_state", new_state)
 
+func _sync_animation_state() -> void:
+	if not anim_playback:
+		return
+	match current_state:
+		State.IDLE:
+			anim_playback.travel("Walk2" if _is_pack_walking else "Stand")
+		State.CHASE:
+			anim_playback.travel("Walk2")
+		State.ATTACK:
+			anim_playback.travel("Punch")
+		State.DEAD:
+			anim_playback.travel("Death")
+
 @rpc("authority", "call_local", "reliable")
 func _rpc_apply_state(new_state: int) -> void:
 	if current_state == State.DEAD:
@@ -114,21 +133,12 @@ func _rpc_apply_state(new_state: int) -> void:
 		
 	current_state = new_state
 	
-	match current_state:
-		State.IDLE:
-			_is_pack_walking = false
-			if anim_playback:
-				anim_playback.travel("Stand")
-		State.CHASE:
-			if anim_playback:
-				anim_playback.travel("Walk2")
-		State.ATTACK:
-			if anim_playback:
-				anim_playback.travel("Punch")
-			_attack_anim_started = false 
-		State.DEAD:
-			if anim_playback:
-				anim_playback.travel("Death")
+	if current_state == State.IDLE:
+		_is_pack_walking = false
+	elif current_state == State.ATTACK:
+		_attack_anim_started = false
+		
+	_sync_animation_state()
 
 
 # ==========================================================
@@ -162,6 +172,7 @@ func _physics_process(delta: float) -> void:
 		return
 	elif not anim_tree.active:
 		anim_tree.active = true
+		_sync_animation_state()
 
 	# Recherche / actualisation de cible selon le mode de jeu
 	_target_update_timer += delta
@@ -243,6 +254,8 @@ func _process_idle_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 			movement_comp.rotate_towards_direction(dir, behavior, delta)
 			var roam_speed = base_movement_speed * navigation_comp.pack_speed_mult * stats_component.get_stat_value("movement_speed")
 			_set_pack_walking(true)
+			if anim_tree.active and anim_playback and anim_playback.get_current_node() != "Walk2":
+				anim_playback.travel("Walk2")
 			return movement_comp.accelerate_to_direction(vitesse_horiz, dir, roam_speed, behavior, delta)
 		else:
 			_set_pack_walking(false)
@@ -260,6 +273,9 @@ func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) ->
 	if distance_to_target <= behavior.attack_range:
 		change_state(State.ATTACK)
 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+		
+	if anim_tree.active and anim_playback and anim_playback.get_current_node() != "Walk2":
+		anim_playback.travel("Walk2")
 		
 	# --- ON DÉLÈGUE LA NAVIGATION ! ---
 	var direction = navigation_comp.get_direction_to_target(target.global_position)

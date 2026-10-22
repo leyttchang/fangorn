@@ -1,5 +1,11 @@
 extends CharacterBody3D
 
+signal boss_died(boss_ilvl: int, boss_enchantment: Variant)
+
+@export_category("Progression & Récompenses")
+@export var ilvl: int = 1
+@export var enchantment: Variant = null
+
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var stats_component: StatsComponent = $StatsComponent
 @onready var knockback_componant = $knockback_componant
@@ -611,6 +617,9 @@ func apply_roar_knockback() -> void:
 
 func _on_died() -> void:
 	if is_multiplayer_authority():
+		if current_state == State.DEAD:
+			return
+		boss_died.emit(ilvl, enchantment)
 		rpc("_rpc_trigger_death")
 
 @rpc("authority", "call_local", "reliable")

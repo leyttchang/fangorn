@@ -1,12 +1,31 @@
 [gd_scene format=3 uid="uid://bl4ed2gewe8qv"]
 
 [ext_resource type="PackedScene" uid="uid://dlgah7gunxiqi" path="res://components/marker_tree_spawner_component.tscn" id="1_a7jjj"]
+[ext_resource type="Script" path="res://map/encounters/Boss_arena/boss_arena.gd" id="2_bossarena"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hlie2"]
+size = Vector3(57, 5, 7)
 
 [node name="Boss_arena" type="Node3D" unique_id=1218114736]
+script = ExtResource("2_bossarena")
 
 [node name="entry" type="Marker3D" parent="." unique_id=259757971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8136554, 0, -0.026209831)
 
 [node name="MarkerTreeSpawnerComponent" parent="." unique_id=184920110 instance=ExtResource("1_a7jjj")]
+
+[node name="Boss_spawn_position" type="Marker3D" parent="." unique_id=1266714369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -107)
+
+[node name="reward_position" type="Marker3D" parent="." unique_id=114217513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09410858, 0, -36.019608)
+
+[node name="entry_detection" type="Area3D" parent="." unique_id=1369351143]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="entry_detection" unique_id=794260698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -3)
+shape = SubResource("BoxShape3D_hlie2")
 
 [editable path="MarkerTreeSpawnerComponent"]

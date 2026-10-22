@@ -72,6 +72,10 @@ func clear_grass() -> void:
 			child.queue_free()
 	print("GrassGenerator: Toute l'herbe a été supprimée.")
 
+## Vrai tant que l'herbe est en cours de génération (le MapGenerator attend `grass_ready` avant le spawn joueur)
+func is_generating() -> bool:
+	return _is_generating
+
 func generate_grass() -> void:
 	if _is_generating:
 		print("Déjà en cours de génération...")
@@ -80,6 +84,11 @@ func generate_grass() -> void:
 	if terrain == null or terrain.data == null:
 		print("ERREUR GrassGenerator: Le Terrain3D n'a pas été assigné dans l'inspecteur !")
 		push_error("GrassGenerator: Terrain3D introuvable ou non initialisé.")
+		_is_generating = false
+		return
+		
+	if map_generator == null or path_generator == null or noise == null:
+		push_error("GrassGenerator: 'map_generator', 'path_generator' et 'noise' doivent être assignés dans l'inspecteur.")
 		_is_generating = false
 		return
 		
@@ -133,20 +142,11 @@ func generate_grass() -> void:
 	patch_noise.frequency = patch_frequency
 	patch_noise.fractal_octaves = 2
 	
-	var map_w: float = 2048.0
-	var map_h: float = 2048.0
-	if map_generator != null:
-		if "map_width_chunks" in map_generator and "region_size" in map_generator:
-			map_w = float(map_generator.map_width_chunks * map_generator.region_size)
-		if "map_height_chunks" in map_generator and "region_size" in map_generator:
-			map_h = float(map_generator.map_height_chunks * map_generator.region_size)
+	var map_w: float = float(map_generator.map_width_chunks * map_generator.region_size)
+	var map_h: float = float(map_generator.map_height_chunks * map_generator.region_size)
 			
 	# Récupération de la largeur de base des chemins (pour le calcul du ratio)
-	var base_path_width: float = 15.0
-	if path_generator != null and "path_width" in path_generator:
-		base_path_width = float(path_generator.path_width)
-	if base_path_width <= 0.0:
-		base_path_width = 15.0
+	var base_path_width: float = float(path_generator.path_width)
 		
 	# Grille spatiale ultra rapide pour éviter la route (Road avoidance)
 	var road_grid = {}
@@ -171,24 +171,19 @@ func generate_grass() -> void:
 	var chunk_size = 64.0
 	var chunks = {}
 	
-	var b_margin: float = 35.0
-	if map_generator != null and "border_margin" in map_generator:
-		b_margin = float(map_generator.border_margin)
-	elif get_parent() != null and "border_margin" in get_parent():
-		b_margin = float(get_parent().border_margin)
+	var b_margin: float = float(map_generator.border_margin)
 		
 	# Passes de plantation : la map (rectangle hors marge), puis l'intérieur de chaque arène de boss
 	var passes: Array = [{"poly": PackedVector2Array(), "min_x": b_margin, "max_x": map_w - b_margin, "min_z": b_margin, "max_z": map_h - b_margin}]
-	if map_generator != null and map_generator.has_method("get_arena_grass_polygons"):
-		for apoly: PackedVector2Array in map_generator.get_arena_grass_polygons():
-			if apoly.size() < 3:
-				continue
-			var a_min := Vector2(INF, INF)
-			var a_max := Vector2(-INF, -INF)
-			for av in apoly:
-				a_min = a_min.min(av)
-				a_max = a_max.max(av)
-			passes.append({"poly": apoly, "min_x": a_min.x, "max_x": a_max.x, "min_z": a_min.y, "max_z": a_max.y})
+	for apoly: PackedVector2Array in map_generator.get_arena_grass_polygons():
+		if apoly.size() < 3:
+			continue
+		var a_min := Vector2(INF, INF)
+		var a_max := Vector2(-INF, -INF)
+		for av in apoly:
+			a_min = a_min.min(av)
+			a_max = a_max.max(av)
+		passes.append({"poly": apoly, "min_x": a_min.x, "max_x": a_max.x, "min_z": a_min.y, "max_z": a_max.y})
 	
 	var row_count = 0
 	for pass_data in passes:
@@ -271,7 +266,7 @@ func generate_grass() -> void:
 					continue
 				
 				var h = terrain.data.get_height(Vector3(px, 0.0, pz))
-				if is_nan(h) and in_arena and map_generator != null and map_generator.has_method("get_terrain_height_at"):
+				if is_nan(h) and in_arena:
 					h = map_generator.get_terrain_height_at(px, pz)
 				if is_nan(h):
 					z += spacing
@@ -280,7 +275,7 @@ func generate_grass() -> void:
 				# Filtrage des pentes raides (falaises et falaises rocheuses)
 				var h_east = terrain.data.get_height(Vector3(px + 1.0, 0.0, pz))
 				var h_south = terrain.data.get_height(Vector3(px, 0.0, pz + 1.0))
-				if in_arena and map_generator != null and map_generator.has_method("get_terrain_height_at"):
+				if in_arena:
 					if is_nan(h_east):
 						h_east = map_generator.get_terrain_height_at(px + 1.0, pz)
 					if is_nan(h_south):
@@ -291,15 +286,10 @@ func generate_grass() -> void:
 						continue
 					
 				# Calcul de l'échelle (Scale) avec le Noise !
-				var s = 1.0
-				if noise != null:
-					# get_noise_2d renvoie entre -1.0 et 1.0. On le ramène entre 0.0 et 1.0
-					var n_val = (noise.get_noise_2d(px, pz) + 1.0) * 0.5
-					# On interpole entre min_scale et max_scale
-					s = lerp(min_scale, max_scale, n_val)
-				else:
-					# Si pas de noise, taille aléatoire
-					s = rng.randf_range(min_scale, max_scale)
+				# get_noise_2d renvoie entre -1.0 et 1.0. On le ramène entre 0.0 et 1.0
+				var n_val = (noise.get_noise_2d(px, pz) + 1.0) * 0.5
+				# On interpole entre min_scale et max_scale
+				var s = lerp(min_scale, max_scale, n_val)
 					
 				# Légère variation aléatoire par-dessus pour ne pas avoir un aspect "trop" parfait
 				s += rng.randf_range(-0.1, 0.1) * s

@@ -10,8 +10,14 @@ signal mob_died(mob: Node3D, remaining_alive: int)
 signal all_mobs_defeated
 
 @export_category("Monster Configuration")
-## List of candidate monster scenes to spawn (e.g. dumb.tscn, dumb_archer.tscn, scout.tscn, spider_enemie.tscn)
-@export var monster_scenes: Array[PackedScene] = []
+## List of candidate monster scenes to spawn (e.g. dumb.tscn, dumb_archer.tscn, scout.tscn, spider_enemie.tscn, creep.tscn)
+@export var monster_scenes: Array[PackedScene] = [
+	preload("res://character/enemie/dumb/dumb.tscn"),
+	preload("res://character/enemie/dumb_archer/dumb_archer.tscn"),
+	preload("res://character/enemie/Scout/scout.tscn"),
+	preload("res://character/enemie/spider/spider_enemie.tscn"),
+	preload("res://character/enemie/creep/creep.tscn")
+]
 ## Monster costs corresponding to monster_scenes index. Leave empty to use GameData defaults.
 @export var monster_costs: Array[int] = []
 ## Monster spawn weights corresponding to monster_scenes index. Leave empty to use GameData defaults.

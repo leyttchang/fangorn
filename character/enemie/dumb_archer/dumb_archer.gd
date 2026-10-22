@@ -84,6 +84,19 @@ func change_state(new_state: State) -> void:
 	if is_multiplayer_authority():
 		rpc("_rpc_apply_state", new_state)
 
+func _sync_animation_state() -> void:
+	if not anim_playback:
+		return
+	match current_state:
+		State.IDLE:
+			anim_playback.travel("anim_walk" if _is_pack_walking else "anim_stand")
+		State.CHASE, State.RETREAT:
+			anim_playback.travel("anim_walk")
+		State.ATTACK:
+			anim_playback.travel("anim_standing_draw_arrow")
+		State.DEAD:
+			anim_playback.travel("anim_death")
+
 @rpc("authority", "call_local", "reliable")
 func _rpc_apply_state(new_state: int) -> void:
 	if current_state == State.DEAD or current_state == new_state:
@@ -91,18 +104,12 @@ func _rpc_apply_state(new_state: int) -> void:
 		
 	current_state = new_state
 	
-	match current_state:
-		State.IDLE:
-			anim_playback.travel("anim_stand")
-		State.CHASE:
-			anim_playback.travel("anim_walk")
-		State.RETREAT:
-			anim_playback.travel("anim_walk") 
-		State.ATTACK:
-			anim_playback.travel("anim_standing_draw_arrow")
-			_attack_anim_started = false 
-		State.DEAD:
-			anim_playback.travel("anim_death")
+	if current_state == State.IDLE:
+		_is_pack_walking = false
+	elif current_state == State.ATTACK:
+		_attack_anim_started = false
+		
+	_sync_animation_state()
 
 
 # ==========================================================
@@ -132,6 +139,7 @@ func _physics_process(delta: float) -> void:
 		return
 	elif not anim_tree.active:
 		anim_tree.active = true
+		_sync_animation_state()
 
 	# Recherche / actualisation de cible selon le mode de jeu
 	_target_update_timer += delta
