@@ -7,7 +7,10 @@ signal totem_activated(player: Node3D)
 ## Nœud enfant propre à l'élément du totem (ex: arcane_totem, fire_totem...)
 @export var element_node: Node3D
 
-## Spawner de monstres lié au totem ou à l'arène (auto-détecté dans l'arène parente si laissé vide)
+## AnimationPlayer des VFX du totem (joue l'animation "end" à l'interaction)
+@export var vfx_anim: AnimationPlayer
+
+## Spawner de monstres lié au totem ou à l'arène
 @export var mob_spawner: MobRaycastSpawner
 
 ## Si vrai, le totem ne peut être activé qu'une seule fois
@@ -16,29 +19,6 @@ signal totem_activated(player: Node3D)
 @onready var interaction_component: InteractionComponent = $InteractionComponent if has_node("InteractionComponent") else null
 
 var is_activated: bool = false
-
-func _ready() -> void:
-	# Détection automatique du nœud élémentaire s'il n'est pas assigné dans l'inspecteur
-	if element_node == null:
-		for child in get_children():
-			if child != interaction_component and child.has_method("on_totem_activated"):
-				element_node = child
-				break
-				
-	# Détection automatique du MobRaycastSpawner (en enfant du totem ou dans l'arène parente)
-	if mob_spawner == null:
-		mob_spawner = _find_mob_spawner()
-
-func _find_mob_spawner() -> MobRaycastSpawner:
-	for child in get_children():
-		if child is MobRaycastSpawner:
-			return child
-	var parent_node: Node = get_parent()
-	if parent_node != null:
-		for sibling in parent_node.get_children():
-			if sibling is MobRaycastSpawner:
-				return sibling
-	return null
 
 ## Appelé automatiquement par InteractionComponent quand le joueur appuie sur E
 func use(player: Node3D) -> void:
@@ -69,7 +49,7 @@ func _rpc_activate_totem(player_path: NodePath) -> void:
 		interaction_component.monitorable = false
 		interaction_component.visible = false
 	
-	# 1. Comportement commun à TOUS les totems peu importe l'élément (spawn des monstres de l'arène, etc.)
+	# 1. Comportement commun à TOUS les totems peu importe l'élément
 	_on_common_totem_activated(player)
 	
 	# 2. Relais vers le nœud spécifique à l'élément (ex: arcane_totem)
@@ -78,11 +58,16 @@ func _rpc_activate_totem(player_path: NodePath) -> void:
 	
 	totem_activated.emit(player)
 
-## Logique commune à tous les totems (spawn de la vague de monstres via MobRaycastSpawner, etc.)
+## Logique commune à tous les totems
 func _on_common_totem_activated(player: Node3D) -> void:
-	if mob_spawner == null:
-		mob_spawner = _find_mob_spawner()
+	_play_vfx_end_animation()
+	
 	if mob_spawner != null:
 		mob_spawner.spawn_mobs()
 		if player != null and is_instance_valid(player):
 			mob_spawner.alert_all_mobs(player)
+
+## Joue l'animation "end" sur l'AnimationPlayer assigné dans l'inspecteur
+func _play_vfx_end_animation() -> void:
+	if vfx_anim != null and vfx_anim.has_animation(&"end"):
+		vfx_anim.play(&"end")
