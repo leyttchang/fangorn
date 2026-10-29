@@ -49,6 +49,13 @@ signal terrain_ready  ## Émis quand toute la génération est terminée
 @export var distance_fog_begin: float = 220.0
 ## Distance où le brouillard atteint 100% d'opacité (en mètres, calé sur les 350m des arbres)
 @export var distance_fog_end: float = 350.0
+## Désactive le brouillard et la limite de distance d'affichage des arbres UNIQUEMENT dans l'éditeur Godot (aucun impact en jeu !)
+@export var editor_unlimited_view: bool = true:
+	set(value):
+		editor_unlimited_view = value
+		if is_inside_tree():
+			_setup_distance_fog()
+			_apply_mesh_distance_limits()
 
 ## Composant ArenaGenerator (enfant de ce nœud) : gère les arènes de boss (slots Nord / Ouest / Est).
 var _arena_gen: Node = null
@@ -97,6 +104,7 @@ func get_arena_grass_polygons() -> Array[PackedVector2Array]:
 
 func _ready() -> void:
 	_setup_distance_fog()
+	_apply_mesh_distance_limits()
 	if not Engine.is_editor_hint():
 		if is_standalone_scene():
 			GameData.current_game_mode = GameData.GameMode.NORMAL
@@ -669,15 +677,47 @@ func _generate_terrain_occluder() -> void:
 
 ## Configure le brouillard de profondeur pour qu'il masque parfaitement la limite de rendu des arbres
 func _setup_distance_fog() -> void:
-	if not distance_fog_enabled:
-		return
+	var hide_fog_in_editor: bool = Engine.is_editor_hint() and editor_unlimited_view
 	var env_nodes = find_children("*", "WorldEnvironment", true, false)
 	for we in env_nodes:
 		if we is WorldEnvironment and we.environment != null:
+			if Engine.is_editor_hint() and not we.has_meta("_editor_env_duped"):
+				we.environment = we.environment.duplicate()
+				we.set_meta("_editor_env_duped", true)
 			var env = we.environment
-			env.fog_enabled = true
-			env.fog_mode = Environment.FOG_MODE_DEPTH
-			env.fog_depth_begin = distance_fog_begin
-			env.fog_depth_end = distance_fog_end
-			env.volumetric_fog_length = distance_fog_end
-			print("MapGenerator: Brouillard de distance configuré (", distance_fog_begin, "m -> ", distance_fog_end, "m) calé sur les arbres.")
+			if hide_fog_in_editor:
+				env.fog_enabled = false
+				env.volumetric_fog_enabled = false
+			elif distance_fog_enabled:
+				env.fog_enabled = true
+				env.volumetric_fog_enabled = true
+				env.fog_mode = Environment.FOG_MODE_DEPTH
+				env.fog_depth_begin = distance_fog_begin
+				env.fog_depth_end = distance_fog_end
+				env.volumetric_fog_length = distance_fog_end
+				print("MapGenerator: Brouillard de distance configuré (", distance_fog_begin, "m -> ", distance_fog_end, "m) calé sur les arbres.")
+			else:
+				env.fog_enabled = false
+				env.volumetric_fog_enabled = false
+
+## Applique ou retire la limite de distance d'affichage des arbres selon si on est dans l'éditeur ou en jeu
+func _apply_mesh_distance_limits() -> void:
+	var no_limit: bool = Engine.is_editor_hint() and editor_unlimited_view
+	var spawner = get_node_or_null("MeshSpawner")
+	if spawner != null:
+		for child in spawner.get_children():
+			if child is MultiMeshInstance3D:
+				child.visibility_range_end = 0.0 if no_limit else 350.0
+				child.visibility_range_end_margin = 0.0 if no_limit else 50.0
+	var wall = get_node_or_null("BorderTreeWall")
+	if wall != null:
+		for child in wall.get_children():
+			if child is MultiMeshInstance3D:
+				child.visibility_range_end = 0.0 if no_limit else 250.0
+				child.visibility_range_end_margin = 0.0 if no_limit else 30.0
+	var arena_gen = get_arena_generator()
+	if arena_gen != null:
+		for mmi in arena_gen.find_children("*", "MultiMeshInstance3D", true, false):
+			if mmi is MultiMeshInstance3D:
+				mmi.visibility_range_end = 0.0 if no_limit else 350.0
+				mmi.visibility_range_end_margin = 0.0 if no_limit else 50.0

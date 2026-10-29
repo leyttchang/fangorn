@@ -1,3 +1,4 @@
+@tool
 class_name BossArena
 extends Node3D
 

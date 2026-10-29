@@ -223,9 +223,10 @@ func generate_wall() -> void:
 		if tree_data["material"] != null:
 			mmi.material_override = tree_data["material"]
 			
+		var no_limit: bool = Engine.is_editor_hint() and map_generator != null and map_generator.get("editor_unlimited_view") == true
 		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		mmi.visibility_range_end = 250.0
-		mmi.visibility_range_end_margin = 30.0
+		mmi.visibility_range_end = 0.0 if no_limit else 250.0
+		mmi.visibility_range_end_margin = 0.0 if no_limit else 30.0
 		
 	# Création des collisions
 	if tree_data["shape"] != null:

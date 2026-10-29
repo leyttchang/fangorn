@@ -1,3 +1,4 @@
+@tool
 class_name MarkerTreeSpawnerComponent
 extends Node3D
 
@@ -186,8 +187,9 @@ func spawn_trees() -> void:
 		var mmi = MultiMeshInstance3D.new()
 		mmi.name = "TreeMultiMesh_" + str(vi)
 		mmi.cast_shadow = cast_shadows
-		mmi.visibility_range_end = visibility_range_end
-		mmi.visibility_range_end_margin = visibility_range_end_margin
+		var no_limit: bool = Engine.is_editor_hint() and _is_editor_unlimited_view()
+		mmi.visibility_range_end = 0.0 if no_limit else visibility_range_end
+		mmi.visibility_range_end_margin = 0.0 if no_limit else visibility_range_end_margin
 		
 		var mm = MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
@@ -578,3 +580,11 @@ func _clear_physics_server_bodies() -> void:
 		if body.is_valid():
 			PhysicsServer3D.free_rid(body)
 	_physics_body_rids.clear()
+
+func _is_editor_unlimited_view() -> bool:
+	var curr: Node = get_parent()
+	while curr != null:
+		if "editor_unlimited_view" in curr:
+			return bool(curr.get("editor_unlimited_view"))
+		curr = curr.get_parent()
+	return false

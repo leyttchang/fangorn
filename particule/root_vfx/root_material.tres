@@ -1,0 +1,20 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://diadsxcbvm4ut"]
+
+[ext_resource type="Shader" uid="uid://7mi8jq3iv056" path="res://assets/3D_models/VFX_spell/root_shader.tres" id="1_fnxl7"]
+[ext_resource type="Texture2D" uid="uid://rdhvid6n8p0w" path="res://assets/texture/bark_brown_text/bark_brown_02_rough_1k.jpg" id="2_lnb8r"]
+[ext_resource type="Texture2D" uid="uid://dw3iwy02wvdtp" path="res://assets/texture/bark_brown_text/bark_brown_02_nor_gl_1k.jpg" id="3_ownfa"]
+[ext_resource type="Texture2D" uid="uid://dmu7fdkv43nh8" path="res://assets/texture/bark_brown_text/bark_brown_02_diff_1k.jpg" id="4_t8enm"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_fnxl7")
+shader_parameter/fin = 0.0
+shader_parameter/debut = 1.0
+shader_parameter/smoth_step_sommet = 0.03
+shader_parameter/force_pincement_ = 0.11
+shader_parameter/root_texture = ExtResource("4_t8enm")
+shader_parameter/ColorParameter = Color(0.14466664, 0.31, 0, 1)
+shader_parameter/smoth_step = 0.0
+shader_parameter/arm_text = ExtResource("2_lnb8r")
+shader_parameter/normal_text = ExtResource("3_ownfa")
+shader_parameter/normal_strength = 1.0

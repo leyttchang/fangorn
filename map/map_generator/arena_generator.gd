@@ -387,7 +387,7 @@ func spawn_arenas() -> void:
 			spawner.spawn_trees()
 			
 		# Si c'est une arène d'enchantement (EnchantArena), faire apparaître son totem maintenant que le sol Terrain3D sous l'arène est généré
-		if not Engine.is_editor_hint() and arena_inst.has_method("spawn_totem"):
+		if arena_inst.has_method("spawn_totem"):
 			arena_inst.spawn_totem()
 			
 		# Nettoyer les arbres de forêt MeshSpawner à proximité du centre de l'arène

@@ -117,6 +117,8 @@ properties/4/spawn = true
 properties/4/replication_mode = 1
 
 [node name="item_bag" type="RigidBody3D" unique_id=12136432]
+collision_layer = 0
+collision_mask = 3
 angular_damp = 10.0
 script = ExtResource("1_ph55c")
 bag_scale = 0.5

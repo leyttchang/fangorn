@@ -1,3 +1,4 @@
+@tool
 class_name EnchantArena
 extends Node3D
 
@@ -52,8 +53,6 @@ func _on_map_terrain_ready() -> void:
 
 ## Choisit un totem parmi `possible_totems` et l'instancie sur le sol à la position XZ du marker `enchant_totem_pos`
 func spawn_totem() -> Node3D:
-	if Engine.is_editor_hint():
-		return null
 	if _active_totem != null and is_instance_valid(_active_totem):
 		snap_totem_to_ground()
 		return _active_totem

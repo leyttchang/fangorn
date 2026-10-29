@@ -393,9 +393,10 @@ func generate_trees() -> void:
 			if v_data["material"] != null:
 				mmi.material_override = v_data["material"]
 				
-			# OPTIMISATION MAGIQUE : Distance d'affichage
-			mmi.visibility_range_end = 350.0 # Ne dessine plus les arbres au-delà de 350m
-			mmi.visibility_range_end_margin = 50.0 # Fondu progressif entre 300m et 350m
+			# OPTIMISATION MAGIQUE : Distance d'affichage (désactivée en éditeur si editor_unlimited_view est coché)
+			var no_limit: bool = Engine.is_editor_hint() and map_generator != null and map_generator.get("editor_unlimited_view") == true
+			mmi.visibility_range_end = 0.0 if no_limit else 350.0 # Ne dessine plus les arbres au-delà de 350m en jeu
+			mmi.visibility_range_end_margin = 0.0 if no_limit else 50.0 # Fondu progressif entre 300m et 350m en jeu
 			
 		print("  -> ", v_data["name"], " : ", count, " arbres créés dans ", chunks.size(), " chunks.")
 		

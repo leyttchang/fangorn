@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://d2q4uqp0iwgep"]
+
+[ext_resource type="Shader" uid="uid://nlkoocory7ca" path="res://particule/shader/tree.gdshader" id="1_u5pqj"]
+[ext_resource type="Texture2D" uid="uid://u6elekb2jt0k" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet Tree Cold.png" id="2_fjoqp"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_u5pqj")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_fjoqp")
+shader_parameter/albedo_texture_size = Vector2i(16, 16)
+shader_parameter/point_size = 1.0
+shader_parameter/roughness = 1.0
+shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
+shader_parameter/wind_height_start = 0.7
+shader_parameter/wind_height_end = 2.0
+shader_parameter/wind_speed = 2.385
+shader_parameter/wind_strength = 0.215
+shader_parameter/wind_direction = Vector2(1, 0.5)
+shader_parameter/wind_max_distance = 80.0
