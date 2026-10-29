@@ -332,8 +332,14 @@ func generate_terrain_async() -> void:
 				
 				for lz in range(bz_min, bz_max + 1):
 					var gz: float = float(chunk_min_z + lz)
+					if gz < border_margin or gz > float(total_h) - border_margin:
+						continue
+					var dist_z_border: float = minf(gz - border_margin, float(total_h) - border_margin - gz)
 					for lx in range(bx_min, bx_max + 1):
 						var gx: float = float(chunk_min_x + lx)
+						if gx < border_margin or gx > float(total_w) - border_margin:
+							continue
+						var dist_to_border: float = minf(dist_z_border, minf(gx - border_margin, float(total_w) - border_margin - gx))
 						
 						var dist_sq: float
 						if l2 < 0.0001:
@@ -349,7 +355,7 @@ func generate_terrain_async() -> void:
 						if dist_sq < seg_w_sq:
 							var dist: float = sqrt(dist_sq)
 							var t_val: float = dist / seg_w
-							var blend: float = 1.0 - (t_val * t_val * (3.0 - 2.0 * t_val))
+							var blend: float = (1.0 - (t_val * t_val * (3.0 - 2.0 * t_val))) * clampf(dist_to_border / 4.0, 0.0, 1.0)
 							var array_idx: int = lz * region_size + lx
 							if blend > path_blend_array[array_idx]:
 								path_blend_array[array_idx] = blend

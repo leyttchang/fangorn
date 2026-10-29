@@ -60,11 +60,45 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 	astar_grid.update()
 	
 	var map_gen = get_parent()
+	var b_margin: float = map_gen.border_margin
+	var arena_gen = map_gen.get_arena_generator() if map_gen.has_method("get_arena_generator") else null
+	var has_west: bool = arena_gen == null or arena_gen.is_slot_active(arena_gen.SLOT_WEST)
+	var has_east: bool = arena_gen == null or arena_gen.is_slot_active(arena_gen.SLOT_EAST)
+	var has_north: bool = arena_gen == null or arena_gen.is_slot_active(arena_gen.SLOT_NORTH)
+	
+	# Marge intérieure garantissant que le chemin (centre + rayon path_width) reste toujours derrière le mur d'arbres
+	var safe_wall_margin: float = b_margin + path_width + 6.0
+	var west_offset: float = b_margin if has_west else safe_wall_margin
+	var east_offset: float = b_margin if has_east else safe_wall_margin
+	var north_offset: float = b_margin if has_north else safe_wall_margin
+				
+	# Coordonnées du Spawn (Sud, placé en avant du mur d'arbres)
+	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - maxf(b_margin + 15.0, safe_wall_margin))
+	start_pos = spawn_pos
+	
+	# Coordonnées des 3 Sorties (alignées sur le mur d'arbres de bordure si une arène est présente)
+	exit_west = Vector2(map_min_x + west_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	exit_east = Vector2(map_max_x - east_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
+	exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + north_offset)
+	
+	# Coordonnées des 2 embranchements
+	var fork1_y = lerp(map_max_z, map_min_z, rng.randf_range(0.3, 0.45))
+	var fork2_y = lerp(map_max_z, map_min_z, rng.randf_range(0.65, 0.8))
+	
+	var fork1 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork1_y)
+	var fork2 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork2_y)
+	
 	print("Calcul du relief Ultra-Haute Résolution (", grid_w, "x", grid_h, ") pour AStarGrid2D...")
 	for x in range(grid_w):
 		for y in range(grid_h):
 			var px = map_min_x + x * cell_res
 			var pz = map_min_z + y * cell_res
+			
+			# Interdiction stricte de sortir de la limite d'arbres (avec cône d'approche souple devant les entrées d'arènes)
+			if not _is_point_in_safe_bounds(px, pz, map_min_x, map_max_x, map_min_z, map_max_z, b_margin, path_width, has_north, has_west, has_east):
+				astar_grid.set_point_solid(Vector2i(x, y), true)
+				continue
+				
 			var h = map_gen.get_base_height_at(px, pz)
 			
 			var max_slope = 0.0
@@ -81,12 +115,13 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 			if x < grid_w - 1 and y < grid_h - 1: max_slope = max(max_slope, abs(h - map_gen.get_base_height_at(px + cell_res, pz + cell_res)) / diag_res)
 				
 			# 40 degrés correspondent à un ratio de pente (tan) d'environ 0.84.
-			# Au-delà, c'est un mur infranchissable absolu.
+			# Au-delà, on applique une pénalité de poids colossale (plutôt que solid=true) pour éviter
+			# les montagnes tout en garantissant que l'AStar ne soit jamais forcé de passer derrière les arbres.
 			if max_slope > 0.84:
-				astar_grid.set_point_solid(Vector2i(x, y), true)
+				var steep_weight = 2500.0 + (max_slope * max_slope * 5000.0)
+				astar_grid.set_point_weight_scale(Vector2i(x, y), steep_weight)
 			else:
 				# Système de poids : privilégie massivement le plat, mais autorise les pentes si le détour est trop long.
-				# Le poids augmente de façon exponentielle avec la pente.
 				var weight = 1.0 + (max_slope * max_slope * 200.0)
 				astar_grid.set_point_weight_scale(Vector2i(x, y), weight)
 					
@@ -94,34 +129,11 @@ func generate_branching_path(map_min_x: float, map_max_x: float, map_min_z: floa
 	print("=> Grille AStar (" , grid_w * grid_h, " cellules) générée en ", time_astar, " ms.")
 	# ------------------------------------------------------
 	
-	var b_margin: float = map_gen.border_margin
-	# Les sorties sur les bordures Nord, Ouest et Est se terminent exactement
-	# sur la ligne du mur d'arbres de bordure (b_margin) pour découper l'ouverture
-	# et y connecter l'entrée de l'arène.
-	var west_offset: float = b_margin
-	var east_offset: float = b_margin
-	var north_offset: float = b_margin
-				
-	# Coordonnées du Spawn (Sud, placé un peu en avant du mur pour le confort du joueur)
-	var spawn_pos = Vector2((map_min_x + map_max_x) / 2.0, map_max_z - b_margin - 15.0)
-	
-	# Coordonnées des 3 Sorties (alignées sur le mur d'arbres de bordure)
-	exit_west = Vector2(map_min_x + west_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	exit_east = Vector2(map_max_x - east_offset, rng.randf_range(map_min_z + 200, map_max_z - 200))
-	exit_north = Vector2(rng.randf_range(map_min_x + 200, map_max_x - 200), map_min_z + north_offset)
-	
-	# Coordonnées des 2 embranchements
-	var fork1_y = lerp(map_max_z, map_min_z, rng.randf_range(0.3, 0.45))
-	var fork2_y = lerp(map_max_z, map_min_z, rng.randf_range(0.65, 0.8))
-	
-	var fork1 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork1_y)
-	var fork2 = Vector2(rng.randf_range(map_min_x + 300, map_max_x - 300), fork2_y)
-	
-	# Dégagement des obstacles AStar aux ouvertures de bordure pour garantir une route fluide jusqu'au mur
-	_clear_exit_obstacle_area(exit_north, 24.0, map_min_x, map_min_z)
-	_clear_exit_obstacle_area(exit_west, 24.0, map_min_x, map_min_z)
-	_clear_exit_obstacle_area(exit_east, 24.0, map_min_x, map_min_z)
-	_clear_exit_obstacle_area(spawn_pos, 24.0, map_min_x, map_min_z)
+	# Dégagement des obstacles AStar aux ouvertures de bordure (uniquement dans le cône autorisé)
+	_clear_exit_obstacle_area(exit_north, 24.0, map_min_x, map_max_x, map_min_z, map_max_z, b_margin, path_width, has_north, has_west, has_east)
+	_clear_exit_obstacle_area(exit_west, 24.0, map_min_x, map_max_x, map_min_z, map_max_z, b_margin, path_width, has_north, has_west, has_east)
+	_clear_exit_obstacle_area(exit_east, 24.0, map_min_x, map_max_x, map_min_z, map_max_z, b_margin, path_width, has_north, has_west, has_east)
+	_clear_exit_obstacle_area(spawn_pos, 24.0, map_min_x, map_max_x, map_min_z, map_max_z, b_margin, path_width, has_north, has_west, has_east)
 	
 	# --- VALIDATION DES POINTS STRATÉGIQUES ---
 	# Seuls le spawn et les embranchements intérieurs sont replacés s'ils tombent sur une falaise
@@ -240,6 +252,14 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 	if astar_grid == null:
 		push_error("PathGenerator: grille AStar absente : generate_branching_path() doit être appelé avant create_sub_path().")
 		return
+		
+	var map_gen = get_parent()
+	var b_margin: float = map_gen.border_margin if map_gen and "border_margin" in map_gen else 35.0
+	var arena_gen = map_gen.get_arena_generator() if map_gen and map_gen.has_method("get_arena_generator") else null
+	var has_west: bool = arena_gen == null or arena_gen.is_slot_active(arena_gen.SLOT_WEST)
+	var has_east: bool = arena_gen == null or arena_gen.is_slot_active(arena_gen.SLOT_EAST)
+	var has_north: bool = arena_gen == null or arena_gen.is_slot_active(arena_gen.SLOT_NORTH)
+	
 	var c_size = astar_grid.cell_size.x
 	var start_cell = Vector2i(
 		clamp((point_a.x - map_min_x) / c_size, 0, astar_grid.region.size.x - 1),
@@ -264,6 +284,9 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 		
 		while grid_path.size() == 0 and test_dist < max_dist:
 			var test_b = point_b + dir_to_a * test_dist
+			if not _is_point_in_safe_bounds(test_b.x, test_b.y, map_min_x, map_max_x, map_min_z, map_max_z, b_margin, custom_width, has_north, has_west, has_east):
+				test_dist += 20.0
+				continue
 			var test_end_cell = Vector2i(
 				clamp((test_b.x - map_min_x) / c_size, 0, astar_grid.region.size.x - 1),
 				clamp((test_b.y - map_min_z) / c_size, 0, astar_grid.region.size.y - 1)
@@ -286,7 +309,7 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 		# print("DEBUG PATH : AStar OK (", grid_path.size(), " pts) de ", point_a, " à ", point_b)
 		var waypoints = []
 		
-		# On ne saute que très peu de points pour respecter le chemin de l'AStar (1 point tous les 16m)
+		# On ne saute que très peu de points pour respecter le chemin de l'AStar (1 point tous les 8m)
 		var step = 2
 		for i in range(0, grid_path.size(), step):
 			waypoints.append(Vector2(grid_path[i].x + map_min_x, grid_path[i].y + map_min_z))
@@ -323,8 +346,11 @@ func create_sub_path(point_a: Vector2, point_b: Vector2, map_min_x: float, map_m
 	if grid_path.size() <= 1:
 		push_error("PathGenerator: l'AStar a ÉCHOUÉ entre %v et %v : la map est scindée en deux, aucune route n'est tracée pour ce tronçon." % [point_a, point_b])
 		return
-	curve.bake_interval = 50.0
+	curve.bake_interval = 10.0
 	var baked_points = curve.get_baked_points()
+	
+	for i in range(baked_points.size()):
+		baked_points[i] = _clamp_point_to_safe_bounds(baked_points[i], map_min_x, map_max_x, map_min_z, map_max_z, b_margin, custom_width, has_north, has_west, has_east)
 	
 	for i in range(baked_points.size() - 1):
 		var p1 = baked_points[i]
@@ -374,8 +400,101 @@ func _find_closest_point_on_segments(p: Vector2, segs: Array) -> Vector2:
 			closest_point = proj
 	return closest_point
 
-## Dégage une zone de cellules dans l'AStar pour garantir qu'une sortie ou arène est accessible
-func _clear_exit_obstacle_area(p: Vector2, radius: float, min_x: float, min_z: float) -> void:
+## Vérifie qu'un point (px, pz) garde toute la largeur de la route strictement à l'intérieur de la limite d'arbres,
+## tout en autorisant un cône d'approche large et naturel devant chaque entrée d'arène active.
+func _is_point_in_safe_bounds(px: float, pz: float, min_x: float, max_x: float, min_z: float, max_z: float, b_margin: float, extra_width: float, has_north: bool, has_west: bool, has_east: bool) -> bool:
+	# 1. Limite absolue : jamais au-delà de la ligne du mur d'arbres (border_margin)
+	if px < min_x + b_margin or px > max_x - b_margin or pz < min_z + b_margin or pz > max_z - b_margin:
+		return false
+		
+	# 2. Zone centrale sûre : à plus de (b_margin + extra_width + 6m) des bords, la route entière (centre + rayon) ne peut toucher aucun arbre de bordure
+	var inner_margin: float = b_margin + extra_width + 6.0
+	var in_x: bool = (px >= min_x + inner_margin and px <= max_x - inner_margin)
+	var in_z: bool = (pz >= min_z + inner_margin and pz <= max_z - inner_margin)
+	if in_x and in_z:
+		return true
+		
+	# 3. Dans la bande de transition (entre b_margin et inner_margin), on autorise un cône souple (~112°) uniquement devant les portes d'arène actives
+	var gate_half_tol: float = maxf(3.0, 16.0 - extra_width)
+	var cone_slope: float = 1.5
+	
+	# Entrée Arène Nord (Z proche de min_z + b_margin)
+	if has_north and exit_north != Vector2.ZERO and in_x and pz < min_z + inner_margin:
+		var d_into_map: float = pz - (min_z + b_margin)
+		if absf(px - exit_north.x) <= gate_half_tol + d_into_map * cone_slope:
+			return true
+			
+	# Entrée Arène Ouest (X proche de min_x + b_margin)
+	if has_west and exit_west != Vector2.ZERO and in_z and px < min_x + inner_margin:
+		var d_into_map: float = px - (min_x + b_margin)
+		if absf(pz - exit_west.y) <= gate_half_tol + d_into_map * cone_slope:
+			return true
+			
+	# Entrée Arène Est (X proche de max_x - b_margin)
+	if has_east and exit_east != Vector2.ZERO and in_z and px > max_x - inner_margin:
+		var d_into_map: float = (max_x - b_margin) - px
+		if absf(pz - exit_east.y) <= gate_half_tol + d_into_map * cone_slope:
+			return true
+			
+	# Zone du Spawn Sud (Z proche de max_z - b_margin)
+	if start_pos != Vector2.ZERO and in_x and pz > max_z - inner_margin:
+		var d_into_map: float = (max_z - b_margin) - pz
+		if absf(px - start_pos.x) <= gate_half_tol + d_into_map * cone_slope:
+			return true
+			
+	return false
+
+## Re-projette un point issu du lissage Bézier (Curve2D) dans la zone sûre pour empêcher toute boucle de déborder derrière les arbres.
+func _clamp_point_to_safe_bounds(p: Vector2, min_x: float, max_x: float, min_z: float, max_z: float, b_margin: float, extra_width: float, has_north: bool, has_west: bool, has_east: bool) -> Vector2:
+	if _is_point_in_safe_bounds(p.x, p.y, min_x, max_x, min_z, max_z, b_margin, extra_width, has_north, has_west, has_east):
+		return p
+		
+	var inner_margin: float = b_margin + extra_width + 6.0
+	var gate_half_tol: float = maxf(3.0, 16.0 - extra_width)
+	var cone_slope: float = 1.5
+	var res := Vector2(
+		clampf(p.x, min_x + b_margin, max_x - b_margin),
+		clampf(p.y, min_z + b_margin, max_z - b_margin)
+	)
+	
+	# Si le point est dans le voisinage d'une entrée d'arène active, on le clampe dans l'entonnoir de cette entrée
+	if has_north and exit_north != Vector2.ZERO and res.y < min_z + inner_margin and absf(res.x - exit_north.x) < 90.0:
+		var d_into: float = maxf(0.0, res.y - (min_z + b_margin))
+		var max_lat: float = gate_half_tol + d_into * cone_slope
+		res.x = clampf(res.x, exit_north.x - max_lat, exit_north.x + max_lat)
+		res.x = clampf(res.x, min_x + inner_margin, max_x - inner_margin)
+		return res
+		
+	if has_west and exit_west != Vector2.ZERO and res.x < min_x + inner_margin and absf(res.y - exit_west.y) < 90.0:
+		var d_into: float = maxf(0.0, res.x - (min_x + b_margin))
+		var max_lat: float = gate_half_tol + d_into * cone_slope
+		res.y = clampf(res.y, exit_west.y - max_lat, exit_west.y + max_lat)
+		res.y = clampf(res.y, min_z + inner_margin, max_z - inner_margin)
+		return res
+		
+	if has_east and exit_east != Vector2.ZERO and res.x > max_x - inner_margin and absf(res.y - exit_east.y) < 90.0:
+		var d_into: float = maxf(0.0, (max_x - b_margin) - res.x)
+		var max_lat: float = gate_half_tol + d_into * cone_slope
+		res.y = clampf(res.y, exit_east.y - max_lat, exit_east.y + max_lat)
+		res.y = clampf(res.y, min_z + inner_margin, max_z - inner_margin)
+		return res
+		
+	if start_pos != Vector2.ZERO and res.y > max_z - inner_margin and absf(res.x - start_pos.x) < 90.0:
+		var d_into: float = maxf(0.0, (max_z - b_margin) - res.y)
+		var max_lat: float = gate_half_tol + d_into * cone_slope
+		res.x = clampf(res.x, start_pos.x - max_lat, start_pos.x + max_lat)
+		res.x = clampf(res.x, min_x + inner_margin, max_x - inner_margin)
+		return res
+		
+	# Partout ailleurs le long des murs d'arbres, on maintient la marge intérieure complète
+	return Vector2(
+		clampf(res.x, min_x + inner_margin, max_x - inner_margin),
+		clampf(res.y, min_z + inner_margin, max_z - inner_margin)
+	)
+
+## Dégage une zone de cellules dans l'AStar pour garantir qu'une sortie ou arène est accessible,
+## sans jamais débloquer de cellules hors de la limite d'arbres.
+func _clear_exit_obstacle_area(p: Vector2, radius: float, min_x: float, max_x: float, min_z: float, max_z: float, b_margin: float, extra_width: float, has_north: bool, has_west: bool, has_east: bool) -> void:
 	if astar_grid == null:
 		return
 	var c_size = astar_grid.cell_size.x
@@ -386,33 +505,48 @@ func _clear_exit_obstacle_area(p: Vector2, radius: float, min_x: float, min_z: f
 		for dy in range(-r_cells, r_cells + 1):
 			var test_cell = Vector2i(cx + dx, cy + dy)
 			if astar_grid.is_in_boundsv(test_cell):
-				astar_grid.set_point_solid(test_cell, false)
-				astar_grid.set_point_weight_scale(test_cell, 1.0)
+				var px: float = min_x + test_cell.x * c_size
+				var pz: float = min_z + test_cell.y * c_size
+				if _is_point_in_safe_bounds(px, pz, min_x, max_x, min_z, max_z, b_margin, extra_width, has_north, has_west, has_east):
+					astar_grid.set_point_solid(test_cell, false)
+					astar_grid.set_point_weight_scale(test_cell, 1.0)
 
-# Helper pour l'AStar : Cherche le point navigable le plus proche (Spirale)
+# Helper pour l'AStar : Cherche le point navigable (et non escarpé) le plus proche (Spirale)
 func _get_closest_valid_point(p: Vector2, min_x: float, min_z: float) -> Vector2:
 	if astar_grid == null: return p
-
 	
 	var c_size = astar_grid.cell_size.x
 	var cx = int(clamp((p.x - min_x) / c_size, 0, astar_grid.region.size.x - 1))
 	var cy = int(clamp((p.y - min_z) / c_size, 0, astar_grid.region.size.y - 1))
 	
 	var cell = Vector2i(cx, cy)
-	if not astar_grid.is_point_solid(cell):
+	if not astar_grid.is_point_solid(cell) and astar_grid.get_point_weight_scale(cell) < 2000.0:
 		return p
 		
-	# Spirale pour trouver la case navigable la plus proche
-	for radius in range(1, 30):
+	var best_fallback_cell: Vector2i = cell
+	var best_fallback_weight: float = INF
+	
+	# Spirale pour trouver la case praticable la plus proche
+	for radius in range(1, 60):
 		for dx in range(-radius, radius + 1):
 			for dy in range(-radius, radius + 1):
 				if abs(dx) == radius or abs(dy) == radius:
 					var test_cell = cell + Vector2i(dx, dy)
 					if astar_grid.is_in_boundsv(test_cell) and not astar_grid.is_point_solid(test_cell):
-						var new_p = Vector2(test_cell.x * c_size + min_x, test_cell.y * c_size + min_z)
-						print("DEBUG PATH : Point stratégique déplacé d'une montagne ", p, " -> ", new_p)
-						return new_p
+						var w: float = astar_grid.get_point_weight_scale(test_cell)
+						if w < 2000.0:
+							var new_p = Vector2(test_cell.x * c_size + min_x, test_cell.y * c_size + min_z)
+							print("DEBUG PATH : Point stratégique déplacé d'une montagne ", p, " -> ", new_p)
+							return new_p
+						elif w < best_fallback_weight:
+							best_fallback_weight = w
+							best_fallback_cell = test_cell
 						
+	if best_fallback_weight < INF:
+		var fallback_p = Vector2(best_fallback_cell.x * c_size + min_x, best_fallback_cell.y * c_size + min_z)
+		print("DEBUG PATH : Point stratégique déplacé vers la moins pire case sûre ", p, " -> ", fallback_p)
+		return fallback_p
+		
 	print("DEBUG PATH : ERREUR FATALE - Impossible de déplacer le point ", p)
 	return p # Si tout est bloqué
 
