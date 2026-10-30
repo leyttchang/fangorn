@@ -22,7 +22,7 @@ texture_margin_bottom = 50.0
 region_rect = Rect2(9.762806, 14.7692375, 605.0376, 404.60632)
 
 [node name="option" type="Panel" unique_id=1114594140]
-custom_minimum_size = Vector2(500, 500)
+custom_minimum_size = Vector2(560, 560)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -39,20 +39,30 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 45
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 45
+theme_override_constants/margin_left = 35
+theme_override_constants/margin_top = 35
+theme_override_constants/margin_right = 35
+theme_override_constants/margin_bottom = 35
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer" unique_id=1849182371]
+[node name="MainVBox" type="VBoxContainer" parent="MarginContainer" unique_id=1900000001]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/MainVBox" unique_id=1900000002]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Général" type="ScrollContainer" parent="MarginContainer/MainVBox/TabContainer" unique_id=1849182371]
 layout_mode = 2
 horizontal_scroll_mode = 0
+metadata/_tab_index = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer" unique_id=424013911]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général" unique_id=424013911]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="screen_option" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1270024636]
+[node name="screen_option" type="OptionButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=1270024636]
 unique_name_in_owner = true
 layout_mode = 2
 item_count = 3
@@ -63,49 +73,51 @@ popup/item_1/id = 1
 popup/item_2/text = "Borderless"
 popup/item_2/id = 2
 
-[node name="sensitivityLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=33904893]
+[node name="sensitivityLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=33904893]
 layout_mode = 2
 text = "Sensitivity"
 horizontal_alignment = 1
 
-[node name="sensitivity" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=533426938]
+[node name="sensitivity" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=533426938]
 layout_mode = 2
 
-[node name="Sensitivity_slider" type="HSlider" parent="MarginContainer/ScrollContainer/VBoxContainer/sensitivity" unique_id=601940212]
+[node name="Sensitivity_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/sensitivity" unique_id=601940212]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="sensitivity_text" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/sensitivity" unique_id=1477098326]
-custom_minimum_size = Vector2(50, 0)
+[node name="sensitivity_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/sensitivity" unique_id=1477098326]
+custom_minimum_size = Vector2(55, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RenderScaleLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1552731518]
+[node name="RenderScaleLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=1552731518]
 layout_mode = 2
 text = "Render scale"
 horizontal_alignment = 1
 
-[node name="RenderScale" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=902356131]
+[node name="RenderScale" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=902356131]
 layout_mode = 2
 
-[node name="RenderScale_slider" type="HSlider" parent="MarginContainer/ScrollContainer/VBoxContainer/RenderScale" unique_id=1388151942]
-custom_minimum_size = Vector2(250, 0)
+[node name="RenderScale_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/RenderScale" unique_id=1388151942]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="RenderScale_text" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/RenderScale" unique_id=1285398810]
-custom_minimum_size = Vector2(50, 0)
+[node name="RenderScale_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/RenderScale" unique_id=1285398810]
+custom_minimum_size = Vector2(55, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="fsr_option" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer/RenderScale" unique_id=1622101815]
+[node name="fsr_option" type="OptionButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/RenderScale" unique_id=1622101815]
 layout_mode = 2
 item_count = 3
 popup/item_0/text = "Bilinear"
@@ -115,11 +127,11 @@ popup/item_1/id = 1
 popup/item_2/text = "FSR 2.0"
 popup/item_2/id = 2
 
-[node name="FPs" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1423695865]
+[node name="FPs" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=1423695865]
 layout_mode = 2
 alignment = 1
 
-[node name="fps_cap" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=1580491478]
+[node name="fps_cap" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/FPs" unique_id=1580491478]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
@@ -127,21 +139,21 @@ text = "FPS cap:"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="fps_cap_text" type="LineEdit" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=401354234]
+[node name="fps_cap_text" type="LineEdit" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/FPs" unique_id=401354234]
 layout_mode = 2
 
-[node name="vsync" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=1224640734]
+[node name="vsync" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/FPs" unique_id=1224640734]
 layout_mode = 2
 text = "Vsync :"
 
-[node name="Vsyinc_buton" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/FPs" unique_id=2102138559]
+[node name="Vsyinc_buton" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/FPs" unique_id=2102138559]
 layout_mode = 2
 
-[node name="Shadow" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=292569579]
+[node name="Shadow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=292569579]
 layout_mode = 2
 alignment = 1
 
-[node name="shadow" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/Shadow" unique_id=1057188111]
+[node name="shadow" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/Shadow" unique_id=1057188111]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
@@ -149,7 +161,7 @@ text = "shadow :"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Shadow_selection" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer/Shadow" unique_id=1549630038]
+[node name="Shadow_selection" type="OptionButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/Shadow" unique_id=1549630038]
 layout_mode = 2
 item_count = 4
 popup/item_0/text = "High"
@@ -161,15 +173,15 @@ popup/item_2/id = 2
 popup/item_3/text = "Off"
 popup/item_3/id = 3
 
-[node name="render_distance" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=925910224]
+[node name="render_distance" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=925910224]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/render_distance" unique_id=1949723632]
+[node name="Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/render_distance" unique_id=1949723632]
 layout_mode = 2
 text = "Render distance"
 
-[node name="OptionButton" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer/render_distance" unique_id=1994656819]
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/render_distance" unique_id=1994656819]
 layout_mode = 2
 item_count = 3
 popup/item_0/text = "Far"
@@ -179,71 +191,394 @@ popup/item_1/id = 1
 popup/item_2/text = "Close"
 popup/item_2/id = 2
 
-[node name="Graphics_sep" type="HSeparator" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010101]
+[node name="Graphics_sep" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010101]
 layout_mode = 2
 
-[node name="GraphicsLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010102]
+[node name="GraphicsLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010102]
 layout_mode = 2
 text = "--- Effets Graphiques (Coût GPU) ---"
 horizontal_alignment = 1
 
-[node name="SSIL" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010103]
+[node name="SSIL" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010103]
 layout_mode = 2
 alignment = 1
 
-[node name="ssil_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/SSIL" unique_id=101010104]
+[node name="ssil_label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/SSIL" unique_id=101010104]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SSIL (Lumière indirecte) :"
 
-[node name="ssil_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/SSIL" unique_id=101010105]
+[node name="ssil_button" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/SSIL" unique_id=101010105]
 layout_mode = 2
 
-[node name="SSAO" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010106]
+[node name="SSAO" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010106]
 layout_mode = 2
 alignment = 1
 
-[node name="ssao_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/SSAO" unique_id=101010107]
+[node name="ssao_label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/SSAO" unique_id=101010107]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SSAO (Ombrage ambiant) :"
 
-[node name="ssao_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/SSAO" unique_id=101010108]
+[node name="ssao_button" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/SSAO" unique_id=101010108]
 layout_mode = 2
 
-[node name="VFog" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010109]
+[node name="VFog" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010109]
 layout_mode = 2
 alignment = 1
 
-[node name="vfog_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/VFog" unique_id=101010110]
+[node name="vfog_label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/VFog" unique_id=101010110]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Brouillard volumétrique :"
 
-[node name="vfog_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/VFog" unique_id=101010111]
+[node name="vfog_button" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/VFog" unique_id=101010111]
 layout_mode = 2
 
-[node name="Glow" type="HBoxContainer" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010112]
+[node name="Glow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010112]
 layout_mode = 2
 alignment = 1
 
-[node name="glow_label" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer/Glow" unique_id=101010113]
+[node name="glow_label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/Glow" unique_id=101010113]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Glow / Bloom :"
 
-[node name="glow_button" type="CheckButton" parent="MarginContainer/ScrollContainer/VBoxContainer/Glow" unique_id=101010114]
+[node name="glow_button" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer/Glow" unique_id=101010114]
 layout_mode = 2
 
-[node name="Graphics_sep2" type="HSeparator" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=101010115]
+[node name="Graphics_sep2" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=101010115]
 layout_mode = 2
 
-[node name="Keybind" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=358060415]
+[node name="Keybind" type="Button" parent="MarginContainer/MainVBox/TabContainer/Général/VBoxContainer" unique_id=358060415]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Keybinds"
 
-[node name="return" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=2146650173]
+[node name="Shader" type="ScrollContainer" parent="MarginContainer/MainVBox/TabContainer" unique_id=1900000003]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 1
+
+[node name="ShaderVBox" type="VBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader" unique_id=1900000004]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ShaderSelectLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000005]
+layout_mode = 2
+text = "Shader Post-Process Actif :"
+horizontal_alignment = 1
+
+[node name="shader_mode_option" type="OptionButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000006]
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "Nouveau : Painterly / Figurine"
+popup/item_0/id = 0
+popup/item_1/text = "Ancien : Toon / Outline"
+popup/item_1/id = 1
+popup/item_2/text = "Désactivé (Aucun)"
+popup/item_2/id = 2
+
+[node name="F10Hint" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000007]
+layout_mode = 2
+text = "(F10 en jeu pour changer rapidement)"
+horizontal_alignment = 1
+
+[node name="ShaderSep" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000008]
+layout_mode = 2
+
+[node name="PainterlySection" type="VBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000009]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Comp1Header" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000010]
+layout_mode = 2
+
+[node name="Comp1Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/Comp1Header" unique_id=1900000011]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "1. Kuwahara 8 Secteurs (Aplats peinture)"
+
+[node name="kuwahara_toggle" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/Comp1Header" unique_id=1900000012]
+layout_mode = 2
+button_pressed = true
+
+[node name="RadiusRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000013]
+layout_mode = 2
+
+[node name="RadiusLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/RadiusRow" unique_id=1900000014]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Rayon peinture :"
+
+[node name="paint_radius_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/RadiusRow" unique_id=1900000015]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="paint_radius_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/RadiusRow" unique_id=1900000016]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "2.0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SepP1" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000017]
+layout_mode = 2
+
+[node name="Comp2Header" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000018]
+layout_mode = 2
+
+[node name="Comp2Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/Comp2Header" unique_id=1900000019]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "2. Rim Light Chaud & Silhouettes"
+
+[node name="dry_brush_toggle" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/Comp2Header" unique_id=1900000020]
+layout_mode = 2
+button_pressed = true
+
+[node name="DarknessRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000021]
+layout_mode = 2
+
+[node name="DarknessLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/DarknessRow" unique_id=1900000022]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Silhouettes :"
+
+[node name="outline_darkness_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/DarknessRow" unique_id=1900000023]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="outline_darkness_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/DarknessRow" unique_id=1900000024]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "0.55"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HighlightRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000025]
+layout_mode = 2
+
+[node name="HighlightLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/HighlightRow" unique_id=1900000026]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Rim Light chaud :"
+
+[node name="edge_highlight_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/HighlightRow" unique_id=1900000027]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="edge_highlight_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/HighlightRow" unique_id=1900000028]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "0.35"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SepP2" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000029]
+layout_mode = 2
+
+[node name="Comp3Header" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000030]
+layout_mode = 2
+
+[node name="Comp3Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/Comp3Header" unique_id=1900000031]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "3. Split-Toning & Contraste (Noirs protégés)"
+
+[node name="split_toning_toggle" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/Comp3Header" unique_id=1900000032]
+layout_mode = 2
+button_pressed = true
+
+[node name="WarmthRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000067]
+layout_mode = 2
+
+[node name="WarmthLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/WarmthRow" unique_id=1900000068]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Chaleur & Éclat :"
+
+[node name="warmth_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/WarmthRow" unique_id=1900000069]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="warmth_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/WarmthRow" unique_id=1900000070]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "1.25"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContrastRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection" unique_id=1900000033]
+layout_mode = 2
+
+[node name="ContrastLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/ContrastRow" unique_id=1900000034]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Contraste doux :"
+
+[node name="contrast_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/ContrastRow" unique_id=1900000035]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="contrast_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/PainterlySection/ContrastRow" unique_id=1900000036]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "1.15"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OldShaderSection" type="VBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000037]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="OldComp1Header" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000038]
+layout_mode = 2
+
+[node name="OldComp1Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldComp1Header" unique_id=1900000039]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "1. Contours de Profondeur (Silhouettes)"
+
+[node name="old_depth_toggle" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldComp1Header" unique_id=1900000040]
+layout_mode = 2
+button_pressed = true
+
+[node name="OldDepthRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000041]
+layout_mode = 2
+
+[node name="OldDepthLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldDepthRow" unique_id=1900000042]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Seuil profondeur :"
+
+[node name="old_depth_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldDepthRow" unique_id=1900000043]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="old_depth_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldDepthRow" unique_id=1900000044]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "0.02"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SepO1" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000045]
+layout_mode = 2
+
+[node name="OldComp2Header" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000046]
+layout_mode = 2
+
+[node name="OldComp2Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldComp2Header" unique_id=1900000047]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "2. Contours de Normales (Arêtes)"
+
+[node name="old_normal_toggle" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldComp2Header" unique_id=1900000048]
+layout_mode = 2
+button_pressed = true
+
+[node name="OldNormalRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000049]
+layout_mode = 2
+
+[node name="OldNormalLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldNormalRow" unique_id=1900000050]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Seuil normales :"
+
+[node name="old_normal_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldNormalRow" unique_id=1900000051]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="old_normal_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldNormalRow" unique_id=1900000052]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "2.0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OldThicknessRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000053]
+layout_mode = 2
+
+[node name="OldThicknessLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldThicknessRow" unique_id=1900000054]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Épaisseur traits :"
+
+[node name="old_thickness_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldThicknessRow" unique_id=1900000055]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="old_thickness_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldThicknessRow" unique_id=1900000056]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "1.5"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SepO2" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000057]
+layout_mode = 2
+
+[node name="OldComp3Header" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000058]
+layout_mode = 2
+
+[node name="OldComp3Label" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldComp3Header" unique_id=1900000059]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "3. Postérisation (Aplats couleurs)"
+
+[node name="old_posterize_toggle" type="CheckButton" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldComp3Header" unique_id=1900000060]
+layout_mode = 2
+button_pressed = true
+
+[node name="OldPosterizeRow" type="HBoxContainer" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection" unique_id=1900000061]
+layout_mode = 2
+
+[node name="OldPosterizeLabel" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldPosterizeRow" unique_id=1900000062]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Niveaux couleurs :"
+
+[node name="old_posterize_slider" type="HSlider" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldPosterizeRow" unique_id=1900000063]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="old_posterize_text" type="Label" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox/OldShaderSection/OldPosterizeRow" unique_id=1900000064]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_hlie2")
+text = "32"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShaderSepBottom" type="HSeparator" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000065]
+layout_mode = 2
+
+[node name="reset_shader_btn" type="Button" parent="MarginContainer/MainVBox/TabContainer/Shader/ShaderVBox" unique_id=1900000066]
+layout_mode = 2
+text = "Réinitialiser les valeurs par défaut"
+
+[node name="return" type="Button" parent="MarginContainer/MainVBox" unique_id=2146650173]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Return"

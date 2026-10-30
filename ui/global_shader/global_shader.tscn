@@ -1,17 +1,23 @@
 [gd_scene format=3 uid="uid://bh8emqqgp4pi1"]
 
-[ext_resource type="Shader" uid="uid://b4dwgbg6c0mqq" path="res://ui/global_shader/global_shader.gdshader" id="1_e7gaw"]
+[ext_resource type="Shader" path="res://ui/global_shader/painterly_shader.gdshader" id="1_e7gaw"]
 [ext_resource type="Script" uid="uid://gvtnd15m8lf2" path="res://ui/global_shader/global_shader.gd" id="1_script"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkk6"]
 render_priority = -10
 shader = ExtResource("1_e7gaw")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_thickness = 1.5
-shader_parameter/depth_threshold = 0.02
-shader_parameter/normal_threshold = 2.0
-shader_parameter/enable_posterization = true
-shader_parameter/posterize_steps = 32.0
+shader_parameter/enable_kuwahara = true
+shader_parameter/paint_radius = 2.5
+shader_parameter/enable_dry_brush = true
+shader_parameter/outline_darkness = 0.55
+shader_parameter/edge_highlight = 0.35
+shader_parameter/depth_sensitivity = 0.14
+shader_parameter/normal_sensitivity = 0.4
+shader_parameter/enable_split_toning = true
+shader_parameter/shadow_tint = Color(0.82, 0.92, 0.98, 1)
+shader_parameter/light_tint = Color(1, 0.86, 0.64, 1)
+shader_parameter/warmth = 1.25
+shader_parameter/contrast = 1.12
 
 [sub_resource type="QuadMesh" id="QuadMesh_l1x8o"]
 

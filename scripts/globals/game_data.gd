@@ -113,6 +113,7 @@ const DEFAULT_MONSTER_DATA: Dictionary = {
 	"scout.tscn": { "cost": 25, "weight": 0.7 },
 	"spider_enemie.tscn": { "cost": 5, "weight": 1.2 },
 	"creep.tscn": { "cost": 20, "weight": 0.2 },
+	"tree_man.tscn": { "cost": 35, "weight": 0.5 },
 	"ogre_boss.tscn": { "cost": 100, "weight": 1.0 }
 }
 
@@ -144,6 +145,8 @@ static func get_monster_entry(scene_or_identifier: Variant) -> Dictionary:
 		return DEFAULT_MONSTER_DATA.get("spider_enemie.tscn", {})
 	elif "creep" in lower:
 		return DEFAULT_MONSTER_DATA.get("creep.tscn", {})
+	elif "tree_man" in lower or "treeman" in lower:
+		return DEFAULT_MONSTER_DATA.get("tree_man.tscn", {})
 	elif "dumb" in lower or "orc" in lower:
 		return DEFAULT_MONSTER_DATA.get("dumb.tscn", {})
 	elif "ogre" in lower:

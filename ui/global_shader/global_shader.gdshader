@@ -7,7 +7,9 @@ uniform sampler2D normal_texture : hint_normal_roughness_texture, repeat_disable
 
 uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
 uniform float outline_thickness : hint_range(0.0, 5.0) = 1.0;
+uniform bool enable_depth_outline = true;
 uniform float depth_threshold = 0.05;
+uniform bool enable_normal_outline = true;
 uniform float normal_threshold = 0.5;
 
 uniform bool enable_posterization = false;
@@ -49,7 +51,9 @@ void fragment() {
     float normal_diff = distance(n_center, n_up) + distance(n_center, n_down) + distance(n_center, n_left) + distance(n_center, n_right) +
                         distance(n_center, n_up_left) + distance(n_center, n_up_right) + distance(n_center, n_down_left) + distance(n_center, n_down_right);
     
-    bool is_edge = (depth_diff > depth_threshold) || (normal_diff > normal_threshold);
+    bool is_depth_edge = enable_depth_outline && (depth_diff > depth_threshold);
+    bool is_normal_edge = enable_normal_outline && (normal_diff > normal_threshold);
+    bool is_edge = is_depth_edge || is_normal_edge;
     vec4 original_color = texture(screen_texture, uv);
     
     // -- POSTÉRISATION --

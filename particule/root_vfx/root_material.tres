@@ -9,7 +9,7 @@
 render_priority = 0
 shader = ExtResource("1_fnxl7")
 shader_parameter/fin = 0.0
-shader_parameter/debut = 1.0
+shader_parameter/debut = 0.0
 shader_parameter/smoth_step_sommet = 0.03
 shader_parameter/force_pincement_ = 0.14
 shader_parameter/root_texture = ExtResource("4_t8enm")

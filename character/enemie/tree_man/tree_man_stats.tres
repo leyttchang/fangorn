@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EntityStats" format=3 uid="uid://ctdpkxpaujtqr"]
+
+[ext_resource type="Script" uid="uid://dpiksbl0a1f5" path="res://scripts/stats/entity_stats.gd" id="1_stats"]
+
+[resource]
+script = ExtResource("1_stats")
+max_health = 500.0
+armor = 50.0
+knockback_resistance = 100.0
+xp_reward = 100.0
+fire_resistance = -0.2
+ice_resistance = 0.4
+lightning_resistance = 0.5
+metadata/_custom_type_script = "uid://dpiksbl0a1f5"

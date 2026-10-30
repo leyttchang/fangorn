@@ -7,6 +7,7 @@ signal vfog_changed(enabled: bool)
 signal ssil_changed(enabled: bool)
 signal ssao_changed(enabled: bool)
 signal glow_changed(enabled: bool)
+signal shader_settings_changed()
 
 var mouse_sensitivity: float = 0.002:
 	set(value):
@@ -71,6 +72,90 @@ var shadow_quality: int = 0: # 0 = High, 1 = Mid, 2 = Low, 3 = Off
 	set(value):
 		shadow_quality = value
 		_apply_shadow_quality()
+
+# --- Paramètres du Shader Global ---
+# 0 = Painterly / Figurine (Nouveau), 1 = Toon / Outline (Ancien), 2 = Désactivé
+var shader_mode: int = 0:
+	set(value):
+		shader_mode = value
+		shader_settings_changed.emit()
+
+# Nouveau Shader : Painterly / Figurine (3 composants)
+var painterly_kuwahara_enabled: bool = true:
+	set(value):
+		painterly_kuwahara_enabled = value
+		shader_settings_changed.emit()
+
+var painterly_paint_radius: float = 2.5:
+	set(value):
+		painterly_paint_radius = value
+		shader_settings_changed.emit()
+
+var painterly_dry_brush_enabled: bool = true:
+	set(value):
+		painterly_dry_brush_enabled = value
+		shader_settings_changed.emit()
+
+var painterly_outline_darkness: float = 0.55:
+	set(value):
+		painterly_outline_darkness = value
+		shader_settings_changed.emit()
+
+var painterly_edge_highlight: float = 0.35:
+	set(value):
+		painterly_edge_highlight = value
+		shader_settings_changed.emit()
+
+var painterly_split_toning_enabled: bool = true:
+	set(value):
+		painterly_split_toning_enabled = value
+		shader_settings_changed.emit()
+
+var painterly_warmth: float = 1.25:
+	set(value):
+		painterly_warmth = value
+		shader_settings_changed.emit()
+
+var painterly_contrast: float = 1.12:
+	set(value):
+		painterly_contrast = value
+		shader_settings_changed.emit()
+
+# Ancien Shader : Toon / Outline (3 composants)
+var old_depth_outline_enabled: bool = true:
+	set(value):
+		old_depth_outline_enabled = value
+		shader_settings_changed.emit()
+
+var old_normal_outline_enabled: bool = true:
+	set(value):
+		old_normal_outline_enabled = value
+		shader_settings_changed.emit()
+
+var old_posterization_enabled: bool = true:
+	set(value):
+		old_posterization_enabled = value
+		shader_settings_changed.emit()
+
+var old_outline_thickness: float = 1.5:
+	set(value):
+		old_outline_thickness = value
+		shader_settings_changed.emit()
+
+var old_depth_threshold: float = 0.02:
+	set(value):
+		old_depth_threshold = value
+		shader_settings_changed.emit()
+
+var old_normal_threshold: float = 2.0:
+	set(value):
+		old_normal_threshold = value
+		shader_settings_changed.emit()
+
+var old_posterize_steps: float = 32.0:
+	set(value):
+		old_posterize_steps = value
+		shader_settings_changed.emit()
 
 const SETTINGS_FILE = "user://settings.cfg"
 var config = ConfigFile.new()
@@ -188,6 +273,22 @@ func save_settings() -> void:
 	config.set_value("Video", "ssil", ssil_enabled)
 	config.set_value("Video", "ssao", ssao_enabled)
 	config.set_value("Video", "glow", glow_enabled)
+	config.set_value("Shader", "shader_mode", shader_mode)
+	config.set_value("Shader", "painterly_kuwahara_enabled", painterly_kuwahara_enabled)
+	config.set_value("Shader", "painterly_paint_radius", painterly_paint_radius)
+	config.set_value("Shader", "painterly_dry_brush_enabled", painterly_dry_brush_enabled)
+	config.set_value("Shader", "painterly_outline_darkness", painterly_outline_darkness)
+	config.set_value("Shader", "painterly_edge_highlight", painterly_edge_highlight)
+	config.set_value("Shader", "painterly_split_toning_enabled", painterly_split_toning_enabled)
+	config.set_value("Shader", "painterly_warmth", painterly_warmth)
+	config.set_value("Shader", "painterly_contrast", painterly_contrast)
+	config.set_value("Shader", "old_depth_outline_enabled", old_depth_outline_enabled)
+	config.set_value("Shader", "old_normal_outline_enabled", old_normal_outline_enabled)
+	config.set_value("Shader", "old_posterization_enabled", old_posterization_enabled)
+	config.set_value("Shader", "old_outline_thickness", old_outline_thickness)
+	config.set_value("Shader", "old_depth_threshold", old_depth_threshold)
+	config.set_value("Shader", "old_normal_threshold", old_normal_threshold)
+	config.set_value("Shader", "old_posterize_steps", old_posterize_steps)
 	config.save(SETTINGS_FILE)
 
 func load_settings() -> void:
@@ -210,6 +311,22 @@ func load_settings() -> void:
 	ssil_enabled = config.get_value("Video", "ssil", true)
 	ssao_enabled = config.get_value("Video", "ssao", true)
 	glow_enabled = config.get_value("Video", "glow", true)
+	shader_mode = config.get_value("Shader", "shader_mode", 0)
+	painterly_kuwahara_enabled = config.get_value("Shader", "painterly_kuwahara_enabled", true)
+	painterly_paint_radius = config.get_value("Shader", "painterly_paint_radius", 2.5)
+	painterly_dry_brush_enabled = config.get_value("Shader", "painterly_dry_brush_enabled", true)
+	painterly_outline_darkness = config.get_value("Shader", "painterly_outline_darkness", 0.55)
+	painterly_edge_highlight = config.get_value("Shader", "painterly_edge_highlight", 0.35)
+	painterly_split_toning_enabled = config.get_value("Shader", "painterly_split_toning_enabled", true)
+	painterly_warmth = config.get_value("Shader", "painterly_warmth", 1.25)
+	painterly_contrast = config.get_value("Shader", "painterly_contrast", 1.12)
+	old_depth_outline_enabled = config.get_value("Shader", "old_depth_outline_enabled", true)
+	old_normal_outline_enabled = config.get_value("Shader", "old_normal_outline_enabled", true)
+	old_posterization_enabled = config.get_value("Shader", "old_posterization_enabled", true)
+	old_outline_thickness = config.get_value("Shader", "old_outline_thickness", 1.5)
+	old_depth_threshold = config.get_value("Shader", "old_depth_threshold", 0.02)
+	old_normal_threshold = config.get_value("Shader", "old_normal_threshold", 2.0)
+	old_posterize_steps = config.get_value("Shader", "old_posterize_steps", 32.0)
 	_apply_environment_settings()
 
 func load_keybinds() -> void:

@@ -1,0 +1,61 @@
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://d15tph6700hw0"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_stand_up"]
+animation = &"anim/stand_up"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_t_pose"]
+animation = &"anim/t_pose"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_zombie_attack"]
+animation = &"anim/zombie_attack"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_zombie_kicking"]
+animation = &"anim/zombie_kicking"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_zombie_running"]
+animation = &"anim/zombie_running"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_start"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_tpose_to_run"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_run_to_tpose"]
+xfade_time = 0.25
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_tpose_to_attack"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_tpose_to_kick"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_run_to_attack"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_run_to_kick"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_attack_to_run"]
+xfade_time = 0.2
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_kick_to_run"]
+xfade_time = 0.2
+switch_mode = 2
+advance_mode = 2
+
+[resource]
+states/Start/position = Vector2(120, 100)
+states/stand_up/node = SubResource("AnimationNodeAnimation_stand_up")
+states/stand_up/position = Vector2(280, 220)
+states/t_pose/node = SubResource("AnimationNodeAnimation_t_pose")
+states/t_pose/position = Vector2(280, 100)
+states/zombie_attack/node = SubResource("AnimationNodeAnimation_zombie_attack")
+states/zombie_attack/position = Vector2(660, 20)
+states/zombie_kicking/node = SubResource("AnimationNodeAnimation_zombie_kicking")
+states/zombie_kicking/position = Vector2(660, 180)
+states/zombie_running/node = SubResource("AnimationNodeAnimation_zombie_running")
+states/zombie_running/position = Vector2(480, 100)
+transitions = ["Start", "t_pose", SubResource("AnimationNodeStateMachineTransition_start"), "t_pose", "zombie_running", SubResource("AnimationNodeStateMachineTransition_tpose_to_run"), "zombie_running", "t_pose", SubResource("AnimationNodeStateMachineTransition_run_to_tpose"), "t_pose", "zombie_attack", SubResource("AnimationNodeStateMachineTransition_tpose_to_attack"), "t_pose", "zombie_kicking", SubResource("AnimationNodeStateMachineTransition_tpose_to_kick"), "zombie_running", "zombie_attack", SubResource("AnimationNodeStateMachineTransition_run_to_attack"), "zombie_running", "zombie_kicking", SubResource("AnimationNodeStateMachineTransition_run_to_kick"), "zombie_attack", "zombie_running", SubResource("AnimationNodeStateMachineTransition_attack_to_run"), "zombie_kicking", "zombie_running", SubResource("AnimationNodeStateMachineTransition_kick_to_run")]

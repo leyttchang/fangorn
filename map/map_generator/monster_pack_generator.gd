@@ -11,6 +11,8 @@ extends Node3D
 # ==========================================================
 @export_category("Scènes & Références")
 @export var pack_scene: PackedScene = preload("res://character/enemie/monster_pack/monster_pack.tscn")
+## Scène du Tree Man (arbre vivant apparaissant en solo aux abords des chemins)
+@export var tree_man_scene: PackedScene = preload("res://character/enemie/tree_man/tree_man.tscn")
 ## Liste des types de monstres disponibles pour composer les meutes
 @export var available_monsters: Array[PackedScene] = [
 	preload("res://character/enemie/dumb/dumb.tscn"),
@@ -43,6 +45,8 @@ extends Node3D
 @export var patrol_pack_count: int = 4
 ## Nombre de meutes rôdeurs dans la forêt / nature
 @export var roam_pack_count: int = 6
+## Nombre de Tree Man solitaires postés aux abords des chemins
+@export var tree_man_count: int = 8
 
 @export_category("Scaling Multijoueur")
 ## Pente d'augmentation du nombre de meutes par joueur supplémentaire au-delà du 1er.
@@ -71,6 +75,14 @@ extends Node3D
 @export var roam_radius_max: float = 30.0
 ## Portée de détection des rôdeurs
 @export var roam_detection_range: float = 20.0
+
+@export_category("Paramètres Tree Man (Abords des Chemins)")
+## Distance minimale depuis le bord de la route (en mètres)
+@export var tree_man_min_road_offset: float = 2.0
+## Distance maximale depuis le bord de la route (en mètres)
+@export var tree_man_max_road_offset: float = 9.0
+## Distance minimale entre deux Tree Man (en mètres)
+@export var tree_man_min_spacing: float = 45.0
 
 @export_category("Sécurité du Terrain")
 ## Hauteur au-dessus du sol lors du spawn (3 mètres au-dessus du sol pour éviter de traverser le relief ou les pentes)
@@ -238,6 +250,7 @@ func generate_monster_packs(pack_seed: int = 0) -> void:
 	var effective_ambush = int(round(float(ambush_pack_count) * mult))
 	var effective_patrol = int(round(float(patrol_pack_count) * mult))
 	var effective_roam = int(round(float(roam_pack_count) * mult))
+	var effective_tree_men = int(round(float(tree_man_count) * mult))
 	
 	var path_gen = _get_path_generator()
 	
@@ -250,11 +263,15 @@ func generate_monster_packs(pack_seed: int = 0) -> void:
 	# 3. Génération des Rôdeurs dans la forêt
 	var actual_roam = _spawn_roam_packs(effective_roam, rng, path_gen)
 	
-	print("[MonsterPackGenerator] Terminé ! %d meutes créées (Rôdeurs: %d, Embuscades: %d, Patrouilles: %d) | Total monstres : %d." % [
+	# 4. Génération des Tree Man aux abords des chemins
+	var actual_tree_men = _spawn_tree_men(effective_tree_men, rng, path_gen)
+	
+	print("[MonsterPackGenerator] Terminé ! %d meutes créées (Rôdeurs: %d, Embuscades: %d, Patrouilles: %d) + %d Tree Man aux abords des chemins | Total monstres : %d." % [
 		_spawned_packs.size(),
 		actual_roam,
 		actual_ambush,
 		actual_patrol,
+		actual_tree_men,
 		_spawned_monsters.size()
 	])
 
@@ -535,6 +552,88 @@ func _spawn_roam_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGen
 			_spawned_monsters.append(mob)
 			pack.add_member(mob)
 			
+		spawned_count += 1
+		
+	return spawned_count
+
+# ==========================================================
+# GÉNÉRATION DES TREE MAN AUX ABORDS DES CHEMINS
+# ==========================================================
+func _spawn_tree_men(count: int, rng: RandomNumberGenerator, path_gen: PathGenerator) -> int:
+	if path_gen == null or path_gen.segments.is_empty() or count <= 0 or tree_man_scene == null:
+		return 0
+		
+	var segments = path_gen.segments
+	var bounds = _get_map_bounds().grow(-40.0)
+	var spawned_positions: Array[Vector2] = []
+	var spawned_count: int = 0
+	var attempts: int = 0
+	var max_attempts: int = count * 20
+	var min_spacing_sq: float = tree_man_min_spacing * tree_man_min_spacing
+	
+	var parent_for_monsters: Node = self
+	if not Engine.is_editor_hint() and is_inside_tree() and get_tree() != null and get_tree().current_scene != null:
+		var net_obj = get_tree().current_scene.get_node_or_null("NetworkObjects")
+		if net_obj != null:
+			parent_for_monsters = net_obj
+			
+	while spawned_count < count and attempts < max_attempts:
+		attempts += 1
+		var seg = segments[rng.randi_range(0, segments.size() - 1)]
+		var start_pt: Vector2 = seg.get("start", Vector2.ZERO)
+		var end_pt: Vector2 = seg.get("end", Vector2.ZERO)
+		var dir = (end_pt - start_pt).normalized()
+		if dir.length_squared() < 0.001:
+			continue
+			
+		var t: float = rng.randf_range(0.1, 0.9)
+		var road_pt_2d: Vector2 = start_pt.lerp(end_pt, t)
+		var side: float = 1.0 if rng.randf() < 0.5 else -1.0
+		var perp: Vector2 = Vector2(-dir.y, dir.x) * side
+		var half_w: float = float(seg.get("width", 15.0)) * 0.5
+		var offset_from_edge: float = rng.randf_range(tree_man_min_road_offset, maxf(tree_man_min_road_offset, tree_man_max_road_offset))
+		var pos_2d: Vector2 = road_pt_2d + perp * (half_w + offset_from_edge)
+		
+		# 1. Rester dans les limites sûres de la carte
+		if not bounds.has_point(pos_2d):
+			continue
+			
+		# 2. Ne pas spawner sur un autre embranchement de route
+		if path_gen.is_point_on_path(pos_2d, 1.0):
+			continue
+			
+		# 3. Éviter le point de spawn immédiat des joueurs
+		if path_gen.start_pos != Vector2.ZERO and pos_2d.distance_squared_to(path_gen.start_pos) < (25.0 * 25.0):
+			continue
+			
+		# 4. Espacement minimum entre deux Tree Man
+		var too_close: bool = false
+		for other in spawned_positions:
+			if other.distance_squared_to(pos_2d) < min_spacing_sq:
+				too_close = true
+				break
+		if too_close:
+			continue
+			
+		# 5. Vérifier la pente du terrain
+		if _get_slope_at(pos_2d.x, pos_2d.y) > 35.0:
+			continue
+			
+		var mob = tree_man_scene.instantiate() as CharacterBody3D
+		if mob == null:
+			continue
+			
+		mob.name = "TreeMan_%d" % (spawned_count + 1)
+		parent_for_monsters.add_child(mob, true)
+		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
+			mob.owner = get_tree().edited_scene_root
+			
+		var ground_y: float = _get_terrain_height_at(pos_2d.x, pos_2d.y)
+		mob.global_position = Vector3(pos_2d.x, ground_y + spawn_height_offset, pos_2d.y)
+		mob.rotation.y = rng.randf_range(0.0, TAU)
+		
+		spawned_positions.append(pos_2d)
+		_spawned_monsters.append(mob)
 		spawned_count += 1
 		
 	return spawned_count
