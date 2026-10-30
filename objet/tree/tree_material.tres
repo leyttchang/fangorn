@@ -1,26 +1,47 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://d2q4uqp0iwgep"]
 
 [ext_resource type="Shader" uid="uid://nlkoocory7ca" path="res://particule/shader/tree.gdshader" id="1_u5pqj"]
-[ext_resource type="Texture2D" uid="uid://u6elekb2jt0k" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet Tree Cold.png" id="2_fjoqp"]
+[ext_resource type="Texture2D" uid="uid://cp7gaqt4syxdi" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet_Tree_Cold_1024_stylised.png" id="2_u5pqj"]
+[ext_resource type="Texture2D" uid="uid://dngx6d5373puq" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet_Tree_Cold_1024_normal.png" id="3_fjoqp"]
+[ext_resource type="Texture2D" uid="uid://cm0627u8a3vwv" path="res://assets/3D_models/tree/low_poly/Textures/Colorsheet_Tree_Cold_1024_ao.png" id="3_i0roa"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_u5pqj")
 shader_parameter/albedo = Color(1, 1, 1, 1)
-shader_parameter/texture_albedo = ExtResource("2_fjoqp")
+shader_parameter/texture_albedo = ExtResource("2_u5pqj")
 shader_parameter/albedo_texture_size = Vector2i(16, 16)
 shader_parameter/point_size = 1.0
 shader_parameter/roughness = 1.0
 shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
 shader_parameter/specular = 0.5
 shader_parameter/metallic = 0.0
+shader_parameter/texture_normal = ExtResource("3_fjoqp")
+shader_parameter/normal_scale = 0.10000076474999986
+shader_parameter/texture_ambient_occlusion = ExtResource("3_i0roa")
+shader_parameter/ao_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/ao_light_affect = 0.55
+shader_parameter/ao_strength = 0.85
 shader_parameter/uv1_scale = Vector3(1, 1, 1)
 shader_parameter/uv1_offset = Vector3(0, 0, 0)
 shader_parameter/uv2_scale = Vector3(1, 1, 1)
 shader_parameter/uv2_offset = Vector3(0, 0, 0)
-shader_parameter/wind_height_start = 0.7
-shader_parameter/wind_height_end = 2.0
+shader_parameter/wind_direction = Vector2(1, 0.5)
 shader_parameter/wind_speed = 2.385
 shader_parameter/wind_strength = 0.215
-shader_parameter/wind_direction = Vector2(1, 0.5)
+shader_parameter/tree_wind_direction = Vector2(0, 0)
+shader_parameter/tree_wind_strength = -1.0
+shader_parameter/wind_time = 0.0
+shader_parameter/wind_scroll = Vector2(0, 0)
+shader_parameter/tree_wind_time = 0.0
+shader_parameter/tree_wind_scroll = Vector2(0, 0)
+shader_parameter/max_sway_distance = 0.7
+shader_parameter/calm_amplitude_ratio = 0.3
+shader_parameter/sway_frequency = 0.2
+shader_parameter/gust_frequency = 0.005
+shader_parameter/trunk_tension = 0.32
+shader_parameter/rebound_amount = 0.45
+shader_parameter/storm_base_lean = 0.42
+shader_parameter/lateral_amount = 0.06
+shader_parameter/vertical_dip = 0.15
 shader_parameter/wind_max_distance = 80.0

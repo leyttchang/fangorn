@@ -392,6 +392,11 @@ func generate_trees() -> void:
 			mmi.multimesh = mm
 			if v_data["material"] != null:
 				mmi.material_override = v_data["material"]
+				if is_inside_tree():
+					var wind_singleton = get_node_or_null("/root/Wind")
+					if wind_singleton != null and v_data["material"] is ShaderMaterial:
+						if wind_singleton.has_method("register_grass_material"):
+							wind_singleton.register_grass_material(v_data["material"])
 				
 			# OPTIMISATION MAGIQUE : Distance d'affichage (désactivée en éditeur si editor_unlimited_view est coché)
 			var no_limit: bool = Engine.is_editor_hint() and map_generator != null and map_generator.get("editor_unlimited_view") == true
@@ -662,8 +667,9 @@ func _setup_collisions(instances: Array[Dictionary], tree_data: Dictionary) -> v
 			PhysicsServer3D.body_set_collision_layer(body, tree_data.collision_layer)
 			PhysicsServer3D.body_set_collision_mask(body, tree_data.collision_mask)
 			
-			# La hitbox cylindre est agrandie selon l'échelle de l'arbre
-			var local_shape_t = Transform3D(Basis().scaled(Vector3.ONE * s), tree_data.shape_offset * s)
+			# La hitbox est agrandie et orientée selon le transform du CollisionShape3D et l'échelle de l'arbre
+			var shape_basis: Basis = tree_data.get("shape_basis", Basis.IDENTITY)
+			var local_shape_t = Transform3D(shape_basis.scaled(Vector3.ONE * s), tree_data.shape_offset * s)
 			PhysicsServer3D.body_add_shape(body, shape_rid, local_shape_t)
 			
 			# Le corps physique est orienté selon la rotation Y de l'arbre et placé au sol
@@ -680,6 +686,7 @@ func _setup_collisions(instances: Array[Dictionary], tree_data: Dictionary) -> v
 			if Engine.is_editor_hint():
 				colliders_node.owner = get_tree().edited_scene_root
 				
+		var shape_basis: Basis = tree_data.get("shape_basis", Basis.IDENTITY)
 		for inst in instances:
 			var s: float = inst["scale"]
 			var rot_y: float = inst["rot_y"]
@@ -692,8 +699,7 @@ func _setup_collisions(instances: Array[Dictionary], tree_data: Dictionary) -> v
 			
 			var col = CollisionShape3D.new()
 			col.shape = tree_data.shape
-			col.scale = Vector3.ONE * s
-			col.position = tree_data.shape_offset * s
+			col.transform = Transform3D(shape_basis.scaled(Vector3.ONE * s), tree_data.shape_offset * s)
 			body.add_child(col)
 			colliders_node.add_child(body)
 
@@ -711,6 +717,7 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 		"mesh_offset": Vector3.ZERO,
 		"material": null,
 		"shape": null,
+		"shape_basis": Basis(),
 		"shape_offset": Vector3.ZERO,
 		"collision_layer": 129,
 		"collision_mask": 3,
@@ -746,6 +753,7 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 				if curr is Node3D:
 					rel_t = curr.transform * rel_t
 				curr = curr.get_parent()
+			result.shape_basis = rel_t.basis
 			result.shape_offset = rel_t.origin
 			var node_scale: float = rel_t.basis.get_scale().x
 			if n.shape is CylinderShape3D:
@@ -755,6 +763,20 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 			elif n.shape is BoxShape3D:
 				var b_sz = (n.shape as BoxShape3D).size
 				result.trunk_radius = maxf(b_sz.x * rel_t.basis.get_scale().x, b_sz.z * rel_t.basis.get_scale().z) * 0.5
+			elif n.shape is ConvexPolygonShape3D or n.shape is ConcavePolygonShape3D:
+				var pts: PackedVector3Array = (n.shape as ConvexPolygonShape3D).points if n.shape is ConvexPolygonShape3D else (n.shape as ConcavePolygonShape3D).get_faces()
+				var max_r_sq: float = 0.0
+				var band_r_sq: float = 0.0
+				for pt in pts:
+					var w_pt: Vector3 = rel_t * pt
+					var r_sq: float = w_pt.x * w_pt.x + w_pt.z * w_pt.z
+					if r_sq > max_r_sq:
+						max_r_sq = r_sq
+					if w_pt.y >= 0.2 and w_pt.y <= 0.6 and r_sq > band_r_sq:
+						band_r_sq = r_sq
+				var chosen_r: float = sqrt(band_r_sq) if band_r_sq > 0.0 else sqrt(max_r_sq)
+				if chosen_r > 0.05:
+					result.trunk_radius = chosen_r
 		elif n is Marker3D:
 			# Marker3D dans la scène : indique exactement où le sol doit couper le tronc !
 			var curr: Node = n

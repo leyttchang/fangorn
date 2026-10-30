@@ -306,7 +306,8 @@ func _setup_wall_collisions(instances: Array[Dictionary], tree_data: Dictionary)
 			PhysicsServer3D.body_set_collision_layer(body, tree_data["collision_layer"])
 			PhysicsServer3D.body_set_collision_mask(body, tree_data["collision_mask"])
 			
-			var local_shape_t = Transform3D(Basis().scaled(Vector3.ONE * s), tree_data["shape_offset"] * s)
+			var shape_basis: Basis = tree_data.get("shape_basis", Basis.IDENTITY)
+			var local_shape_t = Transform3D(shape_basis.scaled(Vector3.ONE * s), tree_data["shape_offset"] * s)
 			PhysicsServer3D.body_add_shape(body, shape_rid, local_shape_t)
 			
 			var body_t = Transform3D(Basis(Vector3.UP, rot_y), pos)
@@ -321,6 +322,7 @@ func _setup_wall_collisions(instances: Array[Dictionary], tree_data: Dictionary)
 			if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 				colliders_node.owner = get_tree().edited_scene_root
 				
+		var shape_basis: Basis = tree_data.get("shape_basis", Basis.IDENTITY)
 		for inst in instances:
 			var s: float = inst["scale"]
 			var rot_y: float = inst["rot_y"]
@@ -333,8 +335,7 @@ func _setup_wall_collisions(instances: Array[Dictionary], tree_data: Dictionary)
 			
 			var col = CollisionShape3D.new()
 			col.shape = tree_data["shape"]
-			col.scale = Vector3.ONE * s
-			col.position = tree_data["shape_offset"] * s
+			col.transform = Transform3D(shape_basis.scaled(Vector3.ONE * s), tree_data["shape_offset"] * s)
 			body.add_child(col)
 			colliders_node.add_child(body)
 
@@ -345,6 +346,7 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 		"mesh_offset": Vector3.ZERO,
 		"material": null,
 		"shape": null,
+		"shape_basis": Basis(),
 		"shape_offset": Vector3.ZERO,
 		"collision_layer": 129,
 		"collision_mask": 3,
@@ -378,6 +380,7 @@ func _extract_tree_model_data(scene: PackedScene) -> Dictionary:
 				if curr is Node3D:
 					rel_t = curr.transform * rel_t
 				curr = curr.get_parent()
+			result.shape_basis = rel_t.basis
 			result.shape_offset = rel_t.origin
 		elif n is Marker3D:
 			var curr: Node = n

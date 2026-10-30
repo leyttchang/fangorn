@@ -482,6 +482,7 @@ func _extract_model_data(scene: PackedScene) -> Dictionary:
 				if curr is Node3D:
 					rel_t = curr.transform * rel_t
 				curr = curr.get_parent()
+			result.shape_basis = rel_t.basis
 			result.shape_offset = rel_t.origin
 			var s: float = rel_t.basis.get_scale().x
 			if n.shape is CylinderShape3D:
@@ -491,6 +492,20 @@ func _extract_model_data(scene: PackedScene) -> Dictionary:
 			elif n.shape is BoxShape3D:
 				var sz = (n.shape as BoxShape3D).size
 				result.trunk_radius = maxf(sz.x, sz.z) * 0.5 * s
+			elif n.shape is ConvexPolygonShape3D or n.shape is ConcavePolygonShape3D:
+				var pts: PackedVector3Array = (n.shape as ConvexPolygonShape3D).points if n.shape is ConvexPolygonShape3D else (n.shape as ConcavePolygonShape3D).get_faces()
+				var max_r_sq: float = 0.0
+				var band_r_sq: float = 0.0
+				for pt in pts:
+					var w_pt: Vector3 = rel_t * pt
+					var r_sq: float = w_pt.x * w_pt.x + w_pt.z * w_pt.z
+					if r_sq > max_r_sq:
+						max_r_sq = r_sq
+					if w_pt.y >= 0.2 and w_pt.y <= 0.6 and r_sq > band_r_sq:
+						band_r_sq = r_sq
+				var chosen_r: float = sqrt(band_r_sq) if band_r_sq > 0.0 else sqrt(max_r_sq)
+				if chosen_r > 0.05:
+					result.trunk_radius = chosen_r
 		elif n is Marker3D and result.ground_offset == 0.0:
 			var curr: Node = n
 			var rel_t: Transform3D = Transform3D.IDENTITY
@@ -524,6 +539,7 @@ func _setup_all_collisions(variation_instances: Array[Array], active_variations:
 		if instances.is_empty() or v_data["shape"] == null:
 			continue
 			
+		var shape_basis: Basis = v_data.get("shape_basis", Basis.IDENTITY)
 		if use_physics_server:
 			var w3d = get_world_3d()
 			if w3d == null:
@@ -545,7 +561,7 @@ func _setup_all_collisions(variation_instances: Array[Array], active_variations:
 				PhysicsServer3D.body_set_collision_layer(body, collision_layer)
 				PhysicsServer3D.body_set_collision_mask(body, collision_mask)
 				
-				var local_shape_t = Transform3D(Basis().scaled(Vector3.ONE * s), v_data["shape_offset"] * s)
+				var local_shape_t = Transform3D(shape_basis.scaled(Vector3.ONE * s), v_data["shape_offset"] * s)
 				PhysicsServer3D.body_add_shape(body, shape_rid, local_shape_t)
 				
 				var body_t = Transform3D(Basis(Vector3.UP, rot_y), pos)
@@ -570,8 +586,7 @@ func _setup_all_collisions(variation_instances: Array[Array], active_variations:
 				
 				var col = CollisionShape3D.new()
 				col.shape = v_data["shape"]
-				col.scale = Vector3.ONE * s
-				col.position = v_data["shape_offset"] * s
+				col.transform = Transform3D(shape_basis.scaled(Vector3.ONE * s), v_data["shape_offset"] * s)
 				body.add_child(col)
 				colliders_node.add_child(body)
 

@@ -59,6 +59,13 @@ var _time: float = 0.0
 var _update_timer: float = 0.0
 var _wind_time: float = 0.0
 var _wind_scroll: Vector2 = Vector2.ZERO
+var _tree_wind_time: float = 0.0
+var _tree_wind_scroll: Vector2 = Vector2.ZERO
+var _tree_strength_current: float = 0.08
+var _tree_strength_vel: float = 0.0
+var _tree_angle_current: float = 0.65
+var _tree_angle_vel: float = 0.0
+var _tree_wind_direction: Vector2 = Vector2(1.0, 0.5).normalized()
 var _grass_materials: Array[WeakRef] = []
 
 # Gestion de la direction et des virements
@@ -89,6 +96,11 @@ func _ready() -> void:
 		var mat = default_mesh.surface_get_material(0)
 		if mat is ShaderMaterial:
 			register_grass_material(mat)
+			
+	# Auto-détection du matériau des arbres du projet
+	var tree_mat = load("res://objet/tree/tree_material.tres") as ShaderMaterial
+	if tree_mat != null:
+		register_grass_material(tree_mat)
 
 ## Enregistre un matériau d'herbe pour qu'il reçoive les mises à jour automatiques du vent
 func register_grass_material(mat: ShaderMaterial) -> void:
@@ -215,6 +227,27 @@ func _process(delta: float) -> void:
 	_wind_time += delta * current_wind_speed
 	_wind_scroll += current_wind_direction * (delta * current_wind_speed)
 	
+	# Vitesse maîtrisée et inertie progressive pour les arbres (évite tout à-coup lors des bourrasques)
+	var speed_t: float = clampf((current_wind_speed - calm_wind_speed) / maxf(0.01, storm_wind_speed - calm_wind_speed), 0.0, 1.0)
+	var tree_eff_speed: float = calm_wind_speed * lerpf(1.0, 1.5, speed_t)
+	_tree_wind_time += delta * tree_eff_speed
+	
+	# Inertie du second ordre sur la force du vent des arbres :
+	# Démarre progressivement (pas d'à-coup à t=0), maintient une vitesse soutenue, puis s'amortit
+	var strength_diff: float = target_strength - _tree_strength_current
+	var desired_strength_vel: float = clampf(strength_diff * 1.8, -0.75, 0.85)
+	_tree_strength_vel = move_toward(_tree_strength_vel, desired_strength_vel, delta * 1.4)
+	_tree_strength_current = clampf(_tree_strength_current + _tree_strength_vel * delta, 0.0, 2.0)
+	
+	# Inertie du second ordre sur la direction du vent des arbres :
+	var angle_diff: float = wrapf(_current_actual_angle - _tree_angle_current, -PI, PI)
+	var desired_angle_vel: float = clampf(angle_diff * 1.6, -1.2, 1.2)
+	_tree_angle_vel = move_toward(_tree_angle_vel, desired_angle_vel, delta * 1.8)
+	_tree_angle_current = wrapf(_tree_angle_current + _tree_angle_vel * delta, -PI, PI)
+	_tree_wind_direction = Vector2(cos(_tree_angle_current), sin(_tree_angle_current)).normalized()
+	
+	_tree_wind_scroll += _tree_wind_direction * (delta * tree_eff_speed)
+	
 	# 6. Envoi aux shaders et signaux
 	_update_grass_materials()
 	_update_timer += delta
@@ -236,3 +269,7 @@ func _update_single_grass_material(mat: ShaderMaterial) -> void:
 	mat.set_shader_parameter("wind_speed", current_wind_speed)
 	mat.set_shader_parameter("wind_time", _wind_time)
 	mat.set_shader_parameter("wind_scroll", _wind_scroll)
+	mat.set_shader_parameter("tree_wind_direction", _tree_wind_direction)
+	mat.set_shader_parameter("tree_wind_strength", _tree_strength_current)
+	mat.set_shader_parameter("tree_wind_time", _tree_wind_time)
+	mat.set_shader_parameter("tree_wind_scroll", _tree_wind_scroll)
