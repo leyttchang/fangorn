@@ -138,6 +138,7 @@ func clear_terrain() -> void:
 	_encounters.clear_encounters()
 	_monster_packs.clear_monster_packs()
 	_border_wall.clear_wall()
+	_clear_road_forest_props()
 
 	var existing_occ = find_child("TerrainOccluder", true, false)
 	if existing_occ != null:
@@ -529,14 +530,16 @@ func _bake_navmesh() -> void:
 		var ax1: float = float(zone["max_x"])
 		var az0: float = float(zone["min_z"])
 		var az1: float = float(zone["max_z"])
-		var slot: int = int(zone.get("slot", 0))
+		var dir: Vector2 = zone.get("dir", Vector2.ZERO)
 		
 		# Recouvrement de 0.8m sur la bordure de la carte pour connecter le NavMesh de l'arène au chunk voisin
-		if slot == ArenaGenerator.SLOT_NORTH:
+		if dir.y < -0.5: # Nord
 			az1 = minf(az1, map_rect.position.y + 0.8)
-		elif slot == ArenaGenerator.SLOT_WEST:
+		elif dir.y > 0.5: # Sud
+			az0 = maxf(az0, map_rect.end.y - 0.8)
+		elif dir.x < -0.5: # Ouest
 			ax1 = minf(ax1, map_rect.position.x + 0.8)
-		elif slot == ArenaGenerator.SLOT_EAST:
+		elif dir.x > 0.5: # Est
 			ax0 = maxf(ax0, map_rect.end.x - 0.8)
 			
 		if ax1 <= ax0 or az1 <= az0:
@@ -616,11 +619,27 @@ func _bake_navmesh() -> void:
 	# Génération d'un occluder de relief pour que les collines masquent les arbres/herbe lointains
 	_generate_terrain_occluder()
 	
+	# Génération déterministe des props forestiers (Champignons, Cocons, Racines-Catapultes)
+	_spawn_road_forest_props()
+	
 	terrain_ready.emit()
 	
 	# En éditeur, appel direct de la génération des meutes (en jeu, c'est géré via le signal terrain_ready)
 	if Engine.is_editor_hint():
 		_monster_packs.generate_monster_packs(world_seed)
+
+func _clear_road_forest_props() -> void:
+	for child in get_children():
+		if child.has_method("clear_props"):
+			child.clear_props()
+
+func _spawn_road_forest_props() -> void:
+	var seed_to_use: int = world_seed
+	if not Engine.is_editor_hint() and GameData.current_seed != 0:
+		seed_to_use = GameData.current_seed
+	for child in get_children():
+		if child.has_method("generate_props"):
+			child.generate_props(seed_to_use)
 
 ## Génère un occluder basse résolution basé sur le relief du terrain
 ## pour culler automatiquement les arbres, l'herbe et les monstres cachés derrière les collines

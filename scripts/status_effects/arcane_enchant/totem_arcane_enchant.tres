@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ArcaneEnchantEffectData" format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/arcane_enchant/arcane_enchant_effect_data.gd" id="1_effect_script"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/arcane_enchant/arcane_enchant_vfx.tscn" id="2_enemie_vfx"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/arcane_enchant/arcane_flare.tscn" id="3_flare_scene"]
+[ext_resource type="Texture2D" uid="uid://b5ek0poo5vgbd" path="res://assets/icon/Mythril Age Icons/foamy-disc.png" id="4_icon"]
+
+[resource]
+script = ExtResource("1_effect_script")
+spawn_interval = 10.0
+spawn_interval_jitter = 1.2
+initial_delay_min = 1.2
+initial_delay_max = 9.5
+max_flares_per_monster = 2
+max_global_active_flares = 18
+trigger_player_range = 38.0
+flare_speed_min = 2.6
+flare_speed_max = 5.2
+flare_acceleration = 0.35
+flare_max_speed = 8.5
+flare_damage = 18.0
+flare_lifetime = 22.0
+flare_turn_speed = 2.6
+flare_knockback = 4.0
+flare_scene = ExtResource("3_flare_scene")
+effect_id = "totem_arcane_enchant"
+is_buff = true
+icon = ExtResource("4_icon")
+enemie_effect = ExtResource("2_enemie_vfx")

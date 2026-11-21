@@ -1,0 +1,133 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/fire_enchant/fire_enchant_vfx.gd" id="1_vfx_script"]
+[ext_resource type="Texture2D" uid="uid://bhwhle7dbpt21" path="res://assets/LeLu's Noise Pack/T_fire01.png" id="3_fire_tex"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="4_spark_tex"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flame_aura"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("3_fire_tex")
+albedo_texture_force_srgb = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Curve" id="Curve_flame_alpha"]
+_data = [Vector2(0, 0.85), 0.0, 0.0, 0, 0, Vector2(0.45, 1), 0.0, 0.0, 0, 0, Vector2(0.92, 0), -2.4, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_flame_alpha"]
+curve = SubResource("Curve_flame_alpha")
+
+[sub_resource type="Gradient" id="Gradient_flame_ramp"]
+offsets = PackedFloat32Array(0.12, 0.48, 0.88)
+colors = PackedColorArray(1, 0.96, 0.78, 1, 0.98, 0.52, 0.08, 1, 0.9, 0.24, 0.03, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_flame_ramp"]
+gradient = SubResource("Gradient_flame_ramp")
+
+[sub_resource type="Curve" id="Curve_flame_scale"]
+_data = [Vector2(0, 0.42), 0.0, 1.5, 0, 0, Vector2(0.65, 0.95), 0.0, 0.0, 0, 0, Vector2(1, 0.5), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_flame_scale"]
+curve = SubResource("Curve_flame_scale")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flame_aura"]
+lifetime_randomness = 0.12
+particle_flag_rotate_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.95
+emission_ring_radius = 0.48
+emission_ring_inner_radius = 0.16
+emission_ring_cone_angle = 90.0
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 1, 0)
+spread = 18.0
+initial_velocity_min = 0.45
+initial_velocity_max = 1.05
+gravity = Vector3(0, 1.1, 0)
+scale_min = 0.36
+scale_max = 0.62
+scale_curve = SubResource("CurveTexture_flame_scale")
+color = Color(1.98, 1.38, 0.86, 1)
+color_ramp = SubResource("GradientTexture1D_flame_ramp")
+alpha_curve = SubResource("CurveTexture_flame_alpha")
+
+[sub_resource type="QuadMesh" id="QuadMesh_flame"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_embers"]
+render_priority = 1
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("4_spark_tex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Curve" id="Curve_spiral_alpha"]
+_data = [Vector2(0, 0.95), 0.0, 0.0, 0, 0, Vector2(0.6, 0.72), -1.2, -1.2, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_spiral_alpha"]
+curve = SubResource("Curve_spiral_alpha")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_embers"]
+lifetime_randomness = 0.2
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.05
+emission_ring_radius = 0.64
+emission_ring_inner_radius = 0.22
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 26.0
+initial_velocity_min = 0.55
+initial_velocity_max = 1.65
+orbit_velocity_min = 0.25
+orbit_velocity_max = 0.6
+gravity = Vector3(0, 1.5, 0)
+scale_min = 0.045
+scale_max = 0.095
+color = Color(2.4, 1.25, 0.48, 1)
+alpha_curve = SubResource("CurveTexture_spiral_alpha")
+
+[sub_resource type="QuadMesh" id="QuadMesh_embers"]
+
+[node name="FireEnchantVFX" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+script = ExtResource("1_vfx_script")
+
+[node name="FlameAura" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+visibility_range_end = 55.0
+visibility_range_end_margin = 8.0
+material_override = SubResource("StandardMaterial3D_flame_aura")
+amount = 9
+lifetime = 0.65
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_flame_aura")
+draw_pass_1 = SubResource("QuadMesh_flame")
+
+[node name="RisingEmbers" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+visibility_range_end = 48.0
+visibility_range_end_margin = 8.0
+material_override = SubResource("StandardMaterial3D_embers")
+amount = 11
+lifetime = 1.0
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_embers")
+draw_pass_1 = SubResource("QuadMesh_embers")

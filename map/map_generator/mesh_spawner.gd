@@ -502,16 +502,19 @@ func _get_encounter_positions() -> Array[Vector2]:
 				if not already_present:
 					positions.append(p2)
 					
-	# Évitement de toutes les arènes actives (Nord, Ouest, Est, etc.)
+	# Évitement de toutes les arènes actives (Nord, Ouest, Est + arènes de totems sans route)
 	for zone in map_generator.get_arena_zones():
-		var arena_c: Vector2 = zone["center"]
-		var already: bool = false
-		for ep in positions:
-			if ep.distance_squared_to(arena_c) < 16.0:
-				already = true
-				break
-		if not already:
-			positions.append(arena_c)
+		for key_name: String in ["center", "pos"]:
+			if not zone.has(key_name):
+				continue
+			var arena_pt: Vector2 = zone[key_name]
+			var already: bool = false
+			for ep in positions:
+				if ep.distance_squared_to(arena_pt) < 16.0:
+					already = true
+					break
+			if not already:
+				positions.append(arena_pt)
 					
 	return positions
 

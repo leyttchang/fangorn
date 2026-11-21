@@ -1,0 +1,246 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://map/encounters/Boss_arena/boss_storm_strike.gd" id="1_strike_script"]
+[ext_resource type="Shader" uid="uid://ci7pxvvbr4lxg" path="res://scripts/abilities/chain_lightning/chain_lightning.gdshader" id="2_chain_shader"]
+[ext_resource type="Shader" uid="uid://bhdxcc41b5ffu" path="res://scripts/abilities/casting_animation/lightning_ball_shader.gdshader" id="3_ball_shader"]
+[ext_resource type="ArrayMesh" uid="uid://cutiw4yynv0u1" path="res://assets/3D_models/VFX_spell/thunder_mesh_editable.tres" id="4_thunder_mesh"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="5_simplex"]
+[ext_resource type="Texture2D" uid="uid://bhwhle7dbpt21" path="res://assets/LeLu's Noise Pack/T_fire01.png" id="6_decal_tex"]
+[ext_resource type="Texture2D" uid="uid://dnirefp03wuyw" path="res://assets/LeLu's Noise Pack/T_VFX_SparklesF21.jpg" id="7_sparkles"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_filament_1"]
+render_priority = 0
+shader = ExtResource("2_chain_shader")
+shader_parameter/Main_Color = Color(0.85, 1.5, 1.95, 1)
+shader_parameter/Effect_Color = Color(0.95, 1.15, 1.35, 1)
+shader_parameter/Octave_Count = 8
+shader_parameter/Amp_Start = 0.42
+shader_parameter/Amp_Coeff = 0.5
+shader_parameter/Freq_Coeff = 2.35
+shader_parameter/Speed = 5.0
+shader_parameter/Y_Size = 6.0
+shader_parameter/X_Size = 1.05
+shader_parameter/Emission_Power = 2.6
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_filament_2"]
+render_priority = 0
+shader = ExtResource("2_chain_shader")
+shader_parameter/Main_Color = Color(0.08, 1.55, 2.85, 1)
+shader_parameter/Effect_Color = Color(0.88, 1.25, 1.55, 1)
+shader_parameter/Octave_Count = 9
+shader_parameter/Amp_Start = 0.48
+shader_parameter/Amp_Coeff = 0.5
+shader_parameter/Freq_Coeff = 2.2
+shader_parameter/Speed = 5.6
+shader_parameter/Y_Size = 5.0
+shader_parameter/X_Size = 1.0
+shader_parameter/Emission_Power = 2.8
+
+[sub_resource type="Gradient" id="Gradient_ball"]
+offsets = PackedFloat32Array(0.7, 0.75, 0.815)
+colors = PackedColorArray(0.004, 0.004, 0.004, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_b1"]
+noise_type = 2
+fractal_octaves = 3
+fractal_weighted_strength = 0.38
+cellular_return_type = 6
+domain_warp_enabled = true
+domain_warp_amplitude = 20.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_b1"]
+noise = SubResource("FastNoiseLite_b1")
+color_ramp = SubResource("Gradient_ball")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_b2"]
+noise_type = 2
+seed = 2
+fractal_octaves = 3
+fractal_weighted_strength = 0.38
+cellular_return_type = 6
+domain_warp_enabled = true
+domain_warp_amplitude = 20.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_b2"]
+noise = SubResource("FastNoiseLite_b2")
+color_ramp = SubResource("Gradient_ball")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_bv"]
+noise_type = 0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bv"]
+noise = SubResource("FastNoiseLite_bv")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_point"]
+render_priority = 0
+shader = ExtResource("3_ball_shader")
+shader_parameter/lightningNoise1 = SubResource("NoiseTexture2D_b1")
+shader_parameter/lightningNoise2 = SubResource("NoiseTexture2D_b2")
+shader_parameter/tint = Color(0.2, 1.9, 3.2, 1)
+shader_parameter/disapear = 1.0
+shader_parameter/distortionVertex = 0.08
+shader_parameter/speedVertex = 0.9
+shader_parameter/noiseVertex = SubResource("NoiseTexture2D_bv")
+
+[sub_resource type="Gradient" id="Gradient_bolt"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_bolt"]
+gradient = SubResource("Gradient_bolt")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bolt"]
+gravity = Vector3(0, 0, 0)
+scale_min = 0.3
+scale_max = 0.3
+color_ramp = SubResource("GradientTexture1D_bolt")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sparks"]
+render_priority = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("5_simplex")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="Gradient" id="Gradient_sparks"]
+offsets = PackedFloat32Array(0, 0.6, 1)
+colors = PackedColorArray(2.1, 2.55, 3.6, 1, 0.25, 1.45, 3.2, 0.4, 0, 0.25, 1.1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_sparks"]
+gradient = SubResource("Gradient_sparks")
+use_hdr = true
+
+[sub_resource type="Curve" id="Curve_sparks_scale"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.25, 0.85), 0.0, 0.0, 0, 0, Vector2(0.65, 0.35), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_sparks_scale"]
+curve = SubResource("Curve_sparks_scale")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparks"]
+lifetime_randomness = 0.15
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.45
+emission_ring_radius = 0.65
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 22.0
+initial_velocity_min = 0.6
+initial_velocity_max = 2.2
+radial_velocity_min = 16.0
+radial_velocity_max = 26.0
+gravity = Vector3(0, 1, 0)
+scale_min = 0.04
+scale_max = 0.09
+scale_curve = SubResource("CurveTexture_sparks_scale")
+color = Color(1.75, 1.85, 2.0, 1)
+color_ramp = SubResource("GradientTexture1D_sparks")
+
+[sub_resource type="QuadMesh" id="QuadMesh_sparks"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trails"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("7_sparkles")
+albedo_texture_msdf = true
+use_particle_trails = true
+
+[sub_resource type="Curve" id="Curve_trail_alpha"]
+_data = [Vector2(0, 0.05), 0.0, 0.0, 0, 0, Vector2(0.18, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_trail_alpha"]
+curve = SubResource("Curve_trail_alpha")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_trails"]
+particle_flag_align_y = true
+emission_shape = 1
+emission_sphere_radius = 0.5
+direction = Vector3(0, 1, 0)
+spread = 90.0
+initial_velocity_min = 3.0
+initial_velocity_max = 6.0
+radial_velocity_min = 1.0
+radial_velocity_max = 4.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.1
+scale_max = 0.38
+color = Color(0.2, 1.45, 2.75, 1)
+alpha_curve = SubResource("CurveTexture_trail_alpha")
+turbulence_enabled = true
+turbulence_noise_scale = 1.0
+turbulence_noise_speed_random = 4.0
+turbulence_influence_max = 0.8
+turbulence_initial_displacement_min = 3.0
+turbulence_initial_displacement_max = 7.0
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_trails"]
+shape = 0
+size = 0.075
+section_segments = 4
+
+[node name="BossStormStrike" type="Node3D"]
+script = ExtResource("1_strike_script")
+filament_material_1 = SubResource("ShaderMaterial_filament_1")
+filament_material_2 = SubResource("ShaderMaterial_filament_2")
+point_material = SubResource("ShaderMaterial_point")
+
+[node name="TelegraphHolder" type="Node3D" parent="."]
+
+[node name="ThunderBoltParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 4.4784245, 0)
+emitting = false
+amount = 1
+lifetime = 0.62
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_bolt")
+draw_pass_1 = ExtResource("4_thunder_mesh")
+
+[node name="SparksParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0)
+material_override = SubResource("StandardMaterial3D_sparks")
+emitting = false
+amount = 42
+lifetime = 0.45
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_sparks")
+draw_pass_1 = SubResource("QuadMesh_sparks")
+
+[node name="TrailsParticles" type="GPUParticles3D" parent="."]
+material_override = SubResource("StandardMaterial3D_trails")
+emitting = false
+amount = 20
+lifetime = 0.55
+one_shot = true
+speed_scale = 2.6
+explosiveness = 1.0
+fixed_fps = 60
+local_coords = true
+trail_enabled = true
+trail_lifetime = 0.22
+process_material = SubResource("ParticleProcessMaterial_trails")
+draw_pass_1 = SubResource("RibbonTrailMesh_trails")
+
+[node name="GroundDecal" type="Decal" parent="."]
+size = Vector3(3.4, 2.5, 3.4)
+texture_albedo = ExtResource("6_decal_tex")
+modulate = Color(0.2, 0.48, 0.78, 0.85)
+
+[node name="StrikeLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(0.2, 0.78, 1.0, 1)
+light_energy = 0.0
+omni_range = 8.0

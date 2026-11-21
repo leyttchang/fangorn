@@ -1,6 +1,8 @@
 extends CharacterBody3D
 
 signal boss_died(boss_ilvl: int, boss_enchantment: Variant)
+signal slam_impacted(world_pos: Vector3, forward_dir: Vector3, is_jump_slam: bool)
+signal phase2_roar_triggered(world_pos: Vector3)
 
 @export_category("Progression & Récompenses")
 @export var ilvl: int = 1
@@ -322,6 +324,10 @@ func spawn_slam_attack() -> void:
 	if slam.has_method("rpc_set_position"):
 		slam.rpc("rpc_set_position", spawn_pos)
 		
+	var slam_fwd: Vector3 = -global_transform.basis.z
+	slam_fwd.y = 0.0
+	slam_fwd = slam_fwd.normalized() if slam_fwd.length_squared() > 0.001 else Vector3.FORWARD
+	slam_impacted.emit(spawn_pos, slam_fwd, true)
 	print("OgreBoss: Jumping attack spammee a ", spawn_pos)
 
 func spawn_ground_slam() -> void:
@@ -354,6 +360,10 @@ func spawn_ground_slam() -> void:
 	if slam.has_method("rpc_set_position"):
 		slam.rpc("rpc_set_position", spawn_pos)
 		
+	var ground_fwd: Vector3 = -global_transform.basis.z
+	ground_fwd.y = 0.0
+	ground_fwd = ground_fwd.normalized() if ground_fwd.length_squared() > 0.001 else Vector3.FORWARD
+	slam_impacted.emit(spawn_pos, ground_fwd, false)
 	print("OgreBoss: Ground slam spamme a ", spawn_pos)
 
 func pick_up_rock() -> void:
@@ -585,6 +595,8 @@ func play_roar() -> void:
 	base_movement_speed *= phase2_speed_multiplier
 	min_time_before_ranged_attack = phase2_min_time_before_ranged_attack
 	max_time_before_ranged_attack = phase2_max_time_before_ranged_attack
+	if is_multiplayer_authority():
+		phase2_roar_triggered.emit(global_position)
 
 func apply_roar_knockback() -> void:
 	if not is_multiplayer_authority(): return

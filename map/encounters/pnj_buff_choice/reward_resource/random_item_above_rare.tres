@@ -5,13 +5,14 @@
 [resource]
 script = ExtResource("1_reward")
 id = "random_item_above_rare"
-title = "Precious Gear"
-description = "A random piece of equipment guaranteed Rare (75%) or Legendary (25%), with a chance of Unique."
+title = "Precious Equipment"
+description = "A random piece of armor (helmet, chest, legs, boots, or gloves) guaranteed Rare (75%) or Legendary (25%), with a chance of Unique."
 card_color = Color(1, 0.82, 0.25, 1)
 button_text = "Choose"
 weight = 1.0
 reward_type = 2
-target_item_type = -1
+target_item_type = -2
+exclude_weapons = true
 rarity_weights = {
 2: 75,
 3: 25

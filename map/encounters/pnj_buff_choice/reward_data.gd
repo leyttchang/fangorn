@@ -39,13 +39,93 @@ enum RewardType {
 @export_range(0.01, 1.0, 0.01) var heal_percent: float = 0.25
 
 @export_group("Paramètres : Équipement Aléatoire")
-## -1 pour n'importe quel type, ou ItemData.ItemType (0: main_hand, 1: chest, 2: legs, 3: feet, 4: head, 5: hands)
+## -2 pour équipement hors armes, -1 pour n'importe quel type, ou ItemData.ItemType (0: main_hand, 1: chest, 2: legs, 3: feet, 4: head, 5: hands)
 @export var target_item_type: int = -1
+## Si vrai, exclut toutes les armes du tirage aléatoire
+@export var exclude_weapons: bool = false
 ## Poids des raretés tirées pour l'équipement généré
 @export var rarity_weights: Dictionary = {
 	ItemData.Rarity.RARE: 75,
 	ItemData.Rarity.LEGENDARY: 25
 }
+
+## Helpers de résolution des composants sur le joueur
+func _get_skill_tree(player: Node) -> SkillTreeComponent:
+	if player == null:
+		return null
+	var st = player.get_node_or_null("Skill_tree_comp") as SkillTreeComponent
+	if st != null:
+		return st
+	st = player.get_node_or_null("SkillTreeComponent") as SkillTreeComponent
+	if st != null:
+		return st
+	var ui_mgr = player.get_node_or_null("UI_manager")
+	if ui_mgr != null and "skill_tree_comp" in ui_mgr and ui_mgr.skill_tree_comp is SkillTreeComponent:
+		return ui_mgr.skill_tree_comp as SkillTreeComponent
+	for child in player.get_children():
+		if child is SkillTreeComponent:
+			return child
+	var found = player.find_children("*", "SkillTreeComponent", true, false)
+	if not found.is_empty():
+		return found[0] as SkillTreeComponent
+	return null
+
+func _get_spellbook_ui(player: Node) -> SpellBookUI:
+	if player == null:
+		return null
+	var sb = player.get_node_or_null("SpellBook_UI") as SpellBookUI
+	if sb != null:
+		return sb
+	var ui_mgr = player.get_node_or_null("UI_manager")
+	if ui_mgr == null:
+		ui_mgr = player.find_child("*UI_manager*", true, false)
+	if ui_mgr != null and "spellbook_ui" in ui_mgr and ui_mgr.spellbook_ui is SpellBookUI:
+		return ui_mgr.spellbook_ui as SpellBookUI
+	for child in player.get_children():
+		if child is SpellBookUI:
+			return child
+	var found = player.find_children("*", "SpellBookUI", true, false)
+	if not found.is_empty():
+		return found[0] as SpellBookUI
+	return player.find_child("SpellBook*", true, false) as SpellBookUI
+
+func _get_skill_bar(player: Node) -> SkillBarComponent:
+	if player == null:
+		return null
+	var bar = player.get_node_or_null("SkillBarComponent") as SkillBarComponent
+	if bar != null:
+		return bar
+	for child in player.get_children():
+		if child is SkillBarComponent:
+			return child
+	var found = player.find_children("*", "SkillBarComponent", true, false)
+	if not found.is_empty():
+		return found[0] as SkillBarComponent
+	return null
+
+func _get_locked_spells(player: Node) -> Array[AbilityData]:
+	var locked: Array[AbilityData] = []
+	var spellbook_ui = _get_spellbook_ui(player)
+	if spellbook_ui == null:
+		return locked
+	var skill_bar = _get_skill_bar(player)
+	var all_spells = GameData.get_all_spells()
+	for sp in all_spells:
+		if sp == null:
+			continue
+		var already_unlocked = false
+		for unlocked in spellbook_ui.unlocked_spells:
+			if unlocked != null and (unlocked == sp or unlocked.ability_name == sp.ability_name):
+				already_unlocked = true
+				break
+		if not already_unlocked and skill_bar != null:
+			for slot_spell in skill_bar.slots.values():
+				if slot_spell != null and (slot_spell == sp or slot_spell.ability_name == sp.ability_name):
+					already_unlocked = true
+					break
+		if not already_unlocked:
+			locked.append(sp)
+	return locked
 
 ## Vérifie si cette récompense est éligible pour être proposée au joueur
 func is_eligible(player: CharacterBody3D, _pnj: Node = null) -> bool:
@@ -54,21 +134,10 @@ func is_eligible(player: CharacterBody3D, _pnj: Node = null) -> bool:
 		
 	match reward_type:
 		RewardType.SKILL_POINTS:
-			var skill_tree = player.get_node_or_null("SkillTreeComponent")
-			if skill_tree == null:
-				skill_tree = player.find_child("SkillTreeComponent", true, false)
-			return skill_tree != null
+			return _get_skill_tree(player) != null
 			
 		RewardType.RANDOM_SPELL:
-			var all_spells = GameData.get_all_spells()
-			var ui_mgr = player.get_node_or_null("UI_manager")
-			if ui_mgr == null:
-				ui_mgr = player.find_child("*UI_manager*", true, false)
-			if ui_mgr != null and "spellbook_ui" in ui_mgr and ui_mgr.spellbook_ui != null:
-				for sp in all_spells:
-					if sp != null and not ui_mgr.spellbook_ui.unlocked_spells.has(sp):
-						return true
-			return false
+			return not _get_locked_spells(player).is_empty()
 			
 		RewardType.RANDOM_EQUIPMENT:
 			return true
@@ -77,8 +146,9 @@ func is_eligible(player: CharacterBody3D, _pnj: Node = null) -> bool:
 			var equip_comp = player.get_node_or_null("EquipmentComponent") as EquipmentComponent
 			if equip_comp == null:
 				equip_comp = player.find_child("EquipmentComponent", true, false) as EquipmentComponent
-			if equip_comp != null and equip_comp.equipped_items.get("main_hand") != null:
-				return true
+			if equip_comp != null:
+				if equip_comp.equipped_items.get("main_hand") is WeaponItem or equip_comp.equipped_items.get("second_weapon") is WeaponItem:
+					return true
 			var inv_comp = player.get_node_or_null("InventoryComponent") as InventoryComponent
 			if inv_comp == null:
 				inv_comp = player.find_child("InventoryComponent", true, false) as InventoryComponent
@@ -111,7 +181,10 @@ func is_eligible(player: CharacterBody3D, _pnj: Node = null) -> bool:
 			var health_comp = player.get_node_or_null("HealthComponent") as HealthComponent
 			if health_comp == null:
 				health_comp = player.find_child("HealthComponent", true, false) as HealthComponent
-			return health_comp != null
+			if health_comp == null:
+				return false
+			var max_hp = health_comp.stats_component.get_stat_value("max_health") if health_comp.stats_component else health_comp._known_max_health
+			return health_comp.current_health < (max_hp - 0.5)
 			
 		_:
 			return true
@@ -133,7 +206,7 @@ func apply_reward(player: CharacterBody3D, pnj: Node = null, on_complete: Callab
 		RewardType.UPGRADE_WEAPON_ILVL:
 			_apply_upgrade_weapon_ilvl(player, pnj, on_complete)
 		RewardType.UPGRADE_ITEM_RARITY:
-			_apply_upgrade_item_rarity(player, on_complete)
+			_apply_upgrade_item_rarity(player, pnj, on_complete)
 		RewardType.HEAL_PERCENT:
 			_apply_heal_percent(player, on_complete)
 		_:
@@ -142,39 +215,30 @@ func apply_reward(player: CharacterBody3D, pnj: Node = null, on_complete: Callab
 				on_complete.call()
 
 func _apply_skill_points(player: CharacterBody3D, on_complete: Callable) -> void:
-	var skill_tree = player.get_node_or_null("SkillTreeComponent")
-	if skill_tree == null:
-		skill_tree = player.find_child("SkillTreeComponent", true, false)
-		
+	var skill_tree = _get_skill_tree(player)
 	if skill_tree != null and "available_skill_points" in skill_tree:
 		skill_tree.available_skill_points += skill_points_amount
 		print("[RewardData] +", skill_points_amount, " points de talent accordés au joueur.")
 	else:
 		push_warning("[RewardData] SkillTreeComponent introuvable sur le joueur.")
+		return
 		
 	if on_complete.is_valid():
 		on_complete.call()
 
 func _apply_random_spell(player: CharacterBody3D, on_complete: Callable) -> void:
-	var all_spells = GameData.get_all_spells()
-	var ui_mgr = player.get_node_or_null("UI_manager")
-	if ui_mgr == null:
-		ui_mgr = player.find_child("*UI_manager*", true, false)
+	var spellbook_ui = _get_spellbook_ui(player)
+	if spellbook_ui == null:
+		push_warning("[RewardData] SpellBookUI introuvable sur le joueur.")
+		return
 		
-	if ui_mgr != null and "spellbook_ui" in ui_mgr and ui_mgr.spellbook_ui != null:
-		var locked_spells: Array[AbilityData] = []
-		for sp in all_spells:
-			if sp != null and not ui_mgr.spellbook_ui.unlocked_spells.has(sp):
-				locked_spells.append(sp)
-				
-		if not locked_spells.is_empty():
-			var picked_spell = locked_spells.pick_random()
-			ui_mgr.spellbook_ui.unlocked_spells.append(picked_spell)
-			print("[RewardData] Nouveau sort débloqué -> ", picked_spell.ability_name)
-		else:
-			print("[RewardData] Tous les sorts sont déjà débloqués.")
+	var locked_spells = _get_locked_spells(player)
+	if not locked_spells.is_empty():
+		var picked_spell = locked_spells.pick_random()
+		spellbook_ui.unlock_spell(picked_spell)
+		print("[RewardData] Nouveau sort débloqué -> ", picked_spell.ability_name)
 	else:
-		push_warning("[RewardData] SpellbookUI introuvable.")
+		print("[RewardData] Tous les sorts sont déjà débloqués.")
 		
 	if on_complete.is_valid():
 		on_complete.call()
@@ -183,14 +247,22 @@ func _apply_random_equipment(player: CharacterBody3D, pnj: Node, on_complete: Ca
 	var bases: Array[EquipmentItem] = []
 	if target_item_type >= 0:
 		bases = GameData.get_bases_by_type(target_item_type as ItemData.ItemType)
-		
-	if bases.is_empty():
+	elif target_item_type == -2 or exclude_weapons:
+		for b in GameData.get_all_bases():
+			if b != null and not (b is WeaponItem) and b.item_type != ItemData.ItemType.main_hand:
+				bases.append(b)
+	else:
 		bases = GameData.get_all_bases()
 		
+	if (exclude_weapons or target_item_type == -2) and not bases.is_empty():
+		var filtered: Array[EquipmentItem] = []
+		for b in bases:
+			if b != null and not (b is WeaponItem) and b.item_type != ItemData.ItemType.main_hand:
+				filtered.append(b)
+		bases = filtered
+		
 	if bases.is_empty():
-		push_warning("[RewardData] Aucune base disponible dans GameData.")
-		if on_complete.is_valid():
-			on_complete.call()
+		push_warning("[RewardData] Aucune base disponible dans GameData pour ce filtre.")
 		return
 		
 	var base_item = bases.pick_random()
@@ -203,10 +275,16 @@ func _apply_random_equipment(player: CharacterBody3D, pnj: Node, on_complete: Ca
 			inv = player.find_child("InventoryComponent", true, false) as InventoryComponent
 			
 		if inv != null:
-			inv.add_item(new_item, 1)
-			print("[RewardData] Nouvel équipement ajouté : ", new_item.item_name, " (ilvl ", new_item.ilvl, ", rareté ", ItemData.Rarity.keys()[new_item.rarity], ")")
+			var remaining = inv.add_item(new_item, 1)
+			if remaining > 0:
+				var item_dict = inv.pack_item(new_item)
+				inv.rpc_id(1, "_rpc_spawn_bag", item_dict, remaining)
+				print("[RewardData] Inventaire plein : équipement déposé au sol devant le joueur -> ", new_item.item_name)
+			else:
+				print("[RewardData] Nouvel équipement ajouté : ", new_item.item_name, " (ilvl ", new_item.ilvl, ", rareté ", ItemData.Rarity.keys()[new_item.rarity], ")")
 		else:
 			push_warning("[RewardData] InventoryComponent introuvable sur le joueur.")
+			return
 			
 	if on_complete.is_valid():
 		on_complete.call()
@@ -241,9 +319,11 @@ func _apply_upgrade_weapon_ilvl(player: CharacterBody3D, pnj: Node, on_complete:
 						
 			var target_ilvl = camp_ilvl if weapon.ilvl < camp_ilvl else weapon.ilvl + 1
 			if is_equipped and equip_comp != null:
-				equip_comp._remove_item_stats(weapon)
+				if equipped_slot != "second_weapon":
+					equip_comp._remove_item_stats(weapon)
 				ItemGenerator.scale_item_to_ilvl(weapon, target_ilvl)
-				equip_comp._apply_item_stats(weapon)
+				if equipped_slot != "second_weapon":
+					equip_comp._apply_item_stats(weapon)
 				equip_comp.equipment_changed.emit(equipped_slot, weapon)
 			else:
 				ItemGenerator.scale_item_to_ilvl(weapon, target_ilvl)
@@ -259,6 +339,8 @@ func _apply_upgrade_weapon_ilvl(player: CharacterBody3D, pnj: Node, on_complete:
 				
 		var cancel_cb = func() -> void:
 			print("[RewardData] Amélioration d'arme annulée par le joueur.")
+			if is_instance_valid(pnj) and pnj.has_method("_open_reward_window"):
+				pnj.call_deferred("_open_reward_window", player)
 			
 		inv_ui.open_for_item_selection("Choose a weapon to upgrade (increases its ilvl)", filter_cb, select_cb, cancel_cb)
 	else:
@@ -269,10 +351,16 @@ func _apply_upgrade_weapon_ilvl(player: CharacterBody3D, pnj: Node, on_complete:
 			
 		var weapon: WeaponItem = null
 		var is_equipped = false
+		var equipped_slot = "main_hand"
 		
-		if equip_comp != null and equip_comp.equipped_items.get("main_hand") != null:
+		if equip_comp != null and equip_comp.equipped_items.get("main_hand") is WeaponItem:
 			weapon = equip_comp.equipped_items["main_hand"] as WeaponItem
 			is_equipped = true
+			equipped_slot = "main_hand"
+		elif equip_comp != null and equip_comp.equipped_items.get("second_weapon") is WeaponItem:
+			weapon = equip_comp.equipped_items["second_weapon"] as WeaponItem
+			is_equipped = true
+			equipped_slot = "second_weapon"
 			
 		if weapon == null:
 			var inv_comp = player.get_node_or_null("InventoryComponent") as InventoryComponent
@@ -287,21 +375,22 @@ func _apply_upgrade_weapon_ilvl(player: CharacterBody3D, pnj: Node, on_complete:
 		if weapon != null:
 			var target_ilvl = camp_ilvl if weapon.ilvl < camp_ilvl else weapon.ilvl + 1
 			if is_equipped and equip_comp != null:
-				equip_comp._remove_item_stats(weapon)
+				if equipped_slot != "second_weapon":
+					equip_comp._remove_item_stats(weapon)
 				ItemGenerator.scale_item_to_ilvl(weapon, target_ilvl)
-				equip_comp._apply_item_stats(weapon)
-				equip_comp.equipment_changed.emit("main_hand", weapon)
+				if equipped_slot != "second_weapon":
+					equip_comp._apply_item_stats(weapon)
+				equip_comp.equipment_changed.emit(equipped_slot, weapon)
 			else:
 				ItemGenerator.scale_item_to_ilvl(weapon, target_ilvl)
 				var inv_comp = player.get_node_or_null("InventoryComponent") as InventoryComponent
 				if inv_comp != null:
 					inv_comp.inventory_changed.emit()
 			print("[RewardData] Arme '", weapon.item_name, "' améliorée à l'ilvl ", target_ilvl)
-			
-		if on_complete.is_valid():
-			on_complete.call()
+			if on_complete.is_valid():
+				on_complete.call()
 
-func _apply_upgrade_item_rarity(player: CharacterBody3D, on_complete: Callable) -> void:
+func _apply_upgrade_item_rarity(player: CharacterBody3D, pnj: Node, on_complete: Callable) -> void:
 	var inv_ui = player.get_node_or_null("InventoryUI") as InventoryUI
 	if inv_ui == null:
 		inv_ui = player.find_child("InventoryUI", true, false) as InventoryUI
@@ -328,13 +417,14 @@ func _apply_upgrade_item_rarity(player: CharacterBody3D, on_complete: Callable) 
 						equipped_slot = slot
 						break
 						
-			if is_equipped and equip_comp != null:
+			if is_equipped and equip_comp != null and equipped_slot != "second_weapon":
 				equip_comp._remove_item_stats(eq_item)
 				
 			var success = ItemGenerator.upgrade_item_rarity(eq_item)
 			
 			if is_equipped and equip_comp != null:
-				equip_comp._apply_item_stats(eq_item)
+				if equipped_slot != "second_weapon":
+					equip_comp._apply_item_stats(eq_item)
 				equip_comp.equipment_changed.emit(equipped_slot, eq_item)
 			else:
 				var inv_comp = player.get_node_or_null("InventoryComponent") as InventoryComponent
@@ -348,12 +438,12 @@ func _apply_upgrade_item_rarity(player: CharacterBody3D, on_complete: Callable) 
 				
 		var cancel_cb = func() -> void:
 			print("[RewardData] Sélection d'amélioration annulée par le joueur.")
+			if is_instance_valid(pnj) and pnj.has_method("_open_reward_window"):
+				pnj.call_deferred("_open_reward_window", player)
 			
 		inv_ui.open_for_item_selection("Choose a piece of gear to upgrade (Normal, Magic, or Rare)", filter_cb, select_cb, cancel_cb)
 	else:
 		push_warning("[RewardData] InventoryUI introuvable pour la sélection interactive.")
-		if on_complete.is_valid():
-			on_complete.call()
 
 func _apply_heal_percent(player: CharacterBody3D, on_complete: Callable) -> void:
 	var health_comp = player.get_node_or_null("HealthComponent") as HealthComponent

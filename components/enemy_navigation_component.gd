@@ -106,10 +106,8 @@ func acquire_target(current_target: Node3D = null) -> Node3D:
 
 var _chase_path: PackedVector3Array = PackedVector3Array()
 var _chase_path_index: int = 0
-var _last_chase_target_pos: Vector3 = Vector3.INF
 
 func _refresh_chase_path(from_pos: Vector3, target_position: Vector3) -> void:
-	_last_chase_target_pos = target_position
 	if _parent_body != null and is_instance_valid(_parent_body):
 		var world_3d = _parent_body.get_world_3d()
 		if world_3d:
@@ -146,9 +144,8 @@ func get_direction_to_target(target_position: Vector3) -> Vector3:
 			return Vector3(dir_2d.x, 0.0, dir_2d.y)
 		return Vector3.ZERO
 	
-	# Recalculer le chemin si la cible a bougé (> 1.0m en 2D) ou après un court délai (8-14 frames)
-	var target_moved = not _last_chase_target_pos.is_finite() or Vector2(_last_chase_target_pos.x - target_position.x, _last_chase_target_pos.z - target_position.z).length_squared() > 1.0
-	if target_moved or frames_since_path_update >= next_path_update_frame or _chase_path.is_empty():
+	# Recalculer le chemin uniquement selon le compteur désynchronisé (8-14 frames) ou si le chemin est vide
+	if frames_since_path_update >= next_path_update_frame or _chase_path.is_empty():
 		_refresh_chase_path(my_pos, target_position)
 		frames_since_path_update = 0
 		next_path_update_frame = randi_range(8, 14)

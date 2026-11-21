@@ -17,13 +17,36 @@ extends CharacterBody3D
 @export var hand_attack_shape: CollisionShape3D
 @export var foot_attack_shape: CollisionShape3D
 
-# --- ANIMATION TREE ---
+@export_group("Attaque de Racines (Root Attack)")
+## Scène de l'attaque de racines (lancée automatiquement en mode aller-retour puis coupée à la rétraction)
+@export var root_attack_scene: PackedScene = preload("res://character/enemie/tree_man/tree_man_root_attack.tscn")
+## Marqueur Marker3D d'où spawnent les racines sur le Tree Man
+@export var root_spawn: Marker3D
+## Temps de recharge entre deux attaques de racines (en secondes)
+@export var root_attack_cooldown: float = 8.0
+## Portée minimale pour déclencher l'attaque de racines en poursuite (en mètres)
+@export var root_attack_min_range: float = 3.2
+## Portée maximale de déclenchement de l'attaque de racines (en mètres)
+@export var root_attack_max_range: float = 15.5
+## Probabilité d'utiliser l'attaque de racines au corps-à-corps quand le cooldown est prêt
+@export_range(0.0, 1.0) var root_attack_melee_chance: float = 0.35
+## Vitesse de l'animation stand_up jouée à l'envers (pour se plaquer au sol avant le spawn des racines)
+@export var stand_down_speed: float = 1.25
+## Vitesse de l'animation stand_up jouée à l'endroit (pour se relever une fois les racines rentrées)
+@export var stand_up_recovery_speed: float = 1.35
+
+# --- ANIMATION TREE & PLAYER ---
 @onready var anim_tree: AnimationTree = $AnimationTree
 @onready var anim_playback: AnimationNodeStateMachinePlayback = anim_tree.get("parameters/playback")
+@onready var anim_player: AnimationPlayer = $"T-Pose/AnimationPlayer"
+@onready var _skeleton: Skeleton3D = get_node_or_null("T-Pose/Armature/Skeleton3D") as Skeleton3D
 
 # --- ETATS ---
-enum State { IDLE, CHASE, ATTACK, DEAD }
+enum State { IDLE, CHASE, ATTACK, ROOT_ATTACK, DEAD }
+enum RootPhase { NONE, KNEELING_DOWN, HOLDING_GROUND, STANDING_UP }
+
 var current_state: State = State.IDLE
+var _root_phase: RootPhase = RootPhase.NONE
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var target: Node3D = null
@@ -35,10 +58,26 @@ var _pending_attacker: Node3D = null
 var _is_waiting_for_aggro: bool = false
 var is_anim_culled: bool = false
 
+# Variables internes de l'attaque de racines
+var _root_attack_cd_timer: float = 2.0
+var _chase_time_elapsed: float = 0.0
+var _root_phase_timer: float = 0.0
+var _locked_root_yaw: float = 0.0
+var _stand_up_anim_len: float = 2.3333
+var _active_root_attack: Node3D = null
+
 func _ready() -> void:
 	randomize()
 	if behavior == null:
 		push_error("TreeMan (" + name + ") : Fichier EnemyBehaviorData manquant dans l'inspecteur !")
+
+	if anim_player != null and anim_player.has_animation("anim/stand_up"):
+		var su_anim := anim_player.get_animation("anim/stand_up")
+		if su_anim != null:
+			_stand_up_anim_len = maxf(0.1, su_anim.length)
+
+	if root_spawn == null:
+		root_spawn = find_child("root_spawn", true, false) as Marker3D
 
 	if anim_tree != null:
 		anim_tree.active = true
@@ -77,6 +116,8 @@ func actor_setup() -> void:
 # GESTION DES HITBOXES D'ATTAQUE (Appelees par l'AnimationPlayer)
 # ==========================================================
 func enable_hitbox() -> void:
+	if current_state != State.ATTACK:
+		return
 	if _current_attack_anim == "zombie_kicking":
 		enable_foot_hitbox()
 	else:
@@ -143,13 +184,37 @@ func change_state(new_state: State) -> void:
 	if not is_multiplayer_authority() or current_state == State.DEAD:
 		return
 
+	if new_state == State.ATTACK and current_state != State.ATTACK:
+		# Intégration dans le pattern : peut lancer l'attaque de racines au corps-à-corps si prête
+		if root_attack_scene != null and _root_attack_cd_timer <= 0.0 and randf() < root_attack_melee_chance:
+			_trigger_root_attack_towards_target()
+			return
+
 	var chosen_attack: String = _current_attack_anim
 	if new_state == State.ATTACK and current_state != State.ATTACK:
 		chosen_attack = "zombie_attack" if randf() < 0.5 else "zombie_kicking"
 
 	rpc("_rpc_apply_state", new_state, chosen_attack)
 
+func _trigger_root_attack_towards_target() -> void:
+	if not is_multiplayer_authority() or current_state == State.DEAD:
+		return
+	var yaw := global_rotation.y
+	if target != null and is_instance_valid(target):
+		var dir := target.global_position - global_position
+		if Vector2(dir.x, dir.z).length_squared() > 0.001:
+			yaw = atan2(dir.x, dir.z)
+	_root_attack_cd_timer = root_attack_cooldown
+	rpc("_rpc_start_root_attack", yaw)
+
 func _sync_animation_state() -> void:
+	# Empêche EnemyOptimizerComponent de réactiver l'AnimationTree en plein milieu de ROOT_ATTACK !
+	if current_state == State.ROOT_ATTACK:
+		if anim_tree != null and anim_tree.active:
+			anim_tree.active = false
+		_restore_root_phase_pose()
+		return
+
 	if not anim_playback:
 		return
 	match current_state:
@@ -167,8 +232,16 @@ func _rpc_apply_state(new_state: int, attack_anim: String = "zombie_attack") -> 
 	if current_state == new_state and new_state != State.IDLE:
 		return
 
+	var was_root_attack := (current_state == State.ROOT_ATTACK)
 	current_state = new_state as State
 	_current_attack_anim = attack_anim
+	_root_phase = RootPhase.NONE
+
+	if current_state == State.CHASE:
+		_chase_time_elapsed = 0.0
+
+	if was_root_attack and anim_tree != null and not is_anim_culled:
+		anim_tree.active = true
 
 	if current_state == State.ATTACK:
 		_attack_anim_started = false
@@ -179,7 +252,176 @@ func _rpc_apply_state(new_state: int, attack_anim: String = "zombie_attack") -> 
 	_sync_animation_state()
 
 # ==========================================================
-# PHYSIQUE & COMPORTEMENTS
+# SEQUENCE COMPLETE DE ROOT_ATTACK (Serveur & Clients)
+# 1. stand_up à l'envers -> 2. Plaquer au sol + spawn racines (aller-retour coupé à 0) -> 3. stand_up à l'endroit
+# ==========================================================
+@rpc("authority", "call_local", "reliable")
+func _rpc_start_root_attack(target_yaw: float) -> void:
+	if current_state == State.DEAD:
+		return
+
+	disable_hitbox()
+	_cleanup_active_root_attack()
+
+	current_state = State.ROOT_ATTACK
+	_root_phase = RootPhase.KNEELING_DOWN
+	_root_phase_timer = 0.0
+	_locked_root_yaw = target_yaw
+	_root_attack_cd_timer = root_attack_cooldown
+
+	if anim_tree != null:
+		anim_tree.active = false
+
+	# Étape 1 : Jouer l'animation stand_up À L'ENVERS (du debout vers le sol)
+	if anim_player != null and anim_player.has_animation("anim/stand_up"):
+		anim_player.speed_scale = 1.0
+		anim_player.play("anim/stand_up", 0.18, -stand_down_speed, true)
+
+func _enter_root_holding_ground_phase() -> void:
+	if current_state != State.ROOT_ATTACK or _root_phase == RootPhase.HOLDING_GROUND:
+		return
+
+	_root_phase = RootPhase.HOLDING_GROUND
+	_root_phase_timer = 0.0
+	global_rotation.y = _locked_root_yaw
+
+	# Étape 2A : Rester plaqué contre le sol (fin de l'animation stand_up inversée = t=0.0)
+	_lock_ground_pose()
+
+	# Étape 2B : Spawner la scène root_man_root_attack directement sur le Marker3D root_spawn
+	if root_attack_scene != null:
+		var inst := root_attack_scene.instantiate() as Node3D
+		if inst != null:
+			_active_root_attack = inst
+			inst.top_level = true
+			add_child(inst)
+
+			var basis_aligned := Basis(Vector3.UP, _locked_root_yaw)
+			var spawn_pos := root_spawn.global_position if (root_spawn != null and is_instance_valid(root_spawn)) else global_position
+			inst.global_transform = Transform3D(basis_aligned, spawn_pos)
+
+			var atk := inst.get_node_or_null("AttackComponent") as AttackComponent
+			if atk != null:
+				atk.caster = self
+
+			if inst.has_signal("roots_retracted"):
+				inst.connect("roots_retracted", _on_roots_retracted, CONNECT_ONE_SHOT)
+
+func _on_roots_retracted() -> void:
+	if current_state != State.ROOT_ATTACK or _root_phase != RootPhase.HOLDING_GROUND:
+		return
+	_active_root_attack = null
+	_enter_root_standing_up_phase()
+
+func _enter_root_standing_up_phase() -> void:
+	if current_state != State.ROOT_ATTACK or _root_phase == RootPhase.STANDING_UP:
+		return
+
+	_root_phase = RootPhase.STANDING_UP
+	_root_phase_timer = 0.0
+
+	# Étape 3 : Une fois les racines rentrées, le Tree Man se relève du sol
+	if anim_player != null and anim_player.has_animation("anim/stand_up"):
+		anim_player.speed_scale = 1.0
+		anim_player.play("anim/stand_up", 0.0, stand_up_recovery_speed, false)
+
+func _finish_root_attack_sequence() -> void:
+	if current_state != State.ROOT_ATTACK:
+		return
+
+	_root_phase = RootPhase.NONE
+	if anim_tree != null and not is_anim_culled:
+		anim_tree.active = true
+
+	if is_multiplayer_authority():
+		if target != null and is_instance_valid(target):
+			var dist := global_position.distance_to(target.global_position)
+			if behavior != null and dist <= behavior.attack_range:
+				change_state(State.ATTACK)
+			else:
+				change_state(State.CHASE)
+		else:
+			change_state(State.IDLE)
+
+func _lock_ground_pose() -> void:
+	if anim_tree != null and anim_tree.active:
+		anim_tree.active = false
+	if anim_player != null and anim_player.has_animation("anim/stand_up"):
+		anim_player.play("anim/stand_up", 0.0, 0.0, false)
+		anim_player.seek(0.0, true)
+		anim_player.pause()
+	if _skeleton != null:
+		_skeleton.force_update_all_bone_transforms()
+
+func _restore_root_phase_pose() -> void:
+	if _root_phase == RootPhase.HOLDING_GROUND:
+		_lock_ground_pose()
+
+func _cleanup_active_root_attack() -> void:
+	if _active_root_attack != null and is_instance_valid(_active_root_attack):
+		_active_root_attack.queue_free()
+	_active_root_attack = null
+
+func _process(delta: float) -> void:
+	if current_state != State.ROOT_ATTACK:
+		return
+
+	# Garantir que l'AnimationTree ne reprend jamais la main pendant ROOT_ATTACK
+	if anim_tree != null and anim_tree.active:
+		anim_tree.active = false
+
+	var action_speed: float = 1.0
+	if stats_component != null:
+		action_speed = maxf(0.0, stats_component.get_stat_value("action_speed"))
+
+	if anim_player != null and _root_phase != RootPhase.HOLDING_GROUND:
+		anim_player.speed_scale = action_speed
+	if _active_root_attack != null and is_instance_valid(_active_root_attack) and _active_root_attack.has_method("set_speed_scale"):
+		_active_root_attack.set_speed_scale(action_speed)
+
+	if action_speed <= 0.0:
+		return
+
+	_root_phase_timer += delta * action_speed
+
+	match _root_phase:
+		RootPhase.KNEELING_DOWN:
+			# Aligne doucement l'orientation sur la direction verrouillée pendant le début de la descente
+			global_rotation.y = lerp_angle(global_rotation.y, _locked_root_yaw, 10.0 * delta)
+			var expected_dur := _stand_up_anim_len / maxf(0.1, stand_down_speed)
+			var anim_done := false
+			if anim_player != null and not is_anim_culled:
+				if not anim_player.is_playing() and _root_phase_timer > 0.12:
+					anim_done = true
+				elif _root_phase_timer > 0.15 and anim_player.current_animation_position <= 0.03:
+					anim_done = true
+			if anim_done or _root_phase_timer >= expected_dur + 0.06:
+				_enter_root_holding_ground_phase()
+
+		RootPhase.HOLDING_GROUND:
+			# Maintient strictement la pose contre le sol tant que les racines ne sont pas rentrées
+			if anim_player != null and anim_player.is_playing():
+				_lock_ground_pose()
+			# Filet de sécurité si l'instance des racines a été détruite ou hors-écran > 4.25s
+			if (_active_root_attack == null or not is_instance_valid(_active_root_attack)) and _root_phase_timer > 0.2:
+				_enter_root_standing_up_phase()
+			elif _root_phase_timer >= 4.35:
+				_cleanup_active_root_attack()
+				_enter_root_standing_up_phase()
+
+		RootPhase.STANDING_UP:
+			var expected_up := _stand_up_anim_len / maxf(0.1, stand_up_recovery_speed)
+			var up_done := false
+			if anim_player != null and not is_anim_culled:
+				if not anim_player.is_playing() and _root_phase_timer > 0.12:
+					up_done = true
+				elif _root_phase_timer > 0.15 and anim_player.current_animation_position >= _stand_up_anim_len - 0.04:
+					up_done = true
+			if up_done or _root_phase_timer >= expected_up + 0.06:
+				_finish_root_attack_sequence()
+
+# ==========================================================
+# PHYSIQUE & COMPORTEMENTS (Autorité Serveur)
 # ==========================================================
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
@@ -190,6 +432,9 @@ func _physics_process(delta: float) -> void:
 	var action_speed: float = 1.0
 	if stats_component != null:
 		action_speed = max(0.0, stats_component.get_stat_value("action_speed"))
+
+	if _root_attack_cd_timer > 0.0 and current_state != State.ROOT_ATTACK:
+		_root_attack_cd_timer = maxf(0.0, _root_attack_cd_timer - delta * action_speed)
 
 	# --- STUN TOTAL & CULLING ANIMATION ---
 	if is_anim_culled:
@@ -205,7 +450,7 @@ func _physics_process(delta: float) -> void:
 			anim_tree.active = false
 		disable_hitbox()
 		return
-	elif not anim_tree.active:
+	elif current_state != State.ROOT_ATTACK and not anim_tree.active:
 		anim_tree.active = true
 		_sync_animation_state()
 
@@ -219,7 +464,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	# Suivi de la fin de l'animation d'attaque
+	# Suivi de la fin de l'animation d'attaque au corps-à-corps
 	if current_state == State.ATTACK and anim_playback != null:
 		var current_anim: StringName = anim_playback.get_current_node()
 		if current_anim == _current_attack_anim:
@@ -246,6 +491,8 @@ func _physics_process(delta: float) -> void:
 			vitesse_horizontale = _process_chase_state(vitesse_horizontale, delta, current_speed)
 		State.ATTACK:
 			vitesse_horizontale = _process_attack_state(vitesse_horizontale, delta)
+		State.ROOT_ATTACK:
+			vitesse_horizontale = movement_comp.apply_friction(vitesse_horizontale, behavior, delta)
 
 	velocity.x = vitesse_horizontale.x
 	velocity.z = vitesse_horizontale.y
@@ -268,7 +515,15 @@ func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) ->
 		change_state(State.IDLE)
 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 
+	_chase_time_elapsed += delta
 	var distance_to_target = global_position.distance_to(target.global_position)
+
+	# Déclenchement de l'attaque de racines à moyenne/longue portée dès que prête !
+	if root_attack_scene != null and _root_attack_cd_timer <= 0.0 and _chase_time_elapsed >= 0.45:
+		if distance_to_target >= root_attack_min_range and distance_to_target <= root_attack_max_range:
+			_trigger_root_attack_towards_target()
+			return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
+
 	if distance_to_target <= behavior.attack_range:
 		change_state(State.ATTACK)
 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
@@ -303,6 +558,8 @@ func _on_died() -> void:
 func _rpc_trigger_death() -> void:
 	remove_from_group("Enemie")
 	current_state = State.DEAD
+	_root_phase = RootPhase.NONE
+	_cleanup_active_root_attack()
 	disable_hitbox()
 	collision_layer = 0
 	collision_mask = 1

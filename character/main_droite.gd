@@ -175,6 +175,8 @@ func start_heavy_attack():
 	anim_playback.travel(anim_name)
 
 func enable_current_hitbox():
+	if owner != null and multiplayer.has_multiplayer_peer() and not owner.is_multiplayer_authority():
+		return
 	# Si l'arme n'est pas encore liee, on le fait maintenant
 	if current_weapon == null:
 		current_weapon = _get_actual_weapon()
@@ -193,6 +195,8 @@ func enable_current_hitbox():
 					child.set_deferred("disabled", false)
 
 func disable_current_hitbox():
+	if owner != null and multiplayer.has_multiplayer_peer() and not owner.is_multiplayer_authority():
+		return
 	if is_instance_valid(current_weapon):
 		has_hit_in_combo_swing = false
 		var ac = current_weapon.get_node_or_null("AttackComponent")
@@ -204,6 +208,8 @@ func disable_current_hitbox():
 					child.set_deferred("disabled", true)
 
 func check_combo():
+	if owner != null and multiplayer.has_multiplayer_peer() and not owner.is_multiplayer_authority():
+		return
 	# On vÃ©rifie si le dernier clic a eu lieu dans la fenÃªtre de tolÃ©rance (ex: moins de 350ms)
 	# OU si le joueur est tout simplement en train de maintenir le bouton enfoncÃ© !
 	var time_since_click = Time.get_ticks_msec() - last_click_time
@@ -232,6 +238,8 @@ func check_combo():
 		anim_tree.set("parameters/TimeScale/scale", 1.0) # Pas de combo, le retour d'arme se fait Ã  vitesse normale
 
 func end_combat_state():
+	if owner != null and multiplayer.has_multiplayer_peer() and not owner.is_multiplayer_authority():
+		return
 	reset_attack_state()
 	
 	var equipped_item = equipment.equipped_items["main_hand"] as WeaponItem
@@ -246,6 +254,6 @@ func _on_weapon_hit(target: Node3D) -> void:
 		if not has_hit_in_combo_swing:
 			has_hit_in_combo_swing = true
 			print("Main_droite: Emitting player_hit_enemy signal!")
-			var player = get_tree().get_first_node_in_group("Player")
+			var player = owner if owner != null else get_tree().get_first_node_in_group("Player")
 			if player != null and player.has_signal("player_hit_enemy"):
 				player.emit_signal("player_hit_enemy")

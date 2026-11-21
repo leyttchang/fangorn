@@ -48,6 +48,7 @@ func receive_hit(attack: AttackComponent) -> void:
 	# 2. Calculs de reduction d'Armure et Resistances
 	if health_component != null:
 		var dmg_phys = attack.damage_physical
+		var dmg_magic = attack.damage_magic
 		var dmg_fire = attack.damage_fire
 		var dmg_ice = attack.damage_ice
 		var dmg_lightning = attack.damage_lightning
@@ -73,7 +74,7 @@ func receive_hit(attack: AttackComponent) -> void:
 			dmg_ice *= (1.0 - max(0.0, res_ice))
 			dmg_lightning *= (1.0 - max(0.0, res_lightning))
 		
-		var total_damage = (dmg_phys + dmg_fire + dmg_ice + dmg_lightning) * damage_taken_mult
+		var total_damage = (dmg_phys + dmg_magic + dmg_fire + dmg_ice + dmg_lightning) * damage_taken_mult
 		
 		var is_headshot = false
 		# NOUVEAU : Application du multiplicateur de Headshot

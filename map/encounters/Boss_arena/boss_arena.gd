@@ -5,6 +5,7 @@ extends Node3D
 ## Contrôleur de la scène d'Arène de Boss (boss_arena.tscn).
 ## Détecte l'entrée d'un joueur via `entry_detection`, fait spawn le boss assigné (par l'inspecteur
 ## ou par l'ArenaGenerator selon la world_seed) sur `Boss_spawn_position` plaqué au sol,
+## active tous les buffs élémentaires correspondant aux Totems complétés (Foudre, Arcane, Feu, Glace),
 ## écoute le signal `boss_died(ilvl, enchantment)` du boss et fait spawn un coffre de même ilvl
 ## sur `reward_position` plaqué au sol.
 
@@ -18,6 +19,26 @@ signal arena_boss_defeated(boss_ilvl: int, boss_enchantment: Variant, reward_che
 @export var reward_chest_scene: PackedScene = preload("res://objet/chest/chest.tscn")
 ## Si > 0, écrase l'ilvl défini sur la scène du boss au moment du spawn (0 = garde l'ilvl du boss)
 @export var boss_ilvl_override: int = 0
+
+@export_category("Porte & Accès")
+## Porte en pierre style Moria rebouchée par des lianes à l'entrée de l'arène
+@export var boss_gate: BossGate
+
+@export_category("Buffs Élémentaires des Totems")
+## Nœud enfant gérant la Tempête d'Éclairs autour du Boss quand au moins 1 Totem Foudre a été fini
+@export var lightning_storm: BossLightningStorm
+## Nœud enfant gérant les Flares d'Arcane dans l'arène quand au moins 1 Totem Arcane a été fini
+@export var arcane_field: BossArcaneField
+## Nœud enfant gérant les Tornades de Feu sur Slam/Jump quand au moins 1 Totem Feu a été fini
+@export var fire_buff: BossFireBuff
+## Nœud enfant gérant le Gel complet de l'arène au cri de Phase 2 quand au moins 1 Totem Glace a été fini
+@export var ice_arena: BossIceArena
+
+@export_group("Debug — Forcer des Totems pour tester le Boss")
+@export_range(0, 3, 1) var debug_force_lightning_totems: int = 0
+@export_range(0, 3, 1) var debug_force_arcane_totems: int = 0
+@export_range(0, 3, 1) var debug_force_fire_totems: int = 0
+@export_range(0, 3, 1) var debug_force_ice_totems: int = 0
 
 @onready var entry_marker: Marker3D = get_node_or_null("entry") as Marker3D
 @onready var boss_spawn_marker: Marker3D = get_node_or_null("Boss_spawn_position") as Marker3D
@@ -33,8 +54,14 @@ var _active_boss: Node3D = null
 
 
 func _ready() -> void:
+	add_to_group("BossArena")
 	if Engine.is_editor_hint():
 		return
+	if boss_gate == null:
+		boss_gate = get_node_or_null("BossGate") as BossGate
+	if boss_gate != null:
+		call_deferred("_snap_gate_to_arena_ground")
+	_resolve_buff_controllers()
 	if entry_detection != null:
 		if not entry_detection.body_entered.is_connected(_on_entry_detection_body_entered):
 			entry_detection.body_entered.connect(_on_entry_detection_body_entered)
@@ -42,8 +69,30 @@ func _ready() -> void:
 		push_error("BossArena (%s): nœud Area3D 'entry_detection' introuvable !" % name)
 
 
+func _resolve_buff_controllers() -> void:
+	if lightning_storm == null:
+		lightning_storm = get_node_or_null("BossLightningStorm") as BossLightningStorm
+	if arcane_field == null:
+		arcane_field = get_node_or_null("BossArcaneField") as BossArcaneField
+	if fire_buff == null:
+		fire_buff = get_node_or_null("BossFireBuff") as BossFireBuff
+	if ice_arena == null:
+		ice_arena = get_node_or_null("BossIceArena") as BossIceArena
+
+
+func _snap_gate_to_arena_ground() -> void:
+	if boss_gate == null or not is_instance_valid(boss_gate):
+		return
+	var gp: Vector3 = boss_gate.global_position
+	var gy: float = _get_arena_ground_y(gp.x, gp.z)
+	if not is_nan(gy):
+		boss_gate.global_position.y = gy
+
+
 func _on_entry_detection_body_entered(body: Node3D) -> void:
 	if _boss_spawned:
+		return
+	if boss_gate != null and is_instance_valid(boss_gate) and not boss_gate.is_open:
 		return
 	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
 		return
@@ -102,6 +151,12 @@ func spawn_boss(triggering_player: Node3D = null) -> Node3D:
 	if triggering_player != null and is_instance_valid(triggering_player) and "target" in boss_inst:
 		boss_inst.set("target", triggering_player)
 		
+	# Connexion aux signaux d'attaques spéciales / Phase 2 du boss pour les buffs Feu et Glace
+	if boss_inst.has_signal("slam_impacted"):
+		boss_inst.connect("slam_impacted", _on_boss_slam_impacted)
+	if boss_inst.has_signal("phase2_roar_triggered"):
+		boss_inst.connect("phase2_roar_triggered", _on_boss_phase2_roar_triggered)
+
 	# Connexion au signal de mort du boss (transmettant ilvl et enchantement)
 	if boss_inst.has_signal("boss_died"):
 		boss_inst.connect("boss_died", _on_boss_died)
@@ -115,6 +170,7 @@ func spawn_boss(triggering_player: Node3D = null) -> Node3D:
 			)
 			
 	_active_boss = boss_inst
+	_apply_completed_totem_buffs_deferred(boss_inst)
 	arena_boss_spawned.emit(boss_inst)
 	print("BossArena (%s): Boss '%s' spawné en %v (ilvl=%s)." % [
 		name,
@@ -125,7 +181,80 @@ func spawn_boss(triggering_player: Node3D = null) -> Node3D:
 	return boss_inst
 
 
+func _on_boss_slam_impacted(world_pos: Vector3, forward_dir: Vector3, is_jump_slam: bool) -> void:
+	if _reward_spawned:
+		return
+	if fire_buff != null and is_instance_valid(fire_buff):
+		fire_buff.on_boss_slam_impact(world_pos, forward_dir, is_jump_slam)
+
+
+func _on_boss_phase2_roar_triggered(world_pos: Vector3) -> void:
+	if _reward_spawned:
+		return
+	if ice_arena != null and is_instance_valid(ice_arena):
+		ice_arena.on_boss_phase2_roar(world_pos)
+
+
+func _apply_completed_totem_buffs_deferred(boss_inst: Node3D) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if boss_inst != null and is_instance_valid(boss_inst):
+		_apply_completed_totem_buffs(boss_inst)
+
+
+func _apply_completed_totem_buffs(boss_inst: Node3D) -> void:
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
+	if boss_inst == null or not is_instance_valid(boss_inst) or _reward_spawned:
+		return
+
+	_resolve_buff_controllers()
+
+	var completed_list: Array[String] = GameData.get_completed_totems_list()
+	for _i in range(debug_force_lightning_totems):
+		completed_list.append("lightning")
+	for _i in range(debug_force_arcane_totems):
+		completed_list.append("arcane")
+	for _i in range(debug_force_fire_totems):
+		completed_list.append("fire")
+	for _i in range(debug_force_ice_totems):
+		completed_list.append("ice")
+
+	if not completed_list.is_empty() and "enchantment" in boss_inst:
+		boss_inst.set("enchantment", completed_list)
+
+	var lightning_stacks: int = GameData.get_completed_totem_count("lightning") + debug_force_lightning_totems
+	if lightning_stacks > 0 and lightning_storm != null:
+		lightning_storm.activate_for_boss(boss_inst, lightning_stacks)
+
+	var arcane_stacks: int = GameData.get_completed_totem_count("arcane") + debug_force_arcane_totems
+	if arcane_stacks > 0 and arcane_field != null:
+		arcane_field.activate_for_boss(boss_inst, arcane_stacks)
+
+	var fire_stacks: int = GameData.get_completed_totem_count("fire") + debug_force_fire_totems
+	if fire_stacks > 0 and fire_buff != null:
+		fire_buff.activate_for_boss(boss_inst, fire_stacks)
+
+	var ice_stacks: int = GameData.get_completed_totem_count("ice") + debug_force_ice_totems
+	if ice_stacks > 0 and ice_arena != null:
+		ice_arena.activate_for_boss(boss_inst, ice_stacks)
+
+
+## Appelé automatiquement par GameData si un totem est validé alors que le boss est déjà apparu
+func on_totem_completed_in_world(_element: String, _new_count: int) -> void:
+	if _active_boss != null and is_instance_valid(_active_boss) and not _reward_spawned:
+		_apply_completed_totem_buffs(_active_boss)
+
+
 func _on_boss_died(dead_boss_ilvl: int, dead_boss_enchantment: Variant) -> void:
+	if lightning_storm != null:
+		lightning_storm.stop_storm()
+	if arcane_field != null:
+		arcane_field.stop_effect()
+	if fire_buff != null:
+		fire_buff.stop_effect()
+	if ice_arena != null:
+		ice_arena.stop_effect()
 	if _reward_spawned:
 		return
 	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():

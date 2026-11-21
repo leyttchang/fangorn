@@ -9,6 +9,36 @@ static var player_pseudos: Dictionary = {}
 ## Nombre de joueurs au lancement de la partie (fixé au début, ne change pas en cours de partie)
 static var starting_player_count: int = 1
 
+## Compteur des totems élémentaires complétés durant la run actuelle (ex: {"lightning": 1, "arcane": 1})
+static var completed_totems: Dictionary = {}
+
+static func reset_completed_totems() -> void:
+	completed_totems.clear()
+
+static func register_completed_totem(element: String, tree: SceneTree = null) -> int:
+	var key := element.strip_edges().to_lower()
+	if key.is_empty():
+		return 0
+	var new_count: int = int(completed_totems.get(key, 0)) + 1
+	completed_totems[key] = new_count
+	print("[GameData] Totem complété enregistré : '%s' (total pour cet élément = %d)" % [key, new_count])
+	if tree != null:
+		for arena in tree.get_nodes_in_group("BossArena"):
+			if is_instance_valid(arena) and arena.has_method("on_totem_completed_in_world"):
+				arena.on_totem_completed_in_world(key, new_count)
+	return new_count
+
+static func get_completed_totem_count(element: String) -> int:
+	return int(completed_totems.get(element.strip_edges().to_lower(), 0))
+
+static func get_completed_totems_list() -> Array[String]:
+	var result: Array[String] = []
+	for k in completed_totems.keys():
+		var cnt: int = int(completed_totems[k])
+		for _i in range(cnt):
+			result.append(str(k))
+	return result
+
 const PERCENT_STATS: Array[String] = [
 	"attack_speed",
 	"cd_red",
@@ -100,6 +130,8 @@ static func get_all_spells() -> Array[AbilityData]:
 			preload("res://scripts/abilities/thunder_aspect/thunder_aspect.tres"),
 			preload("res://scripts/abilities/Warcry/warcry_ability.tres"),
 			preload("res://scripts/abilities/prismatic_blade/prismatic_blade.tres"),
+			preload("res://scripts/abilities/leap_slam/leap_slam.tres"),
+			preload("res://scripts/abilities/cleave/cleave.tres"),
 		]
 	return _all_spells
 

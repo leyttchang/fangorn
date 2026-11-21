@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tooltip"]
+
+[resource]
+script = ExtResource("1_tooltip")
+generated_text = "[b][color=#e6edf5]Cleave[/color][/b]
+[color=#9aa7b8]Attaque Martiale • Mêlée • Zone (AoE)[/color]
+
+Exécute un large balayage horizontal avec votre arme équipée, tranchant tous les ennemis dans l'arc d'attaque avec des dégâts purement physiques.
+
+• [b]Dégâts Physiques :[/b] [color=#f0c674]10[/color] + [color=#f0c674]125%[/color] des dégâts de l'arme
+• [b]Vitesse d'attaque :[/b] [color=#8abeb7]105%[/color] de la vitesse de l'arme
+• [b]Zone de balayage :[/b] [color=#8abeb7]3.8 m × 3.0 m[/color]
+• [b]Coût en Mana :[/b] [color=#81a2be]10[/color]
+• [b]Temps de recharge :[/b] [color=#81a2be]2.0 s[/color]"

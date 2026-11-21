@@ -8,6 +8,16 @@ signal ssil_changed(enabled: bool)
 signal ssao_changed(enabled: bool)
 signal glow_changed(enabled: bool)
 signal shader_settings_changed()
+signal ui_style_changed(new_style: int)
+
+enum UIStyle { CLASSIC = 0, MORIA_D2 = 1 }
+
+# --- Style d'Interface (UI) ---
+# 0 = Classique (Ancien), 1 = Moria / Diablo 2 (Nouveau)
+var ui_style: int = UIStyle.MORIA_D2:
+	set(value):
+		ui_style = value
+		ui_style_changed.emit(ui_style)
 
 var mouse_sensitivity: float = 0.002:
 	set(value):
@@ -273,6 +283,7 @@ func save_settings() -> void:
 	config.set_value("Video", "ssil", ssil_enabled)
 	config.set_value("Video", "ssao", ssao_enabled)
 	config.set_value("Video", "glow", glow_enabled)
+	config.set_value("UI", "ui_style", ui_style)
 	config.set_value("Shader", "shader_mode", shader_mode)
 	config.set_value("Shader", "painterly_kuwahara_enabled", painterly_kuwahara_enabled)
 	config.set_value("Shader", "painterly_paint_radius", painterly_paint_radius)
@@ -311,6 +322,7 @@ func load_settings() -> void:
 	ssil_enabled = config.get_value("Video", "ssil", true)
 	ssao_enabled = config.get_value("Video", "ssao", true)
 	glow_enabled = config.get_value("Video", "glow", true)
+	ui_style = config.get_value("UI", "ui_style", UIStyle.MORIA_D2)
 	shader_mode = config.get_value("Shader", "shader_mode", 0)
 	painterly_kuwahara_enabled = config.get_value("Shader", "painterly_kuwahara_enabled", true)
 	painterly_paint_radius = config.get_value("Shader", "painterly_paint_radius", 2.5)

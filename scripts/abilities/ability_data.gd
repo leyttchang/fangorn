@@ -34,6 +34,10 @@ enum SkillScalingType { SPELL, ATTACK }
 @export_group("Degats & Arme")
 # 1.0 = Vitesse de base. 1.2 = Se charge 20% plus vite que la vitesse d'attaque normale de l'arme
 @export var weapon_speed_multiplier: float = 1.0 
+## Si vrai sur une WEAPON_ATTACK, conserve `cast_time` (ex: 0.5s) comme temps de préparation de base (divisé par l'attack_speed)
+@export var use_fixed_cast_time: bool = false
+## Exposant de réduction du cooldown par la vitesse d'attaque (0.0 = aucun effet, > 0.0 = l'attack_speed réduit le CD)
+@export var cooldown_attack_speed_scaling: float = 0.0
 
 @export_group("Mecanique de Lancement")
 @export var target_mode: TargetMode = TargetMode.INSTANT

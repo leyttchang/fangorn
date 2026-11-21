@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://ct33mvw1mhqsf"]
+
+[ext_resource type="Script" uid="uid://bc36ilqagbc6" path="res://map/encounters/Boss_arena/boss_gate.gd" id="1_bossgate"]
+[ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="2_interact"]
+
+[node name="BossGate" type="Node3D" unique_id=544636407]
+script = ExtResource("1_bossgate")
+
+[node name="InteractionComponent" parent="." unique_id=231557202 instance=ExtResource("2_interact")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 1.15)
+prompt_text = "[E] Écarter les racines"

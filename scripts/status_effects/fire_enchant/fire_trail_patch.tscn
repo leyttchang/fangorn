@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/fire_enchant/fire_trail_patch.gd" id="1_trail_script"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="4_attack_comp"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_trail"]
+height = 0.75
+radius = 1.05
+
+[node name="FireTrailPatch" type="Node3D"]
+script = ExtResource("1_trail_script")
+
+[node name="AttackComponent" parent="." instance=ExtResource("4_attack_comp")]
+collision_layer = 16
+collision_mask = 2
+base_damage = 0.0
+knockback_force = 0.0
+ignore_caster = false
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("CylinderShape3D_trail")
+
+[editable path="AttackComponent"]

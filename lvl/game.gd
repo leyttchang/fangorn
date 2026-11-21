@@ -9,6 +9,7 @@ var _pending_clients: Array[int] = []
 var _terrain_is_ready: bool = false
 
 func _ready() -> void:
+	GameData.reset_completed_totems()
 	if GameData.current_game_mode == GameData.GameMode.NORMAL:
 		# On supprime la carte de test / vagues
 		if has_node("Wave_mode"):

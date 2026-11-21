@@ -114,7 +114,9 @@ func close_ui() -> void:
 	Input.mouse_mode = _previous_mouse_mode
 	queue_free()
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.physical_keycode == KEY_ESCAPE and event.pressed):
 		close_ui()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.physical_keycode == KEY_E and event.pressed:
 		get_viewport().set_input_as_handled()

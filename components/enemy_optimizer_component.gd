@@ -13,7 +13,7 @@ extends Node
 @export var fade_margin: float = 12.0
 
 @export_category("Distances d'Animation (LOD)")
-## Distance maximale pour calculer les animations (au-delà, l'animation est coupée)
+## Distance maximale pour calculer les animations (au-delà, l'animation est coupée même à l'écran)
 @export var max_anim_distance: float = 65.0
 ## Distance de sécurité absolue : à moins de cette distance, on anime TOUJOURS même hors-écran
 @export var close_anim_distance: float = 16.0
@@ -30,6 +30,7 @@ var _anim_tree: AnimationTree
 var _anim_player: AnimationPlayer
 var _ik_nodes: Array[SkeletonIK3D] = []
 var _raycast_nodes: Array[RayCast3D] = []
+var _procedural_anim_nodes: Array[Node] = []
 var _notifier: VisibleOnScreenNotifier3D
 var _timer: float = 0.0
 var _was_anim_player_paused: bool = false
@@ -52,7 +53,7 @@ func _ready() -> void:
 	_anim_tree = _parent_body.find_child("AnimationTree", true, false) as AnimationTree
 	_anim_player = _parent_body.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	
-	# Récupération spécifique des SkeletonIK3D et RayCast3D (ex: araignées)
+	# Récupération spécifique des SkeletonIK3D, RayCast3D et noeuds d'IK procédurale (ex: araignées)
 	for ik in _parent_body.find_children("*", "SkeletonIK3D", true, false):
 		if ik is SkeletonIK3D:
 			_ik_nodes.append(ik)
@@ -60,6 +61,12 @@ func _ready() -> void:
 	for ray in _parent_body.find_children("*", "RayCast3D", true, false):
 		if ray is RayCast3D:
 			_raycast_nodes.append(ray)
+			
+	var step_container = _parent_body.get_node_or_null("step_target_container")
+	if step_container != null:
+		_procedural_anim_nodes.append(step_container)
+		for child in step_container.get_children():
+			_procedural_anim_nodes.append(child)
 			
 	_parent_body.set_meta("enemy_optimizer", self)
 	if "is_anim_culled" in _parent_body:
@@ -80,9 +87,11 @@ func _setup_visibility_notifier() -> void:
 		_notifier = VisibleOnScreenNotifier3D.new()
 		_notifier.name = "EnemyVisibilityNotifier"
 		_notifier.aabb = AABB(aabb_offset - aabb_size * 0.5, aabb_size)
-		_notifier.screen_entered.connect(_on_screen_entered)
-		_notifier.screen_exited.connect(_on_screen_exited)
 		_parent_body.add_child.call_deferred(_notifier)
+	if not _notifier.screen_entered.is_connected(_on_screen_entered):
+		_notifier.screen_entered.connect(_on_screen_entered)
+	if not _notifier.screen_exited.is_connected(_on_screen_exited):
+		_notifier.screen_exited.connect(_on_screen_exited)
 
 func _on_screen_entered() -> void:
 	is_on_screen = true
@@ -125,16 +134,17 @@ func _get_active_camera() -> Node3D:
 func _update_culling_state() -> void:
 	if _parent_body == null or not is_instance_valid(_parent_body): return
 	
+	if _notifier != null and _notifier.is_inside_tree():
+		is_on_screen = _notifier.is_on_screen()
+	
 	var cam: Node3D = _get_active_camera()
 	var dist_sq = 999999.0
 	if cam != null and is_instance_valid(cam):
 		dist_sq = _parent_body.global_position.distance_squared_to(cam.global_position)
 		
 	var should_animate: bool = false
-	# À moins de 16m : toujours animer (proximité / combat)
-	if dist_sq <= (close_anim_distance * close_anim_distance):
+	if close_anim_distance > 0.0 and dist_sq <= (close_anim_distance * close_anim_distance):
 		should_animate = true
-	# Entre 16m et 65m : animer uniquement si à l'écran
 	elif is_on_screen and dist_sq <= (max_anim_distance * max_anim_distance):
 		should_animate = true
 		
@@ -158,6 +168,9 @@ func set_anim_culled(culled: bool) -> void:
 			ik.stop()
 		for ray in _raycast_nodes:
 			ray.enabled = false
+		for node in _procedural_anim_nodes:
+			if is_instance_valid(node):
+				node.set_process(false)
 	else:
 		_parent_body.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_INHERIT
 		if _anim_tree and not _anim_tree.active:
@@ -172,3 +185,6 @@ func set_anim_culled(culled: bool) -> void:
 			ik.start()
 		for ray in _raycast_nodes:
 			ray.enabled = true
+		for node in _procedural_anim_nodes:
+			if is_instance_valid(node):
+				node.set_process(true)

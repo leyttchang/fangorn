@@ -79,8 +79,23 @@ func _process(delta: float) -> void:
 		State.AUTO_CASTING:
 			_handle_auto_casting(delta)
 
+func get_effective_attack_speed_factor(include_weapon_aps: bool = true, weapon_aps_weight: float = 0.45) -> float:
+	var factor: float = 1.0
+	if player_stats != null:
+		var p_speed: float = player_stats.get_stat_value("attack_speed")
+		if p_speed > 0.0:
+			factor *= p_speed
+	if include_weapon_aps:
+		var equipment = get_parent().find_child("EquipmentComponent", true, false)
+		if equipment != null and equipment.equipped_items.has("main_hand"):
+			var weapon = equipment.equipped_items["main_hand"]
+			if weapon != null and weapon.base_attack_speed > 0.0:
+				factor *= lerpf(1.0, weapon.base_attack_speed / 1.2, clampf(weapon_aps_weight, 0.0, 1.0))
+	return maxf(factor, 0.15)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not get_parent().is_multiplayer_authority(): return
+	if get_parent().get("external_motion_override") == true: return
 	if current_state != State.IDLE and current_state != State.SELECTED: return
 	
 	for action in slots.keys():
@@ -118,18 +133,22 @@ func _unhandled_input(event: InputEvent) -> void:
 				
 				# CALCUL DYNAMIQUE DE LA VITESSE
 				if ability.category == AbilityData.AbilityCategory.WEAPON_ATTACK:
-					var equipment = get_parent().find_child("EquipmentComponent", true, false)
-					if equipment != null and equipment.equipped_items.has("main_hand"):
-						var weapon = equipment.equipped_items["main_hand"]
-						if weapon.base_attack_speed > 0:
-							base_cast_time = 1.0 / weapon.base_attack_speed
-						else:
-							base_cast_time = 1.0
-					
-					if player_stats != null:
-						var p_speed = player_stats.get_stat_value("attack_speed")
-						if p_speed != 0.0:
-							final_speed_multiplier = p_speed
+					var fixed_cast: bool = ("use_fixed_cast_time" in ability and ability.use_fixed_cast_time and base_cast_time > 0.0)
+					if fixed_cast:
+						final_speed_multiplier = get_effective_attack_speed_factor(true, 0.45)
+					else:
+						var equipment = get_parent().find_child("EquipmentComponent", true, false)
+						if equipment != null and equipment.equipped_items.has("main_hand"):
+							var weapon = equipment.equipped_items["main_hand"]
+							if weapon != null and weapon.base_attack_speed > 0:
+								base_cast_time = 1.0 / weapon.base_attack_speed
+							else:
+								base_cast_time = 1.0
+						
+						if player_stats != null:
+							var p_speed = player_stats.get_stat_value("attack_speed")
+							if p_speed != 0.0:
+								final_speed_multiplier = p_speed
 					
 					var w_speed_mult = ability.weapon_speed_multiplier if "weapon_speed_multiplier" in ability else 1.0
 					final_speed_multiplier *= w_speed_mult
@@ -422,6 +441,8 @@ func _play_ability_anim_safe(ability: AbilityData, speed: float = 1.0) -> bool:
 
 # --- LE RELAIS MAGIQUE POUR COMPLEX_ATTACK ---
 func trigger_mid_cast_event(event_name: String) -> void:
+	if multiplayer.has_multiplayer_peer() and not get_parent().is_multiplayer_authority():
+		return
 	print("Event animation recu : ", event_name)
 	if current_complex_spell_instance != null and current_complex_spell_instance.has_method("on_mid_cast_event"):
 		current_complex_spell_instance.on_mid_cast_event(event_name)
@@ -519,11 +540,12 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 			# Sort normal : on l'instancie maintenant
 			spell_instance = ability.ability_scene.instantiate()
 			
-			var attack_comp = spell_instance.get_node_or_null("AttackComponent")
-			if attack_comp == null:
-				attack_comp = spell_instance.find_child("AttackComponent*", true, false)
-			if attack_comp != null:
-				attack_comp.set_meta("caster_authority", get_parent().get_multiplayer_authority())
+			var caster_auth: int = get_parent().get_multiplayer_authority()
+			var direct_ac = spell_instance.get_node_or_null("AttackComponent")
+			if direct_ac != null:
+				direct_ac.set_meta("caster_authority", caster_auth)
+			for child in spell_instance.find_children("AttackComponent*", "Area3D", true, false):
+				child.set_meta("caster_authority", caster_auth)
 				
 			get_tree().root.add_child(spell_instance)
 		
@@ -548,7 +570,7 @@ func _execute_ability(ability: AbilityData, target_data: Dictionary) -> void:
 		if target_data.has("collider") and target_data["collider"] != null:
 			target_path = target_data["collider"].get_path()
 			
-		rpc("_rpc_spawn_spell_visual", ability.ability_scene.resource_path, get_parent().get_multiplayer_authority(), impact, has_impact, target_path)
+		rpc("_rpc_spawn_spell_visual", ability.ability_scene.resource_path, get_parent().get_multiplayer_authority(), impact, has_impact, target_path, ability.resource_path)
 
 func _start_cooldown(ability: AbilityData) -> void:
 	if ability.cooldown <= 0.0:
@@ -560,6 +582,11 @@ func _start_cooldown(ability: AbilityData) -> void:
 		var cooldown_recovery = player_stats.get_stat_value("cd_red")
 		cooldown_recovery = max(cooldown_recovery, 0.1) 
 		final_cooldown = ability.cooldown / cooldown_recovery
+		
+	if "cooldown_attack_speed_scaling" in ability and ability.cooldown_attack_speed_scaling > 0.0:
+		var atk_spd_factor: float = get_effective_attack_speed_factor(true, 0.45)
+		final_cooldown /= pow(maxf(atk_spd_factor, 0.25), ability.cooldown_attack_speed_scaling)
+		final_cooldown = maxf(final_cooldown, 0.15)
 		
 	var timer = Timer.new()
 	timer.wait_time = final_cooldown
@@ -623,22 +650,13 @@ func _rpc_play_casting_vfx(anim_name: String, vfx_scene_path: String, play_speed
 					vfx_anim.speed_scale = vfx_length / (1.0 / play_speed) # Approximation
 
 @rpc("any_peer", "call_remote", "unreliable")
-func _rpc_stop_casting_vfx(recovery_anim: String) -> void:
+func _rpc_stop_casting_vfx(_recovery_anim: String) -> void:
 	if current_vfx_instance != null:
 		_kill_vfx(current_vfx_instance)
 		current_vfx_instance = null
-		
-	if anim_player != null:
-		if recovery_anim != "" and anim_player.has_animation(recovery_anim):
-			anim_player.play(recovery_anim)
-		else:
-			if anim_player.has_animation("RESET"):
-				anim_player.play("RESET")
-			else:
-				anim_player.stop()
 
 @rpc("any_peer", "call_remote", "reliable")
-func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: Vector3, has_impact: bool, target_path: NodePath = ^"") -> void:
+func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: Vector3, has_impact: bool, target_path: NodePath = ^"", ability_res_path: String = "") -> void:
 	if scene_path == "": return
 	
 	var spell_instance = null
@@ -651,12 +669,21 @@ func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: V
 		var scene = load(scene_path)
 		if scene == null: return
 		spell_instance = scene.instantiate()
+		var direct_ac_pre = spell_instance.get_node_or_null("AttackComponent")
+		if direct_ac_pre != null:
+			direct_ac_pre.set_meta("caster_authority", caster_id)
+		for child_ac in spell_instance.find_children("AttackComponent*", "Area3D", true, false):
+			child_ac.set_meta("caster_authority", caster_id)
 		get_tree().root.add_child(spell_instance)
 		
 		if has_impact:
 			spell_instance.global_position = impact_point
 		
 	var target_data = {}
+	if ability_res_path != "" and ResourceLoader.exists(ability_res_path):
+		var loaded_ab: AbilityData = load(ability_res_path) as AbilityData
+		if loaded_ab != null:
+			target_data["ability_data"] = loaded_ab
 	if has_impact:
 		target_data["impact_point"] = impact_point
 	if target_path != ^"" and get_node_or_null(target_path) != null:
@@ -668,11 +695,11 @@ func _rpc_spawn_spell_visual(scene_path: String, caster_id: int, impact_point: V
 		
 	# IMPORTANT : On modifie is_active_for_network APRES le add_child() 
 	# sinon la fonction _ready() de l'AttackComponent r-crase la valeur et la remet  True chez le Host !
-	var attack_comp = spell_instance.get_node_or_null("AttackComponent")
-	if attack_comp == null:
-		attack_comp = spell_instance.find_child("AttackComponent*", true, false)
-	if attack_comp != null:
-		attack_comp.is_active_for_network = false
+	var direct_ac = spell_instance.get_node_or_null("AttackComponent")
+	if direct_ac != null:
+		direct_ac.is_active_for_network = false
+	for child_ac in spell_instance.find_children("AttackComponent*", "Area3D", true, false):
+		child_ac.is_active_for_network = false
 
 
 @rpc("any_peer", "call_remote", "reliable")

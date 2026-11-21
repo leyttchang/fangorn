@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="3_is52v"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="3_lsk58"]
 [ext_resource type="PackedScene" uid="uid://cwhbeu55tbwyy" path="res://components/knockback_componant.tscn" id="4_is52v"]
+[ext_resource type="Material" path="res://assets/3D_models/body/orc_degeu/handpainted/dumb_handpainted_material.tres" id="4_vhgsy"]
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="5_y7n3t"]
 [ext_resource type="Resource" uid="uid://cr7en7aw23w0e" path="res://character/enemie/dumb/dumb_stats.tres" id="6_mb0d1"]
 [ext_resource type="Script" uid="uid://cp7upuwpxig1d" path="res://components/StatsComponent.gd" id="7_it7g2"]
@@ -128,6 +129,7 @@ behavior = ExtResource("2_3atj7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1659181656]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.007764, 0)
+visible = false
 shape = SubResource("CapsuleShape3D_hlie2")
 
 [node name="Orc" parent="." unique_id=1043574353 instance=ExtResource("1_vx1eg")]
@@ -157,12 +159,43 @@ bones/21/rotation = Quaternion(-0.37618393, -0.017449059, -0.025064437, 0.926041
 bones/22/rotation = Quaternion(0.63600427, 0.15924065, 0.29055616, 0.6969348)
 bones/23/rotation = Quaternion(0.23355633, 0.02999617, -0.00511548, 0.9718671)
 
+[node name="back_rag_LP_Plane_009" parent="Orc/Armature/Skeleton3D" index="0" unique_id=1280181468]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="belt_body_LP_Plane_013" parent="Orc/Armature/Skeleton3D" index="1" unique_id=271794864]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="belt_lp_Plane_012" parent="Orc/Armature/Skeleton3D" index="2" unique_id=924513392]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="eye left" parent="Orc/Armature/Skeleton3D" index="3" unique_id=164061628]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="eye right" parent="Orc/Armature/Skeleton3D" index="4" unique_id=33329474]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="front_rag_LP_Plane_017" parent="Orc/Armature/Skeleton3D" index="5" unique_id=321634020]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="LP_Cube_015" parent="Orc/Armature/Skeleton3D" index="6" unique_id=1221397072]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="orc_lp_Cube_003" parent="Orc/Armature/Skeleton3D" index="7" unique_id=485984752]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="plaque_lp_Plane_010" parent="Orc/Armature/Skeleton3D" index="8" unique_id=554240755]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
+[node name="Tooth_LP_001_Cube_017" parent="Orc/Armature/Skeleton3D" index="9" unique_id=144507684]
+surface_material_override/0 = ExtResource("4_vhgsy")
+
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="Orc/Armature/Skeleton3D" index="10" unique_id=903327115]
 transform = Transform3D(0.07068381, -0.797758, 0.5988207, 0.3876696, 0.57510006, 0.7203971, -0.91908425, 0.181224, 0.34991667, -0.5362093, -0.39395612, -1.0787408)
 bone_name = "mixamorig_RightHand"
 bone_idx = 14
 
 [node name="AttackComponent" parent="Orc/Armature/Skeleton3D/BoneAttachment3D" unique_id=63324796 instance=ExtResource("3_is52v")]
+visible = false
 collision_layer = 16
 collision_mask = 2
 base_damage = 25.0
@@ -180,6 +213,7 @@ bone_idx = 5
 
 [node name="HitboxComponent_head" parent="Orc/Armature/Skeleton3D/BoneAttachment3D2" unique_id=397696970 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("3_lsk58")]
 transform = Transform3D(0.9674165, 0.037279066, 0.25043097, -0.07925338, 0.98398215, 0.15968142, -0.24046673, -0.17432597, 0.9548751, 0.04117864, -1.6182822, 0.12528804)
+visible = false
 collision_mask = 0
 health_component = NodePath("../../../../../HealthComponent")
 knockback_component = NodePath("../../../../../knockback_componant")
@@ -196,6 +230,7 @@ bone_idx = 0
 
 [node name="HitboxComponent" parent="Orc/Armature/Skeleton3D/BoneAttachment3D3" unique_id=1957871218 node_paths=PackedStringArray("health_component", "knockback_component") instance=ExtResource("3_lsk58")]
 transform = Transform3D(0.5846369, -0.01033398, 0.8112294, -0.12328262, 0.98717535, 0.10142269, -0.8018735, -0.15930595, 0.57586515, 0.013990248, -0.74160874, 0.118285246)
+visible = false
 collision_mask = 0
 health_component = NodePath("../../../../../HealthComponent")
 knockback_component = NodePath("../../../../../knockback_componant")

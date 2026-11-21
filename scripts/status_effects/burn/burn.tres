@@ -4,12 +4,16 @@
 [ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="2_cgt30"]
 [ext_resource type="Material" uid="uid://cck1dcrxivlua" path="res://scripts/status_effects/burn/burn_shader.tres" id="2_ruqcr"]
 [ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="3_ruqcr"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/burn/burn_screen_effect.tscn" id="4_player_vfx"]
+[ext_resource type="Texture2D" uid="uid://c71msakx26sls" path="res://assets/icon/Mythril Age Icons/flaming-sheet.png" id="5_burn_icon"]
 
 [resource]
 script = ExtResource("2_cgt30")
 effect_id = "burn"
+icon = ExtResource("5_burn_icon")
 tick_damage = 10.0
 tick_interval = 2.0
 enemie_effect = ExtResource("1_ly833")
+player_effect = ExtResource("4_player_vfx")
 overlay_material = ExtResource("2_ruqcr")
 metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

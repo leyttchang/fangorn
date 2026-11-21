@@ -39,6 +39,8 @@ func unlock_all_spells() -> void:
 
 # Remplit la grande liste de droite avec les sorts débloqués
 func _setup_inventory_slots() -> void:
+	if u_grid == null:
+		return
 	var u_slots = u_grid.get_children()
 	for i in range(u_slots.size()):
 		if i < unlocked_spells.size():
@@ -50,8 +52,17 @@ func _setup_inventory_slots() -> void:
 func unlock_spell(ability: AbilityData) -> bool:
 	if ability == null: return false
 	
-	# Appel le RPC pour tout le monde (surtout le client concern?)
-	rpc("_rpc_unlock_spell", ability.resource_path)
+	if ability.resource_path != "":
+		if multiplayer.has_multiplayer_peer() and is_multiplayer_authority():
+			rpc("_rpc_unlock_spell", ability.resource_path)
+		else:
+			_rpc_unlock_spell(ability.resource_path)
+	else:
+		for s in unlocked_spells:
+			if s != null and (s == ability or s.ability_name == ability.ability_name):
+				return false
+		unlocked_spells.append(ability)
+		_setup_inventory_slots()
 	return true
 
 @rpc("authority", "call_local", "reliable")
@@ -67,6 +78,7 @@ func _rpc_unlock_spell(ability_path: String) -> void:
 	_setup_inventory_slots()
 
 func open_spellbook() -> void:
+	_setup_inventory_slots()
 	visible = true
 	
 func close_spellbook() -> void:

@@ -1,0 +1,68 @@
+[gd_resource type="Resource" script_class="LightningEnchantEffectData" format=3 uid="uid://3lsly54oo7ku"]
+
+[ext_resource type="Script" uid="uid://0yddv8s1qwq8" path="res://scripts/status_effects/lightning_enchant/lightning_enchant_effect_data.gd" id="1_effect_script"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/lightning_enchant/lightning_enchant_vfx.tscn" id="2_enemie_vfx"]
+[ext_resource type="Shader" path="res://scripts/status_effects/lightning_enchant/enchant_chain_lightning.gdshader" id="3_chain_shader"]
+[ext_resource type="Shader" path="res://scripts/status_effects/lightning_enchant/enchant_lightning_sphere.gdshader" id="4_ball_shader"]
+[ext_resource type="PackedScene" uid="uid://cqc5bu642m1wa" path="res://particule/lightning/spraks.tscn" id="5_sparks"]
+[ext_resource type="Texture2D" uid="uid://cobqyaoudap4a" path="res://assets/icon/Mythril Age Icons/electrical-crescent.png" id="6_icon"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cyan_core"]
+render_priority = 0
+shader = ExtResource("3_chain_shader")
+shader_parameter/Main_Color = Color(0.82, 1.45, 1.85, 1)
+shader_parameter/Effect_Color = Color(0.95, 1.15, 1.35, 1)
+shader_parameter/Octave_Count = 4
+shader_parameter/Amp_Start = 0.44
+shader_parameter/Amp_Coeff = 0.52
+shader_parameter/Freq_Coeff = 2.35
+shader_parameter/Speed = 4.6
+shader_parameter/Y_Size = 5.2
+shader_parameter/X_Size = 1.1
+shader_parameter/Emission_Power = 1.85
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cyan_vivid"]
+render_priority = 0
+shader = ExtResource("3_chain_shader")
+shader_parameter/Main_Color = Color(0.08, 1.45, 2.65, 1)
+shader_parameter/Effect_Color = Color(0.88, 1.25, 1.55, 1)
+shader_parameter/Octave_Count = 4
+shader_parameter/Amp_Start = 0.48
+shader_parameter/Amp_Coeff = 0.5
+shader_parameter/Freq_Coeff = 2.2
+shader_parameter/Speed = 5.3
+shader_parameter/Y_Size = 4.6
+shader_parameter/X_Size = 0.95
+shader_parameter/Emission_Power = 1.95
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cyan_deep"]
+render_priority = 0
+shader = ExtResource("3_chain_shader")
+shader_parameter/Main_Color = Color(0.02, 1.05, 2.25, 1)
+shader_parameter/Effect_Color = Color(0.8, 1.1, 1.4, 1)
+shader_parameter/Octave_Count = 3
+shader_parameter/Amp_Start = 0.54
+shader_parameter/Amp_Coeff = 0.48
+shader_parameter/Freq_Coeff = 2.5
+shader_parameter/Speed = 3.9
+shader_parameter/Y_Size = 5.8
+shader_parameter/X_Size = 1.2
+shader_parameter/Emission_Power = 1.7
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cyan_sphere"]
+render_priority = 0
+shader = ExtResource("4_ball_shader")
+shader_parameter/tint = Color(0.18, 1.9, 3.25, 1)
+
+[resource]
+script = ExtResource("1_effect_script")
+segments_count = 6
+line_material_1 = SubResource("ShaderMaterial_cyan_core")
+line_material_2 = SubResource("ShaderMaterial_cyan_vivid")
+line_material_3 = SubResource("ShaderMaterial_cyan_deep")
+sphere_material = SubResource("ShaderMaterial_cyan_sphere")
+strike_sparks_scene = ExtResource("5_sparks")
+effect_id = "totem_lightning_enchant"
+is_buff = true
+icon = ExtResource("6_icon")
+enemie_effect = ExtResource("2_enemie_vfx")

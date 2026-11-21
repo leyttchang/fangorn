@@ -99,13 +99,19 @@ func pack_item(item: ItemData) -> Dictionary:
 	var dict = {
 		"base_path": item.original_base_path if item.original_base_path != "" else item.resource_path,
 		"rarity": item.rarity,
-		"ilvl": item.ilvl
+		"ilvl": item.ilvl,
+		"item_name": item.item_name
 	}
 	if item is EquipmentItem:
 		dict["is_equip"] = true
 		dict["stats"] = item.stat_bonuses
 		dict["innate"] = item.innate_stats
 		dict["affix"] = item.affix_stats
+		if item is WeaponItem:
+			var w_item: WeaponItem = item as WeaponItem
+			dict["is_weapon"] = true
+			dict["base_damage"] = w_item.base_damage
+			dict["base_attack_speed"] = w_item.base_attack_speed
 	else:
 		dict["is_equip"] = false
 	return dict
@@ -119,11 +125,19 @@ func unpack_item(dict: Dictionary) -> ItemData:
 	new_item.original_base_path = dict["base_path"]
 	new_item.rarity = dict["rarity"]
 	new_item.ilvl = dict["ilvl"]
+	if dict.has("item_name") and str(dict["item_name"]) != "":
+		new_item.item_name = str(dict["item_name"])
 	
 	if dict.get("is_equip", false) and new_item is EquipmentItem:
-		new_item.stat_bonuses = dict["stats"]
-		new_item.innate_stats = dict["innate"]
-		new_item.affix_stats = dict["affix"]
+		new_item.stat_bonuses = dict["stats"].duplicate(true) if dict["stats"] is Dictionary else dict["stats"]
+		new_item.innate_stats = dict["innate"].duplicate(true) if dict["innate"] is Dictionary else dict["innate"]
+		new_item.affix_stats = dict["affix"].duplicate(true) if dict["affix"] is Dictionary else dict["affix"]
+		if dict.get("is_weapon", false) and new_item is WeaponItem:
+			var w_new: WeaponItem = new_item as WeaponItem
+			if dict.has("base_damage"):
+				w_new.base_damage = float(dict["base_damage"])
+			if dict.has("base_attack_speed"):
+				w_new.base_attack_speed = float(dict["base_attack_speed"])
 	
 	return new_item
 

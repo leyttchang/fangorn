@@ -10,6 +10,8 @@ extends CharacterBody3D
 # --- DONNÉES DE COMPORTEMENT (Le Profil) ---
 @export var base_movement_speed: float = 4.5
 @export var behavior: EnemyBehaviorData
+## Décoche cette case pour revenir instantanément à l'ancienne texture d'origine du modèle Orc.glb
+@export var use_handpainted_texture: bool = true
 
 @onready var attack_shape: CollisionShape3D = get_node_or_null("Orc/Armature/Skeleton3D/BoneAttachment3D/AttackComponent/CollisionShape3D")
 
@@ -52,6 +54,13 @@ func _ready() -> void:
 	# On s'assure qu'elle est bien désactivée au lancement
 	if attack_shape != null:
 		attack_shape.disabled = true
+
+	if not use_handpainted_texture:
+		var skel = get_node_or_null("Orc/Armature/Skeleton3D")
+		if skel != null:
+			for child in skel.get_children():
+				if child is MeshInstance3D:
+					child.set_surface_override_material(0, null)
 
 	if not has_node("EnemyOptimizerComponent"):
 		var opt = EnemyOptimizerComponent.new()

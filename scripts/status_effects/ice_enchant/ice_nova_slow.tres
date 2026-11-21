@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="IceNovaSlowEffectData" format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/ice_enchant/ice_nova_slow_effect_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://7ps47quwy8v5" path="res://assets/icon/32x32/fb787.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/ice_enchant/ice_slow_body_vfx.tscn" id="3_body_vfx"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/ice_enchant/ice_slow_screen_effect.tscn" id="4_screen_vfx"]
+
+[resource]
+script = ExtResource("1_script")
+effect_id = "totem_ice_nova_slow"
+is_buff = false
+icon = ExtResource("2_icon")
+enemie_effect = ExtResource("3_body_vfx")
+player_effect = ExtResource("4_screen_vfx")
+slow_per_stack = 0.12
+max_stacks = 6
+max_slow_percent = 0.72
+min_movement_speed_ratio = 0.15

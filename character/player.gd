@@ -46,6 +46,18 @@ const JUMP_VELOCITY = 4.5
 var mouse_sensitivity = 0.002
 var is_dead: bool = false
 
+# --- PROPULSION AÉRIENNE (Racine-Catapulte style Deadlock) ---
+@export_group("Propulsion Aérienne (Catapulte)")
+## Contrôle directionnel en l'air pendant un saut propulsé (permet d'incurver légèrement la trajectoire)
+@export var air_launch_steer_accel: float = 14.0
+## Très légère résistance de l'air pour garder un arc fluide sans accélérer à l'infini
+@export var air_launch_drag: float = 1.4
+
+var _is_air_launched: bool = false
+var _air_launch_grace_timer: float = 0.0
+## Si vrai, une compétence de mouvement/saut (ex: Leap Slam) pilote directement velocity + move_and_slide()
+var external_motion_override: bool = false
+
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 
@@ -119,9 +131,14 @@ func _setup_local_player() -> void:
 
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority() or is_dead:
+		if is_dead:
+			external_motion_override = false
 		if not is_on_floor():
 			velocity += get_gravity() * delta
 			move_and_slide()
+		return
+
+	if external_motion_override:
 		return
 
 	# 1. Gestion de la gravitÃ©
@@ -210,6 +227,11 @@ func _physics_process(delta: float) -> void:
 	# 3. NOUVELLE GESTION DU MOUVEMENT (InspirÃ©e de tes anciens scripts)
 	# ==========================================================
 	
+	if _air_launch_grace_timer > 0.0:
+		_air_launch_grace_timer -= delta
+	elif _is_air_launched and is_on_floor():
+		_is_air_launched = false
+
 	# On isole la vitesse horizontale dans un Vector2 (pour ne pas casser la gravitÃ©)
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
@@ -220,7 +242,56 @@ func _physics_process(delta: float) -> void:
 	# On convertit la direction 3D en direction 2D
 	var direction_2d = Vector2(direction.x, direction.z)
 	
-	if direction_2d != Vector2.ZERO:
+	var on_ice: bool = false
+	var ice_data: Dictionary = {}
+	if is_on_floor() and not _is_air_launched:
+		ice_data = BossIceArena.get_ice_physics_at(global_position)
+		on_ice = bool(ice_data.get("on_ice", false))
+	
+	if _is_air_launched and not is_on_floor():
+		# Mode arc aérien (Racine-Catapulte style Deadlock) :
+		# conserve l'élan horizontal du bond sans freiner vers current_speed quand on maintient Z,
+		# tout en permettant d'incurver sa trajectoire ou de freiner volontairement en reculant (S).
+		var cur_len = vitesse_horizontale.length()
+		if direction_2d != Vector2.ZERO:
+			var align = vitesse_horizontale.normalized().dot(direction_2d) if cur_len > 0.1 else 1.0
+			if align >= -0.25:
+				var preserved_speed = maxf(current_speed, cur_len - air_launch_drag * delta)
+				vitesse_horizontale = vitesse_horizontale.move_toward(direction_2d * preserved_speed, air_launch_steer_accel * delta)
+				if vitesse_horizontale.length() > preserved_speed:
+					vitesse_horizontale = vitesse_horizontale.normalized() * preserved_speed
+			else:
+				# Freinage aérien volontaire si le joueur tire en arrière
+				vitesse_horizontale = vitesse_horizontale.move_toward(direction_2d * current_speed, air_launch_steer_accel * 1.4 * delta)
+		else:
+			vitesse_horizontale = vitesse_horizontale.move_toward(Vector2.ZERO, air_launch_drag * delta)
+	elif on_ice:
+		# Physique de patinage / glissade sur la glace de l'Arène du Boss (Phase 2)
+		var ice_fric: float = float(ice_data.get("friction", 2.2))
+		var ice_accel: float = float(ice_data.get("acceleration", 9.5))
+		var rev_mult: float = float(ice_data.get("reverse_brake_mult", 1.35))
+		var max_mult: float = float(ice_data.get("max_speed_mult", 1.12))
+		var ice_max_spd: float = current_speed * max_mult
+		var cur_ice_len: float = vitesse_horizontale.length()
+
+		if direction_2d != Vector2.ZERO:
+			var align_ice: float = (vitesse_horizontale / cur_ice_len).dot(direction_2d) if cur_ice_len > 0.5 else 1.0
+			if cur_ice_len > ice_max_spd:
+				# Conserve l'excédent de vitesse (knockback du Boss ou Dash) en le laissant glisser
+				# doucement avec ice_fric tout en permettant d'incurver ou de contre-braquer
+				if align_ice < -0.15:
+					vitesse_horizontale = vitesse_horizontale.move_toward(direction_2d * ice_max_spd, (ice_accel * rev_mult) * delta)
+				else:
+					var preserved_ice_spd: float = maxf(ice_max_spd, cur_ice_len - ice_fric * delta)
+					vitesse_horizontale = vitesse_horizontale.move_toward(direction_2d * preserved_ice_spd, ice_accel * delta)
+					if vitesse_horizontale.length() > preserved_ice_spd:
+						vitesse_horizontale = vitesse_horizontale.normalized() * preserved_ice_spd
+			else:
+				var eff_ice_accel: float = (ice_accel * rev_mult) if (cur_ice_len > 0.5 and align_ice < -0.15) else ice_accel
+				vitesse_horizontale = vitesse_horizontale.move_toward(direction_2d * ice_max_spd, eff_ice_accel * delta)
+		else:
+			vitesse_horizontale = vitesse_horizontale.move_toward(Vector2.ZERO, ice_fric * delta)
+	elif direction_2d != Vector2.ZERO:
 		# S'il y a un input, on calcule la vitesse Ã  atteindre
 		var vitesse_cible_2d = direction_2d * current_speed
 		
@@ -242,7 +313,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 	# 5. Bruits de pas (Footsteps)
-	if is_on_floor() and vitesse_horizontale.length() > 0.5:
+	if is_on_floor() and vitesse_horizontale.length() > 0.5 and (not on_ice or direction_2d != Vector2.ZERO):
 		_footstep_distance += vitesse_horizontale.length() * delta
 		if _footstep_distance >= step_interval:
 			_footstep_distance = 0.0
@@ -382,3 +453,24 @@ func _retry_setup_terrain_camera() -> void:
 		if is_instance_valid(t) and t.has_method("set_camera"):
 			t.set_camera(camera)
 			print("Terrain3D: Caméra locale assignée en différé -> ", camera.name)
+
+# ==========================================================
+# PROPULSION AÉRIENNE (Racines-Catapultes style Deadlock)
+# ==========================================================
+func apply_air_launch(launch_velocity: Vector3) -> void:
+	if is_dead:
+		return
+	if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority():
+		_internal_apply_air_launch(launch_velocity)
+	else:
+		rpc_id(get_multiplayer_authority(), "rpc_apply_air_launch", launch_velocity)
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_apply_air_launch(launch_velocity: Vector3) -> void:
+	if is_multiplayer_authority():
+		_internal_apply_air_launch(launch_velocity)
+
+func _internal_apply_air_launch(launch_velocity: Vector3) -> void:
+	velocity = launch_velocity
+	_is_air_launched = true
+	_air_launch_grace_timer = 0.15

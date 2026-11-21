@@ -1,7 +1,10 @@
 @tool
 extends Control
 
+const ROOT_NODE_INDEX: int = 0
+
 signal tree_node_clicked(node_index: int, skill_data: SkillNodeData)
+signal tree_node_right_clicked(node_index: int, skill_data: SkillNodeData)
 
 @export var generate_now: bool = false :
 	set(val):
@@ -654,61 +657,143 @@ func _build_interactive_tree():
 				available_deck.erase(chosen_skill)
 				
 	# 4. Placer les boutons
-	for i in range(points.size()):
-		var pt = points[i]
-		var chosen_skill = node_skills.get(i, null)
-		
-		var ui = node_ui_scene.instantiate() as SkillNodeUI
+	for i: int in range(points.size()):
+		var pt: Vector2 = points[i]
+		var chosen_skill: SkillNodeData = node_skills.get(i, null) as SkillNodeData
+
+		var ui: SkillNodeUI = node_ui_scene.instantiate() as SkillNodeUI
 		add_child(ui)
-		ui.position = pt + center_offset - (ui.size / 2.0)
 		ui.setup(chosen_skill, i)
+		ui.position = pt + center_offset - (ui.size / 2.0)
 		ui.node_clicked.connect(_on_ui_node_clicked.bind(i))
-		
+		ui.node_right_clicked.connect(_on_ui_node_right_clicked.bind(i))
+
 		ui_nodes.append(ui)
 
 
-	# 4. Initialisation des Ã©tats
-	# On fait Ã§a en mode "call_deferred" pour Ãªtre sÃ»r que tout est bien ajoutÃ© Ã  l'arbre
+	# 4. Initialisation des états
+	# On fait ça en mode "call_deferred" pour être sûr que tout est bien ajouté à l'arbre
 	call_deferred("_init_tree_states")
 
-func _init_tree_states():
+func _init_tree_states() -> void:
 	if ui_nodes.size() > 0:
-		# Le noeud central (0) est dÃ©bloquÃ©
-		ui_nodes[0].set_state(SkillNodeUI.NodeState.UNLOCKED)
-		# Ses voisins deviennent disponibles
-		for neighbor in adjacency_list[0]:
-			ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
-			
-		# Mise Ã  jour des lignes pour les noeuds initiaux (et futurs chargements de sauvegarde)
-		for i in range(ui_nodes.size()):
-			if ui_nodes[i].current_state == SkillNodeUI.NodeState.UNLOCKED:
-				for neighbor in adjacency_list[i]:
-					if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.UNLOCKED:
-						var edge_key = str(min(i, neighbor)) + "_" + str(max(i, neighbor))
-						if edge_lines.has(edge_key):
-							edge_lines[edge_key].default_color = Color(1.0, 1.0, 1.0, 1.0)
-							edge_lines[edge_key].width = 6.0
+		# Le noeud central (0) est débloqué gratuitement au départ
+		ui_nodes[ROOT_NODE_INDEX].set_state(SkillNodeUI.NodeState.UNLOCKED)
+		_refresh_availability_and_lines()
 
-func _on_ui_node_clicked(ui: SkillNodeUI, node_index: int):
-	# On dit au Component (s'il Ã©coute) que ce noeud veut Ãªtre dÃ©bloquÃ©
+func _on_ui_node_clicked(ui: SkillNodeUI, node_index: int) -> void:
+	# On dit au Component (s'il écoute) que ce noeud veut être débloqué
 	if ui.current_state == SkillNodeUI.NodeState.AVAILABLE:
-		tree_node_clicked.emit(node_index, node_skills.get(node_index, null))
+		var skill_data: SkillNodeData = node_skills.get(node_index, null) as SkillNodeData
+		tree_node_clicked.emit(node_index, skill_data)
 
-func unlock_node(node_index: int):
+func _on_ui_node_right_clicked(ui: SkillNodeUI, node_index: int) -> void:
+	# Clic droit sur un noeud débloqué : demande de remboursement au SkillTreeComponent
+	if ui.current_state == SkillNodeUI.NodeState.UNLOCKED:
+		var skill_data: SkillNodeData = node_skills.get(node_index, null) as SkillNodeData
+		tree_node_right_clicked.emit(node_index, skill_data)
+
+func get_node_skill_data(node_index: int) -> SkillNodeData:
+	return node_skills.get(node_index, null) as SkillNodeData
+
+func is_root_node(node_index: int) -> bool:
+	return node_index == ROOT_NODE_INDEX
+
+## Vérifie la règle de connectivité de type Path of Exile :
+## En retirant `node_index`, tous les autres nœuds alloués dans `unlocked_indices`
+## doivent rester connectés au nœud racine central (0) via un chemin de nœuds alloués.
+func can_refund_node(node_index: int, unlocked_indices: Array[int]) -> bool:
+	if node_index == ROOT_NODE_INDEX:
+		return false
+	if not unlocked_indices.has(node_index):
+		return false
+	if adjacency_list.is_empty():
+		return false
+
+	var remaining_unlocked: Dictionary = {}
+	for idx: int in unlocked_indices:
+		if idx != node_index and idx != ROOT_NODE_INDEX:
+			remaining_unlocked[idx] = true
+
+	if remaining_unlocked.is_empty():
+		return true
+
+	var visited: Dictionary = {ROOT_NODE_INDEX: true}
+	var queue: Array[int] = [ROOT_NODE_INDEX]
+	var reached_unlocked_count: int = 0
+
+	while not queue.is_empty():
+		var current: int = queue.pop_front()
+		var neighbors: Array = adjacency_list.get(current, [])
+		for neighbor_variant in neighbors:
+			var neighbor: int = int(neighbor_variant)
+			if visited.has(neighbor):
+				continue
+			if remaining_unlocked.has(neighbor):
+				visited[neighbor] = true
+				reached_unlocked_count += 1
+				queue.push_back(neighbor)
+
+	return reached_unlocked_count == remaining_unlocked.size()
+
+func unlock_node(node_index: int) -> void:
 	if node_index >= 0 and node_index < ui_nodes.size():
 		ui_nodes[node_index].set_state(SkillNodeUI.NodeState.UNLOCKED)
-		
-		# Rendre les voisins disponibles (s'ils sont encore verrouillÃ©s)
-		for neighbor in adjacency_list[node_index]:
-			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.LOCKED:
-				ui_nodes[neighbor].set_state(SkillNodeUI.NodeState.AVAILABLE)
-				
-			# Mettre Ã  jour la ligne si le voisin est AUSSI dÃ©bloquÃ©
-			if ui_nodes[neighbor].current_state == SkillNodeUI.NodeState.UNLOCKED:
-				var edge_key = str(min(node_index, neighbor)) + "_" + str(max(node_index, neighbor))
-				if edge_lines.has(edge_key):
-					edge_lines[edge_key].default_color = Color(1.0, 1.0, 1.0, 1.0)
-					edge_lines[edge_key].width = 6.0
+		_refresh_availability_and_lines()
+
+func refund_node(node_index: int) -> void:
+	if node_index == ROOT_NODE_INDEX:
+		return
+	if node_index > 0 and node_index < ui_nodes.size():
+		ui_nodes[node_index].set_state(SkillNodeUI.NodeState.LOCKED)
+		_refresh_availability_and_lines()
+
+func play_reject_feedback(node_index: int) -> void:
+	if node_index >= 0 and node_index < ui_nodes.size():
+		ui_nodes[node_index].play_reject_animation()
+
+func _refresh_availability_and_lines() -> void:
+	if ui_nodes.is_empty():
+		return
+
+	ui_nodes[ROOT_NODE_INDEX].set_state(SkillNodeUI.NodeState.UNLOCKED)
+
+	var unlocked_set: Dictionary = {}
+	for i: int in range(ui_nodes.size()):
+		if ui_nodes[i].current_state == SkillNodeUI.NodeState.UNLOCKED:
+			unlocked_set[i] = true
+
+	for i: int in range(ui_nodes.size()):
+		if unlocked_set.has(i):
+			continue
+
+		var has_unlocked_neighbor: bool = false
+		var neighbors: Array = adjacency_list.get(i, [])
+		for neighbor_variant in neighbors:
+			var neighbor: int = int(neighbor_variant)
+			if unlocked_set.has(neighbor):
+				has_unlocked_neighbor = true
+				break
+
+		var desired_state: SkillNodeUI.NodeState = (
+			SkillNodeUI.NodeState.AVAILABLE if has_unlocked_neighbor else SkillNodeUI.NodeState.LOCKED
+		)
+		if ui_nodes[i].current_state != desired_state:
+			ui_nodes[i].set_state(desired_state)
+
+	for edge: Vector2i in edges:
+		var min_idx: int = mini(edge.x, edge.y)
+		var max_idx: int = maxi(edge.x, edge.y)
+		var edge_key: String = str(min_idx) + "_" + str(max_idx)
+		if edge_lines.has(edge_key):
+			var line: Line2D = edge_lines[edge_key] as Line2D
+			if line != null:
+				if unlocked_set.has(edge.x) and unlocked_set.has(edge.y):
+					line.default_color = Color(1.0, 1.0, 1.0, 1.0)
+					line.width = 6.0
+				else:
+					line.default_color = Color(0.4, 0.4, 0.5, 0.5)
+					line.width = 4.0
 
 func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is_leaf: bool, is_hub: bool, is_root: bool, neighbor_skills: Array = [], dead_end_length: int = 0) -> SkillNodeData:
 	var best_candidates = []
@@ -802,14 +887,11 @@ func _draft_skill(tier: int, strict_zone: int, hybrid_zone: int, deck: Array, is
 					count += temp & 1
 					temp = temp >> 1
 					
-				var force: float = 2.5
-				if tag_match_multiplier_per_tag_minor != null: force = tag_match_multiplier_per_tag_minor
+				var force: float = tag_match_multiplier_per_tag_minor
 				if n_skill.node_type == SkillNodeData.NodeType.NOTABLE:
-					force = 6.0
-					if tag_match_multiplier_per_tag_notable != null: force = tag_match_multiplier_per_tag_notable
+					force = tag_match_multiplier_per_tag_notable
 				elif n_skill.node_type == SkillNodeData.NodeType.KEYSTONE:
-					force = 8.0
-					if tag_match_multiplier_per_tag_keystone != null: force = tag_match_multiplier_per_tag_keystone
+					force = tag_match_multiplier_per_tag_keystone
 					
 				thematic_multiplier += force * count
 		weight *= thematic_multiplier

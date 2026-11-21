@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="FireEnchantEffectData" format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/fire_enchant/fire_enchant_effect_data.gd" id="1_effect_script"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/fire_enchant/fire_enchant_vfx.tscn" id="2_enemie_vfx"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/fire_enchant/fire_trail_patch.tscn" id="3_trail_patch"]
+[ext_resource type="Resource" uid="uid://cwl1x2y7sug0o" path="res://scripts/status_effects/burn/burn.tres" id="4_burn_effect"]
+[ext_resource type="Texture2D" uid="uid://c71msakx26sls" path="res://assets/icon/Mythril Age Icons/flaming-sheet.png" id="5_icon"]
+
+[resource]
+script = ExtResource("1_effect_script")
+effect_id = "totem_fire_enchant"
+is_buff = true
+icon = ExtResource("5_icon")
+enemie_effect = ExtResource("2_enemie_vfx")
+trail_patch_scene = ExtResource("3_trail_patch")
+trail_step_distance = 1.3
+trail_behind_offset = 0.45
+trail_radius = 1.05
+trail_duration = 3.5
+trail_tick_damage = 5.0
+trail_tick_interval = 0.4
+max_patches_per_mob = 7
+burn_status_effect = ExtResource("4_burn_effect")
+burn_chance_on_hit = 0.35
+burn_duration = 5.0

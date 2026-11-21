@@ -23,6 +23,10 @@ func get_border_exits() -> Array[Vector2]:
 		result.append(exit_east)
 	if exit_north != Vector2.ZERO and arena_gen.is_slot_active(arena_gen.SLOT_NORTH):
 		result.append(exit_north)
+	if arena_gen != null and arena_gen.has_method("get_extra_border_openings"):
+		for extra_pos: Vector2 in arena_gen.get_extra_border_openings():
+			if extra_pos != Vector2.ZERO:
+				result.append(extra_pos)
 	return result
 
 

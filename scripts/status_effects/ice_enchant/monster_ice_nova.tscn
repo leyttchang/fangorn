@@ -1,0 +1,499 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/status_effects/ice_enchant/monster_ice_nova.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://hpbjrjvttuj4" path="res://assets/LeLu's Noise Pack/T_smoke_b7.png" id="2_smoke_tex"]
+[ext_resource type="Shader" uid="uid://d38u3ry78d5ro" path="res://assets/3D_models/VFX_spell/wave_impact.tres" id="3_wave_shader"]
+[ext_resource type="Texture2D" uid="uid://c6vermwacx4a4" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/Rotated/spark_06_rotated.png" id="4_spark_rot"]
+[ext_resource type="Texture2D" uid="uid://biff8ah2i3vrg" path="res://assets/LeLu's Noise Pack/PNG (Transparent)/light_03.png" id="5_decal_tex"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="6_simplex_tex"]
+[ext_resource type="Texture2D" uid="uid://lc2d3ly8t5hw" path="res://assets/LeLu's Noise Pack/T_snow_flakes.png" id="7_flakes_tex"]
+
+[sub_resource type="Animation" id="Animation_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visuals/wave:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/smoke:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Visuals/Decal:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1.5, 2.7, 3.3, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Visuals/wave:material_override:shader_parameter/impact_speed")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -6)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Visuals/wave:material_override:shader_parameter/text_ofset")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0.4)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Visuals/spraks:emitting")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Visuals/snow_burst:emitting")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_burst"]
+resource_name = "burst"
+length = 2.4
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.32, 2.35),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"trigger_slow_wave"
+}, {
+"args": [],
+"method": &"disappear"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/wave:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.02),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Visuals/smoke:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.04),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Visuals/Decal:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.22, 0.55, 1.45, 2.15),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1.5, 2.7, 3.3, 0), Color(1.5, 2.7, 3.3, 0.15), Color(1.5, 2.7, 3.3, 0.85), Color(0.36, 0.44, 0.52, 0.55), Color(0.36, 0.44, 0.52, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Visuals/wave:material_override:shader_parameter/impact_speed")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.68),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -6), Vector2(0, 1.5)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Visuals/wave:material_override:shader_parameter/text_ofset")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.68),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0.4), Vector2(0, -0.4)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Visuals/spraks:emitting")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.32),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Visuals/snow_burst:emitting")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.32),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nova"]
+_data = {
+&"RESET": SubResource("Animation_reset"),
+&"burst": SubResource("Animation_burst")
+}
+
+[sub_resource type="Gradient" id="Gradient_smoke"]
+offsets = PackedFloat32Array(0, 0.14814815, 0.6753247, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.429, 0.429, 0.66, 0.78, 0.6351122, 0.7447469, 1.0462428, 0.34, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_smoke"]
+gradient = SubResource("Gradient_smoke")
+
+[sub_resource type="Curve" id="Curve_damping"]
+_limits = [0.0, 100.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 73), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_damping"]
+curve = SubResource("Curve_damping")
+
+[sub_resource type="Curve" id="Curve_smoke_scale"]
+_data = [Vector2(0, 0.68), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_smoke_scale"]
+curve = SubResource("Curve_smoke_scale")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_smoke"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.22
+emission_ring_radius = 0.85
+emission_ring_inner_radius = 0.35
+emission_ring_cone_angle = 90.0
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(1, 0, 1)
+spread = 180.0
+flatness = 1.0
+initial_velocity_min = 8.4
+initial_velocity_max = 9.2
+gravity = Vector3(0, 0, 0)
+damping_min = 5.0
+damping_max = 6.0
+damping_curve = SubResource("CurveTexture_damping")
+scale_min = 1.0
+scale_max = 1.9
+scale_curve = SubResource("CurveTexture_smoke_scale")
+color_ramp = SubResource("GradientTexture1D_smoke")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smoke"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("2_smoke_tex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_smoke"]
+lightmap_size_hint = Vector2i(7, 7)
+material = SubResource("StandardMaterial3D_smoke")
+
+[sub_resource type="Gradient" id="Gradient_wave_particle"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_wave_particle"]
+gradient = SubResource("Gradient_wave_particle")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wave"]
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_wave_particle")
+
+[sub_resource type="Gradient" id="Gradient_wave_fade"]
+offsets = PackedFloat32Array(0, 0.28936172, 0.7787234, 0.9276596)
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wave_fade"]
+gradient = SubResource("Gradient_wave_fade")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kb83e"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("3_wave_shader")
+shader_parameter/impact_color = Color(0.22, 0.82, 1.48, 1)
+shader_parameter/impact_speed = Vector2(0, -6)
+shader_parameter/text_ofset = Vector2(0, 0.4)
+shader_parameter/wave_texture = ExtResource("4_spark_rot")
+shader_parameter/fade_texturegrad2d = SubResource("GradientTexture2D_wave_fade")
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_snelp"]
+_surfaces = [{
+"aabb": AABB(-13.316325, 0.45296824, -13.316325, 26.63265, 0.54703176, 26.63265),
+"format": 34896613377,
+"index_count": 192,
+"index_data": PackedByteArray("AAABAAIAAAADAAEABAAAAAIAAwAFAAEABAACAAYAAwAHAAUACAAEAAYABwAJAAUACAAGAAoABwALAAkADAAIAAoACwANAAkADAAKAA4ACwAPAA0AEAAMAA4ADwARAA0AEAAOABIADwATABEAFAAQABIAEwAVABEAFAASABYAEwAXABUAGAAUABYAFwAZABUAGAAWABoAFwAbABkAHAAYABoAGwAdABkAHAAaAB4AGwAfAB0AIAAcAB4AHwAhAB0AIAAeACIAHwAjACEAJAAgACIAIwAlACEAJAAiACYAIwAnACUAKAAkACYAJwApACUAKAAmACoAJwArACkALAAoACoAKwAtACkALAAqAC4AKwAvAC0AMAAsAC4ALwAxAC0AMAAuADIALwAzADEANAAwADIAMwA1ADEANAAyADYAMwA3ADUAOAA0ADYANwA5ADUAOAA2ADoANwA7ADkAPAA4ADoAOwA9ADkAPAA6AD4AOwA/AD0APwA8AD4APwA+AD0A"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 64,
+"vertex_data": PackedByteArray("/38AAGJ2AAD4mP//dQIAAP9///8AAAAA34EAAJJ2AAAffgAAknYAAPuw//++CQAABmf//3UCAACtgwAAHncAAFF8AAAedwAAHMf//5IVAAADT///vgkAAFaFAAABeAAAqHoAAAF4AACB2v//fSUAAOI4//+SFQAAy4YAADN5AAAzeQAAM3kAAGzq///iOAAAfSX//30lAAD9hwAAqHoAAAF4AACoegAAQPb//wNPAACSFf//4jgAAOCIAABRfAAAHncAAFF8AACJ/f//BmcAAL4J//8DTwAAbIkAAB9+AACSdgAAH34AAP//////fwAAdQL//wZnAACciQAA/38AAGJ2AAD/fwAAif3///iYAAAAAP///38AAGyJAADfgQAAknYAAN+BAABA9v//+7AAAHUC///4mAAA4IgAAK2DAAAedwAArYMAAGzq//8cxwAAvgn///uwAAD9hwAAVoUAAAF4AABWhQAAgdr//4HaAACSFf//HMcAAMuGAADLhgAAM3kAAMuGAAAcx///bOoAAH0l//+B2gAAVoUAAP2HAACoegAA/YcAAPuw//9A9gAA4jj//2zqAACtgwAA4IgAAFF8AADgiAAA+Jj//4n9AAADT///QPYAAN+BAABsiQAAH34AAGyJAAD/f/////8AAAZn//+J/QAA/38AAJyJAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0lfaf"]
+resource_name = "wave_mesh_flat_Cylinder"
+_surfaces = [{
+"aabb": AABB(-13.316325, 0.45296824, -13.316325, 26.63265, 0.54703176, 26.63265),
+"attribute_data": PackedByteArray("///////3AAD//wAA//f////3////7wAA//cAAP/v////7////+cAAP/vAAD/5////+f////fAAD/5wAA/9/////f////1wAA/98AAP/X////1////88AAP/XAAD/z////8/////HAAD/zwAA/8f////H////vwAA/8cAAP+/////v////7cAAP+/AAD/t////7f///+vAAD/twAA/6////+v////pwAA/68AAP+n////p////58AAP+nAAD/n////5////+XAAD/nwAA/5f///+X////jwAA/5cAAP+P////j////4cAAP+PAAD/h////4f///9/AAD/hwAA/3////9/////dwAA/38AAP93////d////28AAP93AAD/b////2////9nAAD/bwAA/2f///9n////XwAA/2cAAP9f////X////1cAAP9fAAD/V////1f///9PAAD/VwAA/0////9P////RwAA/08AAP9H////R////z8AAP9HAAD/P////z////83AAD/PwAA/zf///83////LwAA/zcAAP8v////L////ycAAP8vAAD/J////yf///8fAAD/JwAA/x////8f////FwAA/x8AAP8X////F////w8AAP8XAAD/D////w////8HAAD/DwAA/wf///8H//8AAAAA/wcAAAAA//8="),
+"format": 34896613399,
+"index_count": 192,
+"index_data": PackedByteArray("AAABAAIAAAADAAEABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0AEAARABIAEAATABEAFAAVABYAFAAXABUAGAAZABoAGAAbABkAHAAdAB4AHAAfAB0AIAAhACIAIAAjACEAJAAlACYAJAAnACUAKAApACoAKAArACkALAAtAC4ALAAvAC0AMAAxADIAMAAzADEANAA1ADYANAA3ADUAOAA5ADoAOAA7ADkAPAA9AD4APAA/AD0AQABBAEIAQABDAEEARABFAEYARABHAEUASABJAEoASABLAEkATABNAE4ATABPAE0AUABRAFIAUABTAFEAVABVAFYAVABXAFUAWABZAFoAWABbAFkAXABdAF4AXABfAF0AYABhAGIAYABjAGEAZABlAGYAZABnAGUAaABpAGoAaABrAGkAbABtAG4AbABvAG0AcABxAHIAcABzAHEAdAB1AHYAdAB3AHUAeAB5AHoAeAB7AHkAfAB9AH4AfAB/AH0A"),
+"material": SubResource("ShaderMaterial_kb83e"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 128,
+"vertex_data": PackedByteArray("/38AAGJ2Gv34mP//dQIa/f9///8AABr934EAAJJ2Gv3fgQAAknZX9/uw//++CVf3+Jj//3UCV/etgwAAHndX962DAAAed5zxHMf//5IVnPH7sP//vgmc8VaFAAABeJzxVoUAAAF49OuB2v//fSX06xzH//+SFfTry4YAADN59OvLhgAAM3ll5mzq///iOGXmgdr//30lZeb9hwAAqHpl5v2HAACoevrgQPb//wNP+uBs6v//4jj64OCIAABRfPrg4IgAAFF8utuJ/f//Bme620D2//8DT7rbbIkAAB9+uttsiQAAH3601v//////f7TWif3//wZntNaciQAA/3+01pyJAAD/f/LRif3///iY8tH//////3/y0WyJAADfgfLRbIkAAN+Bh81A9v//+7CHzYn9///4mIfN4IgAAK2Dh83giAAArYOEyWzq//8cx4TJQPb///uwhMn9hwAAVoWEyf2HAABWhfvFgdr//4Ha+8Vs6v//HMf7xcuGAADLhvvFy4YAAMuGA8Mcx///bOoDw4Ha//+B2gPDVoUAAP2HA8NWhQAA/YexwPuw//9A9rHAHMf//2zqscCtgwAA4IixwK2DAADgiBi/+Jj//4n9GL/7sP//QPYYv9+BAABsiRi/34EAAGyJR77/f/////9HvviY//+J/Ue+/38AAJyJR77/fwAAnIlHvgZn//+J/Ue+/3//////R74ffgAAbIlHvh9+AABsiRi/A0///0D2GL8GZ///if0Yv1F8AADgiBi/UXwAAOCIscDiOP//bOqxwANP//9A9rHAqHoAAP2HscCoegAA/YcDw30l//+B2gPD4jj//2zqA8MzeQAAy4YDwzN5AADLhvvFkhX//xzH+8V9Jf//gdr7xQF4AABWhfvFAXgAAFaFhMm+Cf//+7CEyZIV//8cx4TJHncAAK2DhMkedwAArYOHzXUC///4mIfNvgn///uwh82SdgAA34GHzZJ2AADfgfLRAAD///9/8tF1Av//+Jjy0WJ2AAD/f/LRYnYAAP9/tNZ1Av//Bme01gAA////f7TWknYAAB9+tNaSdgAAH366274J//8DT7rbdQL//wZnutsedwAAUXy62x53AABRfPrgkhX//+I4+uC+Cf//A0/64AF4AACoevrgAXgAAKh6ZeZ9Jf//fSVl5pIV///iOGXmM3kAADN5ZeYzeQAAM3n06+I4//+SFfTrfSX//30l9OuoegAAAXj066h6AAABeJzxA0///74JnPHiOP//khWc8VF8AAAed5zxUXwAAB53V/cGZ///dQJX9wNP//++CVf3H34AAJJ2V/cffgAAknYa/f9///8AABr9Bmf//3UCGv3/fwAAYnYa/f98GkD/fBpA/3waQP98GkBXd/5CV3f+Qld3/kJXd/5CCHK1RQhytUUIcrVFCHK1RfFsT0jxbE9I8WxPSPFsT0j2Z9tK9mfbSvZn20r2Z9tK/mJmTf5iZk3+YmZN/mJmTfBd+k/wXfpP8F36T/Bd+k+yWKhSslioUrJYqFKyWKhSJlN+VSZTflUmU35VJlN+VSVNj1glTY9YJU2PWCVNj1h/RvZbf0b2W39G9lt/RvZb8T7SX/E+0l/xPtJf8T7SXxg2WGQYNlhkGDZYZBg2WGRdK9VpXSvVaV0r1WldK9VpzB3EcMwdxHDMHcRwzB3EcLALBXqwCwV6sAsFerALBXr5Ba+L+QWvi/kFr4v5Ba+LOg/LnToPy506D8udOg/LnSoWXasqFl2rKhZdqyoWXaumGxe2phsXtqYbF7amGxe2LCDwviwg8L4sIPC+LCDwvgkkf8YJJH/GCSR/xgkkf8ZvJyXNbyclzW8nJc1vJyXNgCom04AqJtOAKibTgCom01YtsthWLbLYVi2y2FYtstgEMPDdBDDw3QQw8N0EMPDdmTL94pky/eKZMv3imTL94iQ19eckNfXnJDX15yQ19eevN/Dsrzfw7K838OyvN/DsSToI8kk6CPJJOgjySToI8gA9V/cAPVf3AD1X9wA9V/fkP/785D/+/OQ//vzkP/78")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_snelp")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sparks"]
+render_priority = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("6_simplex_tex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_sparks"]
+offsets = PackedFloat32Array(0, 0.6460905, 1)
+colors = PackedColorArray(2.1777, 2.392336, 3.6086066, 1, 0.7186058, 0.9803191, 3.3357346, 0.3529412, 0, 0.1500001, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_sparks"]
+gradient = SubResource("Gradient_sparks")
+use_hdr = true
+
+[sub_resource type="Curve" id="Curve_sparks_scale"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.45, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_sparks_scale"]
+curve = SubResource("Curve_sparks_scale")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparks"]
+lifetime_randomness = 0.15
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.35
+emission_ring_radius = 1.25
+emission_ring_inner_radius = 0.25
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 20.0
+initial_velocity_min = 0.4
+initial_velocity_max = 1.4
+radial_velocity_min = 8.5
+radial_velocity_max = 12.5
+gravity = Vector3(0, 0.8, 0)
+scale_min = 0.032
+scale_max = 0.072
+scale_curve = SubResource("CurveTexture_sparks_scale")
+color = Color(1.82, 1.82, 1.82, 1)
+color_ramp = SubResource("GradientTexture1D_sparks")
+
+[sub_resource type="QuadMesh" id="QuadMesh_sparks"]
+
+[sub_resource type="Curve" id="Curve_snow_alpha"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.15, 1), 0.0, 0.0, 0, 0, Vector2(0.75, 0.85), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_snow_alpha"]
+curve = SubResource("Curve_snow_alpha")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_snow_burst"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.45
+emission_ring_radius = 1.35
+emission_ring_inner_radius = 0.3
+emission_ring_cone_angle = 90.0
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 1, 0)
+spread = 35.0
+initial_velocity_min = 0.3
+initial_velocity_max = 1.1
+radial_velocity_min = 4.2
+radial_velocity_max = 7.2
+damping_min = 3.5
+damping_max = 5.5
+gravity = Vector3(0, -0.45, 0)
+scale_min = 0.09
+scale_max = 0.22
+color = Color(0.85, 1.98, 2.55, 1)
+alpha_curve = SubResource("CurveTexture_snow_alpha")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_snow_burst"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("7_flakes_tex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_snow_burst"]
+material = SubResource("StandardMaterial3D_snow_burst")
+
+[node name="MonsterIceNova" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("AnimationLibrary_nova")
+
+[node name="Visuals" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="smoke" type="GPUParticles3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0)
+cast_shadow = 0
+visibility_range_end = 50.0
+emitting = false
+amount = 24
+lifetime = 1.45
+one_shot = true
+explosiveness = 0.82
+fixed_fps = 30
+local_coords = true
+visibility_aabb = AABB(-8, -2, -8, 16, 4, 16)
+process_material = SubResource("ParticleProcessMaterial_smoke")
+draw_pass_1 = SubResource("QuadMesh_smoke")
+
+[node name="wave" type="GPUParticles3D" parent="Visuals"]
+transform = Transform3D(0.42, 0, 0, 0, 0.65, 0, 0, 0, 0.42, 0, -0.58, 0)
+cast_shadow = 0
+visibility_range_end = 55.0
+material_override = SubResource("ShaderMaterial_kb83e")
+emitting = false
+amount = 1
+lifetime = 0.75
+one_shot = true
+fixed_fps = 30
+local_coords = true
+visibility_aabb = AABB(-15, -2, -15, 30, 5, 30)
+process_material = SubResource("ParticleProcessMaterial_wave")
+draw_pass_1 = SubResource("ArrayMesh_0lfaf")
+
+[node name="Decal" type="Decal" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.72, 0)
+size = Vector3(10.5, 3, 10.5)
+texture_albedo = ExtResource("5_decal_tex")
+modulate = Color(1.5, 2.7, 3.3, 0)
+upper_fade = 1.0
+distance_fade_enabled = true
+distance_fade_begin = 38.0
+distance_fade_length = 10.0
+
+[node name="spraks" type="GPUParticles3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+cast_shadow = 0
+visibility_range_end = 45.0
+material_override = SubResource("StandardMaterial3D_sparks")
+emitting = false
+amount = 20
+lifetime = 0.45
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 30
+local_coords = true
+visibility_aabb = AABB(-8, -2, -8, 16, 5, 16)
+process_material = SubResource("ParticleProcessMaterial_sparks")
+draw_pass_1 = SubResource("QuadMesh_sparks")
+
+[node name="snow_burst" type="GPUParticles3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+cast_shadow = 0
+visibility_range_end = 45.0
+emitting = false
+amount = 14
+lifetime = 0.9
+one_shot = true
+explosiveness = 0.92
+fixed_fps = 30
+local_coords = true
+visibility_aabb = AABB(-8, -2, -8, 16, 5, 16)
+process_material = SubResource("ParticleProcessMaterial_snow_burst")
+draw_pass_1 = SubResource("QuadMesh_snow_burst")

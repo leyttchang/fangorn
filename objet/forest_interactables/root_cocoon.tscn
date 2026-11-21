@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://b7lcxqo1xg2lj"]
+
+[ext_resource type="Script" uid="uid://so16h4fip4va" path="res://objet/forest_interactables/root_cocoon.gd" id="1_rtcoc"]
+[ext_resource type="Script" uid="uid://t2276lmrj8wh" path="res://objet/forest_interactables/breakable_hitbox.gd" id="2_brkhb"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_cocbody"]
+height = 1.25
+radius = 0.45
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_cochb"]
+radius = 1.05
+
+[node name="RootCocoon" type="Node3D" unique_id=605945406]
+script = ExtResource("1_rtcoc")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=833094754]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=359019154]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0)
+shape = SubResource("CylinderShape3D_cocbody")
+
+[node name="BreakableHitbox" type="Area3D" parent="." unique_id=1421794498]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("2_brkhb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BreakableHitbox" unique_id=1024222882]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+shape = SubResource("SphereShape3D_cochb")

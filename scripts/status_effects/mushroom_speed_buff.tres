@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MushroomSpeedBuffData" format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/mushroom_speed_buff_data.gd" id="1_mshbf"]
+
+[resource]
+script = ExtResource("1_mshbf")
+speed_bonus_percent = 0.30
+effect_id = "mushroom_speed_buff"
+is_buff = true

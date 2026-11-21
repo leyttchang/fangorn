@@ -1,0 +1,99 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/ice_enchant/ice_slow_screen_effect.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://kqjvi1847yd7" path="res://scripts/status_effects/Warcry/shader_speed_fullscreen_3d.tres" id="2_shader"]
+[ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="3_noise"]
+[ext_resource type="Texture2D" uid="uid://lc2d3ly8t5hw" path="res://assets/LeLu's Noise Pack/T_snow_flakes.png" id="4_flakes"]
+
+[sub_resource type="Gradient" id="Gradient_mask"]
+offsets = PackedFloat32Array(0.45, 0.92)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mask"]
+gradient = SubResource("Gradient_mask")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 1)
+
+[sub_resource type="Gradient" id="Gradient_frost_colors"]
+offsets = PackedFloat32Array(0, 0.24, 0.36)
+colors = PackedColorArray(0, 0, 0, 0, 0.22, 0.78, 1.45, 0.09, 0.72, 0.92, 1.35, 0.26)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_frost_colors"]
+gradient = SubResource("Gradient_frost_colors")
+
+[sub_resource type="Gradient" id="Gradient_extra"]
+offsets = PackedFloat32Array(0.64)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_extra"]
+gradient = SubResource("Gradient_extra")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_frost_screen"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_shader")
+shader_parameter/zoom_strength = -0.65
+shader_parameter/repeat_circle = 8.0
+shader_parameter/offset = Vector2(-0.35, 0.08)
+shader_parameter/base_texture = ExtResource("3_noise")
+shader_parameter/Mask_texture = SubResource("GradientTexture2D_mask")
+shader_parameter/extra_texture = SubResource("GradientTexture2D_extra")
+shader_parameter/color_gradiant = SubResource("GradientTexture1D_frost_colors")
+shader_parameter/visibility = 0.3
+
+[sub_resource type="QuadMesh" id="QuadMesh_screen"]
+size = Vector2(5, 5)
+
+[sub_resource type="Curve" id="Curve_flake_alpha"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.2, 0.85), 0.0, 0.0, 0, 0, Vector2(0.8, 0.75), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_flake_alpha"]
+curve = SubResource("Curve_flake_alpha")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_cam_flakes"]
+emission_shape = 3
+emission_box_extents = Vector3(1.35, 0.85, 0.35)
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, -1, 0)
+spread = 35.0
+initial_velocity_min = 0.25
+initial_velocity_max = 0.65
+gravity = Vector3(0, -0.35, 0)
+scale_min = 0.02
+scale_max = 0.048
+color = Color(0.82, 1.55, 2.15, 0.75)
+alpha_curve = SubResource("CurveTexture_flake_alpha")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cam_flakes"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("4_flakes")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_cam_flakes"]
+material = SubResource("StandardMaterial3D_cam_flakes")
+
+[node name="IceSlowScreenEffect" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="FrostScreenQuad" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_frost_screen")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_screen")
+
+[node name="FrostFlakes" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.15)
+amount = 22
+lifetime = 1.6
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_cam_flakes")
+draw_pass_1 = SubResource("QuadMesh_cam_flakes")

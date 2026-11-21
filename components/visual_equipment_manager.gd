@@ -95,6 +95,9 @@ func _on_peer_connected(peer_id: int) -> void:
 	if equipment_component != null:
 		var item = equipment_component.equipped_items.get("main_hand")
 		var path = ""
-		if item != null and item.get("weapon_scene") != null:
-			path = item.weapon_scene.resource_path
+		if item != null:
+			if item.get("unique_model_scene") != null:
+				path = item.unique_model_scene.resource_path
+			elif item.get("weapon_scene") != null:
+				path = item.weapon_scene.resource_path
 		rpc_id(peer_id, "_rpc_update_visual_weapon", path)

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="IceEnchantEffectData" format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/ice_enchant/ice_enchant_effect_data.gd" id="1_effect_script"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/ice_enchant/ice_enchant_vfx.tscn" id="2_enemie_vfx"]
+[ext_resource type="PackedScene" path="res://scripts/status_effects/ice_enchant/monster_ice_nova.tscn" id="3_nova_scene"]
+[ext_resource type="Resource" path="res://scripts/status_effects/ice_enchant/ice_nova_slow.tres" id="4_slow_effect"]
+[ext_resource type="Texture2D" uid="uid://bud0cxsehynyl" path="res://assets/icon/32x32/fb788.png" id="5_icon"]
+
+[resource]
+script = ExtResource("1_effect_script")
+effect_id = "totem_ice_enchant"
+is_buff = true
+icon = ExtResource("5_icon")
+enemie_effect = ExtResource("2_enemie_vfx")
+nova_interval = 3.8
+nova_interval_jitter = 0.45
+initial_delay_min = 1.2
+initial_delay_max = 3.6
+nova_radius = 4.2
+trigger_player_range = 26.0
+nova_scene = ExtResource("3_nova_scene")
+player_slow_effect = ExtResource("4_slow_effect")
+slow_duration = 5.0

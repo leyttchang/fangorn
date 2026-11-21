@@ -1,0 +1,521 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://map/encounters/pnj_buff_choice/reward_choice_ui_d2.gd" id="1_script"]
+[ext_resource type="Theme" path="res://ui/themes/moria_d2_theme.tres" id="2_theme"]
+[ext_resource type="FontFile" path="res://assets/fonts/Cinzel.ttf" id="3_cinzel"]
+[ext_resource type="FontFile" path="res://assets/fonts/CormorantGaramond.ttf" id="4_cormorant"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/main_frame.png" id="5_main_frame"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/stele_normal.png" id="6_stele_norm"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/stele_hover.png" id="7_stele_hov"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/btn_accept_normal.png" id="8_acc_norm"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/btn_accept_hover.png" id="9_acc_hov"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/btn_accept_pressed.png" id="10_acc_prs"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/btn_cancel_normal.png" id="11_can_norm"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/btn_cancel_hover.png" id="12_can_hov"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/btn_cancel_pressed.png" id="13_can_prs"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/glyphs/glyph_skill_points.png" id="14_g1"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/glyphs/glyph_weapon_temper.png" id="15_g2"]
+[ext_resource type="Texture2D" path="res://assets/UI/moria_d2/glyphs/glyph_random_spell.png" id="16_g3"]
+
+[sub_resource type="FontVariation" id="FontVariation_cinzel_bold"]
+base_font = ExtResource("3_cinzel")
+variation_opentype = {
+2003265652: 700
+}
+spacing_glyph = 2
+
+[sub_resource type="FontVariation" id="FontVariation_cinzel_card"]
+base_font = ExtResource("3_cinzel")
+variation_opentype = {
+2003265652: 700
+}
+spacing_glyph = 1
+
+[sub_resource type="FontVariation" id="FontVariation_cormorant_desc"]
+base_font = ExtResource("4_cormorant")
+variation_opentype = {
+2003265652: 600
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_main_title"]
+font = SubResource("FontVariation_cinzel_bold")
+font_size = 24
+font_color = Color(0.780392, 0.701961, 0.466667, 1)
+outline_size = 5
+outline_color = Color(0, 0, 0, 0.95)
+shadow_size = 4
+shadow_color = Color(0, 0, 0, 0.85)
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="LabelSettings" id="LabelSettings_subtitle"]
+font = SubResource("FontVariation_cormorant_desc")
+font_size = 17
+font_color = Color(0.66, 0.68, 0.72, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 0.9)
+
+[sub_resource type="LabelSettings" id="LabelSettings_stele_title"]
+font = SubResource("FontVariation_cinzel_card")
+font_size = 15
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 0.95)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.85)
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="LabelSettings" id="LabelSettings_stele_desc"]
+line_spacing = 1.0
+font = SubResource("FontVariation_cormorant_desc")
+font_size = 15
+font_color = Color(0.76, 0.75, 0.71, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 0.92)
+
+[sub_resource type="LabelSettings" id="LabelSettings_leave_hint"]
+font = SubResource("FontVariation_cinzel_card")
+font_size = 12
+font_color = Color(0.55, 0.56, 0.58, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glyph_socket"]
+bg_color = Color(0.05, 0.055, 0.065, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.03, 0.03, 0.04, 1)
+shadow_color = Color(0, 0, 0, 0.75)
+shadow_size = 6
+
+[node name="RewardChoiceUID2" type="CanvasLayer" node_paths=PackedStringArray("title_label", "subtitle_label", "close_button", "card_1_root", "card_1_hover_tex", "card_1_glyph", "card_1_title", "card_1_desc", "card_1_button", "card_2_root", "card_2_hover_tex", "card_2_glyph", "card_2_title", "card_2_desc", "card_2_button", "card_3_root", "card_3_hover_tex", "card_3_glyph", "card_3_title", "card_3_desc", "card_3_button")]
+layer = 50
+script = ExtResource("1_script")
+title_label = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/HeaderVBox/TitleLabel")
+subtitle_label = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/HeaderVBox/SubtitleLabel")
+close_button = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/FooterBar/CloseStoneButton")
+card_1_root = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1")
+card_1_hover_tex = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleHoverTex")
+card_1_glyph = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/GlyphSocketWrap/GlyphFrame/GlyphIcon")
+card_1_title = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/SteleTitle")
+card_1_desc = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/SteleDesc")
+card_1_button = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/ButtonRow/AcceptStoneBtn")
+card_2_root = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2")
+card_2_hover_tex = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleHoverTex")
+card_2_glyph = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/GlyphSocketWrap/GlyphFrame/GlyphIcon")
+card_2_title = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/SteleTitle")
+card_2_desc = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/SteleDesc")
+card_2_button = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/ButtonRow/AcceptStoneBtn")
+card_3_root = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3")
+card_3_hover_tex = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleHoverTex")
+card_3_glyph = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/GlyphSocketWrap/GlyphFrame/GlyphIcon")
+card_3_title = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/SteleTitle")
+card_3_desc = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/SteleDesc")
+card_3_button = NodePath("RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/ButtonRow/AcceptStoneBtn")
+
+[node name="RootControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Backdrop" type="ColorRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.028, 0.8)
+
+[node name="CenterContainer" type="CenterContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MonumentFrame" type="Control" parent="RootControl/CenterContainer"]
+custom_minimum_size = Vector2(1248, 702)
+layout_mode = 2
+
+[node name="OuterDropShadow" type="ColorRect" parent="RootControl/CenterContainer/MonumentFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 14.0
+offset_right = 10.0
+offset_bottom = 14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="FrameTexture" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_main_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InnerMargin" type="MarginContainer" parent="RootControl/CenterContainer/MonumentFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 92
+theme_override_constants/margin_top = 86
+theme_override_constants/margin_right = 92
+theme_override_constants/margin_bottom = 78
+
+[node name="MainVBox" type="VBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderVBox" type="VBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="TitleLabel" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/HeaderVBox"]
+layout_mode = 2
+text = "SURVIVOR'S BLESSING"
+label_settings = SubResource("LabelSettings_main_title")
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/HeaderVBox"]
+layout_mode = 2
+text = "Choose one offering carved in stone as a token of gratitude"
+label_settings = SubResource("LabelSettings_subtitle")
+horizontal_alignment = 1
+
+[node name="StelesRow" type="HBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 26
+alignment = 1
+
+[node name="Stele1" type="Control" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow"]
+custom_minimum_size = Vector2(288, 384)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="SteleNormalTex" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_stele_norm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleHoverTex" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_stele_hov")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleMargin" type="MarginContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 68
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 32
+
+[node name="SteleVBox" type="VBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="GlyphSocketWrap" type="CenterContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="GlyphFrame" type="PanelContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/GlyphSocketWrap"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glyph_socket")
+
+[node name="GlyphIcon" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/GlyphSocketWrap/GlyphFrame"]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("14_g1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleTitle" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox"]
+self_modulate = Color(0.72, 0.76, 0.82, 1)
+layout_mode = 2
+text = "+2 SKILL POINTS"
+label_settings = SubResource("LabelSettings_stele_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SteleDesc" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Grants 2 skill points to spend in your passive skill tree."
+label_settings = SubResource("LabelSettings_stele_desc")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ButtonRow" type="CenterContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AcceptStoneBtn" type="TextureButton" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele1/SteleMargin/SteleVBox/ButtonRow"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "Claim Blessing"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("8_acc_norm")
+texture_pressed = ExtResource("10_acc_prs")
+texture_hover = ExtResource("9_acc_hov")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Stele2" type="Control" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow"]
+custom_minimum_size = Vector2(288, 384)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="SteleNormalTex" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_stele_norm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleHoverTex" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_stele_hov")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleMargin" type="MarginContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 68
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 32
+
+[node name="SteleVBox" type="VBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="GlyphSocketWrap" type="CenterContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="GlyphFrame" type="PanelContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/GlyphSocketWrap"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glyph_socket")
+
+[node name="GlyphIcon" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/GlyphSocketWrap/GlyphFrame"]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("15_g2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleTitle" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox"]
+self_modulate = Color(0.82, 0.6, 0.4, 1)
+layout_mode = 2
+text = "MASTER'S TEMPERING"
+label_settings = SubResource("LabelSettings_stele_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SteleDesc" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Upgrades your weapon to the camp's item level, scaling damage and affixes faithfully."
+label_settings = SubResource("LabelSettings_stele_desc")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ButtonRow" type="CenterContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AcceptStoneBtn" type="TextureButton" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele2/SteleMargin/SteleVBox/ButtonRow"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "Upgrade"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("8_acc_norm")
+texture_pressed = ExtResource("10_acc_prs")
+texture_hover = ExtResource("9_acc_hov")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Stele3" type="Control" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow"]
+custom_minimum_size = Vector2(288, 384)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="SteleNormalTex" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_stele_norm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleHoverTex" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_stele_hov")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleMargin" type="MarginContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 68
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 32
+
+[node name="SteleVBox" type="VBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="GlyphSocketWrap" type="CenterContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="GlyphFrame" type="PanelContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/GlyphSocketWrap"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glyph_socket")
+
+[node name="GlyphIcon" type="TextureRect" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/GlyphSocketWrap/GlyphFrame"]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("16_g3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SteleTitle" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox"]
+self_modulate = Color(0.6, 0.68, 0.9, 1)
+layout_mode = 2
+text = "ARCANE KNOWLEDGE"
+label_settings = SubResource("LabelSettings_stele_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SteleDesc" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Unlocks a random new spell in your spellbook."
+label_settings = SubResource("LabelSettings_stele_desc")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ButtonRow" type="CenterContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AcceptStoneBtn" type="TextureButton" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/StelesRow/Stele3/SteleMargin/SteleVBox/ButtonRow"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "Choose"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("8_acc_norm")
+texture_pressed = ExtResource("10_acc_prs")
+texture_hover = ExtResource("9_acc_hov")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="FooterBar" type="HBoxContainer" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CloseStoneButton" type="TextureButton" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/FooterBar"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Close (Later) [Esc]"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("11_can_norm")
+texture_pressed = ExtResource("13_can_prs")
+texture_hover = ExtResource("12_can_hov")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="LeaveHintLabel" type="Label" parent="RootControl/CenterContainer/MonumentFrame/InnerMargin/MainVBox/FooterBar"]
+layout_mode = 2
+text = "LEAVE FOR LATER [ESC]"
+label_settings = SubResource("LabelSettings_leave_hint")

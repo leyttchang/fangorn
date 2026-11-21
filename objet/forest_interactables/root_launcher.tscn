@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://4jtrk35roab7"]
+
+[ext_resource type="Script" uid="uid://dds6d5dgs8wkj" path="res://objet/forest_interactables/root_launcher.gd" id="1_rtlnch"]
+[ext_resource type="Script" uid="uid://wu0dm5a37ey8" path="res://components/interaction_component.gd" id="2_intcmp"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_prox"]
+height = 3.0
+radius = 2.65
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_interact"]
+radius = 1.25
+
+[node name="RootLauncher" type="Node3D" unique_id=1235590192]
+script = ExtResource("1_rtlnch")
+
+[node name="ProximityArea" type="Area3D" parent="." unique_id=1083536639]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ProximityArea" unique_id=169842217]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("CylinderShape3D_prox")
+
+[node name="InteractionComponent" type="Area3D" parent="." unique_id=1757848437]
+collision_layer = 544
+collision_mask = 0
+script = ExtResource("2_intcmp")
+prompt_text = "[E] Propulser"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionComponent" unique_id=457389596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("SphereShape3D_interact")

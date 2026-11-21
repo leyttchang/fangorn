@@ -44,7 +44,20 @@ const EDGE_SAMPLE_INSET: float = 1.5
 ## de l'arène, puis reste parfaitement plat. Plus c'est grand, plus les pentes sur les côtés sont douces.
 @export var arena_ground_blend_distance: float = 90.0
 
+@export_category("Arènes de Totems Supplémentaires (Sans Route)")
+## Nombre d'arènes de totems additionnelles placées sur les bordures sans chemin (2 => 4 arènes de totems + 1 arène de boss)
+@export_range(0, 6, 1) var extra_totem_arenas_count: int = 2
+## Scène utilisée pour les arènes de totems supplémentaires (sans route)
+@export var extra_totem_arena_scene: PackedScene = preload("res://map/encounters/enchant_arena/totem/enchant_arena.tscn")
+## Garantit qu'un seul totem d'un même élément (arcane, lightning, ice, fire) peut apparaître par map
+@export var unique_totem_types_per_map: bool = true
+## Distance minimale entre deux entrées d'arènes sur une même bordure (en mètres) pour garantir zéro chevauchement
+@export var min_same_wall_center_distance: float = 315.0
+
 var _arena_flat_zones: Array[Dictionary] = []
+## Ouvertures additionnelles dans le BorderTreeWall pour les arènes de totems sans route
+var _extra_border_openings: Array[Vector2] = []
+var _current_seed: int = 0
 ## Régions Terrain3D (indices) ajoutées hors de la map pour prolonger le sol sous les arènes
 var _outside_regions: Dictionary = {}
 ## Contours (coordonnées monde XZ) de l'intérieur des arènes : GrassGenerator y plante aussi de l'herbe
@@ -98,8 +111,10 @@ func _sample_edge_height(x: float, z: float) -> float:
 ## Tire au hasard UNE arène par slot (déterministe d'après la seed). À appeler au début de la génération,
 ## avant la génération des routes (les sorties dépendent des slots actifs).
 func select_arenas(seed_value: int) -> void:
+	_current_seed = seed_value
 	_selected_scenes.clear()
 	_selected_bosses.clear()
+	_extra_border_openings.clear()
 	_edge_height_error_reported = false
 	
 	var valid_bosses: Array[PackedScene] = []
@@ -141,6 +156,10 @@ func get_zones() -> Array[Dictionary]:
 	return _arena_flat_zones
 
 
+func get_extra_border_openings() -> Array[Vector2]:
+	return _extra_border_openings
+
+
 ## Supprime les arènes générées et leurs données. Les régions Terrain3D ajoutées hors de la map sont
 ## retirées par MapGenerator.clear_terrain() (qui efface toutes les régions).
 func clear_arenas() -> void:
@@ -152,6 +171,7 @@ func clear_arenas() -> void:
 		remove_child(a)
 		a.queue_free()
 	_arena_flat_zones.clear()
+	_extra_border_openings.clear()
 	arena_grass_polygons.clear()
 	_outside_regions.clear()
 
@@ -222,11 +242,18 @@ func _get_arena_curve_geometry(arena_scene: PackedScene, arena_name: String) -> 
 	for pt in path_node.curve.get_baked_points():
 		var p_scene: Vector3 = rel_t * pt - entry_pos
 		points_local.append(Vector2(p_scene.x, p_scene.z))
+	var local_poly := PackedVector2Array()
+	for pt in path_node.curve.tessellate_even_length(5, 4.0):
+		var p_scene: Vector3 = rel_t * pt - entry_pos
+		local_poly.append(Vector2(p_scene.x, p_scene.z))
 	inst.free()
 	
 	if points_local.is_empty():
 		push_error("ArenaGenerator: la courbe de l'arène '%s' ne contient aucun point." % arena_name)
 		return {}
+	if local_poly.size() < 3:
+		for pt: Vector2 in points_local:
+			local_poly.append(pt)
 	
 	var min_x: float = INF
 	var max_x: float = -INF
@@ -247,16 +274,76 @@ func _get_arena_curve_geometry(arena_scene: PackedScene, arena_name: String) -> 
 	
 	return {
 		"local_center": local_center,
+		"local_poly": local_poly,
 		"radius": base_radius,
 		"flat_radius": base_radius + ARENA_SAFETY_MARGIN,
 		"blend_radius": ARENA_BLEND_RADIUS
 	}
 
 
-## Initialise les zones de sol plat pour toutes les arènes actives.
+func _build_world_safety_poly(local_poly: PackedVector2Array, hole_pos: Vector2, dir: Vector2, extra_inflate: float) -> PackedVector2Array:
+	if local_poly.size() < 3:
+		return PackedVector2Array()
+	var arena_basis: Basis = Basis.looking_at(Vector3(dir.x, 0.0, dir.y), Vector3.UP)
+	var world_poly := PackedVector2Array()
+	for pt: Vector2 in local_poly:
+		var w3: Vector3 = arena_basis * Vector3(pt.x, 0.0, pt.y)
+		world_poly.append(hole_pos + Vector2(w3.x, w3.z))
+	var total_inflate: float = maxf(0.0, ARENA_GROUND_INFLATE + extra_inflate)
+	if total_inflate <= 0.01:
+		return world_poly
+	var inflated: Array[PackedVector2Array] = Geometry2D.offset_polygon(world_poly, total_inflate, Geometry2D.JOIN_ROUND)
+	if inflated.is_empty():
+		return world_poly
+	var best_poly: PackedVector2Array = inflated[0]
+	for pg: PackedVector2Array in inflated:
+		if _polygon_area(pg) > _polygon_area(best_poly):
+			best_poly = pg
+	return best_poly
+
+
+func _polygons_overlap(poly_a: PackedVector2Array, poly_b: PackedVector2Array) -> bool:
+	if poly_a.size() < 3 or poly_b.size() < 3:
+		return false
+	var a_min := Vector2(INF, INF)
+	var a_max := Vector2(-INF, -INF)
+	for p: Vector2 in poly_a:
+		a_min = a_min.min(p)
+		a_max = a_max.max(p)
+	var b_min := Vector2(INF, INF)
+	var b_max := Vector2(-INF, -INF)
+	for p: Vector2 in poly_b:
+		b_min = b_min.min(p)
+		b_max = b_max.max(p)
+	if a_max.x < b_min.x or a_min.x > b_max.x or a_max.y < b_min.y or a_min.y > b_max.y:
+		return false
+	return not Geometry2D.intersect_polygons(poly_a, poly_b).is_empty()
+
+
+func _estimate_approach_slope(hole_pos: Vector2, outward_dir: Vector2) -> float:
+	if map_generator == null or not map_generator.has_method("get_base_height_at"):
+		return 0.0
+	if map_generator.get("noise") == null or map_generator.get("height_curve") == null:
+		return 0.0
+	var inward_dir: Vector2 = -outward_dir.normalized()
+	var prev_p: Vector2 = hole_pos
+	var prev_h: float = float(map_generator.call("get_base_height_at", prev_p.x, prev_p.y))
+	var max_slope: float = 0.0
+	for step_d: float in [10.0, 22.0, 34.0]:
+		var cur_p: Vector2 = hole_pos + inward_dir * step_d
+		var cur_h: float = float(map_generator.call("get_base_height_at", cur_p.x, cur_p.y))
+		var dist_step: float = maxf(1.0, prev_p.distance_to(cur_p))
+		max_slope = maxf(max_slope, absf(cur_h - prev_h) / dist_step)
+		prev_p = cur_p
+		prev_h = cur_h
+	return max_slope
+
+
+## Initialise les zones de sol plat pour toutes les arènes actives (routes + arènes de totems sans route).
 ## L'altitude de chaque zone est définie dans spawn_arenas() à partir du vrai Terrain3D.
 func init_zones() -> void:
 	_arena_flat_zones.clear()
+	_extra_border_openings.clear()
 	
 	for loc in [SLOT_NORTH, SLOT_WEST, SLOT_EAST]:
 		if not _selected_scenes.has(loc):
@@ -283,14 +370,17 @@ func init_zones() -> void:
 		var flat_r: float = geom["flat_radius"]
 		var blend_r: float = geom["blend_radius"]
 		var total_r: float = flat_r + blend_r
+		var world_poly: PackedVector2Array = _build_world_safety_poly(geom["local_poly"], hole_pos, dir, 8.0)
 		
 		var zone: Dictionary = {
 			"slot": loc,
+			"is_extra": false,
 			"name": arena_name,
 			"scene": scene,
 			"pos": hole_pos,
 			"dir": dir,
 			"center": center,
+			"world_poly": world_poly,
 			"height": NAN,
 			"flat_radius": flat_r,
 			"blend_radius": blend_r,
@@ -305,6 +395,191 @@ func init_zones() -> void:
 		print("Arène '%s': Sol plat adapté à la courbe au centre %v (rayon_plat=%.1fm, blend=%.1fm, Trou=%v)." % [
 			zone.name, zone.center, zone.flat_radius, zone.blend_radius, zone.pos
 		])
+	
+	if extra_totem_arenas_count > 0 and extra_totem_arena_scene != null:
+		_append_extra_totem_zones()
+
+
+## Place `extra_totem_arenas_count` arènes de totems supplémentaires sur les bordures sans route,
+## en garantissant mathématiquement zéro intersection/chevauchement entre deux arènes.
+func _append_extra_totem_zones() -> void:
+	var geom: Dictionary = _get_arena_curve_geometry(extra_totem_arena_scene, "Arena_Totem_Extra")
+	if geom.is_empty():
+		return
+	var local_poly: PackedVector2Array = geom["local_poly"]
+	var local_c: Vector2 = geom["local_center"]
+	var flat_r: float = geom["flat_radius"]
+	var blend_r: float = geom["blend_radius"]
+	var total_r: float = flat_r + blend_r
+	
+	var b_margin: float = border_margin
+	var map_w: float = float(map_width_chunks * region_size)
+	var map_h: float = float(map_height_chunks * region_size)
+	var spawn_pt: Vector2 = Vector2.ZERO
+	if path_generator != null and "start_pos" in path_generator:
+		spawn_pt = path_generator.start_pos
+	
+	var wall_defs: Array[Dictionary] = [
+		{"id": "west", "dir": Vector2(-1, 0), "len": map_h, "prefer": 35.0},
+		{"id": "east", "dir": Vector2(1, 0), "len": map_h, "prefer": 35.0},
+		{"id": "north", "dir": Vector2(0, -1), "len": map_w, "prefer": 0.0},
+		{"id": "south", "dir": Vector2(0, 1), "len": map_w, "prefer": -15.0}
+	]
+	
+	for extra_idx: int in range(extra_totem_arenas_count):
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash([_current_seed, extra_idx, "extra_totem_arena_placement"])
+		
+		var chosen_zone: Dictionary = {}
+		var pass_configs: Array[Dictionary] = [
+			{"same_wall_dist": maxf(275.0, min_same_wall_center_distance), "safety_inflate": 8.0},
+			{"same_wall_dist": 275.0, "safety_inflate": 1.0}
+		]
+		
+		for p_cfg: Dictionary in pass_configs:
+			var req_same_wall: float = float(p_cfg["same_wall_dist"])
+			var safety_inf: float = float(p_cfg["safety_inflate"])
+			var best_score: float = -INF
+			
+			for w_def: Dictionary in wall_defs:
+				var w_id: String = str(w_def["id"])
+				var dir: Vector2 = w_def["dir"]
+				var w_len: float = float(w_def["len"])
+				var corner_inset: float = minf(165.0, maxf(80.0, w_len * 0.2))
+				var coord_min: float = corner_inset
+				var coord_max: float = w_len - corner_inset
+				if coord_max <= coord_min + 4.0:
+					continue
+				
+				# Compter combien d'arènes occupent déjà cette bordure
+				var wall_count: int = 0
+				for ez: Dictionary in _arena_flat_zones:
+					var ez_dir: Vector2 = ez.get("dir", Vector2.ZERO)
+					if ez_dir.dot(dir) > 0.9:
+						wall_count += 1
+				
+				var arena_basis: Basis = Basis.looking_at(Vector3(dir.x, 0.0, dir.y), Vector3.UP)
+				var offset_3d: Vector3 = arena_basis * Vector3(local_c.x, 0.0, local_c.y)
+				var center_offset := Vector2(offset_3d.x, offset_3d.z)
+				
+				var step: float = 16.0
+				var base_coord: float = coord_min
+				while base_coord <= coord_max + 0.01:
+					var coord: float = clampf(base_coord + rng.randf_range(-6.0, 6.0), coord_min, coord_max)
+					base_coord += step
+					
+					var hole_pos: Vector2
+					match w_id:
+						"west": hole_pos = Vector2(b_margin, coord)
+						"east": hole_pos = Vector2(map_w - b_margin, coord)
+						"north": hole_pos = Vector2(coord, b_margin)
+						_: hole_pos = Vector2(coord, map_h - b_margin)
+					
+					# Protéger la zone de départ du joueur au Sud
+					if w_id == "south" and spawn_pt != Vector2.ZERO and hole_pos.distance_to(spawn_pt) < 210.0:
+						continue
+					
+					var cand_center: Vector2 = hole_pos + center_offset
+					var too_close: bool = false
+					var min_gate_dist: float = INF
+					for ez: Dictionary in _arena_flat_zones:
+						var ez_pos: Vector2 = ez["pos"]
+						var ez_center: Vector2 = ez["center"]
+						var ez_dir: Vector2 = ez["dir"]
+						var d_gate: float = hole_pos.distance_to(ez_pos)
+						min_gate_dist = minf(min_gate_dist, d_gate)
+						if ez_dir.dot(dir) > 0.9:
+							if d_gate < req_same_wall:
+								too_close = true
+								break
+						else:
+							if d_gate < 250.0 or cand_center.distance_to(ez_center) < 260.0:
+								too_close = true
+								break
+					if too_close:
+						continue
+					
+					var cand_poly: PackedVector2Array = _build_world_safety_poly(local_poly, hole_pos, dir, safety_inf)
+					var overlaps_any: bool = false
+					for ez: Dictionary in _arena_flat_zones:
+						if ez.has("world_poly") and _polygons_overlap(cand_poly, ez["world_poly"]):
+							overlaps_any = true
+							break
+					if overlaps_any:
+						continue
+					
+					# Score : favorise les bordures peu chargées, bien espacées et accessibles sans falaise
+					var score: float = float(w_def["prefer"])
+					if wall_count == 0:
+						score += 130.0
+					elif wall_count == 1:
+						score += 85.0
+					else:
+						score -= float(wall_count - 1) * 260.0
+					
+					score += minf(min_gate_dist, 480.0) * 0.35
+					var slope: float = _estimate_approach_slope(hole_pos, dir)
+					score -= slope * 90.0
+					if slope > 0.80:
+						score -= 300.0
+					score += rng.randf_range(0.0, 55.0)
+					
+					if score > best_score:
+						best_score = score
+						var extra_name: String = "Arena_Totem_Extra_%d" % (extra_idx + 1)
+						chosen_zone = {
+							"slot": 10 + extra_idx,
+							"is_extra": true,
+							"name": extra_name,
+							"scene": extra_totem_arena_scene,
+							"pos": hole_pos,
+							"dir": dir,
+							"center": cand_center,
+							"world_poly": cand_poly,
+							"height": NAN,
+							"flat_radius": flat_r,
+							"blend_radius": blend_r,
+							"total_radius": total_r,
+							"min_x": cand_center.x - total_r,
+							"max_x": cand_center.x + total_r,
+							"min_z": cand_center.y - total_r,
+							"max_z": cand_center.y + total_r
+						}
+			if not chosen_zone.is_empty():
+				break
+		
+		if chosen_zone.is_empty():
+			push_warning("ArenaGenerator: aucun emplacement sans chevauchement trouvé pour l'arène supplémentaire #%d." % (extra_idx + 1))
+			continue
+		
+		_arena_flat_zones.append(chosen_zone)
+		_extra_border_openings.append(chosen_zone["pos"])
+		print("Arène de totem sans route '%s' placée en %v (dir=%v, centre=%v)." % [
+			chosen_zone["name"], chosen_zone["pos"], chosen_zone["dir"], chosen_zone["center"]
+		])
+
+
+## Construit un paquet mélangé (sans doublon d'élément) de scènes de totems selon la seed du monde
+func _build_unique_totem_deck(raw_totems: Array) -> Array[PackedScene]:
+	var unique_by_elem: Dictionary = {}
+	var deck: Array[PackedScene] = []
+	for item in raw_totems:
+		var t_scn: PackedScene = item as PackedScene
+		if t_scn == null:
+			continue
+		var elem_key: String = EnchantArena.infer_totem_element_from_scene(t_scn)
+		if elem_key.is_empty() or unique_by_elem.has(elem_key):
+			continue
+		unique_by_elem[elem_key] = true
+		deck.append(t_scn)
+	var deck_rng := RandomNumberGenerator.new()
+	deck_rng.seed = hash([_current_seed, "unique_map_totem_deck"])
+	for i: int in range(deck.size() - 1, 0, -1):
+		var j: int = deck_rng.randi_range(0, i)
+		var tmp: PackedScene = deck[i]
+		deck[i] = deck[j]
+		deck[j] = tmp
+	return deck
 
 
 ## Instancie et configure toutes les arènes sur la carte (init_zones() doit avoir été appelé)
@@ -320,6 +595,10 @@ func spawn_arenas() -> void:
 	# Altitude de chaque entrée d'arène (relief réel du bord de la map), connue avant de remplir les sols
 	for z in _arena_flat_zones:
 		z["height"] = _sample_edge_height(z.pos.x, z.pos.y)
+	
+	var totem_deck: Array[PackedScene] = []
+	var totem_deck_initialized: bool = false
+	var assigned_totem_elements: Dictionary = {}
 	
 	for zone in _arena_flat_zones:
 		var ground_y: float = zone["height"]
@@ -347,6 +626,24 @@ func spawn_arenas() -> void:
 			arena_inst.set("boss_scene", _selected_bosses[slot_idx])
 		if "height_provider" in arena_inst:
 			arena_inst.set("height_provider", Callable(map_generator, "get_terrain_height_at"))
+		
+		# Attribution sans remise d'un type de totem unique par map
+		if arena_inst.has_method("spawn_totem") and unique_totem_types_per_map:
+			if "enforce_unique_totem_per_map" in arena_inst:
+				arena_inst.set("enforce_unique_totem_per_map", true)
+			if not totem_deck_initialized and "possible_totems" in arena_inst:
+				totem_deck = _build_unique_totem_deck(arena_inst.get("possible_totems"))
+				totem_deck_initialized = true
+			if "forced_totem_scene" in arena_inst:
+				var picked_totem: PackedScene = null
+				while not totem_deck.is_empty():
+					var cand_scn: PackedScene = totem_deck.pop_back()
+					var cand_elem: String = EnchantArena.infer_totem_element_from_scene(cand_scn)
+					if not assigned_totem_elements.has(cand_elem):
+						assigned_totem_elements[cand_elem] = true
+						picked_totem = cand_scn
+						break
+				arena_inst.set("forced_totem_scene", picked_totem)
 		
 		# 1. Orientation vers l'extérieur (hors de la carte)
 		arena_inst.transform.basis = Basis.looking_at(Vector3(zone.dir.x, 0.0, zone.dir.y), Vector3.UP)
@@ -399,16 +696,36 @@ func spawn_arenas() -> void:
 		])
 
 
-## Altitude de l'entrée de l'arène la plus proche d'un point (NAN s'il n'y a aucune arène)
+## Altitude de l'entrée de l'arène la plus proche d'un point (NAN s'il n'y a aucune arène).
+## Reste 100% plat dans toute l'emprise de chaque arène et raccorde en douceur (smoothstep) à mi-chemin
+## entre deux arènes partageant la même région hors-map.
 func _get_arena_gate_height(p: Vector2) -> float:
 	var best_h: float = NAN
-	var best_d: float = INF
+	var best_d_sq: float = INF
+	var second_h: float = NAN
+	var second_d_sq: float = INF
 	for zone in _arena_flat_zones:
-		var d: float = p.distance_squared_to(zone.pos)
-		if d < best_d:
-			best_d = d
-			best_h = zone.height
-	return best_h
+		var zh: float = float(zone.get("height", NAN))
+		if is_nan(zh):
+			continue
+		var d_sq: float = p.distance_squared_to(zone.pos)
+		if d_sq < best_d_sq:
+			second_d_sq = best_d_sq
+			second_h = best_h
+			best_d_sq = d_sq
+			best_h = zh
+		elif d_sq < second_d_sq:
+			second_d_sq = d_sq
+			second_h = zh
+	if is_nan(second_h) or second_d_sq == INF:
+		return best_h
+	var d1: float = sqrt(best_d_sq)
+	var d2: float = sqrt(second_d_sq)
+	var diff: float = d2 - d1
+	if diff >= 30.0:
+		return best_h
+	var u: float = clampf(0.5 - diff / 60.0, 0.0, 1.0)
+	return lerpf(best_h, second_h, u * u * (3.0 - 2.0 * u))
 
 
 ## Hauteur du sol HORS de la map (sous l'arène). À d=0 (bord de la map) : valeur exacte du Terrain3D, donc

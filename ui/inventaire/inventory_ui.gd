@@ -177,16 +177,23 @@ func open_for_item_selection(prompt_text: String, filter_callable: Callable, on_
 	open_inventory()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
-	# Mettre à jour l'état de l'UI manager si présent
-	var parent_node = get_parent()
-	while parent_node != null:
-		if "current_state" in parent_node:
-			parent_node.current_state = 1 # UIState.INVENTORY
-			break
-		parent_node = parent_node.get_parent()
+	# Mettre à jour l'état de l'UI manager si présent (enfant du Player ou parent)
+	_set_ui_manager_state(1) # UIState.INVENTORY
 		
 	update_ui()
 	_update_equipment_visuals()
+
+func _set_ui_manager_state(state_val: int) -> void:
+	var parent_node = get_parent()
+	while parent_node != null:
+		if "current_state" in parent_node and "inventory_ui" in parent_node:
+			parent_node.current_state = state_val
+			return
+		var sibling_mgr = parent_node.get_node_or_null("UI_manager")
+		if sibling_mgr != null and "current_state" in sibling_mgr:
+			sibling_mgr.current_state = state_val
+			return
+		parent_node = parent_node.get_parent()
 
 func cancel_item_selection() -> void:
 	if not is_selection_mode:
@@ -216,15 +223,53 @@ func is_item_selectable(item: ItemData) -> bool:
 	return true
 
 func _show_selection_banner(prompt_text: String) -> void:
+	var use_d2 := true
+	if get_tree() != null and get_tree().root != null and get_tree().root.has_node("SettingsManager"):
+		var sm = get_tree().root.get_node("SettingsManager")
+		if "ui_style" in sm:
+			use_d2 = (int(sm.ui_style) == 1)
+
 	if selection_banner == null:
 		selection_banner = PanelContainer.new()
 		selection_banner.name = "SelectionBanner"
 		selection_banner.set_anchors_preset(Control.PRESET_TOP_WIDE)
 		selection_banner.offset_left = 180
 		selection_banner.offset_right = -180
-		selection_banner.offset_top = 20
-		selection_banner.offset_bottom = 75
+		selection_banner.offset_top = 16
+		selection_banner.offset_bottom = 92
 		
+		var hbox = HBoxContainer.new()
+		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		hbox.add_theme_constant_override("separation", 25)
+		selection_banner.add_child(hbox)
+		
+		selection_prompt_label = Label.new()
+		selection_prompt_label.text = prompt_text
+		hbox.add_child(selection_prompt_label)
+		
+		var cancel_btn = Button.new()
+		cancel_btn.name = "CancelSelectionBtn"
+		cancel_btn.text = "Cancel"
+		cancel_btn.custom_minimum_size = Vector2(110, 38)
+		cancel_btn.pressed.connect(cancel_item_selection)
+		hbox.add_child(cancel_btn)
+		
+		add_child(selection_banner)
+	else:
+		if selection_prompt_label != null:
+			selection_prompt_label.text = prompt_text
+		selection_banner.visible = true
+
+	if use_d2 and ResourceLoader.exists("res://ui/themes/moria_d2_theme.tres"):
+		selection_banner.theme = load("res://ui/themes/moria_d2_theme.tres")
+		selection_banner.remove_theme_stylebox_override("panel")
+		selection_banner.offset_bottom = 104
+		if selection_prompt_label != null:
+			selection_prompt_label.add_theme_font_size_override("font_size", 19)
+			selection_prompt_label.add_theme_color_override("font_color", Color(0.78, 0.70, 0.47, 1.0))
+	else:
+		selection_banner.theme = null
+		selection_banner.offset_bottom = 75
 		var sb = StyleBoxFlat.new()
 		sb.bg_color = Color(0.12, 0.14, 0.22, 0.95)
 		sb.border_color = Color(1.0, 0.85, 0.2, 1.0)
@@ -237,29 +282,9 @@ func _show_selection_banner(prompt_text: String) -> void:
 		sb.corner_radius_bottom_left = 8
 		sb.corner_radius_bottom_right = 8
 		selection_banner.add_theme_stylebox_override("panel", sb)
-		
-		var hbox = HBoxContainer.new()
-		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-		hbox.add_theme_constant_override("separation", 25)
-		selection_banner.add_child(hbox)
-		
-		selection_prompt_label = Label.new()
-		selection_prompt_label.add_theme_font_size_override("font_size", 18)
-		selection_prompt_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
-		selection_prompt_label.text = prompt_text
-		hbox.add_child(selection_prompt_label)
-		
-		var cancel_btn = Button.new()
-		cancel_btn.text = "Cancel"
-		cancel_btn.custom_minimum_size = Vector2(100, 35)
-		cancel_btn.pressed.connect(cancel_item_selection)
-		hbox.add_child(cancel_btn)
-		
-		add_child(selection_banner)
-	else:
 		if selection_prompt_label != null:
-			selection_prompt_label.text = prompt_text
-		selection_banner.visible = true
+			selection_prompt_label.add_theme_font_size_override("font_size", 18)
+			selection_prompt_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
 
 func _hide_selection_banner() -> void:
 	if selection_banner != null:
@@ -291,12 +316,7 @@ func close_inventory() -> void:
 			current_chest_inventory.inventory_changed.disconnect(_update_loot_ui)
 		current_chest_inventory = null
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	var parent_node = get_parent()
-	while parent_node != null:
-		if "current_state" in parent_node:
-			parent_node.current_state = 0 # UIState.NONE
-			break
-		parent_node = parent_node.get_parent()
+	_set_ui_manager_state(0) # UIState.NONE
 	inventory_closed.emit()
 
 func _unhandled_input(event: InputEvent) -> void:

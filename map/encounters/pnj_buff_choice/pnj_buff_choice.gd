@@ -37,8 +37,18 @@ signal reward_claimed_signal(reward_dict: Dictionary, player: CharacterBody3D)
 ## Text displayed once the reward has already been claimed
 @export var prompt_claimed: String = "The survivor salutes you with gratitude"
 
+enum UIStyleMode {
+	USE_GLOBAL_SETTING, ## Suit SettingsManager.ui_style (Menu Options)
+	FORCE_MORIA_D2,     ## Force le style Pierre de la Moria / Diablo II
+	FORCE_CLASSIC       ## Force l'ancien style Classique
+}
+
 @export_category("Interface de Récompenses")
-## Scène d'interface affichant les 3 cartes de choix
+## Choix du style visuel (par défaut suit le réglage global SettingsManager)
+@export var ui_style_mode: UIStyleMode = UIStyleMode.USE_GLOBAL_SETTING
+## Nouvelle scène d'interface Moria / Diablo II (pierre fissurée, racines noircies & bas-reliefs)
+@export var d2_reward_ui_scene: PackedScene = preload("res://map/encounters/pnj_buff_choice/reward_choice_ui_d2.tscn")
+## Ancienne scène d'interface conservée intacte
 @export var reward_ui_scene: PackedScene = preload("res://map/encounters/pnj_buff_choice/reward_choice_ui.tscn")
 
 @export_category("Actions (Inspecteur / Test)")
@@ -52,16 +62,27 @@ signal reward_claimed_signal(reward_dict: Dictionary, player: CharacterBody3D)
 
 var _cached_rewards: Array[RewardData] = []
 var _player_offered_choices: Dictionary = {}
+var _active_ui: CanvasLayer = null
 
 func _ready() -> void:
 	_update_interaction_prompt()
 	_load_reward_resources()
 
-## Charge toutes les ressources .tres du dossier reward_resource
+## Charge toutes les ressources .tres du dossier reward_resource (compatible éditeur et build exporté PCK)
 func _load_reward_resources() -> void:
 	_cached_rewards.clear()
 	
-	if DirAccess.dir_exists_absolute(rewards_folder):
+	var loaded_paths: Dictionary = {}
+	var files = ResourceLoader.list_directory(rewards_folder)
+	for file_name in files:
+		if file_name.ends_with(".tres") or file_name.ends_with(".res"):
+			var res_path = rewards_folder.path_join(file_name)
+			var res = load(res_path)
+			if res is RewardData and not loaded_paths.has(res_path):
+				loaded_paths[res_path] = true
+				_cached_rewards.append(res)
+				
+	if _cached_rewards.is_empty():
 		var dir = DirAccess.open(rewards_folder)
 		if dir != null:
 			dir.list_dir_begin()
@@ -69,10 +90,11 @@ func _load_reward_resources() -> void:
 			while file_name != "":
 				if not dir.current_is_dir():
 					var clean_name = file_name.trim_suffix(".remap")
-					if clean_name.ends_with(".tres"):
+					if clean_name.ends_with(".tres") or clean_name.ends_with(".res"):
 						var res_path = rewards_folder.path_join(clean_name)
 						var res = load(res_path)
-						if res is RewardData:
+						if res is RewardData and not loaded_paths.has(res_path):
+							loaded_paths[res_path] = true
 							_cached_rewards.append(res)
 				file_name = dir.get_next()
 			dir.list_dir_end()
@@ -109,22 +131,53 @@ func interact(player: CharacterBody3D) -> void:
 		
 	_open_reward_window(player)
 
+func _get_selected_ui_scene() -> PackedScene:
+	var use_d2 := true
+	match ui_style_mode:
+		UIStyleMode.FORCE_MORIA_D2:
+			use_d2 = true
+		UIStyleMode.FORCE_CLASSIC:
+			use_d2 = false
+		UIStyleMode.USE_GLOBAL_SETTING:
+			if get_tree() != null and get_tree().root != null and get_tree().root.has_node("SettingsManager"):
+				var sm = get_tree().root.get_node("SettingsManager")
+				if "ui_style" in sm:
+					use_d2 = (int(sm.ui_style) == 1)
+	if use_d2 and d2_reward_ui_scene != null:
+		return d2_reward_ui_scene
+	return reward_ui_scene
+
 ## Ouvre l'interface des 3 choix pour le joueur
 func _open_reward_window(player: CharacterBody3D) -> void:
-	if reward_ui_scene == null:
-		push_error("PnjBuffChoice : No 'reward_ui_scene' configured!")
+	if reward_claimed:
 		return
+	if is_instance_valid(_active_ui):
+		return
+	var scene_to_open := _get_selected_ui_scene()
+	if scene_to_open == null:
+		push_error("PnjBuffChoice : Aucune scène d'interface de récompense configurée !")
+		return
+		
+	if player != null:
+		var ui_mgr = player.get_node_or_null("UI_manager")
+		if ui_mgr != null and "current_state" in ui_mgr and ui_mgr.current_state != 0 and ui_mgr.has_method("close_all_ui"):
+			ui_mgr.close_all_ui()
 		
 	var player_key = player.get_instance_id() if player != null else 0
 	if not _player_offered_choices.has(player_key) or _player_offered_choices[player_key].is_empty():
 		_player_offered_choices[player_key] = _pick_random_choices(3, player)
 		
 	var choices = _player_offered_choices[player_key]
-	var ui_instance = reward_ui_scene.instantiate() as RewardChoiceUI
-	if ui_instance == null:
-		push_error("PnjBuffChoice : Impossible d'instancier 'RewardChoiceUI' !")
+	if choices.is_empty():
+		print("PnjBuffChoice : Aucun choix disponible pour ce joueur.")
 		return
 		
+	var ui_instance = scene_to_open.instantiate() as CanvasLayer
+	if ui_instance == null or not ui_instance.has_method("open_rewards"):
+		push_error("PnjBuffChoice : Impossible d'instancier l'UI de récompense !")
+		return
+		
+	_active_ui = ui_instance
 	if player != null:
 		player.add_child(ui_instance)
 	else:
@@ -173,6 +226,8 @@ func _pick_random_choices(count: int, player: CharacterBody3D) -> Array:
 
 ## Applique l'effet concret de la récompense choisie au joueur
 func apply_reward(reward_item: Variant, player: CharacterBody3D) -> void:
+	if reward_claimed:
+		return
 	if reward_item is RewardData:
 		var rd = reward_item as RewardData
 		print("PnjBuffChoice : Application de la récompense RewardData '", rd.title, "' sur ", player.name)
@@ -190,7 +245,9 @@ func apply_reward(reward_item: Variant, player: CharacterBody3D) -> void:
 		print("PnjBuffChoice : Application récompense dictionnaire legacy '", reward_id, "'")
 		match reward_id:
 			"skill_point":
-				var st = player.find_child("SkillTreeComponent", true, false)
+				var st = player.get_node_or_null("Skill_tree_comp")
+				if st == null:
+					st = player.find_child("SkillTreeComponent", true, false)
 				if st != null and "available_skill_points" in st:
 					st.available_skill_points += 2
 			"heal_buff":

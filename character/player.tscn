@@ -1093,6 +1093,268 @@ tracks/3/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="Animation_leap_windup"]
+resource_name = "leap_slam_windup"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.5),
+"transitions": PackedFloat32Array(1, 0.55, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.78, -1), Vector3(0.42, -0.94, -0.9), Vector3(0.22, -0.04, -0.66)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.5),
+"transitions": PackedFloat32Array(1, 0.55, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.2, -0.22, -0.15), Vector3(0.38, -0.42, -0.34)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%wrist:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_leap_air"]
+resource_name = "leap_slam_air"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6),
+"transitions": PackedFloat32Array(0.7, 1.4, 1),
+"update": 0,
+"values": [Vector3(0.22, -0.04, -0.66), Vector3(0.14, 0.1, -0.6), Vector3(0.08, -0.06, -0.74)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6),
+"transitions": PackedFloat32Array(0.7, 1.4, 1),
+"update": 0,
+"values": [Vector3(0.38, -0.42, -0.34), Vector3(0.54, -0.28, -0.22), Vector3(0.16, -0.16, -0.14)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%wrist:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_leap_land"]
+resource_name = "leap_slam_land"
+length = 0.42
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.11, 0.2, 0.42),
+"transitions": PackedFloat32Array(1.8, 1, 0.65, 1),
+"update": 0,
+"values": [Vector3(0.08, -0.06, -0.74), Vector3(-0.02, -0.72, -1.14), Vector3(0.02, -0.76, -1.08), Vector3(0.5, -0.9, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.11, 0.2, 0.42),
+"transitions": PackedFloat32Array(1.8, 1, 0.65, 1),
+"update": 0,
+"values": [Vector3(0.16, -0.16, -0.14), Vector3(-2.28, 0.48, -0.32), Vector3(-2.12, 0.42, -0.28), Vector3(0, 0, 0)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.02, 0.18, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"play_attack_sound"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}, {
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%wrist:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.42),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cleave_slash"]
+resource_name = "cleave_slash"
+length = 0.55
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.14, 0.27, 0.41, 0.55),
+"transitions": PackedFloat32Array(0.65, 1.4, 1, 0.75, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.78, -1), Vector3(0.76, -0.38, -0.64), Vector3(0.04, -0.35, -1.26), Vector3(-0.54, -0.36, -1.02), Vector3(-0.78, -0.4, -0.66)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.14, 0.27, 0.41, 0.55),
+"transitions": PackedFloat32Array(0.65, 1.4, 1, 0.75, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-1.51, -1.22, 0.05), Vector3(-1.53, 0, 0), Vector3(-1.51, 0.82, -0.04), Vector3(-1.48, 1.28, -0.06)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.14, 0.16, 0.46),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"enable_current_hitbox"
+}, {
+"args": [],
+"method": &"play_attack_sound"
+}, {
+"args": [],
+"method": &"disable_current_hitbox"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%Camera3D/../SkillBarComponent")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.13, 0.47),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["cleave_start"],
+"method": &"trigger_mid_cast_event"
+}, {
+"args": ["cleave_end"],
+"method": &"trigger_mid_cast_event"
+}]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%wrist:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.55),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cleave_recovery"]
+resource_name = "cleave_slash_recovery"
+length = 0.24
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.24),
+"transitions": PackedFloat32Array(0.65, 1),
+"update": 0,
+"values": [Vector3(-0.78, -0.4, -0.66), Vector3(0.5, -0.9, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.24),
+"transitions": PackedFloat32Array(0.65, 1),
+"update": 0,
+"values": [Vector3(-1.48, 1.28, -0.06), Vector3(0, 0, 0)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.21),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"end_combat_state"
+}]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_aw5rd"]
 _data = {
 &"RESET": SubResource("Animation_xqqx8"),
@@ -1106,10 +1368,15 @@ _data = {
 &"attack_sword_2": SubResource("Animation_aw5rd"),
 &"attack_sword_3": SubResource("Animation_pn6xv"),
 &"attack_sword_4": SubResource("Animation_4vy5w"),
+&"cleave_slash": SubResource("Animation_cleave_slash"),
+&"cleave_slash_recovery": SubResource("Animation_cleave_recovery"),
 &"flaming_stab": SubResource("Animation_2o2rg"),
 &"idle_axe": SubResource("Animation_aayji"),
 &"idle_spear": SubResource("Animation_e72n5"),
 &"idle_sword": SubResource("Animation_sexlj"),
+&"leap_slam_air": SubResource("Animation_leap_air"),
+&"leap_slam_land": SubResource("Animation_leap_land"),
+&"leap_slam_windup": SubResource("Animation_leap_windup"),
 &"thunder_slash": SubResource("Animation_ce8hk")
 }
 

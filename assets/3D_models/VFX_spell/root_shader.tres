@@ -57,10 +57,42 @@ default_value = 1.0
 default_input_values = [0, 0.0, 1, 0.002]
 operator = 6
 
+[sub_resource type="VisualShaderNodeVec2Parameter" id="VisualShaderNodeVec2Parameter_uvscale"]
+parameter_name = "uv_scale"
+default_value_enabled = true
+default_value = Vector2(100, 1)
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_alignuv"]
+parameter_name = "align_bark_uv"
+default_value_enabled = true
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_inv_align"]
+default_input_values = [0, 1.0, 1, 0.0]
+operator = 1
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_ux_keep"]
+operator = 2
+
 [sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_dfnum"]
 parameter_name = "debut"
 default_value_enabled = true
 default_value = 1.0
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_uy_swap"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_u_final"]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_vy_keep"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_vx_swap"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_v_final"]
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_texuv"]
+op_type = 0
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_dybgf"]
 expanded_output_ports = [0]
@@ -238,4 +270,24 @@ nodes/fragment/24/node = SubResource("VisualShaderNodeFloatParameter_s327y")
 nodes/fragment/24/position = Vector2(1000, 1040)
 nodes/fragment/25/node = SubResource("VisualShaderNodeFloatOp_safemax")
 nodes/fragment/25/position = Vector2(-1900, -560)
-nodes/fragment/connections = PackedInt32Array(4, 0, 5, 0, 3, 0, 7, 2, 7, 0, 6, 1, 8, 0, 6, 0, 2, 0, 8, 0, 9, 0, 7, 1, 10, 0, 9, 1, 2, 0, 11, 0, 10, 0, 11, 1, 11, 0, 8, 1, 6, 0, 0, 1, 12, 0, 13, 2, 5, 0, 9, 0, 5, 0, 8, 2, 5, 0, 7, 0, 15, 0, 16, 1, 13, 0, 16, 0, 16, 0, 0, 0, 17, 0, 0, 19, 18, 0, 13, 0, 20, 0, 19, 2, 22, 0, 21, 2, 21, 2, 0, 3, 19, 0, 23, 0, 24, 0, 23, 1, 23, 0, 0, 9, 18, 0, 19, 0, 18, 0, 21, 0, 10, 0, 25, 0, 25, 0, 9, 1, 25, 0, 11, 1)
+nodes/fragment/26/node = SubResource("VisualShaderNodeVec2Parameter_uvscale")
+nodes/fragment/26/position = Vector2(-1320, 620)
+nodes/fragment/27/node = SubResource("VisualShaderNodeFloatParameter_alignuv")
+nodes/fragment/27/position = Vector2(-2120, 420)
+nodes/fragment/28/node = SubResource("VisualShaderNodeFloatOp_inv_align")
+nodes/fragment/28/position = Vector2(-1800, 360)
+nodes/fragment/29/node = SubResource("VisualShaderNodeFloatOp_ux_keep")
+nodes/fragment/29/position = Vector2(-1520, 260)
+nodes/fragment/30/node = SubResource("VisualShaderNodeFloatOp_uy_swap")
+nodes/fragment/30/position = Vector2(-1520, 400)
+nodes/fragment/31/node = SubResource("VisualShaderNodeFloatOp_u_final")
+nodes/fragment/31/position = Vector2(-1300, 300)
+nodes/fragment/32/node = SubResource("VisualShaderNodeFloatOp_vy_keep")
+nodes/fragment/32/position = Vector2(-1520, 540)
+nodes/fragment/33/node = SubResource("VisualShaderNodeFloatOp_vx_swap")
+nodes/fragment/33/position = Vector2(-1520, 680)
+nodes/fragment/34/node = SubResource("VisualShaderNodeFloatOp_v_final")
+nodes/fragment/34/position = Vector2(-1300, 460)
+nodes/fragment/35/node = SubResource("VisualShaderNodeVectorCompose_texuv")
+nodes/fragment/35/position = Vector2(-1100, 380)
+nodes/fragment/connections = PackedInt32Array(4, 0, 5, 0, 3, 0, 7, 2, 7, 0, 6, 1, 8, 0, 6, 0, 2, 0, 8, 0, 9, 0, 7, 1, 10, 0, 9, 1, 2, 0, 11, 0, 10, 0, 11, 1, 11, 0, 8, 1, 6, 0, 0, 1, 12, 0, 13, 2, 5, 0, 9, 0, 5, 0, 8, 2, 5, 0, 7, 0, 15, 0, 16, 1, 13, 0, 16, 0, 16, 0, 0, 0, 17, 0, 0, 19, 18, 0, 13, 0, 20, 0, 19, 2, 22, 0, 21, 2, 21, 2, 0, 3, 19, 0, 23, 0, 24, 0, 23, 1, 23, 0, 0, 9, 18, 0, 19, 0, 18, 0, 21, 0, 10, 0, 25, 0, 25, 0, 9, 1, 25, 0, 11, 1, 26, 0, 18, 1, 27, 0, 28, 1, 5, 0, 29, 0, 28, 0, 29, 1, 5, 1, 30, 0, 27, 0, 30, 1, 29, 0, 31, 0, 30, 0, 31, 1, 5, 1, 32, 0, 28, 0, 32, 1, 5, 0, 33, 0, 27, 0, 33, 1, 32, 0, 34, 0, 33, 0, 34, 1, 31, 0, 35, 0, 34, 0, 35, 1, 35, 0, 18, 0)

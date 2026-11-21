@@ -1,0 +1,95 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/burn/burn_screen_effect.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://kqjvi1847yd7" path="res://scripts/status_effects/Warcry/shader_speed_fullscreen_3d.tres" id="2_shader"]
+[ext_resource type="Texture2D" uid="uid://d1rck7kl7u6rk" path="res://assets/LeLu's Noise Pack/T_Noise56ko.png" id="3_noise"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="4_spark"]
+
+[sub_resource type="Gradient" id="Gradient_mask"]
+offsets = PackedFloat32Array(0.48, 0.94)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mask"]
+gradient = SubResource("Gradient_mask")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 1)
+
+[sub_resource type="Gradient" id="Gradient_burn_colors"]
+offsets = PackedFloat32Array(0, 0.25, 0.4)
+colors = PackedColorArray(0, 0, 0, 0, 1.45, 0.38, 0.04, 0.08, 2.1, 0.72, 0.12, 0.24)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_burn_colors"]
+gradient = SubResource("Gradient_burn_colors")
+
+[sub_resource type="Gradient" id="Gradient_extra"]
+offsets = PackedFloat32Array(0.64)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_extra"]
+gradient = SubResource("Gradient_extra")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_burn_screen"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_shader")
+shader_parameter/zoom_strength = -0.55
+shader_parameter/repeat_circle = 7.0
+shader_parameter/offset = Vector2(-0.35, 0.1)
+shader_parameter/base_texture = ExtResource("3_noise")
+shader_parameter/Mask_texture = SubResource("GradientTexture2D_mask")
+shader_parameter/extra_texture = SubResource("GradientTexture2D_extra")
+shader_parameter/color_gradiant = SubResource("GradientTexture1D_burn_colors")
+shader_parameter/visibility = 0.36
+
+[sub_resource type="QuadMesh" id="QuadMesh_screen"]
+size = Vector2(5, 5)
+
+[sub_resource type="Curve" id="Curve_ember_alpha"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.2, 0.85), 0.0, 0.0, 0, 0, Vector2(0.75, 0.65), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_ember_alpha"]
+curve = SubResource("Curve_ember_alpha")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_cam_embers"]
+emission_shape = 3
+emission_box_extents = Vector3(1.35, 0.85, 0.35)
+direction = Vector3(0, 1, 0)
+spread = 28.0
+initial_velocity_min = 0.3
+initial_velocity_max = 0.85
+gravity = Vector3(0, 0.45, 0)
+scale_min = 0.016
+scale_max = 0.036
+color = Color(2.4, 1.05, 0.25, 0.8)
+alpha_curve = SubResource("CurveTexture_ember_alpha")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cam_embers"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("4_spark")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_cam_embers"]
+material = SubResource("StandardMaterial3D_cam_embers")
+
+[node name="BurnScreenEffect" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="BurnScreenQuad" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_burn_screen")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_screen")
+
+[node name="BurnEmbers" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -0.15)
+amount = 20
+lifetime = 1.3
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_cam_embers")
+draw_pass_1 = SubResource("QuadMesh_cam_embers")

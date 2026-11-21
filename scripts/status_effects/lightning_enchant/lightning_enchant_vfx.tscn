@@ -1,0 +1,130 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/lightning_enchant/lightning_enchant_vfx.gd" id="1_vfx_script"]
+[ext_resource type="Texture2D" uid="uid://dnirefp03wuyw" path="res://assets/LeLu's Noise Pack/T_VFX_SparklesF21.jpg" id="2_arc_tex"]
+[ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="3_spark_tex"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cyan_arcs"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("2_arc_tex")
+
+[sub_resource type="Curve" id="Curve_alpha_ring"]
+_data = [Vector2(0, 0.25), 0.0, 2.2, 0, 0, Vector2(0.22, 1), 0.0, 0.0, 0, 0, Vector2(0.68, 0.45), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_alpha_ring"]
+curve = SubResource("Curve_alpha_ring")
+
+[sub_resource type="Curve" id="Curve_zero"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_orbit_y"]
+_limits = [-2.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1.65), 0.0, 0.0, 0, 0, Vector2(1, 1.65), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_orbit"]
+curve_x = SubResource("Curve_zero")
+curve_y = SubResource("Curve_orbit_y")
+curve_z = SubResource("Curve_zero")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_cyan_arcs"]
+lifetime_randomness = 0.2
+particle_flag_align_y = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.15
+emission_ring_radius = 0.58
+emission_ring_inner_radius = 0.2
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 75.0
+initial_velocity_min = 1.6
+initial_velocity_max = 3.4
+orbit_velocity_min = 0.85
+orbit_velocity_max = 1.35
+orbit_velocity_curve = SubResource("CurveXYZTexture_orbit")
+gravity = Vector3(0, 0, 0)
+scale_min = 0.65
+scale_max = 1.15
+color = Color(0.28, 1.85, 3.05, 1)
+alpha_curve = SubResource("CurveTexture_alpha_ring")
+
+[sub_resource type="QuadMesh" id="QuadMesh_cyan_arcs"]
+size = Vector2(0.16, 0.56)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cyan_sparks"]
+render_priority = 1
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("3_spark_tex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_cyan_sparks"]
+offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(1.8, 2.6, 3.4, 1, 0.1, 1.55, 2.8, 0.45, 0, 0.45, 1.2, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_cyan_sparks"]
+gradient = SubResource("Gradient_cyan_sparks")
+use_hdr = true
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_cyan_sparks"]
+lifetime_randomness = 0.25
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.15
+emission_ring_radius = 0.55
+emission_ring_inner_radius = 0.15
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 45.0
+initial_velocity_min = 0.4
+initial_velocity_max = 1.5
+radial_velocity_min = 1.8
+radial_velocity_max = 4.6
+gravity = Vector3(0, 0.8, 0)
+scale_min = 0.038
+scale_max = 0.082
+color = Color(1.4, 1.9, 2.4, 1)
+color_ramp = SubResource("GradientTexture1D_cyan_sparks")
+
+[sub_resource type="QuadMesh" id="QuadMesh_cyan_sparks"]
+
+[node name="LightningEnchantVFX" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+script = ExtResource("1_vfx_script")
+
+[node name="ElectricArcs" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+visibility_range_end = 50.0
+visibility_range_end_margin = 7.0
+material_override = SubResource("StandardMaterial3D_cyan_arcs")
+amount = 8
+lifetime = 0.36
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_cyan_arcs")
+draw_pass_1 = SubResource("QuadMesh_cyan_arcs")
+
+[node name="ElectricSparks" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+visibility_range_end = 44.0
+visibility_range_end_margin = 7.0
+material_override = SubResource("StandardMaterial3D_cyan_sparks")
+amount = 8
+lifetime = 0.42
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_cyan_sparks")
+draw_pass_1 = SubResource("QuadMesh_cyan_sparks")

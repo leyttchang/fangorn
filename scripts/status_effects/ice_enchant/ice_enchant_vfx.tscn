@@ -1,0 +1,136 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/status_effects/ice_enchant/ice_enchant_vfx.gd" id="1_vfx_script"]
+[ext_resource type="Texture2D" uid="uid://hpbjrjvttuj4" path="res://assets/LeLu's Noise Pack/T_smoke_b7.png" id="2_smoke"]
+[ext_resource type="Texture2D" uid="uid://lc2d3ly8t5hw" path="res://assets/LeLu's Noise Pack/T_snow_flakes.png" id="3_flakes"]
+
+[sub_resource type="Gradient" id="Gradient_frost_mist"]
+offsets = PackedFloat32Array(0, 0.25, 0.68, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.32, 0.62, 0.92, 0.28, 0.55, 0.82, 1.1, 0.32, 0.85, 0.96, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_frost_mist"]
+gradient = SubResource("Gradient_frost_mist")
+
+[sub_resource type="Curve" id="Curve_mist_scale"]
+_data = [Vector2(0, 0.45), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_mist_scale"]
+curve = SubResource("Curve_mist_scale")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_frost_mist"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.25
+emission_ring_radius = 0.48
+emission_ring_inner_radius = 0.12
+emission_ring_cone_angle = 90.0
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, -1, 0)
+spread = 65.0
+initial_velocity_min = 0.15
+initial_velocity_max = 0.45
+gravity = Vector3(0, -0.35, 0)
+scale_min = 0.95
+scale_max = 1.65
+scale_curve = SubResource("CurveTexture_mist_scale")
+color_ramp = SubResource("GradientTexture1D_frost_mist")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frost_mist"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("2_smoke")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_frost_mist"]
+material = SubResource("StandardMaterial3D_frost_mist")
+
+[sub_resource type="Curve" id="Curve_flake_alpha"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.18, 1), 0.0, 0.0, 0, 0, Vector2(0.78, 0.92), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_flake_alpha"]
+curve = SubResource("Curve_flake_alpha")
+
+[sub_resource type="Curve" id="Curve_zero"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_orbit_y"]
+_limits = [-2.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_orbit"]
+curve_x = SubResource("Curve_zero")
+curve_y = SubResource("Curve_orbit_y")
+curve_z = SubResource("Curve_zero")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_snow_orbit"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.4
+emission_ring_radius = 0.7
+emission_ring_inner_radius = 0.28
+emission_ring_cone_angle = 90.0
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 1, 0)
+spread = 35.0
+initial_velocity_min = 0.15
+initial_velocity_max = 0.45
+orbit_velocity_min = 0.35
+orbit_velocity_max = 0.75
+orbit_velocity_curve = SubResource("CurveXYZTexture_orbit")
+gravity = Vector3(0, -0.25, 0)
+scale_min = 0.085
+scale_max = 0.22
+color = Color(0.85, 1.95, 2.55, 1)
+alpha_curve = SubResource("CurveTexture_flake_alpha")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_snow_orbit"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("3_flakes")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_snow_orbit"]
+material = SubResource("StandardMaterial3D_snow_orbit")
+
+[node name="IceEnchantVFX" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+script = ExtResource("1_vfx_script")
+
+[node name="FrostMist" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+visibility_range_end = 48.0
+visibility_range_end_margin = 7.0
+amount = 6
+lifetime = 1.6
+preprocess = 0.4
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_frost_mist")
+draw_pass_1 = SubResource("QuadMesh_frost_mist")
+
+[node name="SnowFlakes" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+visibility_range_end = 44.0
+visibility_range_end_margin = 7.0
+amount = 10
+lifetime = 1.5
+preprocess = 0.3
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_snow_orbit")
+draw_pass_1 = SubResource("QuadMesh_snow_orbit")

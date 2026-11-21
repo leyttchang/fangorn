@@ -4,13 +4,14 @@
 [ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="2_titfo"]
 [ext_resource type="PackedScene" uid="uid://b864y5lmf88we" path="res://particule/lightning/lightning_trails.tscn" id="3_cfhj5"]
 [ext_resource type="Script" uid="uid://d111n3jvlbqp2" path="res://map/encounters/enchant_arena/totem/lightning_totem.gd" id="3_yed87"]
+[ext_resource type="Script" path="res://map/encounters/enchant_arena/totem/totem_sculptor.gd" id="4_sculptor"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_hlie2"]
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_hlie2"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_totem"]
+height = 2.45
+radius = 0.68
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ebjp7"]
-size = Vector3(1, 1, 0.9586792)
+size = Vector3(1.85, 2.6, 1.85)
 
 [sub_resource type="Animation" id="Animation_edyrm"]
 length = 0.001
@@ -26,6 +27,18 @@ tracks/0/keys = {
 "update": 0,
 "values": [0.25]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("OmniLight3D:light_energy")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.12]
+}
 
 [sub_resource type="Animation" id="Animation_bl7kf"]
 resource_name = "default"
@@ -39,10 +52,22 @@ tracks/0/path = NodePath("trails:amount_ratio")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.88),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.22, 0.92),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [0.3024, 1.0]
+"values": [0.3, 1.0, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("OmniLight3D:light_energy")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.95),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.12, 0.45, 0.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ww2j3"]
@@ -90,29 +115,34 @@ section_segments = 11
 
 [node name="enchant_lightning_totem" type="Node3D" unique_id=299790798 node_paths=PackedStringArray("element_node", "vfx_anim")]
 script = ExtResource("1_cfhj5")
+totem_element = "lightning"
 element_node = NodePath("lightning_totem")
 vfx_anim = NodePath("VFX/VFX_anim")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1659859069]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=43394165]
-mesh = SubResource("BoxMesh_hlie2")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1023453048]
-shape = SubResource("BoxShape3D_hlie2")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.225, 0)
+shape = SubResource("CylinderShape3D_totem")
+
+[node name="TotemSculptor" type="Node3D" parent="."]
+script = ExtResource("4_sculptor")
+element_style = "lightning"
 
 [node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("2_titfo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 
 [node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.053649902, -0.078125, 0.03665161)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 shape = SubResource("BoxShape3D_ebjp7")
 
 [node name="VFX" type="Node3D" parent="." unique_id=1017619717]
-transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 1.78, 0)
 
 [node name="OmniLight3D" type="OmniLight3D" parent="VFX" unique_id=436793634]
-light_color = Color(0.002761165, 0.16204965, 0.7048732, 1)
-light_energy = 1.335647
+light_color = Color(0.12, 0.68, 1, 1)
+light_energy = 0.12
+omni_range = 2.8
 
 [node name="VFX_anim" type="AnimationPlayer" parent="VFX" unique_id=946075540]
 libraries/ = SubResource("AnimationLibrary_ww2j3")

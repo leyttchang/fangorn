@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://dlgah7gunxiqi" path="res://components/marker_tree_spawner_component.tscn" id="1_gh1lj"]
 [ext_resource type="PackedScene" uid="uid://cwihvsmtrbcwr" path="res://map/encounters/enchant_arena/totem/enchant_arcane_totem.tscn" id="2_8dt6p"]
 [ext_resource type="PackedScene" uid="uid://d1kl7n64otaqs" path="res://map/encounters/enchant_arena/totem/enchant_lightning_totem.tscn" id="3_iuobn"]
+[ext_resource type="PackedScene" path="res://map/encounters/enchant_arena/totem/enchant_ice_totem.tscn" id="8_ice_totem"]
+[ext_resource type="PackedScene" path="res://map/encounters/enchant_arena/totem/enchant_fire_totem.tscn" id="9_fire_totem"]
 [ext_resource type="PackedScene" uid="uid://bjpvlflywckyu" path="res://map/encounters/mob_raycast_spawner/mob_raycast_spawner.tscn" id="3_l614n"]
 [ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="4_dumb"]
 [ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="5_archer"]
@@ -15,7 +17,7 @@ size = Vector3(57, 5, 7)
 
 [node name="enchant_arena" type="Node3D" unique_id=2038537605 node_paths=PackedStringArray("totem_spawn_marker", "mob_spawner")]
 script = ExtResource("1_bhjao")
-possible_totems = Array[PackedScene]([ExtResource("2_8dt6p"), ExtResource("3_iuobn")])
+possible_totems = Array[PackedScene]([ExtResource("2_8dt6p"), ExtResource("3_iuobn"), ExtResource("8_ice_totem"), ExtResource("9_fire_totem")])
 totem_spawn_marker = NodePath("enchant_totem_pos")
 mob_spawner = NodePath("mob_raycast_spawner")
 
@@ -26,9 +28,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8136554, 0, -0.026209831)
 
 [node name="Boss_spawn_position" type="Marker3D" parent="." unique_id=578107317]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -107)
-
-[node name="reward_position" type="Marker3D" parent="." unique_id=1590267674]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09410858, 0, -36.019608)
 
 [node name="entry_detection" type="Area3D" parent="." unique_id=620107321]
 collision_layer = 0

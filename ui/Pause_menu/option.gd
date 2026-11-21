@@ -96,6 +96,7 @@ func _ready() -> void:
 		if window_mode_btn:
 			window_mode_btn.select(settings.window_mode)
 			window_mode_btn.item_selected.connect(_on_window_mode_selected)
+			_setup_ui_style_option(window_mode_btn.get_parent(), settings)
 			
 		if render_scale_slider:
 			render_scale_slider.value = settings.render_scale
@@ -587,3 +588,26 @@ func _on_reset_shader_pressed() -> void:
 		settings.old_posterize_steps = 32.0
 	settings.save_settings()
 	_sync_shader_ui_from_settings(settings)
+
+func _setup_ui_style_option(container: Node, settings: Node) -> void:
+	if container == null or container.has_node("UIStyleOption"):
+		return
+	var lbl := Label.new()
+	lbl.name = "UIStyleLabel"
+	lbl.text = "UI Style"
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var opt := OptionButton.new()
+	opt.name = "UIStyleOption"
+	opt.add_item("Classic (Original)", 0)
+	opt.add_item("Moria / Diablo II", 1)
+	opt.select(int(settings.ui_style) if "ui_style" in settings else 1)
+	opt.item_selected.connect(func(idx: int):
+		var s = _get_settings()
+		if s != null and "ui_style" in s:
+			s.ui_style = idx
+			s.save_settings()
+	)
+	container.add_child(lbl)
+	container.move_child(lbl, 1)
+	container.add_child(opt)
+	container.move_child(opt, 2)

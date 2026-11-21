@@ -1,16 +1,29 @@
 [gd_scene format=3 uid="uid://bl4ed2gewe8qv"]
 
 [ext_resource type="PackedScene" uid="uid://dlgah7gunxiqi" path="res://components/marker_tree_spawner_component.tscn" id="1_a7jjj"]
-[ext_resource type="Script" path="res://map/encounters/Boss_arena/boss_arena.gd" id="2_bossarena"]
+[ext_resource type="Script" uid="uid://prl7ul6rahxc" path="res://map/encounters/Boss_arena/boss_arena.gd" id="2_bossarena"]
+[ext_resource type="Script" uid="uid://f0875hdqwbv1" path="res://map/encounters/Boss_arena/boss_lightning_storm.gd" id="3_storm_script"]
+[ext_resource type="PackedScene" uid="uid://ct33mvw1mhqsf" path="res://map/encounters/Boss_arena/boss_gate.tscn" id="4_bossgate"]
+[ext_resource type="Script" path="res://map/encounters/Boss_arena/boss_arcane_field.gd" id="5_arcane_script"]
+[ext_resource type="Script" path="res://map/encounters/Boss_arena/fire_buff/boss_fire_buff.gd" id="6_fire_script"]
+[ext_resource type="Script" path="res://map/encounters/Boss_arena/ice_buff/boss_ice_arena.gd" id="7_ice_script"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hlie2"]
 size = Vector3(57, 5, 7)
 
-[node name="Boss_arena" type="Node3D" unique_id=1218114736]
+[node name="Boss_arena" type="Node3D" unique_id=1218114736 node_paths=PackedStringArray("boss_gate", "lightning_storm", "arcane_field", "fire_buff", "ice_arena")]
 script = ExtResource("2_bossarena")
+boss_gate = NodePath("BossGate")
+lightning_storm = NodePath("BossLightningStorm")
+arcane_field = NodePath("BossArcaneField")
+fire_buff = NodePath("BossFireBuff")
+ice_arena = NodePath("BossIceArena")
 
 [node name="entry" type="Marker3D" parent="." unique_id=259757971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8136554, 0, -0.026209831)
+
+[node name="BossGate" parent="." unique_id=1894510234 instance=ExtResource("4_bossgate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8136554, 0, -0.65)
 
 [node name="MarkerTreeSpawnerComponent" parent="." unique_id=184920110 instance=ExtResource("1_a7jjj")]
 
@@ -25,7 +38,19 @@ collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="entry_detection" unique_id=794260698]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2, -7.5)
 shape = SubResource("BoxShape3D_hlie2")
+
+[node name="BossLightningStorm" type="Node3D" parent="." unique_id=1948273645]
+script = ExtResource("3_storm_script")
+
+[node name="BossArcaneField" type="Node3D" parent="." unique_id=1948273646]
+script = ExtResource("5_arcane_script")
+
+[node name="BossFireBuff" type="Node3D" parent="." unique_id=1948273647]
+script = ExtResource("6_fire_script")
+
+[node name="BossIceArena" type="Node3D" parent="." unique_id=1948273648]
+script = ExtResource("7_ice_script")
 
 [editable path="MarkerTreeSpawnerComponent"]

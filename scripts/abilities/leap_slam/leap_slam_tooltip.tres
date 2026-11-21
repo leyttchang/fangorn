@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tooltip_script"]
+
+[resource]
+script = ExtResource("1_tooltip_script")
+generated_text = "[b][color=#e6c280]Tags :[/color][/b] Attaque, Mêlée, Physique, Zone (AoE), Mouvement
+
+Bondit en cloche vers la direction choisie puis abat violemment l'arme équipée au sol, frappant les cibles devant vous et déclenchant une onde de choc sismique circulaire.
+
+• [color=#f2a65a]Dégâts de l'Onde de Choc :[/color] [b]15[/b] Physiques + [b]135%[/b] des Dégâts de l'Arme
+• [color=#f2a65a]Impact Direct :[/color] Frappe d'arme directe à la réception
+• [color=#d4c4a8]Rayon d'Impact :[/color] [b]4.2 m[/b] (échelle avec la Zone d'Effet)
+• [color=#d4c4a8]Projection :[/color] Repousse et soulève les ennemis proches
+
+[color=#9ec5e8]Courbe Barbare (Dégâts Physiques & Arme Lourde) :[/color] Augmente la hauteur et la portée du saut (jusqu'à 28 m).
+[color=#a8e6a3]Courbe Duelliste (Vitesse d'Attaque) :[/color] Réduit l'impulsion (0.5 s de base), accélère la vitesse aérienne, la réception et le temps de recharge."
