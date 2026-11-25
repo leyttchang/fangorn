@@ -26,6 +26,7 @@ func on_mid_cast_event(event_name: String) -> void:
 			$slash_1.global_transform.basis = target_basis * slash1_local_basis
 			# On donne la VRAIE direction d'avancement au script (pour qu'il avance tout droit)
 			$slash_1.forward_direction = -target_basis.z
+		SpellAudioManager.play_lightning_cast(self, ($slash_1 as Node3D).global_position, 0.97, -0.5)
 		
 		var slash_anim = $slash_1/AnimationPlayer
 		if slash_anim != null:
@@ -56,6 +57,7 @@ func on_mid_cast_event(event_name: String) -> void:
 			
 			if $slash_2.get("forward_direction") != null:
 				$slash_2.forward_direction = -target_basis.z
+		SpellAudioManager.play_lightning_cast(self, ($slash_2 as Node3D).global_position, 1.06, -0.5)
 		
 		var slash_anim = $slash_2/AnimationPlayer
 		if slash_anim != null:

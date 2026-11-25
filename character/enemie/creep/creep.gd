@@ -26,6 +26,8 @@ var rest_time: float = 0.0
 var is_tired: bool = false
 var _target_update_timer: float = 0.0
 var is_anim_culled: bool = false
+var _last_synced_state: int = -1
+var _last_synced_anim: String = ""
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var target: Node3D = null
@@ -71,6 +73,7 @@ func _physics_process(delta: float) -> void:
 				anim_tree.active = false
 		elif not anim_tree.active:
 			anim_tree.active = true
+			_sync_animation_state()
 
 	if current_state == State.DEAD:
 		_stop_movement(delta)
@@ -85,6 +88,8 @@ func _physics_process(delta: float) -> void:
 		_update_closest_target()
 		
 	_process_state(delta)
+	if current_state != State.ATTACK and attack_shape != null and not attack_shape.disabled:
+		attack_shape.disabled = true
 	
 	if current_state != State.FLEE:
 		rest_time += delta
@@ -97,7 +102,7 @@ func _physics_process(delta: float) -> void:
 	if not velocity.is_zero_approx() or not is_on_floor():
 		move_and_slide()
 	
-	# Synchro reseau pour les autres clients (Mouvement / Animations)
+	# Synchro reseau pour les autres clients uniquement lors d'un changement d'etat/animation
 	var anim_name = "crouch_idle"
 	if current_state == State.CHARGE:
 		anim_name = "run_fast"
@@ -110,9 +115,10 @@ func _physics_process(delta: float) -> void:
 	elif current_state == State.IDLE:
 		anim_name = "crouching_walk" if _is_pack_walking else "crouch_idle"
 		
-	# Synchronisation de la rotation
-	var current_rot = rotation.y
-	rpc("_rpc_apply_state", current_state, anim_name, current_rot)
+	if current_state != _last_synced_state or anim_name != _last_synced_anim:
+		_last_synced_state = current_state
+		_last_synced_anim = anim_name
+		rpc("_rpc_apply_state", current_state, anim_name, rotation.y)
 
 var _is_pack_walking: bool = false
 
@@ -208,7 +214,7 @@ func _process_state(delta: float) -> void:
 		State.ATTACK:
 			_stop_movement(delta)
 			var dir = (target.global_position - global_position).normalized()
-			movement_comp.rotate_towards_direction(dir, behavior, delta, 2.0)
+			movement_comp.rotate_towards_direction(dir, behavior, delta, 0.80)
 
 func _move_to(target_pos: Vector3, speed: float, delta: float) -> void:
 	var final_speed = speed
@@ -286,13 +292,19 @@ func _on_attack_finished() -> void:
 
 # --- RESEAU ---
 
-@rpc("authority", "call_local", "unreliable")
-func _rpc_apply_state(new_state: int, sync_anim: String, sync_rot: float) -> void:
+func _sync_animation_state() -> void:
+	if anim_playback and _last_synced_anim != "":
+		anim_playback.travel(_last_synced_anim)
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_apply_state(new_state: int, sync_anim: String, _sync_rot: float = 0.0) -> void:
 	if current_state == State.DEAD: return
 	
-	# Le client met a jour son animation et sa rotation
+	# Le client met a jour son etat et son animation (rotation geree par MultiplayerSynchronizer)
 	if not is_multiplayer_authority():
-		rotation.y = lerp_angle(rotation.y, sync_rot, 0.2)
+		current_state = new_state as State
+		_last_synced_state = new_state
+		_last_synced_anim = sync_anim
 		if anim_playback:
 			anim_playback.travel(sync_anim)
 
@@ -305,6 +317,8 @@ func _on_died() -> void:
 func _rpc_trigger_death(fatal_velocity: Vector3 = Vector3.ZERO) -> void:
 	remove_from_group("Enemie")
 	current_state = State.DEAD
+	_last_synced_state = State.DEAD
+	_last_synced_anim = "death"
 	
 	if has_node("HitboxComponent/CollisionShape3D"):
 		$HitboxComponent/CollisionShape3D.set_deferred("disabled", true)

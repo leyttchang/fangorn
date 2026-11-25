@@ -253,7 +253,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_vof52")
 text = "50122"
-placeholder_text = "Seed (ex: 50122)"
+placeholder_text = "Seed (e.g. 50122)"
 
 [node name="S_seed_rand" type="Button" parent="CanvasLayer/Singleplayer/HBoxSeed" unique_id=314159267]
 unique_name_in_owner = true
@@ -339,7 +339,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_vof52")
 text = "50122"
-placeholder_text = "Seed (ex: 50122)"
+placeholder_text = "Seed (e.g. 50122)"
 
 [node name="H_seed_rand" type="Button" parent="CanvasLayer/Host_menu/Host/HBoxHostSeed" unique_id=314159270]
 unique_name_in_owner = true

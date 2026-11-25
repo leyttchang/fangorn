@@ -9,11 +9,17 @@
 [resource]
 script = ExtResource("1_ilgln")
 ability_name = "Burning Ground"
-description = "Ignites the earth beneath your enemies. Creates a lingering pool of molten fire that continuously scorches anyone foolish enough to remain within its radius."
+description = "Ignites the earth beneath a distant target area, creating a wide pool of molten fire that continuously scorches all enemies standing within."
 icon = ExtResource("2_8dwsn")
-cooldown = 6.0
-mana_cost = 20.0
-cast_time = 1.0
+cooldown = 6.5
+mana_cost = 22.0
+cast_time = 0.35
+spell_id = "burning_ground"
+tier = 2
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
 target_mode = 3
 cast_vfx_scene = ExtResource("2_lg8ku")
 indicator_scene = ExtResource("3_h8d7u")

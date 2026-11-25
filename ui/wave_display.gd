@@ -33,10 +33,10 @@ func _connect_spawner(spawner: SmartSpawner) -> void:
 		spawner.boss_wave_incoming.connect(_on_boss_wave_incoming)
 
 func _on_wave_started(wave_number: int, _total_enemies: int) -> void:
-	_display_banner("VAGUE " + str(wave_number), Color(1.0, 0.35, 0.35))
+	_display_banner("WAVE " + str(wave_number), Color(1.0, 0.35, 0.35))
 
 func _on_wave_completed(wave_number: int) -> void:
-	_display_banner("VAGUE " + str(wave_number) + " TERMINEE !", Color(0.35, 1.0, 0.5))
+	_display_banner("WAVE " + str(wave_number) + " COMPLETED!", Color(0.35, 1.0, 0.5))
 
 func _on_boss_wave_incoming(_wave_number: int) -> void:
 	_display_banner("BOSS WAVE INCOMING !", Color(1.0, 0.2, 0.2))

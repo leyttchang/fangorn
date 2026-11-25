@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/egg-defense.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/glacial_shell/glacial_shell.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/glacial_shell/GlacialShell_tooltip.tres" id="4_tt"]
+[ext_resource type="Resource" path="res://scripts/abilities/glacial_ram/GlacialRam.tres" id="5_evo_gr"]
+[ext_resource type="Resource" path="res://scripts/abilities/frostmirror_aegis/FrostmirrorAegis.tres" id="6_evo_fa"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Glacial Shell"
+description = "Encases you in a polar carapace for 6 seconds, granting a temporary Shield based on your Maximum Health and chilling nearby attackers whenever struck."
+icon = ExtResource("2_icon")
+cooldown = 10.0
+mana_cost = 18.0
+cast_time = 0.0
+spell_id = "glacial_shell"
+tier = 1
+element = "ice"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("5_evo_gr"), ExtResource("6_evo_fa")])
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

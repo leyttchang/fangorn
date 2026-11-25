@@ -3,7 +3,7 @@ class_name RootLauncher
 extends Node3D
 
 ## Racine-Catapulte inspirée des propulseurs aériens de Deadlock.
-## - S'active avec [E] dès qu'on court dans sa zone (sans devoir baisser la caméra vers ses pieds)
+## - S'active avec [F] dès qu'on court dans sa zone (sans devoir baisser la caméra vers ses pieds)
 ## - Propulse selon un arc équilibré (~15.5m de haut + ~14.5 m/s dans la direction visée)
 ## - Retour fluide à la vitesse normale dès l'atterrissage (géré par player.apply_air_launch)
 ## - Animation de fouet des racines via root_shader.tres + souffle d'air ascendant
@@ -19,8 +19,8 @@ extends Node3D
 @export var trigger_radius: float = 2.65
 
 @export_category("Visuel & Optimisation")
-@export var prompt_text: String = "[E] Propulser"
-@export var visibility_max_distance: float = 160.0
+@export var prompt_text: String = "[F] Launch"
+@export var visibility_max_distance: float = 150.0
 
 const SFX_WOOSH_PATH := "res://assets/sound_effects/UI/wav (HD)/woosh_5.wav"
 const SFX_SWOOSH_PATH := "res://assets/sound_effects/UI/wav (HD)/Swoosh_3.wav"
@@ -28,10 +28,16 @@ const SFX_TWANG_PATH := "res://assets/sound_effects/Combat and Gore/bone_snap.wa
 const FONT_CINZEL_PATH := "res://assets/fonts/Cinzel.ttf"
 
 static var _shared_arch_mat: ShaderMaterial = null
+static var _shared_idle_whip_mat: ShaderMaterial = null
+static var _shared_center_sphere: SphereMesh = null
+static var _shared_idle_center_mat: StandardMaterial3D = null
+static var _shared_updraft_pmat: ParticleProcessMaterial = null
 
 var _visual_root: Node3D = null
 var _arches_holder: Node3D = null
-var _whip_materials: Array[ShaderMaterial] = []
+var _center_bud_mesh: MeshInstance3D = null
+var _whip_nodes: Array[MeshInstance3D] = []
+var _active_whip_mat: ShaderMaterial = null
 var _center_glow_mat: StandardMaterial3D = null
 var _updraft_particles: GPUParticles3D = null
 var _proximity_area: Area3D = null
@@ -41,48 +47,65 @@ var _local_player_inside: CharacterBody3D = null
 var _cooldown_timer: float = 0.0
 
 func _ready() -> void:
+	set_process(false)
+	set_process_input(false)
 	_rebuild_visuals()
 	if not Engine.is_editor_hint():
+		if is_inside_tree() and get_tree() != null:
+			var sm: Node = get_tree().root.get_node_or_null("SettingsManager")
+			if sm != null and sm.has_signal("keybinds_changed") and not sm.is_connected("keybinds_changed", _refresh_prompt_visibility):
+				sm.connect("keybinds_changed", _refresh_prompt_visibility)
 		_setup_interaction_zones()
 
 func _rebuild_visuals() -> void:
 	if Engine.is_editor_hint():
 		ProceduralForestMeshes.clear_caches()
 		_shared_arch_mat = null
+		_shared_idle_whip_mat = null
+		_shared_center_sphere = null
+		_shared_idle_center_mat = null
+		_shared_updraft_pmat = null
 	if _visual_root != null and is_instance_valid(_visual_root):
 		_visual_root.queue_free()
 		remove_child(_visual_root)
-	_whip_materials.clear()
+	_whip_nodes.clear()
+	_active_whip_mat = null
+	_center_glow_mat = null
 
 	_visual_root = Node3D.new()
 	_visual_root.name = "LauncherVisual"
 	add_child(_visual_root)
 
 	var no_limit := Engine.is_editor_hint()
-	var vis_end := 0.0 if no_limit else visibility_max_distance
+	var vis_end := 0.0 if no_limit else (visibility_max_distance if visibility_max_distance > 0.0 else 150.0)
 
 	if _shared_arch_mat == null:
 		_shared_arch_mat = ProceduralForestMeshes.get_base_root_material(Color(0.65, 0.58, 0.36, 1.0), 0.115, 1.7)
 
-	# 1. Petit cœur de sève sylvestre discret niché SOUS la spirale de racines (pas de disque fluo plat)
+	# 1. Petit cœur de sève sylvestre discret niché SOUS la spirale de racines (matériau partagé au repos)
 	var center_bud := MeshInstance3D.new()
-	var sph := SphereMesh.new()
-	sph.radius = 0.36
-	sph.height = 0.22
-	sph.radial_segments = 14
-	sph.rings = 6
-	_center_glow_mat = StandardMaterial3D.new()
-	_center_glow_mat.albedo_color = Color(0.08, 0.18, 0.10, 1.0)
-	_center_glow_mat.roughness = 0.65
-	_center_glow_mat.emission_enabled = true
-	_center_glow_mat.emission = Color(0.28, 0.78, 0.44, 1.0)
-	_center_glow_mat.emission_energy_multiplier = 0.95
-	sph.material = _center_glow_mat
-	center_bud.mesh = sph
+	if _shared_center_sphere == null:
+		var sph := SphereMesh.new()
+		sph.radius = 0.36
+		sph.height = 0.22
+		sph.radial_segments = 14
+		sph.rings = 6
+		_shared_center_sphere = sph
+	if _shared_idle_center_mat == null:
+		var c_mat := StandardMaterial3D.new()
+		c_mat.albedo_color = Color(0.08, 0.18, 0.10, 1.0)
+		c_mat.roughness = 0.65
+		c_mat.emission_enabled = true
+		c_mat.emission = Color(0.28, 0.78, 0.44, 1.0)
+		c_mat.emission_energy_multiplier = 0.95
+		_shared_idle_center_mat = c_mat
+	center_bud.mesh = _shared_center_sphere
+	center_bud.material_override = _shared_idle_center_mat
 	center_bud.position = Vector3(0.0, 0.06, 0.0)
 	center_bud.visibility_range_end = vis_end
 	center_bud.visibility_range_end_margin = 20.0 if vis_end > 0.0 else 0.0
 	_visual_root.add_child(center_bud)
+	_center_bud_mesh = center_bud
 
 	# 2. Arches et spirales de racines comprimées sous tension
 	_arches_holder = Node3D.new()
@@ -113,8 +136,13 @@ func _rebuild_visuals() -> void:
 		mi.visibility_range_end_margin = 20.0 if vis_end > 0.0 else 0.0
 		_arches_holder.add_child(mi)
 
-	# 3. Racines-fouets (rétractées au repos via fin = 1.0, jaillissent vers le ciel à l'activation)
+	# 3. Racines-fouets (partagent 1 seul ShaderMaterial statique au repos; dupliqué uniquement à l'activation !)
 	if not Engine.is_editor_hint():
+		if _shared_idle_whip_mat == null:
+			_shared_idle_whip_mat = _shared_arch_mat.duplicate() as ShaderMaterial
+			_shared_idle_whip_mat.set_shader_parameter("fin", 1.0)
+			_shared_idle_whip_mat.set_shader_parameter("debut", 1.0)
+
 		var whips := ProceduralForestMeshes.get_launcher_whips()
 		for i in range(whips.size()):
 			var w_data: Dictionary = whips[i]
@@ -122,13 +150,11 @@ func _rebuild_visuals() -> void:
 			w_mi.name = "Whip_" + str(i)
 			w_mi.mesh = w_data["mesh"]
 			w_mi.position = w_data["center"]
-			var w_mat := _shared_arch_mat.duplicate() as ShaderMaterial
-			w_mat.set_shader_parameter("fin", 1.0)
-			w_mat.set_shader_parameter("debut", 1.0)
-			w_mi.material_override = w_mat
+			w_mi.material_override = _shared_idle_whip_mat
 			w_mi.visibility_range_end = vis_end
+			w_mi.visibility_range_end_margin = 20.0 if vis_end > 0.0 else 0.0
 			_visual_root.add_child(w_mi)
-			_whip_materials.append(w_mat)
+			_whip_nodes.append(w_mi)
 
 		# 4. Flux ascendant subtil de feuilles/air lumineux pour repérer le tremplin de loin
 		_updraft_particles = GPUParticles3D.new()
@@ -138,32 +164,34 @@ func _rebuild_visuals() -> void:
 		_updraft_particles.visibility_range_end = 90.0
 		_updraft_particles.visibility_range_end_margin = 15.0
 
-		var pmat := ParticleProcessMaterial.new()
-		pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
-		pmat.emission_ring_axis = Vector3.UP
-		pmat.emission_ring_height = 0.1
-		pmat.emission_ring_radius = 0.85
-		pmat.emission_ring_inner_radius = 0.25
-		pmat.direction = Vector3.UP
-		pmat.spread = 8.0
-		pmat.initial_velocity_min = 1.4
-		pmat.initial_velocity_max = 2.6
-		pmat.gravity = Vector3(0.0, 0.8, 0.0)
-		pmat.scale_min = 0.55
-		pmat.scale_max = 1.15
+		if _shared_updraft_pmat == null:
+			var pmat := ParticleProcessMaterial.new()
+			pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			pmat.emission_ring_axis = Vector3.UP
+			pmat.emission_ring_height = 0.1
+			pmat.emission_ring_radius = 0.85
+			pmat.emission_ring_inner_radius = 0.25
+			pmat.direction = Vector3.UP
+			pmat.spread = 8.0
+			pmat.initial_velocity_min = 1.4
+			pmat.initial_velocity_max = 2.6
+			pmat.gravity = Vector3(0.0, 0.8, 0.0)
+			pmat.scale_min = 0.55
+			pmat.scale_max = 1.15
 
-		var grad := Gradient.new()
-		grad.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
-		grad.colors = PackedColorArray([
-			Color(0.35, 1.0, 0.72, 0.0),
-			Color(0.45, 1.0, 0.78, 0.75),
-			Color(0.75, 1.0, 0.90, 0.0)
-		])
-		var ramp := GradientTexture1D.new()
-		ramp.gradient = grad
-		pmat.color_ramp = ramp
+			var grad := Gradient.new()
+			grad.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+			grad.colors = PackedColorArray([
+				Color(0.35, 1.0, 0.72, 0.0),
+				Color(0.45, 1.0, 0.78, 0.75),
+				Color(0.75, 1.0, 0.90, 0.0)
+			])
+			var ramp := GradientTexture1D.new()
+			ramp.gradient = grad
+			pmat.color_ramp = ramp
+			_shared_updraft_pmat = pmat
 
-		_updraft_particles.process_material = pmat
+		_updraft_particles.process_material = _shared_updraft_pmat
 		_updraft_particles.draw_pass_1 = ProceduralForestMeshes.get_spore_quad_mesh(0.14)
 		_visual_root.add_child(_updraft_particles)
 
@@ -209,11 +237,13 @@ func _setup_interaction_zones() -> void:
 func _on_body_entered(body: Node3D) -> void:
 	if body is CharacterBody3D and body.is_in_group("Player") and body.is_multiplayer_authority():
 		_local_player_inside = body as CharacterBody3D
+		set_process_input(true)
 		_refresh_prompt_visibility()
 
 func _on_body_exited(body: Node3D) -> void:
 	if body == _local_player_inside:
 		_local_player_inside = null
+		set_process_input(false)
 		_refresh_prompt_visibility()
 
 func _refresh_prompt_visibility() -> void:
@@ -225,20 +255,24 @@ func _refresh_prompt_visibility() -> void:
 			_prompt_label.text = "%.1fs" % _cooldown_timer
 			_prompt_label.modulate = Color(0.62, 0.66, 0.62, 0.78)
 		else:
-			_prompt_label.text = prompt_text
+			_prompt_label.text = InteractionComponent.format_action_prompt(prompt_text) if not Engine.is_editor_hint() else prompt_text
 			_prompt_label.modulate = Color(0.78, 1.0, 0.86, 0.96)
 	else:
 		_prompt_label.visible = false
 
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
+		set_process(false)
 		return
 	if _cooldown_timer > 0.0:
 		_cooldown_timer = maxf(0.0, _cooldown_timer - delta)
 		if _cooldown_timer == 0.0:
 			_on_rearmed()
-		if _local_player_inside != null:
+			set_process(false)
+		elif _local_player_inside != null:
 			_refresh_prompt_visibility()
+	else:
+		set_process(false)
 
 func _input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
@@ -251,9 +285,9 @@ func _input(event: InputEvent) -> void:
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 
-	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_E:
+	if event.is_action_pressed(&"interact") and not event.is_echo():
 		use(_local_player_inside)
-		# Bloque la propagation vers _unhandled_input pour éviter de lancer le sort slot_2 (touche E) !
+		# Bloque la propagation vers _unhandled_input une fois l'interaction consommée
 		get_viewport().set_input_as_handled()
 
 ## Compatible aussi avec InteractionComponent / loot_cast.gd si le joueur vise directement la racine
@@ -298,6 +332,7 @@ func _rpc_trigger_launch_vfx() -> void:
 	if _cooldown_timer > 0.0:
 		return
 	_cooldown_timer = cooldown_duration
+	set_process(true)
 	_refresh_prompt_visibility()
 
 	# 1. Détente violente des arches + jaillissement des racines-fouets
@@ -307,13 +342,31 @@ func _rpc_trigger_launch_vfx() -> void:
 		tw_arch.tween_property(_arches_holder, "scale", Vector3(0.96, 0.65, 0.96), 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tw_arch.tween_property(_arches_holder, "scale", Vector3.ONE, maxf(0.2, cooldown_duration - 0.50)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
-	for w_mat in _whip_materials:
-		if w_mat != null:
+	if not _whip_nodes.is_empty():
+		if _active_whip_mat == null and _shared_arch_mat != null:
+			_active_whip_mat = _shared_arch_mat.duplicate() as ShaderMaterial
+			_active_whip_mat.set_shader_parameter("fin", 1.0)
+			_active_whip_mat.set_shader_parameter("debut", 1.0)
+		if _active_whip_mat != null:
+			for w_mi in _whip_nodes:
+				if w_mi != null and is_instance_valid(w_mi):
+					w_mi.material_override = _active_whip_mat
+			var w_mat := _active_whip_mat
 			var tw_w := create_tween()
 			tw_w.tween_method(func(v: float): w_mat.set_shader_parameter("fin", v), 1.0, 0.0, 0.11).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 			tw_w.tween_interval(0.18)
 			tw_w.tween_method(func(v: float): w_mat.set_shader_parameter("fin", v), 0.0, 1.0, 0.65).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tw_w.tween_callback(func() -> void:
+				if _shared_idle_whip_mat != null:
+					for w_mi in _whip_nodes:
+						if w_mi != null and is_instance_valid(w_mi):
+							w_mi.material_override = _shared_idle_whip_mat
+			)
 
+	if _center_glow_mat == null and _shared_idle_center_mat != null:
+		_center_glow_mat = _shared_idle_center_mat.duplicate() as StandardMaterial3D
+		if _center_bud_mesh != null and is_instance_valid(_center_bud_mesh):
+			_center_bud_mesh.material_override = _center_glow_mat
 	if _center_glow_mat != null:
 		_center_glow_mat.emission_energy_multiplier = 0.25
 	if _updraft_particles != null:
@@ -343,6 +396,8 @@ func _spawn_launch_gust() -> void:
 	gust.lifetime = 0.75
 	gust.one_shot = true
 	gust.explosiveness = 0.95
+	gust.visibility_range_end = 90.0
+	gust.visibility_range_end_margin = 15.0
 
 	var pmat := ParticleProcessMaterial.new()
 	pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING

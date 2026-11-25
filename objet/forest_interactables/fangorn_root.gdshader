@@ -52,7 +52,8 @@ void vertex() {
 	float u = UV.x;
 	float w_sommet = max(smoth_step_sommet, 0.005);
 	float s_start = smoothstep(fin, fin + w_sommet, u);
-	float s_end = 1.0 - smoothstep(debut - w_sommet, debut, u);
+	float tip_end = mix(debut - 0.045, debut, smoothstep(0.94, 1.0, debut));
+	float s_end = 1.0 - smoothstep(tip_end - w_sommet, tip_end, u);
 	float body_mask = clamp(s_start * s_end, 0.0, 1.0);
 
 	float pinch = eval_pinch_curve(body_mask) * force_pincement_ * eval_radius_profile(u);

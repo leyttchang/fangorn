@@ -23,13 +23,26 @@ func on_totem_activated(_player: Node3D, totem_root: EnchantTotem) -> void:
 	if not is_instance_valid(spawner):
 		return
 
-	for mob: Node3D in spawner.get_alive_mobs():
+	var batch_count: int = 0
+	for mob: Node3D in spawner.get_alive_mobs().duplicate():
+		if not is_inside_tree():
+			return
 		_apply_arcane_enchant(mob)
+		batch_count += 1
+		if batch_count >= 8:
+			batch_count = 0
+			await get_tree().process_frame
 
 func on_totem_completed(totem_root: EnchantTotem) -> void:
 	if totem_root != null and totem_root.mob_spawner != null:
 		if totem_root.mob_spawner.mob_spawned.is_connected(_on_spawner_mob_spawned):
 			totem_root.mob_spawner.mob_spawned.disconnect(_on_spawner_mob_spawned)
+	if get_tree() != null:
+		var host_parent: Node = get_tree().current_scene if get_tree().current_scene != null else get_tree().root
+		if host_parent != null:
+			var coord: ArcaneEnchantCoordinator = host_parent.get_node_or_null(ArcaneEnchantCoordinator.COORDINATOR_NODE_NAME) as ArcaneEnchantCoordinator
+			if coord != null and is_instance_valid(coord):
+				coord.pop_all_active_flares(true)
 
 func _on_spawner_mob_spawned(mob: Node3D) -> void:
 	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():

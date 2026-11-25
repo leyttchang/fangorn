@@ -15,3 +15,5 @@ extends Resource
 @export var friction: float = 35.0
 @export var air_friction: float = 10.0
 @export var rotation_speed: float = 10.0
+## Vitesse maximale de pivot en degrés par seconde (empêche les 180° instantanés sur un dash tout en suivant un joueur qui court)
+@export var max_turn_speed_deg: float = 260.0

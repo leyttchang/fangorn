@@ -130,69 +130,66 @@ func _rpc_sync_set_or_update_modifier(stat_name: String, mod_type: int, value: f
 	_applying_remote_sync = false
 # Fonction pour rcuprer rapidement la valeur finale (ex: pour taper un ennemi)
 func get_stat_value(stat_name: String) -> float:
-	if _stats.has(stat_name):
-		return _stats[stat_name].get_value()
+	var s: Stat = _stats.get(stat_name)
+	if s != null:
+		return s.get_value()
 	
 	push_warning("La stat demande n'existe pas : " + stat_name)
 	return 0.0
 
 # Fonction pour rcuprer l'objet Stat complet (ex: pour lui ajouter un buff)
 func get_stat(stat_name: String) -> Stat:
-	if _stats.has(stat_name):
-		return _stats[stat_name]
-	return null
+	return _stats.get(stat_name)
 
 # --- NOUVELLES FONCTIONS : LE PONT DES MODIFICATEURS ---
 func add_modifier(stat_name: String, mod_type: int, value: float, source_id: String) -> void:
-	var stat = get_stat(stat_name)
+	var stat: Stat = _stats.get(stat_name)
 	if stat != null:
-		if stat.has_method("add_modifier"):
-			var new_modifier = StatModifier.new(source_id, value, mod_type)
-			stat.add_modifier(new_modifier)
-			
-			# NOUVEAU : On prvient le reste du jeu de la nouvelle valeur !
-			stat_changed.emit(stat_name, stat.get_value())
-			if _should_sync_source(source_id) and _can_send_player_sync():
-				_rpc_sync_add_modifier.rpc(stat_name, mod_type, value, source_id)
-		else:
-			push_warning("Attention, la classe Stat n'a pas de fonction add_modifier()")
+		var new_modifier := StatModifier.new(source_id, value, mod_type)
+		stat.add_modifier(new_modifier)
+		
+		# NOUVEAU : On prvient le reste du jeu de la nouvelle valeur !
+		stat_changed.emit(stat_name, stat.get_value())
+		if _should_sync_source(source_id) and _can_send_player_sync():
+			_rpc_sync_add_modifier.rpc(stat_name, mod_type, value, source_id)
 
 func remove_modifier_by_source(source_id: String) -> void:
 	var any_removed: bool = false
 	for stat_name in _stats:
-		var stat = _stats[stat_name]
-		if stat.has_method("remove_modifier"):
-			# On garde l'ancienne valeur en mmoire pour voir si a a vraiment chang
-			var old_cnt: int = stat.modifiers.size()
-			var old_value = stat.get_value()
-			stat.remove_modifier(source_id)
-			if stat.modifiers.size() != old_cnt:
-				any_removed = true
-			
-			# NOUVEAU : Si la stat a chang aprs le retrait, on prvient le jeu
-			if stat.get_value() != old_value:
-				stat_changed.emit(stat_name, stat.get_value())
+		var stat: Stat = _stats[stat_name]
+		if stat == null or not stat.has_modifier(source_id):
+			continue
+		var old_value: float = stat.get_value()
+		if stat.remove_modifier(source_id):
+			any_removed = true
+			var new_value: float = stat.get_value()
+			if not is_equal_approx(new_value, old_value):
+				stat_changed.emit(stat_name, new_value)
 	if any_removed and _should_sync_source(source_id) and _can_send_player_sync():
 		_rpc_sync_remove_modifier.rpc(source_id)
 
 ## Récupère la valeur d'une stat en ignorant un modificateur spécifique
 func get_stat_value_excluding(stat_name: String, excluded_source_id: String) -> float:
-	if _stats.has(stat_name):
-		var stat = _stats[stat_name]
-		if stat.has_method("get_value_excluding"):
-			return stat.get_value_excluding(excluded_source_id)
-		return stat.get_value()
+	var stat: Stat = _stats.get(stat_name)
+	if stat != null:
+		return stat.get_value_excluding(excluded_source_id)
 	return 0.0
 
 ## Met à jour la valeur d'un modificateur existant ou l'ajoute s'il n'existe pas
 func set_or_update_modifier(stat_name: String, mod_type: int, value: float, source_id: String) -> void:
-	var stat = get_stat(stat_name)
+	var stat: Stat = _stats.get(stat_name)
 	if stat != null:
 		for mod in stat.modifiers:
 			if mod.id == source_id:
-				if not is_equal_approx(mod.value, value):
-					mod.value = value
-					stat_changed.emit(stat_name, stat.get_value())
+				if is_equal_approx(mod.value, value) and mod.type == mod_type:
+					return
+				var old_val: float = stat.get_value()
+				mod.value = value
+				mod.type = mod_type
+				stat.mark_dirty()
+				var new_val: float = stat.get_value()
+				if not is_equal_approx(old_val, new_val):
+					stat_changed.emit(stat_name, new_val)
 					if _should_sync_source(source_id) and _can_send_player_sync():
 						_rpc_sync_set_or_update_modifier.rpc(stat_name, mod_type, value, source_id)
 				return

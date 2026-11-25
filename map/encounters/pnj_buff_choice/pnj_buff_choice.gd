@@ -33,7 +33,7 @@ signal reward_claimed_signal(reward_dict: Dictionary, player: CharacterBody3D)
 ## Text displayed when approaching while cage is locked
 @export var prompt_locked: String = "Imprisoned Survivor (Defeat the guards to free)"
 ## Text displayed when approaching after opening the cage
-@export var prompt_freed: String = "Press [E] to choose your blessing"
+@export var prompt_freed: String = "Press [F] to choose your blessing"
 ## Text displayed once the reward has already been claimed
 @export var prompt_claimed: String = "The survivor salutes you with gratitude"
 
@@ -115,6 +115,8 @@ func unlock_pnj() -> void:
 
 ## Méthode appelée automatiquement par l'InteractionComponent quand le joueur appuie sur E
 func interact(player: CharacterBody3D) -> void:
+	if camp_ilvl <= 1 and not Engine.is_editor_hint() and global_position != Vector3.ZERO:
+		camp_ilvl = WorldLevelScaler.get_camp_ilvl_at(self, global_position)
 	if not is_freed:
 		print("PnjBuffChoice : The NPC is still locked in the cage.")
 		if interaction_component:

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Channeled Spell | Cooldown: 2.2s | Mana: 5 + 11/s[/color]
+
+[color=orange][b]- Creeping Roots -[/b][/color]
+Damage: [b]4[/b] Base every 0.35s [color=yellow](AoE)[/color]
+Damage Type: [color=#b86bff]100% Arcane[/color]
+Range: 24m (Cursor-Guided)
+Applies [b]Root Snare[/b] (-80% Move Speed) for 1.0s
+"

@@ -1,0 +1,156 @@
+[gd_scene format=3 uid="uid://beuwlaw5f65k1"]
+
+[sub_resource type="GDScript" id="GDScript_smoke"]
+script/source = "extends Node3D
+
+class MockArenaGen extends Node3D:
+	var zones_data: Array[Dictionary] = []
+	func get_zones() -> Array[Dictionary]:
+		return zones_data
+
+class MockMapGen extends Node3D:
+	var world_seed: int = 123456
+	var _ag: Node = null
+	func get_arena_generator() -> Node:
+		return _ag
+	func get_terrain_height_at(_x: float, _z: float) -> float:
+		return 10.0
+
+func _ready() -> void:
+	# 1. Environnement + Lumière + Mock MapGenerator avec 1 totem caché 'lightning'
+	var we: WorldEnvironment = WorldEnvironment.new()
+	var env: Environment = Environment.new()
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.01, 0.02, 0.05)
+	env.fog_sky_affect = 0.5
+	env.ambient_light_color = Color(0.26, 0.37, 0.53)
+	env.ambient_light_energy = 1.42
+	we.environment = env
+	add_child(we)
+
+	var dl: DirectionalLight3D = DirectionalLight3D.new()
+	dl.light_color = Color(0.76, 0.82, 1.0)
+	dl.light_energy = 1.2
+	add_child(dl)
+
+	var mg: MockMapGen = MockMapGen.new()
+	mg.name = 'Map_generator'
+	add_child(mg)
+
+	var mesh_spawner: Node3D = Node3D.new()
+	mesh_spawner.name = 'MeshSpawner'
+	mg.add_child(mesh_spawner)
+
+	var orig_tree_mat: Material = load('res://objet/tree/tree_material.tres')
+	var tree_mmi: MultiMeshInstance3D = MultiMeshInstance3D.new()
+	tree_mmi.material_override = orig_tree_mat
+	mesh_spawner.add_child(tree_mmi)
+
+	var ag: MockArenaGen = MockArenaGen.new()
+	ag.name = 'ArenaGenerator'
+	mg._ag = ag
+	mg.add_child(ag)
+
+	var extra_arena: Node3D = Node3D.new()
+	extra_arena.name = 'Arena_Totem_Extra_1'
+	var fake_totem: Node3D = Node3D.new()
+	fake_totem.name = 'SpawnedTotem'
+	var ft_script: GDScript = GDScript.new()
+	ft_script.source_code = 'extends Node3D
+var totem_element: String = \"lightning\"
+var is_activated: bool = false
+'
+	ft_script.reload()
+	fake_totem.set_script(ft_script)
+	extra_arena.add_child(fake_totem)
+	fake_totem.global_position = Vector3(720.0, 10.0, 1060.0)
+	ag.add_child(extra_arena)
+
+	ag.zones_data = [{
+		'name': 'Arena_Totem_Extra_1',
+		'is_extra': true,
+		'has_totem': true,
+		'pos': Vector2(720.0, 989.0),
+		'totem_pos': Vector2(720.0, 1060.0),
+		'dir': Vector2(0.0, 1.0),
+		'height': 10.0
+	}]
+
+	# 2. Mock Player + Camera3D
+	var player: Node3D = Node3D.new()
+	player.name = '1'
+	player.add_to_group('Player')
+	player.position = Vector3(512.0, 10.0, 960.0)
+	add_child(player)
+
+	var cam: Camera3D = Camera3D.new()
+	cam.name = 'Camera3D'
+	cam.fov = 75.0
+	cam.position = Vector3(0.0, 1.6, 0.0)
+	cam.current = true
+	player.add_child(cam)
+
+	# 3. Instancier le Grand Cocon d'Oracle et le briser
+	var cocoon_scn: PackedScene = load('res://objet/forest_interactables/oracle_vision/oracle_root_cocoon.tscn')
+	var cocoon: Node3D = cocoon_scn.instantiate() as Node3D
+	cocoon.position = Vector3(515.5, 10.0, 946.5)
+	add_child(cocoon)
+	var rib_count: int = (cocoon.get('_rib_nodes') as Array).size()
+
+	cocoon.call('_on_struck', player, Vector3(0.0, 0.0, -1.0), null)
+
+	var seeker: Node3D = null
+	for ch: Node in get_children():
+		if ch.has_method('setup_seeker'):
+			seeker = ch as Node3D
+			break
+
+	# 4. Simuler le vol de la sphère multicolore jusqu'à l'impact dans le joueur
+	var steps: int = 0
+	while seeker != null and is_instance_valid(seeker) and not seeker.is_queued_for_deletion() and steps < 120:
+		seeker.call('_process', 0.02)
+		steps += 1
+
+	var fx: Node3D = player.get_node_or_null('ActiveTotemVisionEffect') as Node3D
+	var fx_created: bool = (fx != null)
+
+	# 5. Vérifier les 4 maillages élémentaires procéduraux
+	var fx_script: GDScript = load('res://objet/forest_interactables/oracle_vision/totem_vision_effect.gd') as GDScript
+	var meshes_ok: bool = true
+	for elem_k: String in ['arcane', 'lightning', 'ice', 'fire']:
+		var m: ArrayMesh = fx_script.call('_get_element_particle_mesh', elem_k) as ArrayMesh
+		if m == null or m.get_surface_count() == 0:
+			meshes_ok = false
+
+	# 6. Simuler t = 5.0s (pleine vision)
+	var mid_tree_swapped: bool = false
+	var mid_fov_warped: bool = false
+	var mid_sky_shifted: bool = false
+	if fx != null:
+		fx.call('_process', 5.0)
+		mid_tree_swapped = (tree_mmi.material_override != orig_tree_mat and tree_mmi.material_override is ShaderMaterial)
+		mid_fov_warped = (cam.fov > 82.0)
+		mid_sky_shifted = (env.fog_light_color.distance_to(Color(0.01, 0.02, 0.05)) > 0.05)
+
+		# 7. Simuler la fin des 10s (restauration à 100%)
+		fx.call('_process', 5.5)
+
+	var restored_tree: bool = (tree_mmi.material_override == orig_tree_mat)
+	var restored_fov: bool = is_equal_approx(cam.fov, 75.0)
+	var restored_sky: bool = (env.fog_light_color.distance_to(Color(0.01, 0.02, 0.05)) < 0.001)
+
+	print('[OracleVisionSmoke] ribs=%d fx=%s elem=%s meshes=%s mid(tree=%s fov=%.1f sky=%s) restored(tree=%s fov=%.1f sky=%s)' % [
+		rib_count, str(fx_created), str(fx.get('_target_element') if fx != null else 'none'), str(meshes_ok),
+		str(mid_tree_swapped), cam.fov, str(mid_sky_shifted),
+		str(restored_tree), cam.fov, str(restored_sky)
+	])
+	var all_pass: bool = (
+		rib_count == 9 and fx_created and meshes_ok
+		and mid_tree_swapped and mid_fov_warped and mid_sky_shifted
+		and restored_tree and restored_fov and restored_sky
+	)
+	print('[OracleVisionSmoke] RESULT=%s' % ('ALL_PASS' if all_pass else 'FAIL'))
+"
+
+[node name="SmokeRoot" type="Node3D" unique_id=401152705]
+script = SubResource("GDScript_smoke")

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/electrical-crescent.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/lodestone_beam/lodestone_beam.tscn" id="3_scene"]
+[ext_resource type="PackedScene" uid="uid://djtioufafqhx8" path="res://scripts/abilities/casting_animation/lightning_casting_vfx.tscn" id="4_vfx"]
+[ext_resource type="Resource" path="res://scripts/abilities/lodestone_beam/LodestoneBeam_tooltip.tres" id="5_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Lodestone Beam"
+description = "Channels a magnetic lightning beam onto a single enemy, dealing rapid lightning damage only to that target while turning it into a powerful living magnet that strongly pulls nearby monsters toward it."
+icon = ExtResource("2_icon")
+cooldown = 1.8
+mana_cost = 6.0
+max_range = 16.0
+cast_time = 0.0
+spell_id = "lodestone_beam"
+tier = 2
+element = "lightning"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+channel_mana_per_sec = 15.5
+channel_tick_interval = 0.2
+target_mode = 6
+custom_tooltip = ExtResource("5_tt")
+cast_vfx_scene = ExtResource("4_vfx")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

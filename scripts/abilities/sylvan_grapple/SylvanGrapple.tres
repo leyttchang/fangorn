@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb895.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/sylvan_grapple/sylvan_grapple.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/sylvan_grapple/SylvanGrapple_tooltip.tres" id="4_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Sylvan Grapple"
+description = "Shoot an elastic sylvan vine from your left hand that latches onto tree trunks, high branches, foliage, or terrain to propel you directly toward your anchor point. Hitting an enemy deals arcane damage and knocks them back."
+icon = ExtResource("2_icon")
+cooldown = 5.5
+mana_cost = 16.0
+max_range = 34.0
+cast_time = 0.0
+spell_id = "sylvan_grapple"
+tier = 2
+element = "arcane"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+target_mode = 1
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

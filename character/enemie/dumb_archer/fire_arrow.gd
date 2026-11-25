@@ -45,6 +45,10 @@ func _on_attack_landed(target: Node) -> void:
 	linear_velocity = Vector3.ZERO
 	angular_velocity = Vector3.ZERO
 	set_physics_process(false)
+	var move_comp = get_node_or_null("ProjectileMovementComponent")
+	if move_comp != null:
+		move_comp.set_physics_process(false)
+		move_comp.set_process(false)
 	
 	var col = get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if col != null:
@@ -74,7 +78,17 @@ func _on_attack_landed(target: Node) -> void:
 		return
 
 	# 3. Faire disparatre la flche aprs 10 secondes (si elle est dans un mur)
-	await get_tree().create_timer(stick_duration).timeout
+	var sync_flush_delay := minf(0.05, stick_duration)
+	if sync_flush_delay > 0.0:
+		await get_tree().create_timer(sync_flush_delay).timeout
+	if not is_instance_valid(self):
+		return
+	if has_node("MultiplayerSynchronizer"):
+		$MultiplayerSynchronizer.process_mode = Node.PROCESS_MODE_DISABLED
+
+	var remaining_stick := maxf(0.0, stick_duration - sync_flush_delay)
+	if remaining_stick > 0.0:
+		await get_tree().create_timer(remaining_stick).timeout
 	if is_instance_valid(self):
 		if is_inside_tree() and multiplayer.is_server():
 			queue_free()

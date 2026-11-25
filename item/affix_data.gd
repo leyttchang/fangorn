@@ -1,7 +1,7 @@
 class_name AffixData
 extends Resource
 
-@export var affix_name: String = "Nouvel Affixe"
+@export var affix_name: String = "New Affix"
 @export var stat_name: String = "max_health"
 
 @export_category("Valeurs de base (ilvl 1)")

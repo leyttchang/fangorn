@@ -48,6 +48,7 @@ func on_mid_cast_event(event_name: String) -> void:
 			
 			$Sphere3.global_transform.basis = target_basis * sphere3_local_basis
 		
+		SpellAudioManager.play_fire_cast(self, ($Sphere3 as Node3D).global_position, 1.06, -0.5)
 		if anim_player != null:
 			anim_player.stop()
 			anim_player.play("stab") 

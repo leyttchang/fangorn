@@ -8,11 +8,17 @@
 [resource]
 script = ExtResource("1_20ysy")
 ability_name = "Fireball"
-description = "Hurls a sphere of concentrated flame that detonates upon impact, scorching all enemies caught in the blast and leaving them with lingering burns."
+description = "Hurls a volatile sphere of concentrated flame that crackles through the air and detonates in a heavy explosive blast upon impact."
 icon = ExtResource("1_w6ik7")
-cooldown = 10.0
-mana_cost = 50.0
-cast_time = 2.0
+cooldown = 5.5
+mana_cost = 24.0
+cast_time = 0.45
+spell_id = "fireball"
+tier = 2
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
 target_mode = 1
 cast_vfx_scene = ExtResource("2_86154")
 ability_scene = ExtResource("1_i6nhm")

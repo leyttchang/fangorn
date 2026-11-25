@@ -21,8 +21,13 @@ func _generate():
 	var type_str = "Spell"
 	if spell_data.skill_type == AbilityData.SkillScalingType.ATTACK:
 		type_str = "Attack"
+	elif spell_data.target_mode == AbilityData.TargetMode.CHANNEL:
+		type_str = "Channeled Spell"
 		
-	bbcode += "[color=lightblue]%s | Cooldown: %ss | Mana Cost: %s[/color]\n\n" % [type_str, spell_data.cooldown, spell_data.mana_cost]
+	if spell_data.target_mode == AbilityData.TargetMode.CHANNEL:
+		bbcode += "[color=lightblue]%s | Cooldown: %ss | Mana: %s + %s/s[/color]\n\n" % [type_str, spell_data.cooldown, spell_data.mana_cost, spell_data.channel_mana_per_sec]
+	else:
+		bbcode += "[color=lightblue]%s | Cooldown: %ss | Mana Cost: %s[/color]\n\n" % [type_str, spell_data.cooldown, spell_data.mana_cost]
 	
 	var scene_instance = spell_data.ability_scene.instantiate()
 	
@@ -111,14 +116,18 @@ func _generate():
 			
 	scene_instance.queue_free()
 	
-	var tooltip_res = SpellTooltipData.new()
-	tooltip_res.generated_text = bbcode
-	
 	var original_path = spell_data.resource_path
 	var new_path = original_path.get_base_dir() + "/" + original_path.get_file().get_basename() + "_tooltip.tres"
 	
+	var tooltip_res = null
+	if ResourceLoader.exists(new_path):
+		tooltip_res = ResourceLoader.load(new_path)
+	if tooltip_res == null:
+		tooltip_res = SpellTooltipData.new()
+	tooltip_res.generated_text = bbcode
+	
 	ResourceSaver.save(tooltip_res, new_path)
-	print("[TooltipGenerator] Succes ! Nouveau fichier cree: " + new_path)
+	print("[TooltipGenerator] Succes ! Fichier mis a jour: " + new_path)
 
 func _format_attack(attack_comp, scaling) -> String:
 	var bbcode = "[color=orange][b]- %s -[/b][/color]\n" % attack_comp.get_parent().name.capitalize()

@@ -1,0 +1,52 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/ember_bolt/ember_bolt.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_atk"]
+[ext_resource type="PackedScene" uid="uid://c8vpbw6n27cqq" path="res://components/spell_componants/projectile_movement_component.tscn" id="3_mov"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="4_scl"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="5_sea"]
+[ext_resource type="Resource" uid="uid://cwl1x2y7sug0o" path="res://scripts/status_effects/burn/burn.tres" id="6_burn"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_body"]
+radius = 0.16
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hit"]
+radius = 0.34
+
+[sub_resource type="Resource" id="Resource_burn_app"]
+script = ExtResource("5_sea")
+effect = ExtResource("6_burn")
+duration = 3.0
+apply_chance = 0.35
+metadata/_custom_type_script = "uid://f3s08057cvjq"
+
+[node name="EmberBolt" type="RigidBody3D"]
+collision_layer = 0
+gravity_scale = 0.0
+script = ExtResource("1_script")
+lifespan = 0.52
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_body")
+
+[node name="AttackComponent" parent="." instance=ExtResource("2_atk")]
+collision_layer = 4
+collision_mask = 137
+base_damage = 16.0
+destroy_on_environment = true
+knockback_force = 2.5
+is_projectile = true
+status_effects_to_apply = Array[ExtResource("5_sea")]([SubResource("Resource_burn_app")])
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0"]
+shape = SubResource("SphereShape3D_hit")
+
+[node name="ProjectileMovementComponent" parent="." instance=ExtResource("3_mov")]
+projectile_speed = 32.0
+
+[node name="SpellScalingComponent" parent="." node_paths=PackedStringArray("attack_component") instance=ExtResource("4_scl")]
+attack_component = NodePath("../AttackComponent")
+phys_ratio = 0.0
+fire_ratio = 1.0
+
+[editable path="AttackComponent"]

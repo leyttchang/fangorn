@@ -9,12 +9,15 @@ extends CharacterBody3D
 
 signal flare_popped
 
-const GROUND_CHECK_INTERVAL: float = 0.15
-const TARGET_REFRESH_INTERVAL: float = 0.20
+const GROUND_CHECK_INTERVAL: float = 0.32
+const TARGET_REFRESH_INTERVAL: float = 0.25
 const NET_SYNC_INTERVAL: float = 0.15
 const MIN_GROUND_CLEARANCE: float = 0.65
 const REFERENCE_TURN_SPEED_VEL: float = 2.8
-const MIN_VISUAL_RANGE: float = 130.0
+const MIN_VISUAL_RANGE: float = 44.0
+
+static var _cached_map_gen: Node = null
+static var _cached_map_gen_frame: int = -1
 
 @export_group("Mouvement & Guidage")
 ## Vitesse initiale de déplacement de cette orbe (en m/s)
@@ -22,7 +25,7 @@ const MIN_VISUAL_RANGE: float = 130.0
 ## Accélération progressive de l'orbe au fil du temps (en m/s²) pour rattraper le combat
 @export_range(0.0, 5.0, 0.05, "suffix:m/s²") var speed_acceleration: float = 0.35
 ## Vitesse plafond maximale atteignable par l'orbe (en m/s)
-@export_range(1.0, 25.0, 0.1, "suffix:m/s") var max_move_speed: float = 8.5
+@export_range(1.0, 25.0, 0.01, "suffix:m/s") var max_move_speed: float = 7.22
 ## Vitesse de braquage de base à basse vitesse (en rad/s, augmente proportionnellement avec la vitesse)
 @export_range(0.2, 15.0, 0.1, "suffix:rad/s") var turn_speed: float = 2.6
 ## Durée de vie maximale avant dissipation automatique (en secondes)
@@ -54,11 +57,6 @@ var _target_player: Node3D = null
 @onready var attack_component: AttackComponent = $AttackComponent as AttackComponent
 @onready var body_collision: CollisionShape3D = $CollisionShape3D as CollisionShape3D
 @onready var visuals_root: Node3D = $Visuals as Node3D
-
-# Ressources partagées pour l'éclat one-shot de destruction (zéro allocation shader à l'impact)
-static var _pop_mat: StandardMaterial3D = null
-static var _pop_proc_mat: ParticleProcessMaterial = null
-static var _pop_quad: QuadMesh = null
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(1)
@@ -96,7 +94,6 @@ func _ready() -> void:
 			attack_component.area_entered.connect(_on_attack_area_entered)
 
 	_apply_stats()
-	_ensure_pop_vfx_resources()
 	call_deferred("_post_spawn_init")
 
 func _post_spawn_init() -> void:
@@ -123,7 +120,7 @@ func setup_flare(
 	p_turn_speed: float = 2.6,
 	p_knockback: float = 4.0,
 	p_acceleration: float = 0.35,
-	p_max_speed: float = 8.5
+	p_max_speed: float = 7.22
 ) -> void:
 	move_speed = maxf(0.1, p_speed)
 	_current_speed = move_speed
@@ -177,7 +174,18 @@ func _physics_process(delta: float) -> void:
 		var target_pos: Vector3 = _get_player_torso_pos(_target_player)
 		var to_target: Vector3 = target_pos - global_position
 		var dist_sq: float = to_target.length_squared()
-		if dist_sq > 0.0004:
+		var player_hc: HealthComponent = _target_player.get_node_or_null("HealthComponent") as HealthComponent
+		var player_intangible: bool = (player_hc != null and player_hc.is_intangible)
+		if is_auth and dist_sq <= 0.65 * 0.65 and not player_intangible:
+			if attack_component != null and not attack_component.hit_entities.has(_target_player):
+				var p_hb: HitboxComponent = _target_player.get_node_or_null("HitboxComponent") as HitboxComponent
+				if p_hb != null:
+					attack_component.hit_entities.append(_target_player)
+					_apply_stats()
+					p_hb.receive_hit(attack_component)
+			pop_flare(true)
+			return
+		if dist_sq > 0.0004 and not (player_intangible and dist_sq < 1.8 * 1.8):
 			var desired_dir: Vector3 = to_target / sqrt(dist_sq)
 			var speed_ratio: float = maxf(1.0, _current_speed / REFERENCE_TURN_SPEED_VEL)
 			var effective_turn: float = turn_speed * lerpf(1.0, speed_ratio, 0.72)
@@ -201,7 +209,8 @@ func _physics_process(delta: float) -> void:
 			global_position.y = _min_allowed_y
 
 	velocity = vel
-	move_and_slide()
+	# collision_mask == 0 : déplacement direct O(1) sans sweep-and-slide PhysicsServer3D coûteux
+	global_position += vel * delta
 
 	if multiplayer.has_multiplayer_peer():
 		if is_auth:
@@ -242,7 +251,21 @@ func _steer_direction(current_dir: Vector3, desired_dir: Vector3, max_angle_rad:
 	return cur.slerp(des, t).normalized()
 
 func _update_ground_clearance() -> void:
-	if not is_inside_tree() or get_world_3d() == null:
+	if not is_inside_tree():
+		return
+	var cur_frame: int = Engine.get_physics_frames()
+	if _cached_map_gen == null or not is_instance_valid(_cached_map_gen):
+		if cur_frame != _cached_map_gen_frame and get_tree() != null and get_tree().current_scene != null:
+			_cached_map_gen_frame = cur_frame
+			_cached_map_gen = get_tree().current_scene.find_child("Map_generator", true, false)
+	if _cached_map_gen != null and is_instance_valid(_cached_map_gen) and _cached_map_gen.has_method("get_terrain_height_at"):
+		var th: float = float(_cached_map_gen.call("get_terrain_height_at", global_position.x, global_position.z))
+		if not is_nan(th) and not is_inf(th):
+			_has_ground_floor = true
+			_min_allowed_y = th + MIN_GROUND_CLEARANCE
+			return
+
+	if get_world_3d() == null:
 		return
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
 	if space_state == null:
@@ -399,96 +422,27 @@ func _execute_pop_local(play_vfx: bool) -> void:
 func _spawn_pop_burst(world_pos: Vector3) -> void:
 	if get_tree() == null:
 		return
+	var burst: GPUParticles3D = get_node_or_null("PopBurst") as GPUParticles3D
+	if burst == null:
+		return
 	var vp: Viewport = get_viewport()
 	if vp != null:
 		var cam: Camera3D = vp.get_camera_3d()
-		if cam != null and cam.global_position.distance_squared_to(world_pos) > 95.0 * 95.0:
+		if cam != null and cam.global_position.distance_squared_to(world_pos) > 75.0 * 75.0:
 			return
-
-	_ensure_pop_vfx_resources()
-
-	var burst: GPUParticles3D = GPUParticles3D.new()
-	burst.name = "ArcaneFlarePopVFX"
-	burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	burst.visibility_range_end = 95.0
-	burst.visibility_range_end_margin = 6.0
-	burst.material_override = _pop_mat
-	burst.process_material = _pop_proc_mat
-	burst.draw_pass_1 = _pop_quad
-	burst.amount = 10
-	burst.lifetime = 0.35
-	burst.one_shot = true
-	burst.explosiveness = 0.92
-	burst.fixed_fps = 30
-	burst.position = world_pos
 
 	var host_parent: Node = get_tree().current_scene if get_tree().current_scene != null else get_tree().root
 	if host_parent == null:
-		burst.queue_free()
 		return
+	remove_child(burst)
 	host_parent.add_child(burst)
 	burst.global_position = world_pos
 	burst.emitting = true
 
-	burst.finished.connect(func() -> void:
-		if is_instance_valid(burst):
-			burst.queue_free()
+	var burst_ref: WeakRef = weakref(burst)
+	burst.finished.connect(burst.queue_free)
+	get_tree().create_timer(0.50).timeout.connect(func() -> void:
+		var b: Node = burst_ref.get_ref() as Node
+		if b != null and is_instance_valid(b):
+			b.queue_free()
 	)
-	get_tree().create_timer(0.55).timeout.connect(func() -> void:
-		if is_instance_valid(burst):
-			burst.queue_free()
-	)
-
-static func _ensure_pop_vfx_resources() -> void:
-	if _pop_mat != null and _pop_proc_mat != null and _pop_quad != null:
-		return
-
-	var spark_tex: Texture2D = preload("res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png")
-
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.vertex_color_use_as_albedo = true
-	mat.vertex_color_is_srgb = true
-	mat.albedo_texture = spark_tex
-	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	mat.billboard_keep_scale = true
-	_pop_mat = mat
-
-	var grad: Gradient = Gradient.new()
-	grad.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
-	grad.colors = PackedColorArray([
-		Color(2.2, 1.5, 3.2, 1.0),
-		Color(1.45, 0.32, 2.65, 0.85),
-		Color(0.55, 0.08, 1.2, 0.0)
-	])
-	var grad_tex: GradientTexture1D = GradientTexture1D.new()
-	grad_tex.gradient = grad
-	grad_tex.use_hdr = true
-
-	var scale_curve: Curve = Curve.new()
-	scale_curve.add_point(Vector2(0.0, 1.0))
-	scale_curve.add_point(Vector2(1.0, 0.15))
-	var scale_tex: CurveTexture = CurveTexture.new()
-	scale_tex.curve = scale_curve
-
-	var proc: ParticleProcessMaterial = ParticleProcessMaterial.new()
-	proc.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	proc.emission_sphere_radius = 0.10
-	proc.direction = Vector3(0.0, 1.0, 0.0)
-	proc.spread = 180.0
-	proc.initial_velocity_min = 2.2
-	proc.initial_velocity_max = 4.8
-	proc.damping_min = 5.0
-	proc.damping_max = 8.5
-	proc.gravity = Vector3.ZERO
-	proc.scale_min = 0.09
-	proc.scale_max = 0.20
-	proc.scale_curve = scale_tex
-	proc.color_ramp = grad_tex
-	_pop_proc_mat = proc
-
-	var quad: QuadMesh = QuadMesh.new()
-	quad.size = Vector2(1.0, 1.0)
-	_pop_quad = quad

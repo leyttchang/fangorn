@@ -19,7 +19,6 @@ func _ready() -> void:
 
 func _on_player_hit_enemy() -> void:
 	hit_timestamps.append(Time.get_ticks_msec())
-	print("Overwhelming Combo: Hit Registered! Total hits: ", hit_timestamps.size())
 
 func _process(_delta: float) -> void:
 	if stats == null: return
@@ -39,14 +38,12 @@ func _process(_delta: float) -> void:
 		last_calculated_hits = current_hits
 
 func _update_combo_stats(num_hits: int) -> void:
-	stats.remove_modifier_by_source("overwhelming_combo")
-	print("Overwhelming Combo: Buff Removed")
-	
 	if num_hits > 0:
 		var bonus = num_hits * DAMAGE_PER_HIT
 		# mod_type = 1 (PERCENT)
-		stats.add_modifier("physical_damage", 1, bonus, "overwhelming_combo")
-		print("Overwhelming Combo: Buff Applied: +", bonus*100, "%")
+		stats.set_or_update_modifier("physical_damage", 1, bonus, "overwhelming_combo")
+	else:
+		stats.remove_modifier_by_source("overwhelming_combo")
 
 func _exit_tree() -> void:
 	if player != null and player.has_signal("player_hit_enemy"):
@@ -55,4 +52,3 @@ func _exit_tree() -> void:
 			
 	if stats != null:
 		stats.remove_modifier_by_source("overwhelming_combo")
-	print("Overwhelming Combo: Buff Removed")

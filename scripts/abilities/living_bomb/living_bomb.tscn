@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/living_bomb/living_bomb.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="2_atk"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="3_scl"]
+[ext_resource type="Script" uid="uid://f3s08057cvjq" path="res://scripts/status_effects/status_effect_application.gd" id="4_sea"]
+[ext_resource type="Resource" uid="uid://cwl1x2y7sug0o" path="res://scripts/status_effects/burn/burn.tres" id="5_burn"]
+
+[sub_resource type="Resource" id="Resource_burn_app"]
+script = ExtResource("4_sea")
+effect = ExtResource("5_burn")
+duration = 4.0
+apply_chance = 1.0
+metadata/_custom_type_script = "uid://f3s08057cvjq"
+
+[node name="LivingBomb" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="AttackComponent" parent="." instance=ExtResource("2_atk")]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+base_damage = 42.0
+knockback_force = 6.5
+knockback_angle = 18.0
+status_effects_to_apply = Array[ExtResource("4_sea")]([SubResource("Resource_burn_app")])
+
+[node name="SpellScalingComponent" parent="." node_paths=PackedStringArray("attack_component") instance=ExtResource("3_scl")]
+attack_component = NodePath("../AttackComponent")
+base_impact_radius = 4.8
+is_aoe = true
+phys_ratio = 0.0
+fire_ratio = 1.0

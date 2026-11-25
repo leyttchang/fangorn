@@ -11,8 +11,8 @@ class TrailSample:
 		outer_pos = in_outer
 		age = in_age
 
-@export var trail_lifetime: float = 0.16
-@export var max_sample_spacing: float = 0.06
+@export var trail_lifetime: float = 0.15
+@export var max_sample_spacing: float = 0.05
 @export var min_sample_spacing: float = 0.004
 
 var is_emitting: bool = false
@@ -53,8 +53,8 @@ func start_trail(caster: Node3D) -> void:
 
 	_source_node = _resolve_trail_source(caster)
 	var blade_top_y: float = _compute_blade_top_y(_source_node)
-	_inner_local = Vector3(0.0, blade_top_y * 0.66, 0.0)
-	_outer_local = Vector3(0.0, blade_top_y * 0.98, 0.0)
+	_inner_local = Vector3(0.0, blade_top_y * 0.56, 0.0)
+	_outer_local = Vector3(0.0, blade_top_y * 1.02, 0.0)
 
 	is_emitting = _source_node != null and is_instance_valid(_source_node)
 	if is_emitting:
@@ -165,8 +165,8 @@ func _rebuild_ribbon_mesh() -> void:
 		var pos_out: Vector3 = sample.outer_pos
 		var pos_in: Vector3 = pos_out.lerp(sample.inner_pos, width_taper)
 
-		var outer_color := Color(0.92, 0.95, 1.0, 0.42 * life_fade * head_taper)
-		var inner_color := Color(0.85, 0.90, 0.96, 0.08 * life_fade * head_taper)
+		var outer_color := Color(0.93, 0.96, 1.0, 0.52 * life_fade * head_taper)
+		var inner_color := Color(0.86, 0.91, 0.98, 0.11 * life_fade * head_taper)
 
 		_ribbon_mesh.surface_set_color(outer_color)
 		_ribbon_mesh.surface_set_uv(Vector2(u, 0.0))

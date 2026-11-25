@@ -45,12 +45,20 @@ func _on_equipment_changed(slot_name: String, _item: ItemData) -> void:
 func _input(event):
 	if not owner.is_multiplayer_authority(): return
 	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE: return
+	if owner.get("external_motion_override") == true or owner.get("is_in_transformation") == true:
+		if is_attacking:
+			reset_attack_state()
+		return
 	if skill_bar != null and skill_bar.current_state != SkillBarComponent.State.IDLE: return
-	# Les autres inputs spÃ©cifiques (si prÃ©sents) peuvent rester ici
+	# Les autres inputs spécifiques (si présents) peuvent rester ici
 
 func _process(delta: float) -> void:
 	if not owner.is_multiplayer_authority(): return
 	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE: return
+	if owner.get("external_motion_override") == true or owner.get("is_in_transformation") == true:
+		if is_attacking:
+			reset_attack_state()
+		return
 	if skill_bar != null and skill_bar.current_state != SkillBarComponent.State.IDLE: return
 	
 	# 1. MÃ©moriser les clics rapides (spam) pendant une attaque
@@ -250,10 +258,8 @@ func end_combat_state():
 
 func _on_weapon_hit(target: Node3D) -> void:
 	if target.get_parent().is_in_group("Enemie") or "Dummy" in target.get_parent().name:
-		print("Main_droite: Hit enemy!")
 		if not has_hit_in_combo_swing:
 			has_hit_in_combo_swing = true
-			print("Main_droite: Emitting player_hit_enemy signal!")
 			var player = owner if owner != null else get_tree().get_first_node_in_group("Player")
 			if player != null and player.has_signal("player_hit_enemy"):
 				player.emit_signal("player_hit_enemy")

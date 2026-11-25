@@ -11,37 +11,42 @@ signal level_up(new_level: int)
 
 var xp_to_next_level: int = 100
 
+
 func _ready() -> void:
 	_calculate_xp_requirement()
-	
+
+
 func add_xp(amount: int) -> void:
-	if amount <= 0: return
-	
+	if amount <= 0:
+		return
+
 	current_xp += amount
-	
-	# Vérifie si on a assez d'XP pour monter de niveau (peut arriver plusieurs fois d'un coup si on gagne beaucoup d'XP)
+
 	while current_xp >= xp_to_next_level:
 		_level_up()
-		
-	# On émet le signal pour que l'interface puisse mettre à jour la barre d'XP
+
 	xp_changed.emit(current_xp, xp_to_next_level)
+
+	# Distribue aussi l'XP gagnée aux sorts actuellement équipés dans la barre de sorts du joueur
+	var parent_node: Node = get_parent()
+	if parent_node != null:
+		var spellbook: Node = parent_node.get_node_or_null("SpellBook_UI")
+		if spellbook != null and spellbook.has_method("on_player_xp_gained"):
+			spellbook.call("on_player_xp_gained", amount)
+
 
 @rpc("any_peer", "call_local", "reliable")
 func _rpc_add_xp(amount: int) -> void:
 	if get_parent().is_multiplayer_authority():
 		add_xp(amount)
 
+
 func _level_up() -> void:
-	# On retire l'XP requise pour le niveau actuel
 	current_xp -= xp_to_next_level
 	current_level += 1
-	
-	# On recalcule le besoin pour le niveau suivant
 	_calculate_xp_requirement()
-	
-	# On prévient tout le monde (l'UI, le joueur pour gagner des stats, etc.)
 	level_up.emit(current_level)
 
+
 func _calculate_xp_requirement() -> void:
-	# Formule classique : 100 au niveau 1, 150 au niveau 2, 225 au niveau 3, etc.
 	xp_to_next_level = int(base_xp_requirement * pow(xp_multiplier_per_level, current_level - 1))

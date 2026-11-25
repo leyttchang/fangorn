@@ -5,7 +5,9 @@
 
 [node name="BossGate" type="Node3D" unique_id=544636407]
 script = ExtResource("1_bossgate")
+open_rim_keep_meters = 1.45
+editor_debut_preview = 0.55
 
 [node name="InteractionComponent" parent="." unique_id=231557202 instance=ExtResource("2_interact")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 1.15)
-prompt_text = "[E] Écarter les racines"
+prompt_text = "[F] Clear the roots"

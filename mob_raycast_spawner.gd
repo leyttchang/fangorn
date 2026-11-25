@@ -74,6 +74,8 @@ enum FacingMode {
 @export var spawn_on_ready: bool = false
 ## Clear old monsters from this spawner before spawning new ones
 @export var clear_previous_before_spawn: bool = true
+## Automatically free alive monsters spawned by this spawner when the spawner leaves the scene tree
+@export var clear_mobs_on_exit: bool = true
 ## Parent node to store spawned monsters (leave empty to child under this spawner)
 @export var mobs_container: Node3D
 
@@ -115,6 +117,8 @@ enum FacingMode {
 var alive_mobs: Array[Node3D] = []
 var _is_spawning: bool = false
 var _scan_timer: float = 0.0
+var _cached_map_gen: Node = null
+var _map_gen_searched: bool = false
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -125,7 +129,69 @@ func _ready() -> void:
 	_remove_debug_mesh()
 	
 	if spawn_on_ready:
-		call_deferred("spawn_mobs")
+		call_deferred("_deferred_spawn_on_ready")
+
+func _exit_tree() -> void:
+	if Engine.is_editor_hint():
+		return
+	if clear_mobs_on_exit:
+		clear_mobs()
+
+func _deferred_spawn_on_ready() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	var p: Node = get_parent()
+	while p != null:
+		if p.is_queued_for_deletion():
+			return
+		p = p.get_parent()
+	spawn_mobs()
+
+func _find_map_generator() -> Node:
+	if _cached_map_gen != null and is_instance_valid(_cached_map_gen):
+		return _cached_map_gen
+	if _map_gen_searched:
+		return null
+	_map_gen_searched = true
+	if not is_inside_tree() or get_tree() == null:
+		return null
+	var cur: Node = get_parent()
+	while cur != null:
+		if cur.has_method("get_terrain_height_at"):
+			_cached_map_gen = cur
+			return _cached_map_gen
+		cur = cur.get_parent()
+	var scene_root: Node = get_tree().current_scene
+	if scene_root != null:
+		var found: Node = scene_root.find_child("Map_generator", true, false)
+		if found != null and found.has_method("get_terrain_height_at"):
+			_cached_map_gen = found
+			return _cached_map_gen
+	return null
+
+func _enforce_mobs_above_ground() -> void:
+	var mg: Node = _find_map_generator()
+	for i: int in range(alive_mobs.size() - 1, -1, -1):
+		var mob: Node3D = alive_mobs[i]
+		if mob == null or not is_instance_valid(mob) or mob.is_queued_for_deletion():
+			continue
+		if not mob.is_physics_processing():
+			continue
+		var mp: Vector3 = mob.global_position
+		if mg != null:
+			var ty: float = float(mg.call("get_terrain_height_at", mp.x, mp.z))
+			if not is_nan(ty) and not is_inf(ty):
+				if mp.y < ty - 2.5:
+					mob.global_position = Vector3(mp.x, ty + 1.0, mp.z)
+					if mob is CharacterBody3D and (mob as CharacterBody3D).velocity.y < 0.0:
+						(mob as CharacterBody3D).velocity.y = 0.0
+				continue
+		if mp.y < global_position.y - 80.0:
+			var hc: HealthComponent = mob.get_node_or_null("HealthComponent") as HealthComponent
+			if hc != null:
+				hc.take_damage(999999.0)
+			else:
+				mob.queue_free()
 
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
@@ -139,6 +205,8 @@ func _physics_process(delta: float) -> void:
 	if _scan_timer < 0.15:
 		return
 	_scan_timer = 0.0
+
+	_enforce_mobs_above_ground()
 
 	# 1. Pack Mind: Check if any alive monster already has a valid target
 	if aggro_link:
@@ -244,6 +312,7 @@ func spawn_mobs() -> Array[Node3D]:
 			
 		target_container.add_child(mob_instance, true)
 		mob_instance.global_position = ground_info.position
+		WorldLevelScaler.apply_level_to_monster(mob_instance, maxi(1, encounter_level))
 		
 		_apply_facing(mob_instance, rng)
 		_track_mob(mob_instance)
@@ -364,6 +433,11 @@ func _find_valid_ground_position(rng: RandomNumberGenerator) -> Dictionary:
 		
 		var result = space_state.intersect_ray(query)
 		if not result.is_empty():
+			# Rejeter les troncs d'arbres géants (collision_layer 129 = 1 | 128) pour ne jamais spawner en haut d'un arbre
+			if result.has("rid"):
+				var hit_rid: RID = result["rid"] as RID
+				if hit_rid.is_valid() and (PhysicsServer3D.body_get_collision_layer(hit_rid) & 128) != 0:
+					continue
 			var hit_pos = result.position + Vector3(0.0, spawn_height_offset, 0.0)
 			return {"success": true, "position": hit_pos, "normal": result.normal}
 			
@@ -420,6 +494,12 @@ func alert_all_mobs(target_player: Node3D) -> void:
 	for mob in alive_mobs:
 		if not is_instance_valid(mob) or mob.is_queued_for_deletion():
 			continue
+		var opt: EnemyOptimizerComponent = mob.get_node_or_null("EnemyOptimizerComponent") as EnemyOptimizerComponent
+		if opt != null:
+			opt.set_ai_sleeping(false)
+		else:
+			mob.set_physics_process(true)
+			mob.set_process(true)
 		
 		# Extend chase range of EnemyNavigationComponent
 		var nav_comp = mob.get_node_or_null("EnemyNavigationComponent") as EnemyNavigationComponent

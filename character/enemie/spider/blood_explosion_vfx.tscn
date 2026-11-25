@@ -141,7 +141,8 @@ sub_emitter_frequency = 46.44
 [node name="blood_explosion_vfx" type="Node3D" unique_id=1363400936]
 
 [node name="blood" type="GPUParticles3D" parent="." unique_id=815233806]
-amount = 10000
+emitting = false
+amount = 320
 preprocess = 0.2
 explosiveness = 0.29
 fixed_fps = 60
@@ -150,7 +151,7 @@ draw_pass_1 = SubResource("QuadMesh_yqkk6")
 
 [node name="blood2" type="GPUParticles3D" parent="." unique_id=987654321]
 emitting = false
-amount = 10000
+amount = 320
 preprocess = 0.2
 explosiveness = 0.29
 fixed_fps = 60

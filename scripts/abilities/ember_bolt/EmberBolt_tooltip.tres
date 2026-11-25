@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Spell | Instant | Cooldown: 0.85s | Mana Cost: 6[/color]
+
+[color=orange][b]- Ember Bolt -[/b][/color]
+Damage: [b]16[/b] Base
+Damage Type: [color=orangered]100% Fire[/color]
+Range: 16.5m
+Applies [b]Burn[/b] (35% chance) for 3.0s
+"

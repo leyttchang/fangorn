@@ -2,9 +2,10 @@
 
 [ext_resource type="Script" uid="uid://0yddv8s1qwq8" path="res://scripts/status_effects/lightning_enchant/lightning_enchant_effect_data.gd" id="1_effect_script"]
 [ext_resource type="PackedScene" path="res://scripts/status_effects/lightning_enchant/lightning_enchant_vfx.tscn" id="2_enemie_vfx"]
-[ext_resource type="Shader" path="res://scripts/status_effects/lightning_enchant/enchant_chain_lightning.gdshader" id="3_chain_shader"]
-[ext_resource type="Shader" path="res://scripts/status_effects/lightning_enchant/enchant_lightning_sphere.gdshader" id="4_ball_shader"]
+[ext_resource type="Shader" uid="uid://c6tprukhb7kgv" path="res://scripts/status_effects/lightning_enchant/enchant_chain_lightning.gdshader" id="3_chain_shader"]
+[ext_resource type="Shader" uid="uid://be58xb6jvmq17" path="res://scripts/status_effects/lightning_enchant/enchant_lightning_sphere.gdshader" id="4_ball_shader"]
 [ext_resource type="PackedScene" uid="uid://cqc5bu642m1wa" path="res://particule/lightning/spraks.tscn" id="5_sparks"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="6_c26f1"]
 [ext_resource type="Texture2D" uid="uid://cobqyaoudap4a" path="res://assets/icon/Mythril Age Icons/electrical-crescent.png" id="6_icon"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cyan_core"]
@@ -56,7 +57,6 @@ shader_parameter/tint = Color(0.18, 1.9, 3.25, 1)
 
 [resource]
 script = ExtResource("1_effect_script")
-segments_count = 6
 line_material_1 = SubResource("ShaderMaterial_cyan_core")
 line_material_2 = SubResource("ShaderMaterial_cyan_vivid")
 line_material_3 = SubResource("ShaderMaterial_cyan_deep")

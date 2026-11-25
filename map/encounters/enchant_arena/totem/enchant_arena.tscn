@@ -46,7 +46,9 @@ monster_scenes = Array[PackedScene]([ExtResource("4_dumb"), ExtResource("5_arche
 monster_costs = Array[int]([10, 15, 25, 5, 20])
 monster_weights = Array[float]([1.2, 1.0, 0.7, 1.2, 0.2])
 base_credits = 200
-spawn_radius = 67.5
-min_spawn_radius = 4.0
+spawn_radius = 36.0
+min_spawn_radius = 4.5
+zone_aggro_radius = 48.0
+combat_aggro_radius = 180.0
 
 [editable path="MarkerTreeSpawnerComponent"]

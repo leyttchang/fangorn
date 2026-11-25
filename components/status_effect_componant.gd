@@ -12,6 +12,25 @@ class ActiveEffect:
 	var visual_instance: Node = null
 
 var _active_effects: Dictionary = {}
+var _expired_keys: Array[String] = []
+var _tick_damages: Array[float] = []
+static var _loaded_effects_cache: Dictionary = {}
+
+func _needs_frame_process() -> bool:
+	for key in _active_effects:
+		var eff = _active_effects[key]
+		if eff == null or eff.data == null:
+			continue
+		if eff.data.tick_damage > 0.0 and eff.data.tick_interval > 0.0:
+			return true
+		if eff.data.has_method("on_process"):
+			return true
+		if eff.total_duration < 90000.0:
+			return true
+	return false
+
+func _ready() -> void:
+	set_process(_needs_frame_process())
 
 # --- MULTIJOUEUR : APPLY ---
 func apply_effect(data: StatusEffectData, duration: float) -> void:
@@ -35,12 +54,15 @@ func _request_apply_effect(effect_path: String, duration: float) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _apply_effect_broadcast(effect_path: String, duration: float) -> void:
-	var data = load(effect_path) as StatusEffectData
+	var data: StatusEffectData = _loaded_effects_cache.get(effect_path) as StatusEffectData
+	if data == null and not effect_path.is_empty():
+		data = load(effect_path) as StatusEffectData
+		if data != null:
+			_loaded_effects_cache[effect_path] = data
 	if data != null:
 		_internal_apply_effect(data, duration)
 
 func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
-	print("Tentative application status : " + str(data.effect_id))
 	if data == null: return
 	
 	# Si l'effet existe deja, on refresh la duree
@@ -48,6 +70,7 @@ func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 		var eff = _active_effects[data.effect_id]
 		eff.total_duration = max(eff.total_duration, duration)
 		eff.time_remaining = max(eff.time_remaining, duration)
+		set_process(_needs_frame_process())
 		# Appel de la fonction custom meme en cas de refresh
 		data.on_apply(get_parent(), self, true)
 		return
@@ -59,6 +82,7 @@ func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 	new_effect.next_tick_time = data.tick_interval
 	
 	_active_effects[data.effect_id] = new_effect
+	set_process(_needs_frame_process())
 	
 	# --- APPLICATION DES STATS ---
 	if stats_component != null and stats_component.has_method("add_modifier"):
@@ -80,7 +104,6 @@ func _internal_apply_effect(data: StatusEffectData, duration: float) -> void:
 		
 	# --- APPLICATION DU SHADER (Overlay Material) ---
 	if data.overlay_material != null and not is_local_player:
-		print("Application du shader " + str(data.overlay_material) + " sur " + str(get_parent().name))
 		_apply_overlay_material(get_parent(), data.overlay_material)
 		
 	# Appel de la fonction custom
@@ -132,14 +155,22 @@ func _internal_remove_effect(effect_id: String) -> void:
 			_remove_overlay_material(get_parent(), eff.data.overlay_material)
 		
 	_active_effects.erase(effect_id)
+	if _active_effects.is_empty():
+		set_process(false)
 
 func has_effect(effect_id: String) -> bool:
 	return _active_effects.has(effect_id)
 
 func _process(delta: float) -> void:
-	var keys = _active_effects.keys()
-	for key in keys:
-		if not _active_effects.has(key): continue
+	if _active_effects.is_empty():
+		set_process(false)
+		return
+
+	var is_auth: bool = not multiplayer.has_multiplayer_peer() or is_multiplayer_authority()
+	_expired_keys.clear()
+	_tick_damages.clear()
+
+	for key in _active_effects:
 		var eff = _active_effects[key]
 		
 		# Ticks de degats (DoT)
@@ -147,18 +178,32 @@ func _process(delta: float) -> void:
 			eff.next_tick_time -= delta
 			if eff.next_tick_time <= 0.0:
 				eff.next_tick_time = eff.data.tick_interval
-				if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority(): # ONLY HOST INFLIGE DEGATS
-					if health_component != null and health_component.has_method("take_damage"):
-						health_component.take_damage(eff.data.tick_damage)
+				if is_auth: # ONLY HOST INFLIGE DEGATS
+					_tick_damages.append(eff.data.tick_damage)
 		
 		# Duree
 		eff.time_remaining -= delta
 		if eff.time_remaining <= 0.0:
-			if not multiplayer.has_multiplayer_peer() or is_multiplayer_authority(): # ONLY HOST DECIDE DE LA FIN
-				remove_effect(key)
+			if is_auth: # ONLY HOST DECIDE DE LA FIN
+				_expired_keys.append(key)
 		else:
 			if eff.data != null and eff.data.has_method("on_process"):
 				eff.data.on_process(get_parent(), self, delta, eff.time_remaining, eff.total_duration)
+
+	if not _tick_damages.is_empty():
+		for dmg in _tick_damages:
+			if health_component != null and health_component.has_method("take_damage"):
+				health_component.take_damage(dmg)
+		_tick_damages.clear()
+
+	if not _expired_keys.is_empty():
+		for key in _expired_keys:
+			if _active_effects.has(key):
+				remove_effect(key)
+		_expired_keys.clear()
+
+	if _active_effects.is_empty():
+		set_process(false)
 
 # --- FONCTIONS POUR SHADERS ---
 func _apply_overlay_material(node: Node, mat: Material) -> void:

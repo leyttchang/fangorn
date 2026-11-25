@@ -169,24 +169,19 @@ func _find_network_objects() -> Node:
 	return null
 
 
-## Résout l'ilvl de manière contextuelle (SmartSpawner ou distance de zone)
+## Résout l'ilvl de manière contextuelle (niveau du monstre, mode Vagues, ou distance 1..5 depuis le spawn joueur)
 func _resolve_ilvl() -> int:
 	if ilvl_override > 0:
 		return ilvl_override
-		
-	# Mode Vagues (SmartSpawner)
-	var spawners = get_tree().get_nodes_in_group("SmartSpawner")
-	if not spawners.is_empty():
-		var spawner = spawners[0]
-		if "current_wave" in spawner:
-			var wave = spawner.current_wave
-			if wave > 0:
-				return max(1, int(float(wave) / 1.5))
-				
-	# Mode Exploration / Normal : calculé selon l'éloignement au spawn (0,0,0)
-	var dist = global_position.length()
-	var lvl_from_dist = int(dist / 200.0) + 1
-	return max(1, lvl_from_dist)
+
+	var parent_node: Node = get_parent()
+	if parent_node != null:
+		if parent_node.has_meta("monster_level"):
+			return maxi(1, int(parent_node.get_meta("monster_level")))
+		if "ilvl" in parent_node and int(parent_node.get("ilvl")) > 0:
+			return maxi(1, int(parent_node.get("ilvl")))
+
+	return WorldLevelScaler.resolve_context_ilvl(self, global_position)
 
 
 ## Sélectionne une rareté pondérée avec l'influence du Magic Find

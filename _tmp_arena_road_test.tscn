@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://dkxm8142jelqt"]
+
+[ext_resource type="PackedScene" uid="uid://davgp2m6lkil8" path="res://map/map_generator/map_generator.tscn" id="1_mg"]
+
+[sub_resource type="GDScript" id="GDScript_test"]
+script/source = "extends Node3D
+
+@onready var map_gen: Node3D = $Map_generator
+@onready var cam: Camera3D = $TestCam
+
+func _ready() -> void:
+	var t0 := Time.get_ticks_msec()
+	var spec := map_gen.get_node_or_null('Camera3D')
+	if spec != null:
+		spec.queue_free()
+	cam.make_current()
+
+	await map_gen.terrain_ready
+	var grass_gen := map_gen.get_node_or_null('grass_generator')
+	if grass_gen != null and grass_gen.is_generating():
+		await grass_gen.grass_ready
+
+	var dt := Time.get_ticks_msec() - t0
+	var arena_gen := map_gen.get_arena_generator()
+	print('[ArenaRoadTest] Generation finished in %d ms | arena_path_segments=%d' % [dt, arena_gen.arena_path_segments.size()])
+
+	var west_arena := arena_gen.get_node_or_null('Arena_West') as Node3D
+	if west_arena != null:
+		var entry_m := west_arena.find_child('entry', true, false) as Node3D
+		var totem_m := west_arena.find_child('enchant_totem_pos', true, false) as Node3D
+		if entry_m != null and totem_m != null:
+			var ep := entry_m.global_position
+			var tp := totem_m.global_position
+			var fwd := (tp - ep).normalized()
+			cam.global_position = ep - fwd * 14.0 + Vector3(0.0, 26.0, 0.0)
+			cam.look_at(ep.lerp(tp, 0.68) + Vector3(0.0, 1.5, 0.0), Vector3.UP)
+			cam.make_current()
+			if map_gen.terrain != null and map_gen.terrain.has_method('set_camera'):
+				map_gen.terrain.set_camera(cam)
+			print('[ArenaRoadTest] Framed Arena_West: entry=%v totem=%v cam=%v' % [ep, tp, cam.global_position])
+"
+
+[node name="TestRoot" type="Node3D" unique_id=1890262952]
+script = SubResource("GDScript_test")
+
+[node name="Map_generator" parent="." unique_id=965507467 instance=ExtResource("1_mg")]
+oracle_vision_cocoon_count = null
+near_hidden_totem_cocoon_count = null
+
+[node name="TestCam" type="Camera3D" parent="." unique_id=560200823]
+current = true
+fov = 68.0

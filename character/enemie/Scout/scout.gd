@@ -98,12 +98,10 @@ func actor_setup() -> void:
 func enable_hitbox() -> void:
 	if attack_shape != null:
 		attack_shape.disabled = false
-		print("[HITBOX] ENABLED BY ANIMATION METHOD")
 
 func disable_hitbox() -> void:
 	if attack_shape != null:
 		attack_shape.disabled = true
-		print("[HITBOX] DISABLED BY ANIMATION METHOD")
 
 var _pending_attacker: Node3D = null
 var _is_waiting_for_aggro: bool = false
@@ -237,7 +235,6 @@ func _process(delta: float) -> void:
 	if attack_shape != null:
 		if attack_shape.disabled != _last_hitbox_disabled:
 			_last_hitbox_disabled = attack_shape.disabled
-			print("[HITBOX DEBUG] Frame ", Engine.get_frames_drawn(), " - disabled = ", attack_shape.disabled, " | State = ", current_state, " | Anim = ", anim_playback.get_current_node() if anim_playback else "null")
 
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority(): return
@@ -421,7 +418,7 @@ func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 		var dir_to_target = global_position.direction_to(target.global_position)
 		dir_to_target.y = 0
 		if dir_to_target.length_squared() > 0.01:
-			movement_comp.rotate_towards_direction(dir_to_target.normalized(), behavior, delta * 0.3)
+			movement_comp.rotate_towards_direction(dir_to_target.normalized(), behavior, delta, 0.58)
 			
 	if _current_attack_anim == "attaque":
 		pass
@@ -449,6 +446,7 @@ func spawn_slam_attack() -> void:
 	
 	get_tree().current_scene.get_node("NetworkObjects").add_child(slam, true)
 	slam.global_position = spawn_pos
+	WorldLevelScaler.scale_spawned_attack(slam, self)
 	
 	if slam.has_method("rpc_set_position"):
 		slam.rpc("rpc_set_position", spawn_pos)

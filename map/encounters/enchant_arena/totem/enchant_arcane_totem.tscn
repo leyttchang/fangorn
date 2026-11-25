@@ -12,7 +12,7 @@ height = 2.25
 radius = 0.68
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ebjp7"]
-size = Vector3(1.85, 2.5, 1.85)
+size = Vector3(2.8, 3.2, 2.8)
 
 [sub_resource type="Animation" id="Animation_edyrm"]
 length = 0.001
@@ -176,11 +176,11 @@ _data = {
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_87x4s"]
 transparency = 1
+blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("6_noen3")
-albedo_texture_msdf = true
 billboard_mode = 3
 billboard_keep_scale = true
 particles_anim_h_frames = 1
@@ -243,13 +243,12 @@ color = Color(0.73955935, 0.40586767, 1.1759251, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7rrm5"]
 transparency = 1
+blend_mode = 1
 cull_mode = 2
 shading_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("7_i7go4")
-albedo_texture_msdf = true
-use_particle_trails = true
 
 [sub_resource type="Curve" id="Curve_2sbp0"]
 _data = [Vector2(0, 0.04494381), 0.0, 0.0, 0, 0, Vector2(0.1658986, 1), 0.0, 0.0, 0, 0, Vector2(0.84792626, 0), 0.0, 0.0, 0, 0]
@@ -301,10 +300,8 @@ scale_max = 0.7
 color = Color(1.7410523, 0.60426503, 3.7045925, 1)
 alpha_curve = SubResource("CurveTexture_uhd1q")
 
-[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_nnqd0"]
-shape = 0
-size = 0.08
-section_segments = 4
+[sub_resource type="QuadMesh" id="RibbonTrailMesh_nnqd0"]
+size = Vector2(0.09, 0.52)
 
 [node name="enchant_arcane_totem" type="Node3D" unique_id=299790798 node_paths=PackedStringArray("element_node", "vfx_anim")]
 script = ExtResource("1_6g20f")
@@ -345,31 +342,38 @@ libraries/ = SubResource("AnimationLibrary_ww2j3")
 
 [node name="particles" type="GPUParticles3D" parent="arcane_VFX" unique_id=763127382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04879272, 0, 0)
+cast_shadow = 0
+visibility_range_end = 85.0
+visibility_range_end_margin = 10.0
 material_override = SubResource("StandardMaterial3D_87x4s")
 amount = 10
 lifetime = 2.0
-fixed_fps = 60
+fixed_fps = 30
 process_material = SubResource("ParticleProcessMaterial_kyuus")
 draw_pass_1 = SubResource("QuadMesh_62gku")
 
 [node name="vacum_particles" type="GPUParticles3D" parent="arcane_VFX" unique_id=492148390]
+cast_shadow = 0
+visibility_range_end = 85.0
+visibility_range_end_margin = 10.0
 material_override = SubResource("StandardMaterial3D_87x4s")
-amount = 50
+amount = 22
 lifetime = 0.75
 explosiveness = 0.85
-fixed_fps = 60
+fixed_fps = 30
 process_material = SubResource("ParticleProcessMaterial_hf65i")
 draw_pass_1 = SubResource("QuadMesh_62gku")
 
 [node name="trails" type="GPUParticles3D" parent="arcane_VFX" unique_id=678061877]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+cast_shadow = 0
+visibility_range_end = 85.0
+visibility_range_end_margin = 10.0
 material_override = SubResource("StandardMaterial3D_7rrm5")
-amount = 4
-lifetime = 3.0
-fixed_fps = 60
+amount = 8
+lifetime = 2.2
+fixed_fps = 30
 local_coords = true
-trail_enabled = true
-trail_lifetime = 0.7
 process_material = SubResource("ParticleProcessMaterial_dc2ui")
 draw_pass_1 = SubResource("RibbonTrailMesh_nnqd0")
 

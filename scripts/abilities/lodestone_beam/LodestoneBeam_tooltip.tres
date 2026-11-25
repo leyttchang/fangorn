@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Channeled Spell | Cooldown: 1.8s | Mana: 6 + 15.5/s[/color]
+
+[color=orange][b]- Lodestone Beam -[/b][/color]
+Tick Damage: [b]10.5[/b] Base [color=yellow](Single-Target)[/color] every 0.20s (scales with Cast Speed)
+Damage Type: [color=gold]100% Lightning[/color]
+Range: 16.0m • Magnetic Pull Radius: [b]8.0m[/b]
+[color=cyan]Turns the struck enemy into a powerful magnet, strongly pulling nearby monsters toward it without dealing area damage[/color]
+Applies [b]Shock[/b] (20% chance per tick) for 2.5s
+"

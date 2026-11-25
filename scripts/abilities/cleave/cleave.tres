@@ -8,15 +8,15 @@
 [resource]
 script = ExtResource("1_ability")
 ability_name = "Cleave"
-description = "Balaye largement devant vous d'un coup d'arme horizontal net, tranchant tous les ennemis dans l'arc d'attaque avec des dégâts purement physiques."
+description = "Sweeps wide in front of you with a clean horizontal weapon slash, cleaving all enemies within the attack arc for pure physical damage."
 icon = ExtResource("2_icon")
 category = 1
 cooldown = 2.0
 mana_cost = 10.0
-max_range = 4.0
+max_range = 4.3
 cast_time = 0.0
 skill_type = 1
-weapon_speed_multiplier = 1.05
+weapon_speed_multiplier = 1.22
 use_fixed_cast_time = false
 cooldown_attack_speed_scaling = 0.0
 target_mode = 5

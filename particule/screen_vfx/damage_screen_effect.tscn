@@ -110,6 +110,7 @@ script = ExtResource("1_script")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1611111299]
 visible = false
+layers = 2
 material_override = SubResource("ShaderMaterial_yqkk6")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_hlie2")

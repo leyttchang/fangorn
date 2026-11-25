@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell (Transformation) | Instant | Cooldown: 10.0s | Mana Cost: 24[/color]
+
+[color=cyan][b]- Glacial Ram -[/b][/color]
+Duration: [b]3.4s[/b] • Slide Speed: [b]19.5 m/s[/b] (Heavy inertia • Right-Click to cancel)
+Barrier: [b]20% of Max Health[/b] temporary Shield + Knockback Resistance
+Ram Impact: [b]34[/b] Base [color=cyan]100% Ice[/color] Damage [color=yellow](2.05m AoE)[/color]
+Knockback: [b]20.0[/b] (Launches enemies) • Hard ricochets off walls & trees
+Applies [b]Chill[/b] (-50% Move & Attack Speed) for 3.5s
+"

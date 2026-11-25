@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Spell | Instant | Cooldown: 1.15s | Mana Cost: 8[/color]
+
+[color=orange][b]- Kinetic Bolt -[/b][/color]
+Damage: [b]22[/b] Base
+Damage Type: [color=#b86bff]75% Arcane[/color] / [color=gray]25% Physical[/color]
+Properties: [color=violet]Pierces up to 2 targets • Ricochets once off walls/trees[/color]
+Applies [b]Arcane Sunder[/b] (-35% Armor & -20% Elemental Resistances) for 4.5s
+"

@@ -6,48 +6,75 @@ extends Node3D
 @export var main_droite: Marker3D
 
 var _current_attack_comp: AttackComponent = null
+var _weapon_container: Node = null
+var _cached_weapon_node: Node = null
+var _cached_container_child_count: int = -1
+var _weapon_cache_dirty: bool = true
+var _expired_targets: Array = []
 
 # Dictionnaire pour attendre que le raycast touche (Cible: Temps restant)
 var _pending_impacts: Dictionary = {}
 const MAX_WAIT_TIME: float = 0.15 # On attend jusqu'a 0.15s que l'arme penetre
 
-var _debug_printed_main_null: bool = false
-var _debug_printed_no_attack: bool = false
-
-var _debug_timer: float = 0.0
-
 func _ready() -> void:
-	print("[WeaponImpact] Le script est bien charge dans la scene ! main_droite = ", main_droite)
-
-func _process(delta: float) -> void:
-	_debug_timer += delta
-	
-	if main_droite == null:
-		if _debug_timer > 2.0:
-			print("[WeaponImpact] ERREUR EN BOUCLE : La case 'main_droite' est VIDE dans l'inspecteur de ton joueur !")
-			_debug_timer = 0.0
+	if owner != null and multiplayer.has_multiplayer_peer() and not owner.is_multiplayer_authority():
+		if raycast != null:
+			raycast.enabled = false
+		set_process(false)
 		return
-		
-	var found_comp = _find_attack_component_recursive(main_droite)
-	
-	if found_comp == null:
-		if _debug_timer > 2.0:
-			print("[WeaponImpact] ERREUR EN BOUCLE : 'main_droite' est bien la, mais AUCUN AttackComponent n'a ete trouve a l'interieur (arme pas equipee ou mal placee).")
-			_debug_timer = 0.0
-	else:
-		if not _debug_printed_no_attack:
-			print("[WeaponImpact] SUCCES : Un AttackComponent a ete trouve et est connecte !")
-			_debug_printed_no_attack = true
-			
+	_bind_weapon_container()
+
+func _bind_weapon_container() -> void:
+	if main_droite == null:
+		return
+	var wrist: Node = main_droite.get_node_or_null("wrist")
+	_weapon_container = wrist if wrist != null else main_droite
+	if not main_droite.child_entered_tree.is_connected(_on_weapon_tree_changed):
+		main_droite.child_entered_tree.connect(_on_weapon_tree_changed)
+		main_droite.child_exiting_tree.connect(_on_weapon_tree_changed)
+	if _weapon_container != main_droite and not _weapon_container.child_entered_tree.is_connected(_on_weapon_tree_changed):
+		_weapon_container.child_entered_tree.connect(_on_weapon_tree_changed)
+		_weapon_container.child_exiting_tree.connect(_on_weapon_tree_changed)
+	_weapon_cache_dirty = true
+
+func _on_weapon_tree_changed(_node: Node) -> void:
+	_weapon_cache_dirty = true
+
+func _refresh_attack_component() -> void:
+	_weapon_cache_dirty = false
+	if _weapon_container != null:
+		_cached_container_child_count = _weapon_container.get_child_count()
+	var found_comp: AttackComponent = _find_attack_component_recursive(_weapon_container if _weapon_container != null else main_droite)
+	_cached_weapon_node = found_comp.get_parent() if found_comp != null else null
 	if found_comp != _current_attack_comp:
-		if _current_attack_comp != null and _current_attack_comp.attack_landed.is_connected(_on_attack_landed):
+		if _current_attack_comp != null and is_instance_valid(_current_attack_comp) and _current_attack_comp.attack_landed.is_connected(_on_attack_landed):
 			_current_attack_comp.attack_landed.disconnect(_on_attack_landed)
 		_current_attack_comp = found_comp
 		if _current_attack_comp != null:
 			_current_attack_comp.attack_landed.connect(_on_attack_landed)
-			print("[WeaponImpact] Nouvelle arme connectée : ", _current_attack_comp.get_parent().name)
 
-	# --- NOUVEAU : VERIFICATION DES IMPACTS EN ATTENTE ---
+func _process(delta: float) -> void:
+	if owner != null and multiplayer.has_multiplayer_peer() and not owner.is_multiplayer_authority():
+		if raycast != null:
+			raycast.enabled = false
+		set_process(false)
+		return
+
+	if main_droite == null:
+		return
+
+	if _weapon_container == null:
+		_bind_weapon_container()
+
+	if (
+		_weapon_cache_dirty
+		or (_weapon_container != null and _weapon_container.get_child_count() != _cached_container_child_count)
+		or (_cached_weapon_node != null and (not is_instance_valid(_cached_weapon_node) or not _cached_weapon_node.is_inside_tree() or _cached_weapon_node.is_queued_for_deletion()))
+		or (_current_attack_comp != null and not is_instance_valid(_current_attack_comp))
+	):
+		_refresh_attack_component()
+
+	# --- VERIFICATION DES IMPACTS EN ATTENTE ---
 	if not _pending_impacts.is_empty() and raycast != null:
 		raycast.force_raycast_update()
 		
@@ -57,18 +84,16 @@ func _process(delta: float) -> void:
 		
 		if raycast.is_colliding():
 			var collider = raycast.get_collider()
-			# On ne spam le print que s'il y a des cibles en attente
-			print("[WeaponImpact] Pendant l'attente, Raycast touche actuellement : ", collider.name if collider else "null")
 			
-			# On cherche si l'objet touche par le Raycast est l'un de nos monstres fraiches touches
-			for target in _pending_impacts.keys():
+			# On cherche si l'objet touche par le Raycast est l'un de nos monstres fraichement touches
+			for target in _pending_impacts:
 				if target != null and is_instance_valid(target) and collider != null:
 					if collider == target or collider == target.get_parent() or collider.owner == target.owner:
 						hit_target = target
 						impact_point = raycast.get_collision_point()
 						impact_normal = raycast.get_collision_normal()
 						
-						# --- NOUVEAU : DEEP PENETRATION (Pour coller au Mesh/RigidBody) ---
+						# --- DEEP PENETRATION (Pour coller au Mesh/RigidBody) ---
 						var ray_start = raycast.global_position
 						var ray_end = raycast.to_global(raycast.target_position)
 						var ray_dir = (ray_end - ray_start).normalized()
@@ -89,25 +114,29 @@ func _process(delta: float) -> void:
 								impact_normal = deep_hit.normal
 						# -----------------------------------------------------------------
 						break
-		else:
-			print("[WeaponImpact] Pendant l'attente, Raycast ne touche RIEN.")
 		
 		# Si on a vu le raycast toucher notre cible !
 		if hit_target != null:
-			print("[WeaponImpact] SUCCESS ! Le Raycast a bien trouvé la cible : ", hit_target.name, ". Spawn du sang !")
 			var target_path = hit_target.get_path() if is_instance_valid(hit_target) else NodePath("")
 			_spawn_blood(impact_point, impact_normal, target_path)
 			_pending_impacts.erase(hit_target)
 			
 		# Diminuer le temps des cibles et nettoyer celles qui ont expire (raycast a rate)
-		var keys = _pending_impacts.keys()
-		for target in keys:
-			_pending_impacts[target] -= delta
-			if _pending_impacts[target] <= 0.0:
-				print("[WeaponImpact] ECHEC : Le temps est écoulé (0.15s) et le raycast n'a jamais touché ", target.name if is_instance_valid(target) else "cibledetruite")
+		if not _pending_impacts.is_empty():
+			_expired_targets.clear()
+			for target in _pending_impacts:
+				var rem: float = float(_pending_impacts[target]) - delta
+				if rem <= 0.0 or not is_instance_valid(target):
+					_expired_targets.append(target)
+				else:
+					_pending_impacts[target] = rem
+			for target in _expired_targets:
 				_pending_impacts.erase(target)
+			_expired_targets.clear()
 
 func _find_attack_component_recursive(node: Node) -> AttackComponent:
+	if node == null or node == self or node is WeaponImpactComponent or node.is_queued_for_deletion():
+		return null
 	if node is AttackComponent:
 		return node
 	for child in node.get_children():
@@ -116,11 +145,25 @@ func _find_attack_component_recursive(node: Node) -> AttackComponent:
 			return result
 	return null
 
+func _should_spawn_blood_for(target: Node) -> bool:
+	if target == null or not is_instance_valid(target):
+		return false
+	if target.get("enable_blood_vfx") == false:
+		return false
+	if target.is_in_group("ArcaneFlare"):
+		return false
+	var p: Node = target.get_parent()
+	if p != null and (p.is_in_group("ArcaneFlare") or p.get("enable_blood_vfx") == false):
+		return false
+	if target.owner != null and target.owner.is_in_group("ArcaneFlare"):
+		return false
+	return true
+
 func _on_attack_landed(target: Node) -> void:
 	if raycast == null or blood_particles_scene == null:
-		print("[WeaponImpact] ERREUR : Raycast ou BloodParticlesScene manquant dans l'inspecteur !")
 		return
-	print("[WeaponImpact] Signal attack_landed recu ! Ennemi touche : ", target.name, ". Mise sur liste d'attente.")
+	if not _should_spawn_blood_for(target):
+		return
 	# On met l'ennemi dans la file d'attente (le raycast a 0.15s pour le toucher physiquement)
 	_pending_impacts[target] = MAX_WAIT_TIME
 
@@ -163,5 +206,3 @@ func _rpc_spawn_blood(impact_point: Vector3, impact_normal: Vector3, target_path
 		
 	if blood.has_method("play_effect"):
 		blood.play_effect()
-	else:
-		print("[ERROR] Blood particle does NOT have play_effect method!")

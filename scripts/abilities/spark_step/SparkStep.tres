@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/electrical-crescent.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/spark_step/spark_step.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/spark_step/SparkStep_tooltip.tres" id="4_tt"]
+[ext_resource type="Resource" path="res://scripts/abilities/living_lightning/LivingLightning.tres" id="5_evo_ll"]
+[ext_resource type="Resource" path="res://scripts/abilities/stormwire/Stormwire.tres" id="6_evo_sw"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Spark Step"
+description = "Dematerializes you into a jagged bolt of lightning that zig-zags forward while intangible, phasing through monsters and leaving a crackling electric arc in your wake."
+icon = ExtResource("2_icon")
+cooldown = 4.5
+mana_cost = 14.0
+max_range = 7.0
+cast_time = 0.0
+spell_id = "spark_step"
+tier = 1
+element = "lightning"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("5_evo_ll"), ExtResource("6_evo_sw")])
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

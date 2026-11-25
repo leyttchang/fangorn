@@ -11,6 +11,8 @@ func _ready() -> void:
 
 # Cette fonction est appelée automatiquement par ton SkillBarComponent juste après l'apparition du sort
 func execute(caster: Node, target_data: Dictionary) -> void:
+	var sfx_pos: Vector3 = target_data["impact_point"] as Vector3 if target_data.has("impact_point") else global_position
+	SpellAudioManager.play_fire_impact(self, sfx_pos, 0.94, -1.8)
 	# 1. On demande au ScalingComponent de faire ses calculs en lui donnant le Joueur (caster)
 	if scaling_component != null and scaling_component.has_method("on_execute"):
 		scaling_component.on_execute(caster, target_data)
@@ -21,3 +23,4 @@ func execute(caster: Node, target_data: Dictionary) -> void:
 	# 3. On applique la bonne taille au visuel et à la hitbox
 	if ground_fire != null and ground_fire.has_method("setup"):
 		ground_fire.setup(radius, duration_on_ground)
+		SpellAudioManager.attach_fire_loop(ground_fire as Node3D, -8.8, 12.5, 38.0)

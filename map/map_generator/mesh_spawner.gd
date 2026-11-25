@@ -215,6 +215,15 @@ func generate_trees() -> void:
 	var encounter_positions: Array[Vector2] = _get_encounter_positions()
 	if not encounter_positions.is_empty():
 		print("MeshSpawner: Évitement actif pour ", encounter_positions.size(), " encounter(s) (rayon: ", rad, "m).")
+
+	var lesser_stele_pts: Array[Vector2] = []
+	var lesser_stele_rad: float = 18.5
+	if map_generator != null and "lesser_stele_positions" in map_generator:
+		for ls_p in map_generator.lesser_stele_positions:
+			if ls_p is Vector2:
+				lesser_stele_pts.append(ls_p as Vector2)
+		if "lesser_stele_tree_clear_radius" in map_generator and float(map_generator.lesser_stele_tree_clear_radius) > 0.0:
+			lesser_stele_rad = float(map_generator.lesser_stele_tree_clear_radius)
 		
 	var total_spawned: int = 0
 	var b_margin: float = 35.0
@@ -245,6 +254,11 @@ func generate_trees() -> void:
 				
 			# FILTRE 1.5 : Évitement des Encounters (dégage les zones de combat/camps)
 			if not encounter_positions.is_empty() and _is_near_any_encounter(px, pz, encounter_positions, rad):
+				x += spacing
+				continue
+
+			# FILTRE 1.6 : Clairière compacte autour des Petites Stèles Tier I (aucun arbre sur la stèle ou ses gardiens)
+			if not lesser_stele_pts.is_empty() and _is_near_any_encounter(px, pz, lesser_stele_pts, lesser_stele_rad):
 				x += spacing
 				continue
 				
@@ -390,6 +404,7 @@ func generate_trees() -> void:
 				mm.set_instance_transform(i, chunk_transforms[i])
 				
 			mmi.multimesh = mm
+			mmi.layers = 2 # Couche 2 : visible caméra/ombres, mais ignorée par la HeightField de pluie pour que la pluie traverse les cimes !
 			if v_data["material"] != null:
 				mmi.material_override = v_data["material"]
 				if is_inside_tree():

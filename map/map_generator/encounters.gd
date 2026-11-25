@@ -39,12 +39,30 @@ extends Node3D
 			clear_now = false
 			clear_encounters()
 
+var _spawned_network_encounters: Array[Node] = []
+
+func _clear_spawners_recursive(node: Node) -> void:
+	if node == null or not is_instance_valid(node):
+		return
+	if node is MobRaycastSpawner:
+		(node as MobRaycastSpawner).clear_mobs()
+	for ch: Node in node.get_children():
+		_clear_spawners_recursive(ch)
+
 func clear_encounters() -> void:
+	for inst: Node in _spawned_network_encounters:
+		if inst != null and is_instance_valid(inst) and not inst.is_queued_for_deletion():
+			_clear_spawners_recursive(inst)
+			inst.queue_free()
+	_spawned_network_encounters.clear()
+
 	for child in get_children():
 		if child is Marker3D:
 			for subchild in child.get_children():
+				_clear_spawners_recursive(subchild)
 				subchild.queue_free()
 		elif not child.name.begins_with("encounter_"):
+			_clear_spawners_recursive(child)
 			child.queue_free()
 	print("Encounters: nettoyés.")
 
@@ -104,17 +122,27 @@ func spawn_encounters(encounter_seed: int = 0) -> void:
 		var random_index = rng.randi_range(0, valid_scenes.size() - 1)
 		var scn: PackedScene = valid_scenes[random_index]
 		var instance = scn.instantiate()
+		var camp_lvl: int = WorldLevelScaler.get_camp_ilvl_at(self, marker.global_position, seed_to_use)
+		if "camp_ilvl" in instance:
+			instance.set("camp_ilvl", camp_lvl)
 		
 		if instance is Node3D:
 			if randomize_rotation:
 				instance.rotation.y = rng.randf_range(0.0, TAU)
 				
 		if net_obj != null:
+			if instance is Node3D:
+				instance.position = marker.global_position
 			net_obj.add_child(instance, true)
+			_spawned_network_encounters.append(instance)
 			if instance is Node3D:
 				instance.global_position = marker.global_position
+			if instance.has_method("snap_camp_to_ground"):
+				instance.call("snap_camp_to_ground")
 		else:
 			marker.add_child(instance)
+			if instance.has_method("snap_camp_to_ground"):
+				instance.call("snap_camp_to_ground")
 			
 		if Engine.is_editor_hint() and get_tree().edited_scene_root != null:
 			instance.owner = get_tree().edited_scene_root

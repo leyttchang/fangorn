@@ -35,8 +35,6 @@ func update_damage_from_stats(player_stats: Node, combo_step: int = 1) -> void:
 		var flat_lightning = player_stats.get_stat_value("flat_lightning_damage")
 		attack_component.damage_lightning = flat_lightning * lightning_multiplier * combo_multiplier
 		
-		print("Weapon Damage Updated! phys: ", attack_component.damage_physical, " | fire: ", attack_component.damage_fire, " | ice: ", attack_component.damage_ice, " | lightning: ", attack_component.damage_lightning)
-		
 		# --- APPLICATION DU KNOCKBACK POWER ---
 		var kb_mult = player_stats.get_stat_value("knockback_power")
 		if attack_component.has_meta("base_knockback"):

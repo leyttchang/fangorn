@@ -13,6 +13,7 @@ var mon_lanceur: Node3D = null
 func execute(caster: Node3D, target_data: Dictionary) -> void:
 	mon_lanceur = caster
 	global_position = caster.global_position
+	SpellAudioManager.play_lightning_cast(self, global_position, 0.92, -1.0)
 	
 	# 1. On applique les vraies stats (Le buff de degats/vitesse)
 	# MULTIJOUEUR : Seul le lanceur applique l'effet pour eviter que tout le monde envoie la commande en meme temps

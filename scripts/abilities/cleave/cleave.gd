@@ -1,14 +1,14 @@
 class_name CleaveAbility
 extends Node3D
 
-const BASE_BOX_SIZE: Vector3 = Vector3(3.8, 1.35, 3.0)
-const BASE_BOX_OFFSET: Vector3 = Vector3(0.0, 0.15, -1.60)
+const BASE_BOX_SIZE: Vector3 = Vector3(4.3, 1.85, 3.15)
+const BASE_BOX_OFFSET: Vector3 = Vector3(0.0, -0.05, -1.68)
 const MAX_LIFETIME_FAILSAFE: float = 5.0
 
 @onready var weapon_trail: CleaveWeaponTrail = $WeaponTrail
-@onready var sweep_pivot: Node3D = $SweepPivot
-@onready var attack_component: AttackComponent = $SweepPivot/AttackComponent
-@onready var collision_shape: CollisionShape3D = $SweepPivot/AttackComponent/CollisionShape3D
+@onready var sweep_pivot: Node3D = $Cleave
+@onready var attack_component: AttackComponent = $Cleave/AttackComponent
+@onready var collision_shape: CollisionShape3D = $Cleave/AttackComponent/CollisionShape3D
 @onready var scaling_component: SpellScalingComponent = $SpellScalingComponent
 
 var caster: Node3D = null
@@ -129,10 +129,30 @@ func _begin_cleave_swing() -> void:
 			BASE_BOX_OFFSET.y,
 			BASE_BOX_OFFSET.z * aoe_mult
 		)
-		collision_shape.disabled = not is_auth
+		collision_shape.set_deferred("disabled", not is_auth)
+		if is_auth and attack_component != null:
+			_apply_immediate_cleave_hits(duplicated_box)
 
 	if weapon_trail != null and caster != null and is_instance_valid(caster):
 		weapon_trail.start_trail(caster)
+
+func _apply_immediate_cleave_hits(box_shape: BoxShape3D) -> void:
+	if attack_component == null or box_shape == null or collision_shape == null:
+		return
+	var world: World3D = get_world_3d()
+	if world == null or world.direct_space_state == null:
+		return
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = box_shape
+	query.transform = collision_shape.global_transform
+	query.collision_mask = attack_component.collision_mask
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var overlaps: Array[Dictionary] = world.direct_space_state.intersect_shape(query, 64)
+	for hit_info: Dictionary in overlaps:
+		var hit_collider: Variant = hit_info.get("collider")
+		if hit_collider is Area3D:
+			attack_component._on_area_entered(hit_collider as Area3D)
 
 func _is_caster_authoritative() -> bool:
 	if caster == null or not is_instance_valid(caster):
@@ -145,7 +165,7 @@ func _end_cleave_swing() -> void:
 	_is_swing_active = false
 	_has_ended_swing = true
 	if collision_shape != null:
-		collision_shape.disabled = true
+		collision_shape.set_deferred("disabled", true)
 	if weapon_trail != null:
 		weapon_trail.stop_trail()
 

@@ -81,7 +81,8 @@ func _bind_stele_interactions(root_ctrl: Control, btn: BaseButton, idx: int) -> 
 		root_ctrl.gui_input.connect(_on_stele_gui_input.bind(idx))
 
 func _on_stele_gui_input(event: InputEvent, idx: int) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and event.double_click:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		get_viewport().set_input_as_handled()
 		_on_card_button_pressed(idx)
 
 func _on_stele_part_mouse_exited(idx: int) -> void:
@@ -251,5 +252,15 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.physical_keycode == KEY_ESCAPE and event.pressed):
 		close_ui()
 		get_viewport().set_input_as_handled()
-	elif event is InputEventKey and event.physical_keycode == KEY_E and event.pressed:
+	elif event.is_action_pressed(&"interact") and not event.is_echo():
 		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_1 and current_choices.size() >= 1:
+			get_viewport().set_input_as_handled()
+			_on_card_button_pressed(0)
+		elif event.physical_keycode == KEY_2 and current_choices.size() >= 2:
+			get_viewport().set_input_as_handled()
+			_on_card_button_pressed(1)
+		elif event.physical_keycode == KEY_3 and current_choices.size() >= 3:
+			get_viewport().set_input_as_handled()
+			_on_card_button_pressed(2)

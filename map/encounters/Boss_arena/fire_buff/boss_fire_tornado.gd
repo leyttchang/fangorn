@@ -16,8 +16,8 @@ const RAYCAST_INTERVAL_SEC: float = 0.08
 
 @export_group("Dégâts & Knockback vers le haut")
 @export_range(0.0, 300.0, 1.0) var damage_fire: float = 24.0
-@export_range(0.0, 60.0, 0.5) var knockback_force: float = 24.0
-@export_range(0.0, 85.0, 1.0, "suffix:°") var knockback_angle: float = 62.0
+@export_range(0.0, 60.0, 0.5) var knockback_force: float = 15.0
+@export_range(0.0, 85.0, 1.0, "suffix:°") var knockback_angle: float = 30.0
 @export_range(0.2, 4.0, 0.05, "suffix:s") var rehit_cooldown: float = 0.85
 
 @export_group("Brûlure (Status Effect)")
@@ -68,8 +68,8 @@ func setup_tornado(
 	p_speed: float = 6.2,
 	p_duration: float = 4.8,
 	p_damage_fire: float = 24.0,
-	p_knockback_force: float = 24.0,
-	p_knockback_angle: float = 62.0,
+	p_knockback_force: float = 15.0,
+	p_knockback_angle: float = 30.0,
 	p_curve_rate: float = 0.45,
 	p_caster: Node3D = null
 ) -> void:

@@ -1,3 +1,12 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Packs audio bruts de tri (non utilisés directement en jeu)
+assets/audio_tri/
+assets/weather_sound/
+
+# Fichiers temporaires Windows / Godot GDExtension hot-reload
+*.TMP
+**/~*
+_tmp_*

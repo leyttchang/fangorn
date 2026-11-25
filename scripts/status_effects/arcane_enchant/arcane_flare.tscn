@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://c1nesxgc173ff" path="res://components/health_component.gd" id="4_health_script"]
 [ext_resource type="PackedScene" uid="uid://cih2av7d5rpmb" path="res://components/hitbox_component.tscn" id="5_hitbox_scene"]
 [ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="6_attack_scene"]
-[ext_resource type="Texture2D" uid="uid://djqg6inatmobw" path="res://assets/LeLu's Noise Pack/T_VFX_Glow31.png" id="7_glow_tex"]
 [ext_resource type="Texture2D" uid="uid://cw0riargunqgf" path="res://assets/LeLu's Noise Pack/T_VFX_simplex_1.png" id="8_spark_tex"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_body"]
@@ -29,53 +28,48 @@ code = "shader_type spatial;
 render_mode unshaded, blend_add, cull_back, depth_draw_never;
 
 uniform vec4 core_color : source_color = vec4(0.96, 0.86, 1.0, 1.0);
-uniform vec4 halo_color : source_color = vec4(0.55, 0.14, 1.0, 1.0);
-uniform float emission_boost : hint_range(0.5, 6.0) = 2.55;
+uniform vec4 halo_color : source_color = vec4(0.56, 0.15, 1.0, 1.0);
+uniform float emission_boost : hint_range(0.5, 6.0) = 2.45;
 uniform float pulse_speed : hint_range(0.0, 10.0) = 4.2;
 
+varying float v_cam_fade;
+varying vec3 v_obj_nrm;
+
 void vertex() {
-	float pulse = 1.0 + 0.065 * sin(TIME * pulse_speed);
-	VERTEX *= pulse;
+	v_obj_nrm = NORMAL;
+	float pulse = 1.0 + 0.06 * sin(TIME * pulse_speed);
+	float cam_dist = length(CAMERA_POSITION_WORLD - NODE_POSITION_WORLD);
+	// Borne la taille écran à courte portée pour empêcher tout overdraw plein écran 1080p
+	float near_scale = clamp(cam_dist / 1.35, 0.18, 1.0);
+	VERTEX *= pulse * near_scale;
+	v_cam_fade = mix(0.25, 1.0, smoothstep(0.30, 1.35, cam_dist));
 }
 
 void fragment() {
 	float ndotv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
-	float center_glow = pow(ndotv, 2.3);
-	float rim_glow = pow(1.0 - ndotv, 1.9) * ndotv * 2.6;
-	float pulse = 0.92 + 0.12 * sin(TIME * pulse_speed * 1.25);
-	vec3 halo_hdr = vec3(1.4, 0.35, 2.6);
+	float swirl = 0.88 + 0.22 * sin(v_obj_nrm.x * 7.5 + TIME * 6.2) * cos(v_obj_nrm.y * 6.5 - TIME * 4.8);
+	float outer_halo = pow(ndotv, 0.90) * 0.52 * swirl;
+	float center_glow = pow(ndotv, 2.8);
+	float rim_glow = pow(1.0 - ndotv, 1.8) * ndotv * 2.1 * swirl;
+	float pulse = 0.92 + 0.10 * sin(TIME * pulse_speed * 1.25);
+	vec3 halo_hdr = halo_color.rgb * 2.35;
 	vec3 core_hdr = core_color.rgb * (emission_boost * 1.15);
 	vec3 col = mix(halo_hdr, core_hdr, center_glow);
 	ALBEDO = col * pulse;
-	ALPHA = clamp(center_glow * 0.95 + rim_glow * 0.78, 0.0, 1.0);
+	ALPHA = clamp((outer_halo + center_glow * 0.90 + rim_glow * 0.65) * v_cam_fade, 0.0, 1.0);
 }
 "
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_orb_core"]
-render_priority = 1
 shader = SubResource("Shader_orb_core")
 
 [sub_resource type="SphereMesh" id="SphereMesh_orb_core"]
-radius = 0.17
-height = 0.34
-radial_segments = 12
-rings = 6
+radius = 0.24
+height = 0.48
+radial_segments = 10
+rings = 5
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orb_halo"]
-render_priority = 0
-transparency = 1
-blend_mode = 1
-shading_mode = 0
-albedo_color = Color(1.4, 0.35, 2.6, 0.58)
-albedo_texture = ExtResource("7_glow_tex")
-billboard_mode = 3
-billboard_keep_scale = true
-
-[sub_resource type="QuadMesh" id="QuadMesh_orb_halo"]
-size = Vector2(0.62, 0.62)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wisps"]
-render_priority = 1
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pop"]
 transparency = 1
 blend_mode = 1
 shading_mode = 0
@@ -84,40 +78,30 @@ vertex_color_is_srgb = true
 albedo_texture = ExtResource("8_spark_tex")
 billboard_mode = 3
 billboard_keep_scale = true
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
 
-[sub_resource type="Curve" id="Curve_wisp_alpha"]
-_data = [Vector2(0, 0), 0.0, 3.2, 0, 0, Vector2(0.22, 0.95), 0.0, 0.0, 0, 0, Vector2(0.72, 0.55), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 4
+[sub_resource type="Curve" id="Curve_pop_scale"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.12), 0.0, 0.0, 0, 0]
+point_count = 2
 
-[sub_resource type="CurveTexture" id="CurveTexture_wisp_alpha"]
-curve = SubResource("Curve_wisp_alpha")
+[sub_resource type="CurveTexture" id="CurveTexture_pop_scale"]
+curve = SubResource("Curve_pop_scale")
 
-[sub_resource type="Curve" id="Curve_wisp_scale"]
-_data = [Vector2(0, 0.85), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.2), 0.0, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="CurveTexture" id="CurveTexture_wisp_scale"]
-curve = SubResource("Curve_wisp_scale")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wisps"]
-lifetime_randomness = 0.25
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pop"]
 emission_shape = 1
-emission_sphere_radius = 0.14
+emission_sphere_radius = 0.1
 direction = Vector3(0, 1, 0)
 spread = 180.0
-initial_velocity_min = 0.18
-initial_velocity_max = 0.55
-gravity = Vector3(0, 0.28, 0)
-scale_min = 0.065
-scale_max = 0.135
-scale_curve = SubResource("CurveTexture_wisp_scale")
-color = Color(1.4, 0.35, 2.6, 1)
-alpha_curve = SubResource("CurveTexture_wisp_alpha")
+initial_velocity_min = 2.0
+initial_velocity_max = 4.4
+damping_min = 5.0
+damping_max = 8.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.08
+scale_max = 0.18
+scale_curve = SubResource("CurveTexture_pop_scale")
+color = Color(1.65, 0.45, 2.8, 0.9)
 
-[sub_resource type="QuadMesh" id="QuadMesh_wisps"]
+[sub_resource type="QuadMesh" id="QuadMesh_pop"]
 
 [node name="ArcaneFlare" type="CharacterBody3D" groups=["Enemie", "ArcaneFlare"]]
 collision_layer = 256
@@ -140,6 +124,7 @@ stats_component = NodePath("../StatsComponent")
 collision_layer = 8
 collision_mask = 0
 health_component = NodePath("../HealthComponent")
+enable_blood_vfx = false
 
 [node name="CollisionShape3D" parent="HitboxComponent" index="0"]
 shape = SubResource("SphereShape3D_hitbox")
@@ -160,28 +145,24 @@ shape = SubResource("SphereShape3D_attack")
 
 [node name="CoreOrb" type="MeshInstance3D" parent="Visuals"]
 cast_shadow = 0
-visibility_range_end = 55.0
+visibility_range_end = 44.0
 visibility_range_end_margin = 6.0
 material_override = SubResource("ShaderMaterial_orb_core")
 mesh = SubResource("SphereMesh_orb_core")
 
-[node name="OuterHalo" type="MeshInstance3D" parent="Visuals"]
+[node name="PopBurst" type="GPUParticles3D" parent="."]
 cast_shadow = 0
-visibility_range_end = 55.0
+visibility_range_end = 75.0
 visibility_range_end_margin = 6.0
-material_override = SubResource("StandardMaterial3D_orb_halo")
-mesh = SubResource("QuadMesh_orb_halo")
-
-[node name="ArcaneWisps" type="GPUParticles3D" parent="Visuals"]
-cast_shadow = 0
-visibility_range_end = 55.0
-visibility_range_end_margin = 6.0
-material_override = SubResource("StandardMaterial3D_wisps")
-amount = 8
-lifetime = 0.52
+material_override = SubResource("StandardMaterial3D_pop")
+emitting = false
+amount = 7
+lifetime = 0.32
+one_shot = true
+explosiveness = 0.92
 fixed_fps = 30
-process_material = SubResource("ParticleProcessMaterial_wisps")
-draw_pass_1 = SubResource("QuadMesh_wisps")
+process_material = SubResource("ParticleProcessMaterial_pop")
+draw_pass_1 = SubResource("QuadMesh_pop")
 
 [editable path="HitboxComponent"]
 [editable path="AttackComponent"]

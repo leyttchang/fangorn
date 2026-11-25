@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://objet/forest_interactables/oracle_vision/oracle_root_cocoon.gd" id="1_oracle_coc"]
+[ext_resource type="Script" uid="uid://t2276lmrj8wh" path="res://objet/forest_interactables/breakable_hitbox.gd" id="2_brkhb"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_oracle_body"]
+height = 2.35
+radius = 0.82
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_oracle_hb"]
+radius = 1.65
+
+[node name="OracleRootCocoon" type="Node3D"]
+script = ExtResource("1_oracle_coc")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+shape = SubResource("CylinderShape3D_oracle_body")
+
+[node name="BreakableHitbox" type="Area3D" parent="."]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("2_brkhb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BreakableHitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.18, 0)
+shape = SubResource("SphereShape3D_oracle_hb")

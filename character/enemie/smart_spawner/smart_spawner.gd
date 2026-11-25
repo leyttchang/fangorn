@@ -217,11 +217,7 @@ func _spawn_single_enemy(enemy_scene: PackedScene) -> void:
 		
 	var enemy_instance: Node3D = enemy_scene.instantiate() as Node3D
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
-	
-	var stats = enemy_instance.get_node_or_null("StatsComponent")
-	if stats != null and current_effective_wave > 1:
-		var bonus_percent_hp = (current_effective_wave - 1) * 0.10 
-		stats.add_modifier("max_health", 1, bonus_percent_hp, "wave_scaling")
+	WorldLevelScaler.apply_level_to_monster(enemy_instance, maxi(1, current_effective_wave))
 	
 	var random_angle: float = randf_range(0, TAU)
 	var random_dist: float = sqrt(randf()) * spawn_radius
@@ -243,11 +239,7 @@ func _spawn_single_spider_from_bundle(spider_scene: PackedScene) -> void:
 	if not is_inside_tree() or spider_scene == null: return
 	var enemy_instance: Node3D = spider_scene.instantiate() as Node3D
 	get_tree().current_scene.get_node("NetworkObjects").add_child(enemy_instance, true)
-	
-	var stats = enemy_instance.get_node_or_null("StatsComponent")
-	if stats != null and current_effective_wave > 1:
-		var bonus_percent_hp = (current_effective_wave - 1) * 0.10 
-		stats.add_modifier("max_health", 1, bonus_percent_hp, "wave_scaling")
+	WorldLevelScaler.apply_level_to_monster(enemy_instance, maxi(1, current_effective_wave))
 	
 	var random_angle: float = randf_range(0, TAU)
 	var random_dist: float = sqrt(randf()) * spawn_radius

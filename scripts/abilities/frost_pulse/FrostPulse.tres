@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb788.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/frost_pulse/frost_pulse.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/frost_pulse/FrostPulse_tooltip.tres" id="4_tt"]
+[ext_resource type="Resource" uid="uid://baoapw1xxjddl" path="res://scripts/abilities/ice_nova/IceNova.tres" id="5_evo_nova"]
+[ext_resource type="Resource" path="res://scripts/abilities/ice_spikes/IceSpikes.tres" id="6_evo_spikes"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Frost Pulse"
+description = "Unleashes a short frontal cone of biting frost that pushes enemies back slightly and inflicts a heavy Chill on contact."
+icon = ExtResource("2_icon")
+cooldown = 4.0
+mana_cost = 12.0
+max_range = 5.5
+cast_time = 0.0
+spell_id = "frost_pulse"
+tier = 1
+element = "ice"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("5_evo_nova"), ExtResource("6_evo_spikes")])
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

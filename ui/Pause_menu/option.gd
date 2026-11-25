@@ -4,6 +4,14 @@ extends Panel
 @onready var sensitivity_label: Label = find_child("sensitivity_text", true, false)
 @onready var window_mode_btn: OptionButton = find_child("screen_option", true, false)
 
+@onready var master_volume_slider: HSlider = find_child("MasterVolume_slider", true, false) as HSlider
+@onready var master_volume_label: Label = find_child("MasterVolume_text", true, false) as Label
+@onready var ambient_volume_slider: HSlider = find_child("AmbientVolume_slider", true, false) as HSlider
+@onready var ambient_volume_label: Label = find_child("AmbientVolume_text", true, false) as Label
+@onready var spell_volume_slider: HSlider = find_child("SpellVolume_slider", true, false) as HSlider
+@onready var spell_volume_label: Label = find_child("SpellVolume_text", true, false) as Label
+@onready var reset_audio_btn: Button = find_child("reset_audio_btn", true, false) as Button
+
 @onready var render_scale_slider: HSlider = find_child("RenderScale_slider", true, false)
 @onready var render_scale_label: Label = find_child("RenderScale_text", true, false)
 @onready var fsr_mode_btn: OptionButton = find_child("fsr_option", true, false)
@@ -60,6 +68,7 @@ extends Panel
 @onready var keybinds_return_btn: Button = $Panel/MarginContainer2/VBoxContainer/return
 
 var _updating_shader_ui: bool = false
+var _updating_audio_ui: bool = false
 
 func _ready() -> void:
 	# Masquer le panel de keybinds par défaut
@@ -82,6 +91,21 @@ func _ready() -> void:
 		render_scale_slider.min_value = 0.5
 		render_scale_slider.max_value = 1.0
 		render_scale_slider.step = 0.05
+
+	if master_volume_slider:
+		master_volume_slider.min_value = 0.0
+		master_volume_slider.max_value = 1.0
+		master_volume_slider.step = 0.01
+
+	if ambient_volume_slider:
+		ambient_volume_slider.min_value = 0.0
+		ambient_volume_slider.max_value = 1.0
+		ambient_volume_slider.step = 0.01
+
+	if spell_volume_slider:
+		spell_volume_slider.min_value = 0.0
+		spell_volume_slider.max_value = 1.0
+		spell_volume_slider.step = 0.01
 
 	_setup_shader_sliders()
 	
@@ -139,6 +163,18 @@ func _ready() -> void:
 		if glow_btn:
 			glow_btn.button_pressed = settings.glow_enabled
 			glow_btn.toggled.connect(_on_glow_toggled)
+
+		_sync_audio_ui_from_settings(settings)
+		if master_volume_slider:
+			master_volume_slider.value_changed.connect(_on_master_volume_changed)
+		if ambient_volume_slider:
+			ambient_volume_slider.value_changed.connect(_on_ambient_volume_changed)
+		if spell_volume_slider:
+			spell_volume_slider.value_changed.connect(_on_spell_volume_changed)
+		if reset_audio_btn:
+			reset_audio_btn.pressed.connect(_on_reset_audio_pressed)
+		if settings.has_signal("audio_settings_changed") and not settings.audio_settings_changed.is_connected(_on_external_audio_settings_changed):
+			settings.audio_settings_changed.connect(_on_external_audio_settings_changed)
 
 		_sync_shader_ui_from_settings(settings)
 		_connect_shader_signals()
@@ -316,6 +352,79 @@ func _update_label(value: float) -> void:
 func _update_render_scale_label(value: float) -> void:
 	if render_scale_label == null: return
 	render_scale_label.text = "%d%%" % int(value * 100)
+
+func _sync_audio_ui_from_settings(settings: Node) -> void:
+	_updating_audio_ui = true
+	var mv: float = float(settings.master_volume) if "master_volume" in settings else 1.0
+	var av: float = float(settings.ambient_volume) if "ambient_volume" in settings else 1.0
+	var sv: float = float(settings.spell_volume) if "spell_volume" in settings else 0.55
+	if master_volume_slider:
+		master_volume_slider.value = mv
+	if master_volume_label:
+		master_volume_label.text = "%d%%" % int(round(mv * 100.0))
+	if ambient_volume_slider:
+		ambient_volume_slider.value = av
+	if ambient_volume_label:
+		ambient_volume_label.text = "%d%%" % int(round(av * 100.0))
+	if spell_volume_slider:
+		spell_volume_slider.value = sv
+	if spell_volume_label:
+		spell_volume_label.text = "%d%%" % int(round(sv * 100.0))
+	_updating_audio_ui = false
+
+func _on_external_audio_settings_changed() -> void:
+	if _updating_audio_ui:
+		return
+	var settings = _get_settings()
+	if settings != null:
+		_sync_audio_ui_from_settings(settings)
+
+func _on_master_volume_changed(value: float) -> void:
+	if master_volume_label:
+		master_volume_label.text = "%d%%" % int(round(value * 100.0))
+	if _updating_audio_ui:
+		return
+	var settings = _get_settings()
+	if settings != null:
+		_updating_audio_ui = true
+		settings.master_volume = value
+		settings.save_settings()
+		_updating_audio_ui = false
+
+func _on_ambient_volume_changed(value: float) -> void:
+	if ambient_volume_label:
+		ambient_volume_label.text = "%d%%" % int(round(value * 100.0))
+	if _updating_audio_ui:
+		return
+	var settings = _get_settings()
+	if settings != null:
+		_updating_audio_ui = true
+		settings.ambient_volume = value
+		settings.save_settings()
+		_updating_audio_ui = false
+
+func _on_spell_volume_changed(value: float) -> void:
+	if spell_volume_label:
+		spell_volume_label.text = "%d%%" % int(round(value * 100.0))
+	if _updating_audio_ui:
+		return
+	var settings: Node = _get_settings()
+	if settings != null:
+		_updating_audio_ui = true
+		settings.set("spell_volume", value)
+		settings.call("save_settings")
+		_updating_audio_ui = false
+
+func _on_reset_audio_pressed() -> void:
+	var settings: Node = _get_settings()
+	if settings == null:
+		return
+	_updating_audio_ui = true
+	settings.set("master_volume", 1.0)
+	settings.set("ambient_volume", 1.0)
+	settings.set("spell_volume", 0.55)
+	settings.call("save_settings")
+	_sync_audio_ui_from_settings(settings)
 
 func _on_sensitivity_changed(value: float) -> void:
 	_update_label(value)

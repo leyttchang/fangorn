@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Channeled Spell | Cooldown: 1.0s | Mana: 4 + 12.5/s[/color]
+
+[color=orange][b]- Crackling Arc -[/b][/color]
+Tick Damage: [b]8.5[/b] Base every 0.20s (scales with Cast Speed)
+Damage Type: [color=gold]100% Lightning[/color]
+Range: 13.5m • [color=cyan]Magnetizes to enemy nearest cursor[/color]
+"

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb768.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/dragons_breath/dragons_breath.tscn" id="3_scene"]
+[ext_resource type="PackedScene" uid="uid://d2g0bngsgl1ay" path="res://scripts/abilities/casting_animation/fire_casting_VFX.tscn" id="4_vfx"]
+[ext_resource type="Resource" path="res://scripts/abilities/dragons_breath/DragonsBreath_tooltip.tres" id="5_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Dragon's Breath"
+description = "Channels a continuous cone of roaring dragonfire from your hands, scorching all enemies caught in the inferno."
+icon = ExtResource("2_icon")
+cooldown = 1.8
+mana_cost = 6.0
+max_range = 9.8
+cast_time = 0.0
+spell_id = "dragons_breath"
+tier = 2
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+channel_mana_per_sec = 16.0
+channel_tick_interval = 0.18
+target_mode = 6
+custom_tooltip = ExtResource("5_tt")
+cast_vfx_scene = ExtResource("4_vfx")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

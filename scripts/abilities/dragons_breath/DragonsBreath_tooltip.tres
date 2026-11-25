@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Channeled Spell | Cooldown: 1.8s | Mana: 6 + 16.0/s[/color]
+
+[color=orange][b]- Dragon's Breath -[/b][/color]
+Tick Damage: [b]9.5[/b] Base every 0.18s [color=yellow](AoE • Cast Speed)[/color]
+Damage Type: [color=orangered]100% Fire[/color]
+Cone Reach: 9.5m (60° Spread) • [color=cyan]Overheats into Plasma[/color]
+Applies [b]Burn[/b] (30% chance per tick) for 3.0s
+"

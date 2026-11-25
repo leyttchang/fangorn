@@ -195,6 +195,7 @@ func fire_arrow() -> void:
 	var new_arrow = arrow_scene.instantiate()
 	get_tree().current_scene.get_node("NetworkObjects").add_child(new_arrow, true)
 	new_arrow.execute(self, {})
+	WorldLevelScaler.scale_spawned_attack(new_arrow, self)
 
 # ==========================================================
 # LOGIQUE DES COMPORTEMENTS (Le Cerveau)
@@ -278,9 +279,11 @@ func _process_retreat_state(vitesse_horiz: Vector2, delta: float, speed: float) 
 	return new_vitesse
 
 func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
-	if target != null:
-		var look_direction = (target.global_position - global_position).normalized()
-		movement_comp.rotate_towards_direction(look_direction, behavior, delta, 1.5)
+	if target != null and is_instance_valid(target):
+		var look_direction: Vector3 = (target.global_position - global_position).normalized()
+		var current_anim: StringName = anim_playback.get_current_node() if anim_playback != null else &""
+		var turn_mult: float = 0.40 if current_anim == &"anim_aim_recoil" else 0.72
+		movement_comp.rotate_towards_direction(look_direction, behavior, delta, turn_mult)
 		
 	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 

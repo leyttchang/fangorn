@@ -11,7 +11,8 @@ const DEFAULT_NOVA_SCENE: PackedScene = preload("res://scripts/status_effects/ic
 const DEFAULT_SLOW_EFFECT: StatusEffectData = preload("res://scripts/status_effects/ice_enchant/ice_nova_slow.tres")
 
 var effect_config: Resource
-var _enchanted_mobs: Array[Node3D] = []
+var _enchanted_mobs: Array = []
+var _enchanted_mob_ids: PackedInt64Array = PackedInt64Array()
 var _mob_timers: Dictionary = {}
 var _global_stagger_cooldown: float = 0.0
 var _active_novas_count: int = 0
@@ -43,19 +44,26 @@ func register_mob(mob: Node3D) -> void:
 		return
 	set_process(true)
 	if not _enchanted_mobs.has(mob):
+		var mid := mob.get_instance_id()
 		_enchanted_mobs.append(mob)
+		_enchanted_mob_ids.append(mid)
 		var min_d := _get_cfg_float("initial_delay_min", 1.2)
 		var max_d := maxf(min_d, _get_cfg_float("initial_delay_max", 3.6))
 		# Échelonner naturellement un pack de monstres qui spawn en même temps
 		var slot_offset := fmod(float(_spawn_index_stagger) * 0.28, maxf(0.25, max_d - min_d))
 		_spawn_index_stagger += 1
 		var init_timer := clampf(min_d + slot_offset + randf_range(0.0, 0.35), min_d, max_d + 0.35)
-		_mob_timers[mob.get_instance_id()] = init_timer
+		_mob_timers[mid] = init_timer
 
-func unregister_mob(mob: Node3D) -> void:
-	if mob != null:
-		_mob_timers.erase(mob.get_instance_id())
-	_enchanted_mobs.erase(mob)
+func unregister_mob(mob: Variant) -> void:
+	var idx := _enchanted_mobs.find(mob)
+	if idx >= 0:
+		var mid := _enchanted_mob_ids[idx]
+		_enchanted_mobs.remove_at(idx)
+		_enchanted_mob_ids.remove_at(idx)
+		_mob_timers.erase(mid)
+	elif mob != null and is_instance_valid(mob):
+		_mob_timers.erase((mob as Object).get_instance_id())
 
 func _process(delta: float) -> void:
 	_prune_dead_or_invalid_mobs()
@@ -80,7 +88,12 @@ func _process(delta: float) -> void:
 	var trigger_range := _get_cfg_float("trigger_player_range", 26.0)
 	var radius := maxf(1.0, _get_cfg_float("nova_radius", 4.2))
 
-	for mob in _enchanted_mobs:
+	for raw_mob: Variant in _enchanted_mobs:
+		if raw_mob == null or not is_instance_valid(raw_mob):
+			continue
+		var mob := raw_mob as Node3D
+		if mob == null:
+			continue
 		var mid := mob.get_instance_id()
 		var rem := float(_mob_timers.get(mid, interval)) - delta
 		if rem <= 0.0:
@@ -107,14 +120,15 @@ func _process(delta: float) -> void:
 
 func _prune_dead_or_invalid_mobs() -> void:
 	if _enchanted_mobs.is_empty():
+		if not _mob_timers.is_empty():
+			_mob_timers.clear()
 		return
-	var valid: Array[Node3D] = []
-	for m in _enchanted_mobs:
-		if not is_mob_invalid_or_dead(m):
-			valid.append(m)
-		elif m != null:
-			_mob_timers.erase(m.get_instance_id())
-	_enchanted_mobs = valid
+	for i in range(_enchanted_mobs.size() - 1, -1, -1):
+		if is_mob_invalid_or_dead(_enchanted_mobs[i]):
+			var mid: int = _enchanted_mob_ids[i]
+			_enchanted_mobs.remove_at(i)
+			_enchanted_mob_ids.remove_at(i)
+			_mob_timers.erase(mid)
 
 func _has_living_player_within(origin: Vector3, max_dist: float) -> bool:
 	if get_tree() == null:
@@ -249,8 +263,11 @@ static func get_mob_ground_pos(mob: Node3D) -> Vector3:
 
 	return Vector3(base_pos.x, est_bottom_y, base_pos.z)
 
-static func is_mob_invalid_or_dead(mob: Node3D) -> bool:
-	if mob == null or not is_instance_valid(mob) or mob.is_queued_for_deletion():
+static func is_mob_invalid_or_dead(raw_mob: Variant) -> bool:
+	if raw_mob == null or not is_instance_valid(raw_mob):
+		return true
+	var mob := raw_mob as Node3D
+	if mob == null or mob.is_queued_for_deletion():
 		return true
 	var hc := mob.get_node_or_null("HealthComponent") as HealthComponent
 	if hc != null and hc.current_health <= 0.0:

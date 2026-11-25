@@ -4,17 +4,17 @@
 
 [resource]
 script = ExtResource("1_f2ync")
-generated_text = "[color=lightblue]Spell | Cooldown: 10.0s | Mana Cost: 50.0[/color]
+generated_text = "[color=lightblue]Tier II Spell | Cast: 0.45s | Cooldown: 5.5s | Mana Cost: 24[/color]
 
-[color=orange][b]- Fireball -[/b][/color]
-Damage: [b]100.0[/b] Base
-Damage Type: [color=orangered]100.0% Fire[/color]
+[color=orange][b]- Direct Impact -[/b][/color]
+Damage: [b]100[/b] Base
+Damage Type: [color=orangered]100% Fire[/color]
 Knockback: 10.0
-Applies [b]Burn[/b] (100.0% chance) for 5.0s
+Applies [b]Burn[/b] (100% chance) for 5.0s
 
-[color=orange][b]- Explosion -[/b][/color]
-Damage: [b]30.0[/b] Base [color=yellow](AoE)[/color]
-Damage Type: [color=orangered]100.0% Fire[/color]
-Applies [b]Burn[/b] (100.0% chance) for 5.0s
-
+[color=orange][b]- Explosive Blast -[/b][/color]
+Damage: [b]30[/b] Base [color=yellow](AoE • 4.0m Radius)[/color]
+Damage Type: [color=orangered]100% Fire[/color]
+Knockback: 9.0
+Applies [b]Burn[/b] (33% chance) for 5.0s
 "

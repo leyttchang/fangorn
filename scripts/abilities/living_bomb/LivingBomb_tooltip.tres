@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=gold]Tier II Rare Spell[/color] [color=lightblue]| Cast: 0.25s | Cooldown: 7.5s | Mana Cost: 24[/color]
+
+[color=orange][b]- Living Bomb -[/b][/color]
+Fuse Delay: [b]2.0s[/b] (detonates early if host dies)
+Blast Damage: [b]42[/b] Base [color=yellow](AoE • 4.8m Radius)[/color]
+Host Bonus: [color=orangered][b]+55% Extra Fire Damage[/b][/color] to implanted target
+Damage Type: [color=orangered]100% Fire[/color] • Range: 24.0m
+Applies [b]Burn[/b] (100% chance) for 4.0s
+"

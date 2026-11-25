@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Spell | Instant | Cooldown: 10.0s | Mana Cost: 18[/color]
+
+[color=cyan][b]- Glacial Shell (Barrier) -[/b][/color]
+Shield Amount: [b]24% of Max Health[/b] (scales with Spell Level)
+Duration: [b]6.0s[/b]
+Retaliation: [b]6[/b] Base Ice Damage + [b]Chill[/b] (3.0s) to attackers within 4.5m
+"

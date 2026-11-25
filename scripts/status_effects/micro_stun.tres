@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" uid="uid://dk47ed0nqqgl4" path="res://scripts/status_effects/status_effect_data.gd" id="1_se"]
+[ext_resource type="Script" uid="uid://x6g2xwk4dhug" path="res://passive_skill_tree/ressource_node/stat_modifier_data.gd" id="2_sm"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/electrical-crescent.png" id="3_icon"]
+
+[sub_resource type="Resource" id="Resource_micro_stun_act"]
+script = ExtResource("2_sm")
+stat_name = "action_speed"
+value = -1.0
+mod_type = 1
+metadata/_custom_type_script = "uid://x6g2xwk4dhug"
+
+[resource]
+script = ExtResource("1_se")
+effect_id = "micro_stun"
+icon = ExtResource("3_icon")
+stat_modifiers = Array[ExtResource("2_sm")]([SubResource("Resource_micro_stun_act")])
+metadata/_custom_type_script = "uid://dk47ed0nqqgl4"

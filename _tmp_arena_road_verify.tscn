@@ -1,0 +1,182 @@
+[gd_scene format=3 uid="uid://cs48ki4jea0qg"]
+
+[sub_resource type="GDScript" id="GDScript_verify"]
+script/source = "extends Node3D
+
+class MockMapGen extends Node3D:
+	var terrain: Terrain3D
+	var path_generator: PathGenerator
+	var region_size: int = 1024
+	var map_width_chunks: int = 1
+	var map_height_chunks: int = 1
+	var border_margin: float = 35.0
+	var noise: FastNoiseLite = null
+	var height_curve: Curve = null
+	var _arena_gen_ref: ArenaGenerator = null
+
+	func get_arena_generator() -> Node:
+		return _arena_gen_ref
+
+	func _get_map_rect() -> Rect2:
+		return Rect2(0.0, 0.0, 1024.0, 1024.0)
+
+	func _sample_edge_height(x: float, z: float) -> float:
+		return terrain.data.get_height(Vector3(x, 0.0, z))
+
+	func get_arena_path_segments() -> Array[Dictionary]:
+		return _arena_gen_ref.arena_path_segments
+
+func _eval_grass_prob(px: float, pz: float, segs: Array[Dictionary], base_w: float, road_margin: float, road_fade: float) -> float:
+	var min_prob: float = 1.0
+	for seg: Dictionary in segs:
+		var a: Vector2 = seg['start']
+		var b: Vector2 = seg['end']
+		var dx: float = b.x - a.x
+		var dy: float = b.y - a.y
+		var l2: float = dx * dx + dy * dy
+		var dist_sq: float = 0.0
+		if l2 < 0.0001:
+			dist_sq = Vector2(px - a.x, pz - a.y).length_squared()
+		else:
+			var t: float = clampf(((px - a.x) * dx + (pz - a.y) * dy) / l2, 0.0, 1.0)
+			dist_sq = Vector2(px - (a.x + t * dx), pz - (a.y + t * dy)).length_squared()
+		var seg_w: float = float(seg['width'])
+		var ratio: float = seg_w / base_w
+		var s_margin: float = road_margin * ratio
+		var s_fade: float = road_fade * ratio
+		var actual_dist: float = sqrt(dist_sq) - seg_w
+		if actual_dist < s_margin:
+			return 0.0
+		elif actual_dist < s_fade:
+			var p: float = (actual_dist - s_margin) / maxf(0.001, s_fade - s_margin)
+			if p < min_prob:
+				min_prob = p
+	return min_prob
+
+func _ready() -> void:
+	var mock_mg: MockMapGen = MockMapGen.new()
+	add_child(mock_mg)
+
+	var t3d: Terrain3D = Terrain3D.new()
+	mock_mg.terrain = t3d
+	mock_mg.add_child(t3d)
+
+	var pg: PathGenerator = PathGenerator.new()
+	mock_mg.path_generator = pg
+	mock_mg.add_child(pg)
+
+	var ag: ArenaGenerator = ArenaGenerator.new()
+	var totem_scn: PackedScene = load('res://map/encounters/enchant_arena/totem/enchant_arena.tscn')
+	var boss_scn: PackedScene = load('res://map/encounters/Boss_arena/boss_arena.tscn')
+	ag.north_arenas = [boss_scn]
+	ag.west_arenas = [totem_scn]
+	ag.east_arenas = [totem_scn]
+	ag.extra_totem_arenas_count = 2
+	ag.extra_totem_arena_scene = totem_scn
+	mock_mg._arena_gen_ref = ag
+	mock_mg.add_child(ag)
+
+	var rs: int = 1024
+	var h_arr: PackedFloat32Array = PackedFloat32Array()
+	h_arr.resize(rs * rs)
+	h_arr.fill(12.0)
+	var ctrl_default: int = ((0 & 0x1F) << 27) | ((1 & 0x1F) << 22) | (1 << 1)
+	var c_arr: PackedInt32Array = PackedInt32Array()
+	c_arr.resize(rs * rs)
+	c_arr.fill(ctrl_default)
+
+	ag.select_arenas(123456)
+	pg.generate_branching_path(1024, 1024, 123456, 35.0, true, true, true)
+	ag.init_zones()
+
+	var t_us0: int = Time.get_ticks_usec()
+	ag._build_arena_path_segments()
+	var build_us: int = Time.get_ticks_usec() - t_us0
+
+	var t_chunk0: int = Time.get_ticks_usec()
+	for aseg: Dictionary in ag.arena_path_segments:
+		var aseg_w: float = float(aseg['width'])
+		var abx_min: int = maxi(0, int(floor(float(aseg['min_x']) - aseg_w)) - 1)
+		var abx_max: int = mini(rs - 1, int(ceil(float(aseg['max_x']) + aseg_w)) + 1)
+		var abz_min: int = maxi(0, int(floor(float(aseg['min_y']) - aseg_w)) - 1)
+		var abz_max: int = mini(rs - 1, int(ceil(float(aseg['max_y']) + aseg_w)) + 1)
+		if abx_min > abx_max or abz_min > abz_max:
+			continue
+		var aa: Vector2 = aseg['start']
+		var ab: Vector2 = aseg['end']
+		var ddx: float = ab.x - aa.x
+		var ddy: float = ab.y - aa.y
+		var l2: float = ddx * ddx + ddy * ddy
+		var w_sq: float = aseg_w * aseg_w
+		for lz in range(abz_min, abz_max + 1):
+			var gz: float = float(lz)
+			var row_i: int = lz * rs
+			for lx in range(abx_min, abx_max + 1):
+				var gx: float = float(lx)
+				var t_p: float = clampf(((gx - aa.x) * ddx + (gz - aa.y) * ddy) / maxf(0.0001, l2), 0.0, 1.0)
+				var d_sq: float = Vector2(gx - (aa.x + t_p * ddx), gz - (aa.y + t_p * ddy)).length_squared()
+				if d_sq < w_sq:
+					var tv: float = sqrt(d_sq) / aseg_w
+					var bl: int = int((1.0 - tv * tv * (3.0 - 2.0 * tv)) * 255.0)
+					if bl > ((c_arr[row_i + lx] >> 14) & 0xFF):
+						c_arr[row_i + lx] = ctrl_default | ((bl & 0xFF) << 14)
+	var chunk_arena_us: int = Time.get_ticks_usec() - t_chunk0
+
+	var h_img: Image = Image.create_from_data(rs, rs, false, Image.FORMAT_RF, h_arr.to_byte_array())
+	var c_img: Image = Image.create_from_data(rs, rs, false, Image.FORMAT_RF, c_arr.to_byte_array())
+	t3d.data.import_images([h_img, c_img, null], Vector3.ZERO, 0.0, 1.0)
+
+	for z: Dictionary in ag.get_zones():
+		z['height'] = 12.0
+	var t_out0: int = Time.get_ticks_usec()
+	ag._import_outside_region(t3d.data, -1, 0)
+	var out_region_us: int = Time.get_ticks_usec() - t_out0
+
+	var west_zone: Dictionary = {}
+	for z: Dictionary in ag.get_zones():
+		if z['name'] == 'Arena_West':
+			west_zone = z
+			break
+
+	var entry_p: Vector2 = west_zone['pos']
+	var totem_p: Vector2 = west_zone['totem_pos']
+	var fwd: Vector2 = (totem_p - entry_p).normalized()
+	var perp: Vector2 = Vector2(-fwd.y, fwd.x)
+
+	var p_entry: Vector2 = entry_p
+	var p_seam_in: Vector2 = Vector2(1.0, entry_p.y)
+	var p_seam_out: Vector2 = Vector2(-2.0, entry_p.y)
+	var p_mid: Vector2 = entry_p.lerp(totem_p, 0.5)
+	var p_front_totem: Vector2 = totem_p - fwd * 5.0
+	var p_at_totem: Vector2 = totem_p
+	var p_behind_totem: Vector2 = totem_p + fwd * 14.0
+
+	var b_entry: int = (t3d.data.get_control(Vector3(p_entry.x, 0.0, p_entry.y)) >> 14) & 0xFF
+	var b_seam_in: int = (t3d.data.get_control(Vector3(p_seam_in.x, 0.0, p_seam_in.y)) >> 14) & 0xFF
+	var b_seam_out: int = (t3d.data.get_control(Vector3(p_seam_out.x, 0.0, p_seam_out.y)) >> 14) & 0xFF
+	var b_mid: int = (t3d.data.get_control(Vector3(p_mid.x, 0.0, p_mid.y)) >> 14) & 0xFF
+	var b_front: int = (t3d.data.get_control(Vector3(p_front_totem.x, 0.0, p_front_totem.y)) >> 14) & 0xFF
+	var b_totem: int = (t3d.data.get_control(Vector3(p_at_totem.x, 0.0, p_at_totem.y)) >> 14) & 0xFF
+	var b_behind: int = (t3d.data.get_control(Vector3(p_behind_totem.x, 0.0, p_behind_totem.y)) >> 14) & 0xFF
+
+	var g_mid: float = _eval_grass_prob(p_mid.x, p_mid.y, ag.arena_path_segments, pg.path_width, -3.5, 4.0)
+	var g_front: float = _eval_grass_prob(p_front_totem.x, p_front_totem.y, ag.arena_path_segments, pg.path_width, -3.5, 4.0)
+	var g_totem: float = _eval_grass_prob(p_at_totem.x, p_at_totem.y, ag.arena_path_segments, pg.path_width, -3.5, 4.0)
+	var g_side: float = _eval_grass_prob((p_mid + perp * 26.0).x, (p_mid + perp * 26.0).y, ag.arena_path_segments, pg.path_width, -3.5, 4.0)
+	var g_behind: float = _eval_grass_prob((totem_p + fwd * 18.0).x, (totem_p + fwd * 18.0).y, ag.arena_path_segments, pg.path_width, -3.5, 4.0)
+
+	print('[ArenaRoadVerify] segs=%d | build=%d us | chunk_border_raster=%d us | outside_region_total=%d us' % [ag.arena_path_segments.size(), build_us, chunk_arena_us, out_region_us])
+	print('[ArenaRoadVerify] blends(0..255): entry=%d seam_in=%d seam_out=%d mid=%d front_totem=%d at_totem=%d behind_totem=%d' % [b_entry, b_seam_in, b_seam_out, b_mid, b_front, b_totem, b_behind])
+	print('[ArenaRoadVerify] grass_prob: mid=%.2f front_totem=%.2f at_totem=%.2f side_26m=%.2f behind_18m=%.2f' % [g_mid, g_front, g_totem, g_side, g_behind])
+
+	var ok: bool = (
+		b_entry >= 240 and b_seam_in >= 220 and b_seam_out >= 220
+		and b_mid >= 170 and b_front >= 240 and b_totem >= 120 and b_behind == 0
+		and g_mid == 0.0 and g_front == 0.0 and g_totem == 0.0
+		and g_side == 1.0 and g_behind == 1.0
+	)
+	print('[ArenaRoadVerify] RESULT=%s' % ('ALL_PASS' if ok else 'FAIL'))
+"
+
+[node name="TestRoot" type="Node3D" unique_id=1827002283]
+script = SubResource("GDScript_verify")

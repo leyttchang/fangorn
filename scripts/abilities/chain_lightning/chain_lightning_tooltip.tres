@@ -4,12 +4,11 @@
 
 [resource]
 script = ExtResource("1_fngsv")
-generated_text = "[color=lightblue]Spell | Cooldown: 8.0s | Mana Cost: 40.0[/color]
+generated_text = "[color=lightblue]Tier II Spell | Cast: 0.35s | Cooldown: 5.5s | Mana Cost: 24[/color]
 
 [color=orange][b]- Chain Lightning -[/b][/color]
-Damage: [b]100.0[/b] Base
-Damage Type: [color=gold]100.0% Lightning[/color]
-Knockback: 1.0
-Applies [b]Shock[/b] (100.0% chance) for 6.0s
-
+Damage: [b]100[/b] Base per target
+Damage Type: [color=gold]100% Lightning[/color]
+Arcs: Up to [b]5[/b] targets within 10.0m (scales with Area of Effect)
+Applies [b]Shock[/b] (100% chance) for 6.0s
 "

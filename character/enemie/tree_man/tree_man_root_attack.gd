@@ -40,19 +40,31 @@ func _make_resources_unique() -> void:
 	if attack_shape != null and attack_shape.shape != null:
 		attack_shape.shape = attack_shape.shape.duplicate()
 
-	# Dupliquer chaque mesh + ShaderMaterial de surface_0 pour isoler shader_parameter/debut
+	# Isoler uniquement le ShaderMaterial via material_override sans dupliquer l'ArrayMesh partagé en VRAM
 	var roots_holder := get_node_or_null("root_attacj")
 	if roots_holder != null:
 		for child in roots_holder.get_children():
 			if child is MeshInstance3D and child.mesh != null:
-				var dup_mesh: Mesh = child.mesh.duplicate()
-				var surf_mat: Material = dup_mesh.surface_get_material(0)
+				var surf_mat: Material = child.mesh.surface_get_material(0)
+				if surf_mat == null:
+					surf_mat = child.get_active_material(0)
 				if surf_mat != null:
 					var dup_mat: Material = surf_mat.duplicate()
 					if dup_mat is ShaderMaterial:
 						dup_mat.set_shader_parameter("debut", 0.0)
-					dup_mesh.surface_set_material(0, dup_mat)
-				child.mesh = dup_mesh
+					child.material_override = dup_mat
+
+	if anim_player != null:
+		for anim_name in anim_player.get_animation_list():
+			var anim: Animation = anim_player.get_animation(anim_name)
+			if anim == null:
+				continue
+			for i in range(anim.get_track_count()):
+				var path_str := String(anim.track_get_path(i))
+				if ":mesh:surface_0/material:" in path_str:
+					anim.track_set_path(i, NodePath(path_str.replace(":mesh:surface_0/material:", ":material_override:")))
+				elif ":surface_material_override/0:" in path_str:
+					anim.track_set_path(i, NodePath(path_str.replace(":surface_material_override/0:", ":material_override:")))
 
 func set_speed_scale(scale_val: float) -> void:
 	if anim_player != null:

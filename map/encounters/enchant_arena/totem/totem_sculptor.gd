@@ -11,6 +11,10 @@ extends Node3D
 ## - "fire"      : Fût de pierre craquelée & brasero à 6 crocs de fer sombre + Noyau rocheux fracturé & anneaux de pierre
 
 const VISUAL_VERSION := 2
+const ANIM_CULL_DIST_SQ := 110.0 * 110.0
+const CAM_CHECK_INTERVAL := 0.3
+const TOTEM_VISIBILITY_END := 280.0
+const TOTEM_VISIBILITY_MARGIN := 30.0
 
 const SLATE_DIFF_PATH := "res://map/encounters/Boss_arena/gate_assets/moria_slate_diff.jpg"
 const SLATE_NOR_PATH := "res://map/encounters/Boss_arena/gate_assets/moria_slate_nor.jpg"
@@ -59,6 +63,8 @@ var _activation_elapsed: float = 0.0
 var _is_spent: bool = false
 var _is_blessing_ready: bool = false
 var _core_base_y: float = 2.0
+var _cam_check_timer: float = 0.0
+var _is_far_from_camera: bool = false
 
 func _ready() -> void:
 	_rebuild_visuals()
@@ -114,6 +120,23 @@ func _process(delta: float) -> void:
 		var target_spin: float = 0.45 if _is_blessing_ready else 0.0
 		_power_level = move_toward(_power_level, target_power, delta * 0.85)
 		_spin_boost = move_toward(_spin_boost, target_spin, delta * 0.75)
+
+	if not Engine.is_editor_hint():
+		_cam_check_timer -= delta
+		if _cam_check_timer <= 0.0:
+			_cam_check_timer = CAM_CHECK_INTERVAL
+			var vp := get_viewport()
+			var cam := vp.get_camera_3d() if vp != null else null
+			if cam != null and is_instance_valid(cam):
+				var was_far := _is_far_from_camera
+				_is_far_from_camera = global_position.distance_squared_to(cam.global_position) > ANIM_CULL_DIST_SQ
+				if was_far and not _is_far_from_camera:
+					# Resynchronisation immédiate à l'entrée dans le rayon de 110m
+					pass
+			else:
+				_is_far_from_camera = false
+		if _is_far_from_camera:
+			return
 
 	var sink_offset := lerpf(0.0, -0.26, clampf(1.0 - _power_level, 0.0, 1.0)) if (_is_activating_anim or _is_spent) else 0.0
 	var bob_amp := 0.085 * clampf(_power_level, 0.0, 1.0)
@@ -500,6 +523,9 @@ func _spawn_mesh(parent: Node3D, node_name: String, mesh: Mesh, mat: Material) -
 	mi.name = node_name
 	mi.mesh = mesh
 	mi.material_override = mat
+	if not Engine.is_editor_hint():
+		mi.visibility_range_end = TOTEM_VISIBILITY_END
+		mi.visibility_range_end_margin = TOTEM_VISIBILITY_MARGIN
 	parent.add_child(mi)
 	return mi
 
@@ -528,6 +554,9 @@ func _spawn_base_roots(parent: Node3D, count: int, outer_r: float, climb_h: floa
 		mi.mesh = built["mesh"]
 		mi.position = built["center"]
 		mi.material_override = root_mat
+		if not Engine.is_editor_hint():
+			mi.visibility_range_end = TOTEM_VISIBILITY_END
+			mi.visibility_range_end_margin = TOTEM_VISIBILITY_MARGIN
 		parent.add_child(mi)
 
 ## Icosphère géodésique exacte à facettes triangulaires plates (subdivisions=1 -> 80 facettes nettes !)

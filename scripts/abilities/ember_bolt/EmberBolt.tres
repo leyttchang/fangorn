@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb765.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/ember_bolt/ember_bolt.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/ember_bolt/EmberBolt_tooltip.tres" id="4_tt"]
+[ext_resource type="Resource" uid="uid://dqb24sph7m7kt" path="res://scripts/abilities/fireball/Fireball.tres" id="5_evo_fb"]
+[ext_resource type="Resource" path="res://scripts/abilities/dragons_breath/DragonsBreath.tres" id="6_evo_db"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Ember Bolt"
+description = "Snaps a swift, short-range dart of living flame that scorches the target on impact with a chance to ignite them."
+icon = ExtResource("2_icon")
+cooldown = 0.85
+mana_cost = 6.0
+max_range = 16.5
+cast_time = 0.0
+spell_id = "ember_bolt"
+tier = 1
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("5_evo_fb"), ExtResource("6_evo_db")])
+target_mode = 1
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

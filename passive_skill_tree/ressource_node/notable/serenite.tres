@@ -20,7 +20,7 @@ metadata/_custom_type_script = "uid://x6g2xwk4dhug"
 [resource]
 script = ExtResource("1_sob2i")
 node_id = "serenite"
-node_name = "sérénité"
+node_name = "Serenity"
 icon = ExtResource("1_lwq55")
 node_type = 1
 max_occurrences = 3

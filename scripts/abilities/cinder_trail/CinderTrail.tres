@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb760.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/cinder_trail/cinder_trail.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/cinder_trail/CinderTrail_tooltip.tres" id="4_tt"]
+[ext_resource type="Resource" uid="uid://daqdw4sgg0trk" path="res://scripts/abilities/Burning_ground/BurningGround.tres" id="5_evo_bg"]
+[ext_resource type="Resource" path="res://scripts/abilities/blazing_stride/BlazingStride.tres" id="6_evo_bs"]
+[ext_resource type="Resource" path="res://scripts/abilities/immolation_aura/ImmolationAura.tres" id="7_evo_ia"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Cinder Trail"
+description = "Ignites your footsteps for 4 seconds, leaving a glowing wake of smoldering embers that continually burns enemies pursuing or standing in your path."
+icon = ExtResource("2_icon")
+cooldown = 7.5
+mana_cost = 14.0
+cast_time = 0.0
+spell_id = "cinder_trail"
+tier = 1
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("5_evo_bg"), ExtResource("6_evo_bs"), ExtResource("7_evo_ia")])
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

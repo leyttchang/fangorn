@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb770.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/kinetic_bolt/kinetic_bolt.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/kinetic_bolt/KineticBolt_tooltip.tres" id="4_tt"]
+[ext_resource type="Resource" path="res://scripts/abilities/singularity_orb/SingularityOrb.tres" id="5_evo_so"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Kinetic Bolt"
+description = "Fires a long-range bolt of condensed arcane force that pierces through enemies, ricochets once off walls or trees, and fractures the armor and resistances of every target traversed."
+icon = ExtResource("2_icon")
+cooldown = 1.15
+mana_cost = 8.0
+max_range = 45.0
+cast_time = 0.0
+spell_id = "kinetic_bolt"
+tier = 1
+element = "arcane"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("5_evo_so")])
+target_mode = 1
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

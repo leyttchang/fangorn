@@ -283,7 +283,7 @@ func _enter_root_holding_ground_phase() -> void:
 
 	_root_phase = RootPhase.HOLDING_GROUND
 	_root_phase_timer = 0.0
-	global_rotation.y = _locked_root_yaw
+	_locked_root_yaw = global_rotation.y
 
 	# Étape 2A : Rester plaqué contre le sol (fin de l'animation stand_up inversée = t=0.0)
 	_lock_ground_pose()
@@ -303,6 +303,7 @@ func _enter_root_holding_ground_phase() -> void:
 			var atk := inst.get_node_or_null("AttackComponent") as AttackComponent
 			if atk != null:
 				atk.caster = self
+			WorldLevelScaler.scale_spawned_attack(inst, self)
 
 			if inst.has_signal("roots_retracted"):
 				inst.connect("roots_retracted", _on_roots_retracted, CONNECT_ONE_SHOT)
@@ -386,8 +387,10 @@ func _process(delta: float) -> void:
 
 	match _root_phase:
 		RootPhase.KNEELING_DOWN:
-			# Aligne doucement l'orientation sur la direction verrouillée pendant le début de la descente
-			global_rotation.y = lerp_angle(global_rotation.y, _locked_root_yaw, 10.0 * delta)
+			# Aligne progressivement l'orientation avec une vitesse angulaire plafonnée (pas de 180° instantané)
+			var yaw_diff: float = wrapf(_locked_root_yaw - global_rotation.y, -PI, PI)
+			var max_kneel_turn: float = deg_to_rad(185.0) * delta * action_speed
+			global_rotation.y = rotate_toward(global_rotation.y, global_rotation.y + yaw_diff, max_kneel_turn)
 			var expected_dur := _stand_up_anim_len / maxf(0.1, stand_down_speed)
 			var anim_done := false
 			if anim_player != null and not is_anim_culled:
@@ -538,7 +541,7 @@ func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) ->
 func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 	if target != null and is_instance_valid(target):
 		var direction = (target.global_position - global_position).normalized()
-		movement_comp.rotate_towards_direction(direction, behavior, delta, 1.5)
+		movement_comp.rotate_towards_direction(direction, behavior, delta, 0.70)
 	return movement_comp.apply_friction(vitesse_horiz, behavior, delta)
 
 # ==========================================================

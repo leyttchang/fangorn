@@ -1,9 +1,14 @@
-[gd_resource type="Resource" script_class="SpellTooltipData" format=3 uid="uid://ypb1c0w76kwe"]
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
 
-[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_ciyt5"]
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
 
 [resource]
-script = ExtResource("1_ciyt5")
-generated_text = "[color=lightblue]Spell | Cooldown: 30.0s | Mana Cost: 10.0[/color]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Rare Spell | Cooldown: 9.0s | Mana Cost: 26[/color]
 
+[color=orange][b]- Celestial Pillar -[/b][/color]
+Damage: [b]58[/b] Base [color=yellow](AoE)[/color]
+Damage Type: [color=#b86bff]100% Arcane[/color]
+Radius: 3.4m
+Knockback: 6.5
 "

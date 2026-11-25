@@ -17,5 +17,5 @@ shape = SubResource("BoxShape3D_interact")
 [node name="Label3D" type="Label3D" parent="." unique_id=987654323]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 billboard = 1
-text = "Appuyez sur E pour interagir"
+text = "Press [F] to interact"
 font_size = 48

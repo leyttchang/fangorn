@@ -1,18 +1,45 @@
 extends CanvasLayer
 
+static var _retained_resources: Array[Resource] = []
+
 var folders_to_scan = [
 	"res://scripts/abilities",
 	"res://scripts/status_effects",
 	"res://particule",
 	"res://assets",
 	"res://objet",
-	"res://map/grass"
+	"res://map/grass",
+	"res://ui/global_shader"
 ]
 
 @onready var container = Node3D.new()
+@onready var canvas_container = Control.new()
 @onready var camera = Camera3D.new()
 
+var _seen_ids: Dictionary = {}
+
+func _retain_resource(res: Resource) -> void:
+	if res == null:
+		return
+	if res is Material or res is Shader:
+		var id: int = res.get_instance_id()
+		if not _seen_ids.has(id):
+			_seen_ids[id] = true
+			_retained_resources.append(res)
+		if res is ShaderMaterial and res.shader != null:
+			var sid: int = res.shader.get_instance_id()
+			if not _seen_ids.has(sid):
+				_seen_ids[sid] = true
+				_retained_resources.append(res.shader)
+
 func _ready():
+	for r in _retained_resources:
+		if r != null:
+			_seen_ids[r.get_instance_id()] = true
+
+	# Conteneur 2D place sous le fond noir pour precompiler aussi les shaders canvas_item sans flash visuel
+	add_child(canvas_container)
+
 	# UI Noir pour cacher le chargement
 	var bg = ColorRect.new()
 	bg.color = Color.BLACK
@@ -59,13 +86,16 @@ func _ready():
 			
 		elif res is Material:
 			# Si c'est un material libre (.tres)
+			_retain_resource(res)
 			_create_dummy_mesh(res, container, dummy_mesh)
 			dummy_mesh_count += 1
 			
 		elif res is Shader:
 			# Si c'est un fichier de shader libre (.gdshader)
+			_retain_resource(res)
 			var sm = ShaderMaterial.new()
 			sm.shader = res
+			_retain_resource(sm)
 			_create_dummy_mesh(sm, container, dummy_mesh)
 			dummy_mesh_count += 1
 			
@@ -73,7 +103,7 @@ func _ready():
 			# Si c'est un StatusEffectData ou autre, on cherche dedans
 			_extract_materials_from_resource(res, container, dummy_mesh)
 			
-	print("[Precompiler] " + str(spawned_count) + " scenes et " + str(dummy_mesh_count) + " materiaux isoles instancies. Attente...")
+	print("[Precompiler] " + str(spawned_count) + " scenes et " + str(dummy_mesh_count) + " materiaux isoles instancies (" + str(_retained_resources.size()) + " ressources retenues). Attente...")
 	
 	# On attend 3 frames pour etre sur que la carte graphique a tout rendu
 	await get_tree().process_frame
@@ -101,6 +131,19 @@ func _find_files_recursively(path: String, result: Array):
 			file_name = dir.get_next()
 
 func _create_dummy_mesh(mat: Material, parent: Node, mesh: Mesh):
+	if mat == null:
+		return
+	_retain_resource(mat)
+	if mat is CanvasItemMaterial or (mat is ShaderMaterial and mat.shader != null and mat.shader.get_mode() == Shader.MODE_CANVAS_ITEM):
+		var cr = ColorRect.new()
+		cr.size = Vector2(2, 2)
+		cr.material = mat
+		canvas_container.add_child(cr)
+		return
+	if mat is ParticleProcessMaterial or mat is FogMaterial or mat is ProceduralSkyMaterial or mat is PanoramaSkyMaterial or mat is PhysicalSkyMaterial:
+		return
+	if mat is ShaderMaterial and mat.shader != null and mat.shader.get_mode() != Shader.MODE_SPATIAL:
+		return
 	var mi = MeshInstance3D.new()
 	mi.mesh = mesh
 	mi.material_override = mat
@@ -118,6 +161,8 @@ func _extract_materials_from_node_properties(node: Node, parent: Node, mesh: Mes
 			var val = node.get(prop.name)
 			if val is Material:
 				_create_dummy_mesh(val, parent, mesh)
+			elif val is Shader:
+				_retain_resource(val)
 			elif val is Resource:
 				_extract_materials_from_resource(val, parent, mesh)
 			
@@ -130,6 +175,8 @@ func _extract_materials_from_resource(res: Resource, parent: Node, mesh: Mesh):
 			var val = res.get(prop.name)
 			if val is Material:
 				_create_dummy_mesh(val, parent, mesh)
+			elif val is Shader:
+				_retain_resource(val)
 
 func _remove_scripts_recursively(node: Node):
 	node.set_script(null)

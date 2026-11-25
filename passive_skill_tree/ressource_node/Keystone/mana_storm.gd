@@ -80,4 +80,3 @@ func _exit_tree() -> void:
 			storm.queue_free()
 	_active_storms.clear()
 	is_on_cooldown = false
-

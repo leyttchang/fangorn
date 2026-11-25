@@ -10,7 +10,7 @@ size = Vector3(1.458435, 1.1616211, 1.3568726)
 script = ExtResource("1_kgj5i")
 
 [node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("2_iv5md")]
-prompt_text = "Press E to revive"
+prompt_text = "Hold [F] to revive"
 
 [node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.069488525, 0.58081055, 0.12612915)

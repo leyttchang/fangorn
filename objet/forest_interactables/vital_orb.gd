@@ -7,7 +7,7 @@ extends Node3D
 enum OrbType { HEALTH = 1, MANA = 2 }
 
 @export var orb_type: OrbType = OrbType.HEALTH
-@export var heal_percent: float = 0.18
+@export var heal_percent: float = 0.15
 @export var mana_percent: float = 0.25
 @export var magnet_radius: float = 4.2
 @export var pickup_radius: float = 0.95
@@ -22,8 +22,10 @@ var _visual_root: Node3D = null
 
 const PICKUP_SFX_PATH := "res://assets/sound_effects/UI/wav (HD)/JDSherbert - Ultimate UI SFX Pack - Select - 2.wav"
 
-func setup_orb(p_type: OrbType, start_pos: Vector3, ground_y: float, initial_vel: Vector3) -> void:
+func setup_orb(p_type: OrbType, start_pos: Vector3, ground_y: float, initial_vel: Vector3, p_heal_percent: float = -1.0) -> void:
 	orb_type = p_type
+	if p_heal_percent > 0.0:
+		heal_percent = p_heal_percent
 	global_position = start_pos
 	_ground_y = ground_y
 	_vel = initial_vel
@@ -170,7 +172,7 @@ func _apply_restore(player: Node3D) -> void:
 	if orb_type == OrbType.HEALTH:
 		var hc := player.get_node_or_null("HealthComponent") as HealthComponent
 		if hc != null and stats != null:
-			var amount := maxf(10.0, stats.get_stat_value("max_health") * heal_percent)
+			var amount := maxf(1.0, stats.get_stat_value("max_health") * heal_percent)
 			hc.heal(amount)
 	else:
 		var mc := player.get_node_or_null("ManaComponent") as ManaComponent

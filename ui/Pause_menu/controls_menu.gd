@@ -12,6 +12,7 @@ var actions_to_map = {
 	"left": "Left",
 	"right": "Right",
 	"jump": "Jump",
+	"interact": "Interact",
 	"r_click": "Attack",
 	"switch_weapons": "Switch Weapons",
 	"toggle_inventory": "Inventory",
@@ -129,6 +130,10 @@ func save_keybinds() -> void:
 			if events.size() > 0:
 				config.set_value("Keybinds", action, events[0])
 	config.save(keybind_file_path)
+	if is_inside_tree() and get_tree() != null:
+		var sm: Node = get_tree().root.get_node_or_null("SettingsManager")
+		if sm != null and sm.has_signal("keybinds_changed"):
+			sm.emit_signal("keybinds_changed")
 
 func load_keybinds() -> void:
 	var config = ConfigFile.new()

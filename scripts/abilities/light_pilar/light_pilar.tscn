@@ -4,11 +4,13 @@
 [ext_resource type="Shader" uid="uid://b3uo1snrwyfgh" path="res://objet/chest/glow_shader.tres" id="2_ynyim"]
 [ext_resource type="Texture2D" uid="uid://vtltbnpfsplq" path="res://assets/LeLu's Noise Pack/T_Aura7.png" id="3_31khw"]
 [ext_resource type="Script" uid="uid://7gph4kmw32to" path="res://scripts/abilities/light_pilar/light_pilar.gd" id="4_script"]
+[ext_resource type="PackedScene" uid="uid://pjqtm0ibekmm" path="res://components/attack_component.tscn" id="5_atk"]
+[ext_resource type="PackedScene" uid="uid://b28h68cl712if" path="res://components/spell_componants/spell_scaling_component.tscn" id="6_scl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wtftm"]
 render_priority = 0
 shader = ExtResource("2_ynyim")
-shader_parameter/Main_color = Color(2.7067378, 2.7067378, 1.9737649, 1)
+shader_parameter/Main_color = Color(2.35, 1.55, 3.1, 1)
 shader_parameter/BlinkingSpeed = 4.0
 shader_parameter/Transparancy_texture = ExtResource("3_31khw")
 shader_parameter/fading_param = 1.0
@@ -23,21 +25,25 @@ curve = SubResource("Curve_wiybp")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_heeqv"]
 emission_shape = 6
 emission_ring_axis = Vector3(0, 1, 0)
-emission_ring_height = 1.0
-emission_ring_radius = 0.3
-emission_ring_inner_radius = 0.2
+emission_ring_height = 2.4
+emission_ring_radius = 1.2
+emission_ring_inner_radius = 0.25
 emission_ring_cone_angle = 90.0
 angle_min = -179.99998
 angle_max = 180.00002
 direction = Vector3(0, 1, 0)
-spread = 5.0
-initial_velocity_min = 1.0
-initial_velocity_max = 2.0
+spread = 8.0
+initial_velocity_min = 1.8
+initial_velocity_max = 3.8
 gravity = Vector3(0, 0, 0)
-scale_min = 0.049999997
-scale_max = 0.099999994
+scale_min = 0.06
+scale_max = 0.13
 scale_curve = SubResource("CurveTexture_dria3")
-color = Color(2.2011487, 1.8130012, 0.40969932, 1)
+color = Color(2.2, 1.45, 3.2, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pillar"]
+height = 6.0
+radius = 3.4
 
 [sub_resource type="Animation" id="Animation_osr64"]
 length = 0.001
@@ -68,7 +74,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1.03, 1.52, 2.02, 3.0333333, 3.76),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [1.0, 5.459, 5.459, 8.082, 0.738, 4.524]
+"values": [1.8, 3.4, 3.0, 4.2, 1.4, 2.8]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_31khw"]
@@ -81,22 +87,41 @@ _data = {
 script = ExtResource("4_script")
 
 [node name="chest_particule" parent="." unique_id=288196329 instance=ExtResource("1_osr64")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1827312, 0)
+transform = Transform3D(1.5, 0, 0, 0, 1.6, 0, 0, 0, 1.5, 0, 1.1827312, 0)
 
 [node name="aura_glow_effect" parent="chest_particule" index="0" unique_id=1637198412]
 material_override = SubResource("ShaderMaterial_wtftm")
 
 [node name="particles" parent="chest_particule/aura_glow_effect" index="0" unique_id=212527297]
-amount = 20
+amount = 24
 process_material = SubResource("ParticleProcessMaterial_heeqv")
+
+[node name="AttackComponent" parent="." unique_id=98213411 instance=ExtResource("5_atk")]
+collision_layer = 4
+collision_mask = 8
+base_damage = 58.0
+knockback_force = 6.5
+knockback_angle = 35.0
+
+[node name="CollisionShape3D" parent="AttackComponent" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+shape = SubResource("CylinderShape3D_pillar")
+
+[node name="SpellScalingComponent" parent="." unique_id=98213412 node_paths=PackedStringArray("attack_component") instance=ExtResource("6_scl")]
+attack_component = NodePath("../AttackComponent")
+base_impact_radius = 3.4
+is_aoe = true
+phys_ratio = 0.0
+magic_ratio = 1.0
 
 [node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1805580673]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6870255, 0)
-light_color = Color(2.707, 2.707, 1.974, 1)
-omni_range = 40.0
+light_color = Color(2.1, 1.45, 2.85, 1)
+omni_range = 12.0
 omni_attenuation = 2.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="OmniLight3D" unique_id=1025740147]
 libraries/ = SubResource("AnimationLibrary_31khw")
 
 [editable path="chest_particule"]
+[editable path="AttackComponent"]

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Spell | Instant | Cooldown: 7.5s | Mana Cost: 14[/color]
+
+[color=orange][b]- Cinder Trail -[/b][/color]
+Trail Duration: [b]4.0s[/b]
+Tick Damage: [b]8[/b] Base every 0.35s [color=yellow](AoE)[/color]
+Damage Type: [color=orangered]100% Fire[/color]
+Applies [b]Burn[/b] (20% chance per tick) for 2.5s
+"

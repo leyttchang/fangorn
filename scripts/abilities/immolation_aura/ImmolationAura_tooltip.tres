@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell | Instant | Cooldown: 12.0s | Mana Cost: 26[/color]
+
+[color=orange][b]- Immolation Aura -[/b][/color]
+Aura Duration: [b]7.0s[/b]
+Tick Damage: [b]11.5[/b] Base every 0.35s [color=yellow](AoE • 5.4m Radius)[/color]
+Damage Type: [color=orangered]100% Fire[/color]
+[color=gold]Guaranteed Burn[/color] (100% chance) for 3.0s
+"

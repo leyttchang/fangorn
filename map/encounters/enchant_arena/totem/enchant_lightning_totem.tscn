@@ -11,7 +11,7 @@ height = 2.45
 radius = 0.68
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ebjp7"]
-size = Vector3(1.85, 2.6, 1.85)
+size = Vector3(2.8, 3.2, 2.8)
 
 [sub_resource type="Animation" id="Animation_edyrm"]
 length = 0.001

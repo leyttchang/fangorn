@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Mobility & Trap Spell | Instant | 3 Charges (5.5s Recharge) | Mana Cost: 12[/color]
+
+[color=orange][b]- Stormwire -[/b][/color]
+Damage: [b]22[/b] Base [color=yellow](Dash Pass-Through & Grounded Wire Network)[/color]
+Damage Type: [color=gold]100% Lightning (AoE)[/color]
+Dash Distance: ~7.0m • Post Duration: [b]7.5s[/b]
+[color=cyan]Each dash plants an electric post into the ground — all active posts connect together with low-lying electric wires[/color]
+Applies [b]Micro-Stun[/b] (0.45s, 100% chance) and [b]Shock[/b] (60% chance, 3.0s)
+"

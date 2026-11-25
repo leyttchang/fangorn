@@ -111,29 +111,85 @@ static func get_bases_by_type(target_type: ItemData.ItemType) -> Array[Equipment
 			result.append(b)
 	return result
 
+const ALL_SPELL_PATHS: Array[String] = [
+	# --- TIER I SPELLS ---
+	"res://scripts/abilities/ember_bolt/EmberBolt.tres",
+	"res://scripts/abilities/cinder_trail/CinderTrail.tres",
+	"res://scripts/abilities/creeping_roots/CreepingRoots.tres",
+	"res://scripts/abilities/kinetic_bolt/KineticBolt.tres",
+	"res://scripts/abilities/glacial_shell/GlacialShell.tres",
+	"res://scripts/abilities/frost_pulse/FrostPulse.tres",
+	"res://scripts/abilities/crackling_arc/CracklingArc.tres",
+	"res://scripts/abilities/spark_step/SparkStep.tres",
+	# --- TIER II SPELLS (Evolutions & Rare Drops) ---
+	"res://scripts/abilities/fireball/Fireball.tres",
+	"res://scripts/abilities/dragons_breath/DragonsBreath.tres",
+	"res://scripts/abilities/Burning_ground/BurningGround.tres",
+	"res://scripts/abilities/blazing_stride/BlazingStride.tres",
+	"res://scripts/abilities/immolation_aura/ImmolationAura.tres",
+	"res://scripts/abilities/living_bomb/LivingBomb.tres",
+	"res://scripts/abilities/grasping_briars/GraspingBriars.tres",
+	"res://scripts/abilities/sylvan_grapple/SylvanGrapple.tres",
+	"res://scripts/abilities/singularity_orb/SingularityOrb.tres",
+	"res://scripts/abilities/glacial_ram/GlacialRam.tres",
+	"res://scripts/abilities/frostmirror_aegis/FrostmirrorAegis.tres",
+	"res://scripts/abilities/ice_nova/IceNova.tres",
+	"res://scripts/abilities/ice_spikes/IceSpikes.tres",
+	"res://scripts/abilities/ice_path/IcePath.tres",
+	"res://scripts/abilities/chain_lightning/chain_lightning.tres",
+	"res://scripts/abilities/lodestone_beam/LodestoneBeam.tres",
+	"res://scripts/abilities/living_lightning/LivingLightning.tres",
+	"res://scripts/abilities/stormwire/Stormwire.tres",
+	"res://scripts/abilities/lightning_strike/LightningStrike.tres",
+	# --- UTILITY & MARTIAL ATTACKS ---
+	"res://scripts/abilities/dash/dash.tres",
+	"res://scripts/abilities/Ice Crash/IceCrash.tres",
+	"res://scripts/abilities/thunder_slash/thunder_slash.tres",
+	"res://scripts/abilities/flaming_stab/flaming_stab.tres",
+	"res://scripts/abilities/thunder_aspect/thunder_aspect.tres",
+	"res://scripts/abilities/Warcry/warcry_ability.tres",
+	"res://scripts/abilities/prismatic_blade/prismatic_blade.tres",
+	"res://scripts/abilities/leap_slam/leap_slam.tres",
+	"res://scripts/abilities/cleave/cleave.tres",
+]
+
 static var _all_spells: Array[AbilityData] = []
 
 static func get_all_spells() -> Array[AbilityData]:
 	if _all_spells.is_empty():
-		_all_spells = [
-			preload("res://scripts/abilities/fireball/Fireball.tres"),
-			preload("res://scripts/abilities/dash/dash.tres"),
-			preload("res://scripts/abilities/magic_shot/MagicShot.tres"),
-			preload("res://scripts/abilities/Burning_ground/BurningGround.tres"),
-			preload("res://scripts/abilities/Ice Crash/IceCrash.tres"),
-			preload("res://scripts/abilities/light_pilar/light_pillar.tres"),
-			preload("res://scripts/abilities/chain_lightning/chain_lightning.tres"),
-			preload("res://scripts/abilities/ice_nova/IceNova.tres"),
-			preload("res://scripts/abilities/lightning_strike/LightningStrike.tres"),
-			preload("res://scripts/abilities/thunder_slash/thunder_slash.tres"),
-			preload("res://scripts/abilities/flaming_stab/flaming_stab.tres"),
-			preload("res://scripts/abilities/thunder_aspect/thunder_aspect.tres"),
-			preload("res://scripts/abilities/Warcry/warcry_ability.tres"),
-			preload("res://scripts/abilities/prismatic_blade/prismatic_blade.tres"),
-			preload("res://scripts/abilities/leap_slam/leap_slam.tres"),
-			preload("res://scripts/abilities/cleave/cleave.tres"),
-		]
+		for path: String in ALL_SPELL_PATHS:
+			if ResourceLoader.exists(path):
+				var ab: AbilityData = load(path) as AbilityData
+				if ab != null:
+					_all_spells.append(ab)
 	return _all_spells
+
+
+## Retourne les compétences éligibles aux Stèles et récompenses aléatoires :
+## - Exclut toujours les sorts d'évolution pure (`is_evolution_only == true`), débloqués via le niveau max du sort parent.
+## - Inclut les compétences de base (Tier I + Attaques) et, avec une faible probabilité (`rare_drop_chance`), les sorts Tier II `[Rare Drop]`.
+static func get_droppable_skills(rare_drop_chance: float = 0.14) -> Array[AbilityData]:
+	var base_pool: Array[AbilityData] = []
+	var rare_pool: Array[AbilityData] = []
+	for ab: AbilityData in get_all_spells():
+		if ab == null or ab.is_evolution_only:
+			continue
+		if ab.is_rare_drop:
+			rare_pool.append(ab)
+		else:
+			base_pool.append(ab)
+
+	if not rare_pool.is_empty() and randf() < rare_drop_chance:
+		base_pool.append_array(rare_pool)
+	return base_pool
+
+
+static func get_all_non_evolution_skills() -> Array[AbilityData]:
+	var result: Array[AbilityData] = []
+	for ab: AbilityData in get_all_spells():
+		if ab != null and not ab.is_evolution_only:
+			result.append(ab)
+	return result
 
 # ==========================================================
 # CONFIGURATION CENTRALE DES MONSTRES (Crédits & Poids de spawn)

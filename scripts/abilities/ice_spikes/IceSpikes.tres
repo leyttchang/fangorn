@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/peaks.png" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://dtc7yo2hbaf0f" path="res://scripts/abilities/casting_animation/ice_casting_vfx.tscn" id="3_cast_vfx"]
+[ext_resource type="PackedScene" uid="uid://bnemrb3vjo0la" path="res://scripts/abilities/indicators/round_indicator.tscn" id="4_ind"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/ice_spikes/ice_spikes.tscn" id="5_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/ice_spikes/IceSpikes_tooltip.tres" id="6_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Ice Spikes"
+description = "Causes jagged spires of glacial ice to erupt beneath a distant target area, impaling enemies upward and briefly freezing them in place."
+icon = ExtResource("2_icon")
+cooldown = 6.5
+mana_cost = 24.0
+max_range = 24.0
+cast_time = 0.3
+spell_id = "ice_spikes"
+tier = 2
+element = "ice"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+target_mode = 3
+custom_tooltip = ExtResource("6_tt")
+cast_vfx_scene = ExtResource("3_cast_vfx")
+indicator_scene = ExtResource("4_ind")
+ability_scene = ExtResource("5_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

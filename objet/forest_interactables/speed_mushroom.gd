@@ -19,10 +19,12 @@ extends Node3D
 		custom_visual_scene = value
 		if is_inside_tree():
 			_rebuild_visuals()
-@export var visibility_max_distance: float = 135.0
+@export var visibility_max_distance: float = 150.0
 
 const SFX_POP_PATH := "res://assets/sound_effects/Combat and Gore/splat_quick.wav"
 const SFX_CRUNCH_PATH := "res://assets/sound_effects/Combat and Gore/crunch_quick.wav"
+
+static var _shared_ambient_spores_mat: ParticleProcessMaterial = null
 
 var _is_destroyed: bool = false
 var _visual_root: Node3D = null
@@ -33,9 +35,22 @@ func _ready() -> void:
 	if not Engine.is_editor_hint():
 		_setup_hitbox()
 
+func _apply_visibility_recursive(node: Node, vis_end: float, vis_margin: float) -> void:
+	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
+		mi.visibility_range_end = vis_end
+		mi.visibility_range_end_margin = vis_margin
+	elif node is GPUParticles3D:
+		var gp := node as GPUParticles3D
+		gp.visibility_range_end = 90.0
+		gp.visibility_range_end_margin = 15.0
+	for child in node.get_children():
+		_apply_visibility_recursive(child, vis_end, vis_margin)
+
 func _rebuild_visuals() -> void:
 	if Engine.is_editor_hint():
 		ProceduralForestMeshes.clear_caches()
+		_shared_ambient_spores_mat = null
 	if _visual_root != null and is_instance_valid(_visual_root):
 		_visual_root.queue_free()
 		remove_child(_visual_root)
@@ -45,10 +60,12 @@ func _rebuild_visuals() -> void:
 	add_child(_visual_root)
 
 	var no_limit := Engine.is_editor_hint()
-	var vis_end := 0.0 if no_limit else visibility_max_distance
+	var vis_end := 0.0 if no_limit else (visibility_max_distance if visibility_max_distance > 0.0 else 150.0)
 
 	if custom_visual_scene != null:
 		var inst := custom_visual_scene.instantiate()
+		if vis_end > 0.0:
+			_apply_visibility_recursive(inst, vis_end, 20.0)
 		_visual_root.add_child(inst)
 		return
 
@@ -91,20 +108,22 @@ func _rebuild_visuals() -> void:
 		ambient_spores.position = Vector3(0.0, 0.45, 0.0)
 		ambient_spores.amount = 8
 		ambient_spores.lifetime = 2.4
-		ambient_spores.visibility_range_end = 55.0
-		ambient_spores.visibility_range_end_margin = 10.0
-		var pmat := ParticleProcessMaterial.new()
-		pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-		pmat.emission_sphere_radius = 0.42
-		pmat.direction = Vector3.UP
-		pmat.spread = 35.0
-		pmat.initial_velocity_min = 0.12
-		pmat.initial_velocity_max = 0.32
-		pmat.gravity = Vector3(0.0, 0.06, 0.0)
-		pmat.scale_min = 0.45
-		pmat.scale_max = 0.95
-		pmat.color = Color(0.28, 1.0, 0.82, 0.72)
-		ambient_spores.process_material = pmat
+		ambient_spores.visibility_range_end = 90.0
+		ambient_spores.visibility_range_end_margin = 15.0
+		if _shared_ambient_spores_mat == null:
+			var pmat := ParticleProcessMaterial.new()
+			pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			pmat.emission_sphere_radius = 0.42
+			pmat.direction = Vector3.UP
+			pmat.spread = 35.0
+			pmat.initial_velocity_min = 0.12
+			pmat.initial_velocity_max = 0.32
+			pmat.gravity = Vector3(0.0, 0.06, 0.0)
+			pmat.scale_min = 0.45
+			pmat.scale_max = 0.95
+			pmat.color = Color(0.28, 1.0, 0.82, 0.72)
+			_shared_ambient_spores_mat = pmat
+		ambient_spores.process_material = _shared_ambient_spores_mat
 		ambient_spores.draw_pass_1 = ProceduralForestMeshes.get_spore_quad_mesh(0.11)
 		_visual_root.add_child(ambient_spores)
 
@@ -202,6 +221,8 @@ func _spawn_spore_explosion(hit_dir: Vector3) -> void:
 	burst.lifetime = 0.95
 	burst.one_shot = true
 	burst.explosiveness = 0.94
+	burst.visibility_range_end = 90.0
+	burst.visibility_range_end_margin = 15.0
 
 	var pmat := ParticleProcessMaterial.new()
 	pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
@@ -254,6 +275,8 @@ func _spawn_cap_chunks(hit_dir: Vector3) -> void:
 		mi.mesh = chunk_mesh
 		mi.material_override = cap_mat
 		mi.scale = Vector3.ONE * randf_range(0.9, 1.45)
+		mi.visibility_range_end = 150.0
+		mi.visibility_range_end_margin = 20.0
 		rb.add_child(mi)
 		add_child(rb)
 

@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("1_ability_script")
 ability_name = "Leap Slam"
-description = "Bondit puissamment selon une trajectoire en cloche et écrase le sol à l'atterrissage, frappant avec l'arme équipée et déclenchant une onde de choc physique de zone qui repousse les ennemis."
+description = "Leaps powerfully along a high arc and slams the ground upon landing, striking with your equipped weapon and unleashing a physical shockwave that knocks back nearby enemies."
 icon = ExtResource("2_icon")
 category = 1
 cooldown = 2.8

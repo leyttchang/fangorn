@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/embrassed-energy.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/singularity_orb/singularity_orb.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/singularity_orb/SingularityOrb_tooltip.tres" id="4_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Singularity Orb"
+description = "Launch a slow-moving gravitational singularity that glides across terrain, drags nearby enemies inward toward its event horizon while pulsing with arcane force, and collapses in a devastating implosion that sunders armor and resistances."
+icon = ExtResource("2_icon")
+cooldown = 7.0
+mana_cost = 22.0
+max_range = 22.0
+cast_time = 0.0
+spell_id = "singularity_orb"
+tier = 2
+element = "arcane"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+target_mode = 1
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

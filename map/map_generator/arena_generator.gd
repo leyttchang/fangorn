@@ -53,8 +53,12 @@ const EDGE_SAMPLE_INSET: float = 1.5
 @export var unique_totem_types_per_map: bool = true
 ## Distance minimale entre deux entrées d'arènes sur une même bordure (en mètres) pour garantir zéro chevauchement
 @export var min_same_wall_center_distance: float = 315.0
+## Si activé, trace aussi un sentier intérieur dans les arènes de totems supplémentaires (sans déborder sur la map)
+@export var totem_path_in_extra_arenas: bool = true
 
 var _arena_flat_zones: Array[Dictionary] = []
+## Segments de chemin prolongés à l'intérieur des arènes (jusqu'à devant le totem / seuil de porte), peints sans surcoût
+var arena_path_segments: Array[Dictionary] = []
 ## Ouvertures additionnelles dans le BorderTreeWall pour les arènes de totems sans route
 var _extra_border_openings: Array[Vector2] = []
 var _current_seed: int = 0
@@ -172,6 +176,7 @@ func clear_arenas() -> void:
 		a.queue_free()
 	_arena_flat_zones.clear()
 	_extra_border_openings.clear()
+	arena_path_segments.clear()
 	arena_grass_polygons.clear()
 	_outside_regions.clear()
 
@@ -231,6 +236,19 @@ func _get_arena_curve_geometry(arena_scene: PackedScene, arena_name: String) -> 
 		return {}
 	
 	var entry_pos: Vector3 = entry_node.position
+	var totem_node: Node3D = inst.find_child("enchant_totem_pos", true, false) as Node3D
+	var has_totem: bool = (totem_node != null)
+	var local_totem_offset := Vector2.ZERO
+	if totem_node != null:
+		var t_rel := Transform3D.IDENTITY
+		var t_curr: Node = totem_node
+		while t_curr != null and t_curr != inst:
+			if t_curr is Node3D:
+				t_rel = (t_curr as Node3D).transform * t_rel
+			t_curr = t_curr.get_parent()
+		var t_scene: Vector3 = t_rel.origin - entry_pos
+		local_totem_offset = Vector2(t_scene.x, t_scene.z)
+
 	var rel_t: Transform3D = Transform3D.IDENTITY
 	var curr: Node = path_node
 	while curr != null and curr != inst:
@@ -275,6 +293,8 @@ func _get_arena_curve_geometry(arena_scene: PackedScene, arena_name: String) -> 
 	return {
 		"local_center": local_center,
 		"local_poly": local_poly,
+		"has_totem": has_totem,
+		"local_totem_offset": local_totem_offset,
 		"radius": base_radius,
 		"flat_radius": base_radius + ARENA_SAFETY_MARGIN,
 		"blend_radius": ARENA_BLEND_RADIUS
@@ -344,6 +364,7 @@ func _estimate_approach_slope(hole_pos: Vector2, outward_dir: Vector2) -> float:
 func init_zones() -> void:
 	_arena_flat_zones.clear()
 	_extra_border_openings.clear()
+	arena_path_segments.clear()
 	
 	for loc in [SLOT_NORTH, SLOT_WEST, SLOT_EAST]:
 		if not _selected_scenes.has(loc):
@@ -367,6 +388,13 @@ func init_zones() -> void:
 		var offset_3d: Vector3 = arena_basis * Vector3(local_c.x, 0.0, local_c.y)
 		var center: Vector2 = hole_pos + Vector2(offset_3d.x, offset_3d.z)
 		
+		var has_totem: bool = bool(geom.get("has_totem", false))
+		var totem_world_pos := Vector2.ZERO
+		if has_totem:
+			var lt: Vector2 = geom["local_totem_offset"]
+			var t3: Vector3 = arena_basis * Vector3(lt.x, 0.0, lt.y)
+			totem_world_pos = hole_pos + Vector2(t3.x, t3.z)
+		
 		var flat_r: float = geom["flat_radius"]
 		var blend_r: float = geom["blend_radius"]
 		var total_r: float = flat_r + blend_r
@@ -375,6 +403,8 @@ func init_zones() -> void:
 		var zone: Dictionary = {
 			"slot": loc,
 			"is_extra": false,
+			"has_totem": has_totem,
+			"totem_pos": totem_world_pos,
 			"name": arena_name,
 			"scene": scene,
 			"pos": hole_pos,
@@ -398,6 +428,8 @@ func init_zones() -> void:
 	
 	if extra_totem_arenas_count > 0 and extra_totem_arena_scene != null:
 		_append_extra_totem_zones()
+	
+	_build_arena_path_segments()
 
 
 ## Place `extra_totem_arenas_count` arènes de totems supplémentaires sur les bordures sans route,
@@ -527,9 +559,17 @@ func _append_extra_totem_zones() -> void:
 					if score > best_score:
 						best_score = score
 						var extra_name: String = "Arena_Totem_Extra_%d" % (extra_idx + 1)
+						var extra_has_totem: bool = bool(geom.get("has_totem", false))
+						var extra_totem_pos := Vector2.ZERO
+						if extra_has_totem:
+							var lt_ex: Vector2 = geom["local_totem_offset"]
+							var t3_ex: Vector3 = arena_basis * Vector3(lt_ex.x, 0.0, lt_ex.y)
+							extra_totem_pos = hole_pos + Vector2(t3_ex.x, t3_ex.z)
 						chosen_zone = {
 							"slot": 10 + extra_idx,
 							"is_extra": true,
+							"has_totem": extra_has_totem,
+							"totem_pos": extra_totem_pos,
 							"name": extra_name,
 							"scene": extra_totem_arena_scene,
 							"pos": hole_pos,
@@ -557,6 +597,87 @@ func _append_extra_totem_zones() -> void:
 		print("Arène de totem sans route '%s' placée en %v (dir=%v, centre=%v)." % [
 			chosen_zone["name"], chosen_zone["pos"], chosen_zone["dir"], chosen_zone["center"]
 		])
+
+
+## Génère en O(1) les quelques segments prolongeant le chemin dans chaque arène jusqu'à devant le totem
+func _build_arena_path_segments() -> void:
+	arena_path_segments.clear()
+	var base_w: float = 15.0
+	if path_generator != null and "path_width" in path_generator:
+		base_w = float(path_generator.path_width)
+
+	for zone: Dictionary in _arena_flat_zones:
+		var hole_pos: Vector2 = zone["pos"]
+		var dir: Vector2 = (zone["dir"] as Vector2).normalized()
+		var is_extra: bool = bool(zone.get("is_extra", false))
+		var has_totem: bool = bool(zone.get("has_totem", false))
+
+		if not has_totem:
+			# Arène de Boss : prolonge simplement la route jusqu'au seuil de l'arche en pierre (sans envahir l'arène)
+			if not is_extra:
+				_push_arena_segment(hole_pos - dir * 7.0, hole_pos + dir * 2.5, base_w)
+			continue
+
+		var totem_pos: Vector2 = zone["totem_pos"]
+		var to_totem_vec: Vector2 = totem_pos - hole_pos
+		var total_dist: float = to_totem_vec.length()
+		if total_dist < 8.0:
+			continue
+		var fwd: Vector2 = to_totem_vec / total_dist
+		var perp := Vector2(-fwd.y, fwd.x)
+
+		# Si arène supplémentaire sans route et option désactivée : juste un petit parvis dégagé devant le totem
+		if is_extra and not totem_path_in_extra_arenas:
+			_push_arena_segment(totem_pos - fwd * 4.2, totem_pos - fwd * 1.5, base_w * 0.58)
+			continue
+
+		# Point d'arrêt : ~4.8m devant le centre du totem (le rayon arrondi couvre le parvis + le pied du totem sans dépasser derrière)
+		var stop_pt: Vector2 = totem_pos - fwd * 4.8
+
+		var seg_rng := RandomNumberGenerator.new()
+		seg_rng.seed = hash([_current_seed, int(zone.get("slot", 0)), "arena_totem_path"])
+		var sway_sign: float = 1.0 if seg_rng.randf() > 0.5 else -1.0
+		var sway_amp: float = seg_rng.randf_range(2.2, 4.0) * sway_sign
+
+		var pts: Array[Vector2] = []
+		var widths: Array[float] = []
+
+		if not is_extra:
+			# Démarre 7m à l'intérieur de la carte pour souder sans couture avec la route principale arrivant à `hole_pos`
+			pts.append(hole_pos - dir * 7.0)
+			widths.append(base_w)
+			pts.append(hole_pos)
+			widths.append(base_w * 0.96)
+		else:
+			# Arène sans route : démarre 5m APRÈS le mur d'arbres pour ne rien dévoiler côté forêt !
+			pts.append(hole_pos + fwd * 5.0)
+			widths.append(base_w * 0.62)
+
+		var start_in_arena: Vector2 = pts[pts.size() - 1]
+		var steps: int = 4
+		for s_i in range(1, steps + 1):
+			var u: float = float(s_i) / float(steps)
+			var base_p: Vector2 = start_in_arena.lerp(stop_pt, u)
+			# Légère ondulation organique en S qui revient pile dans l'axe devant le totem (u = 1 -> sin(PI) = 0)
+			var lateral: float = sin(u * PI * 1.5) * sin(u * PI) * sway_amp
+			pts.append(base_p + perp * lateral)
+			widths.append(lerpf(widths[0], base_w * 0.80, u))
+
+		for i in range(pts.size() - 1):
+			_push_arena_segment(pts[i], pts[i + 1], 0.5 * (widths[i] + widths[i + 1]))
+
+
+func _push_arena_segment(p1: Vector2, p2: Vector2, w: float) -> void:
+	arena_path_segments.append({
+		"start": p1,
+		"end": p2,
+		"width": w,
+		"is_arena_path": true,
+		"min_x": minf(p1.x, p2.x),
+		"max_x": maxf(p1.x, p2.x),
+		"min_y": minf(p1.y, p2.y),
+		"max_y": maxf(p1.y, p2.y),
+	})
 
 
 ## Construit un paquet mélangé (sans doublon d'élément) de scènes de totems selon la seed du monde
@@ -626,6 +747,15 @@ func spawn_arenas() -> void:
 			arena_inst.set("boss_scene", _selected_bosses[slot_idx])
 		if "height_provider" in arena_inst:
 			arena_inst.set("height_provider", Callable(map_generator, "get_terrain_height_at"))
+		
+		# Attribution de l'iLvl strict : Totems = toujours 6..8, Boss = toujours 10
+		if arena_inst.has_method("spawn_totem"):
+			var is_hidden_totem: bool = bool(zone.get("is_extra", false))
+			var rolled_totem_ilvl: int = WorldLevelScaler.get_totem_ilvl_for_arena(_current_seed, str(zone["name"]), is_hidden_totem)
+			if "totem_ilvl" in arena_inst:
+				arena_inst.set("totem_ilvl", rolled_totem_ilvl)
+		elif "boss_ilvl_override" in arena_inst:
+			arena_inst.set("boss_ilvl_override", WorldLevelScaler.BOSS_ILVL)
 		
 		# Attribution sans remise d'un type de totem unique par map
 		if arena_inst.has_method("spawn_totem") and unique_totem_types_per_map:
@@ -910,6 +1040,50 @@ func _import_outside_region(terrain_data: Terrain3DData, rx: int, rz: int) -> vo
 	var ctrl := PackedInt32Array()
 	ctrl.resize(rs * rs)
 	ctrl.fill(ctrl_default)
+	
+	# Peinture ultra-rapide (< 0.1 ms) uniquement dans les micro-boîtes englobantes des chemins d'arène
+	if not arena_path_segments.is_empty():
+		var r_max_x: float = float(x0 + rs)
+		var r_max_z: float = float(z0 + rs)
+		for seg: Dictionary in arena_path_segments:
+			var seg_w: float = float(seg["width"])
+			if float(seg["max_x"]) + seg_w < float(x0) or float(seg["min_x"]) - seg_w > r_max_x:
+				continue
+			if float(seg["max_y"]) + seg_w < float(z0) or float(seg["min_y"]) - seg_w > r_max_z:
+				continue
+			var bx_min: int = maxi(0, int(floor(float(seg["min_x"]) - seg_w)) - x0 - 1)
+			var bx_max: int = mini(rs - 1, int(ceil(float(seg["max_x"]) + seg_w)) - x0 + 1)
+			var bz_min: int = maxi(0, int(floor(float(seg["min_y"]) - seg_w)) - z0 - 1)
+			var bz_max: int = mini(rs - 1, int(ceil(float(seg["max_y"]) + seg_w)) - z0 + 1)
+			if bx_min > bx_max or bz_min > bz_max:
+				continue
+			var a: Vector2 = seg["start"]
+			var b: Vector2 = seg["end"]
+			var ax: float = a.x; var ay: float = a.y
+			var ddx_s: float = b.x - ax; var ddy_s: float = b.y - ay
+			var l2_s: float = ddx_s * ddx_s + ddy_s * ddy_s
+			var seg_w_sq: float = seg_w * seg_w
+			for lz in range(bz_min, bz_max + 1):
+				var gz: float = float(z0 + lz)
+				var row_off: int = lz * rs
+				for lx in range(bx_min, bx_max + 1):
+					var gx: float = float(x0 + lx)
+					var dist_sq: float
+					if l2_s < 0.0001:
+						var ex: float = gx - ax; var ey: float = gz - ay
+						dist_sq = ex * ex + ey * ey
+					else:
+						var t_p: float = clampf(((gx - ax) * ddx_s + (gz - ay) * ddy_s) / l2_s, 0.0, 1.0)
+						var ex: float = gx - (ax + t_p * ddx_s)
+						var ey: float = gz - (ay + t_p * ddy_s)
+						dist_sq = ex * ex + ey * ey
+					if dist_sq < seg_w_sq:
+						var t_val: float = sqrt(dist_sq) / seg_w
+						var blend: float = 1.0 - (t_val * t_val * (3.0 - 2.0 * t_val))
+						var b_byte: int = int(blend * 255.0)
+						var c_idx: int = row_off + lx
+						if b_byte > ((ctrl[c_idx] >> 14) & 0xFF):
+							ctrl[c_idx] = ctrl_default | ((b_byte & 0xFF) << 14)
 	
 	var img: Image = Image.create_from_data(rs, rs, false, Image.FORMAT_RF, heights.to_byte_array())
 	var control_img: Image = Image.create_from_data(rs, rs, false, Image.FORMAT_RF, ctrl.to_byte_array())

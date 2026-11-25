@@ -55,6 +55,15 @@ func open_inventory_with_chest(chest_inv: Node) -> void:
 		
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
+func _has_external_reward_modal_open() -> bool:
+	if owner == null:
+		return false
+	for child: Node in owner.get_children():
+		if child != null and is_instance_valid(child) and not child.is_queued_for_deletion():
+			if child is RewardChoiceUID2 or child is RewardChoiceUI:
+				return true
+	return false
+
 func close_all_ui() -> void:
 	if inventory_ui:
 		inventory_ui.close_inventory()
@@ -64,5 +73,8 @@ func close_all_ui() -> void:
 		skill_tree_comp.close_tree()
 		
 	current_state = UIState.NONE
-	# On recapture la souris pour le jeu
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	# On recapture la souris pour le jeu uniquement si aucune fenêtre de récompense n'est ouverte
+	if _has_external_reward_modal_open():
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

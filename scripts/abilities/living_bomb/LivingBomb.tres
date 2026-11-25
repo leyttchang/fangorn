@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb779.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/living_bomb/living_bomb.tscn" id="3_scene"]
+[ext_resource type="PackedScene" uid="uid://d2g0bngsgl1ay" path="res://scripts/abilities/casting_animation/fire_casting_VFX.tscn" id="4_vfx"]
+[ext_resource type="Resource" path="res://scripts/abilities/living_bomb/LivingBomb_tooltip.tres" id="5_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Living Bomb"
+description = "Fires an unstable magma seed that embeds into a monster's flesh, causing it to violently swell with volatile heat before detonating in a fiery blast."
+icon = ExtResource("2_icon")
+cooldown = 7.5
+mana_cost = 24.0
+max_range = 24.0
+cast_time = 0.25
+spell_id = "living_bomb"
+tier = 2
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 140
+is_rare_drop = true
+is_evolution_only = false
+target_mode = 1
+custom_tooltip = ExtResource("5_tt")
+cast_vfx_scene = ExtResource("4_vfx")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

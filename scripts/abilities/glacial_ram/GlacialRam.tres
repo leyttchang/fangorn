@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/mountains.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/glacial_ram/glacial_ram.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/glacial_ram/GlacialRam_tooltip.tres" id="4_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Glacial Ram"
+description = "Transforms you into a towering glacial monolith hurtling forward with heavy momentum! Slide with inertia, bowl over and launch monsters in your path, and ricochet off trees and walls in third-person view. Right-click to end early."
+icon = ExtResource("2_icon")
+cooldown = 10.0
+mana_cost = 24.0
+max_range = 18.0
+cast_time = 0.0
+spell_id = "glacial_ram"
+tier = 2
+element = "ice"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

@@ -98,10 +98,10 @@ properties/0/spawn = true
 properties/0/replication_mode = 2
 properties/1/path = NodePath(".:position")
 properties/1/spawn = true
-properties/1/replication_mode = 1
+properties/1/replication_mode = 2
 properties/2/path = NodePath(".:rotation")
 properties/2/spawn = true
-properties/2/replication_mode = 1
+properties/2/replication_mode = 2
 
 [node name="tree_man" type="CharacterBody3D" unique_id=135306071 node_paths=PackedStringArray("hand_attack_component", "foot_attack_component", "hand_attack_shape", "foot_attack_shape", "root_spawn") groups=["Enemie"]]
 collision_layer = 256
@@ -297,7 +297,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("CapsuleShape3D_hips_hitbox")
 
 [node name="root_spawn" type="Marker3D" parent="T-Pose/Armature/Skeleton3D/hips" unique_id=1688574612]
-transform = Transform3D(0.9999998, 4.656613e-10, -1.33004505e-08, 4.656613e-09, 0.9999998, 0, 1.7054845e-08, 0, 0.9999998, -0.0064842477, 1.9879788, 0.21885157)
+transform = Transform3D(0.99999976, 6.9849193e-10, -2.0751031e-08, 5.820766e-09, 0.99999976, 0, 2.4738256e-08, 0, 0.99999976, 0.0054921582, -1.6838106, -0.18536633)
 
 [node name="left_hand" type="BoneAttachment3D" parent="T-Pose/Armature/Skeleton3D" index="3" unique_id=239139547]
 transform = Transform3D(0.98740923, -0.09681523, 0.12509826, 0.12597255, 0.002947703, -0.9920295, 0.095674455, 0.9952979, 0.015106678, 1.0186448, 0.37687826, 1.7252269)
@@ -375,6 +375,7 @@ hurt_sounds = Array[AudioStream]([ExtResource("46_belch1"), ExtResource("47_belc
 volume_db = -40.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1538105657]
+delta_interval = 0.033
 replication_config = SubResource("SceneReplicationConfig_treeman")
 
 [node name="status_effect_componant" parent="." unique_id=1809605373 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("49_status_comp")]

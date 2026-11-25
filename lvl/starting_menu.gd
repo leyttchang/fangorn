@@ -115,7 +115,7 @@ func _on_peer_disconnected(id: int) -> void:
 
 func _on_connected_to_server() -> void:
 	# Le client vient de se connecter, il envoie son pseudo au serveur
-	var my_pseudo = "Joueur " + str(multiplayer.get_unique_id())
+	var my_pseudo = "Player " + str(multiplayer.get_unique_id())
 	if pseudo_input != null and pseudo_input.text.strip_edges() != "":
 		my_pseudo = pseudo_input.text.strip_edges()
 	rpc_id(1, "rpc_register_player", my_pseudo)
@@ -145,7 +145,7 @@ func rpc_sync_lobby(players_dict: Dictionary) -> void:
 			var pseudo = players_dict[id]
 			label.text = pseudo
 			if id == multiplayer.get_unique_id():
-				label.text += " (Toi)"
+				label.text += " (You)"
 			label.show()
 		else:
 			label.text = "---"

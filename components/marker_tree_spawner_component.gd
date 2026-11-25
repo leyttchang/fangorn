@@ -112,6 +112,9 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	if auto_spawn_on_ready:
+		# Si le composant dépend d'un height_provider externe (ex: ArenaGenerator), attendre qu'il soit fourni
+		if snap_to_ground and not height_provider.is_valid():
+			return
 		spawn_trees()
 
 func _exit_tree() -> void:
@@ -186,6 +189,7 @@ func spawn_trees() -> void:
 		var v_data = active_variations[vi]
 		var mmi = MultiMeshInstance3D.new()
 		mmi.name = "TreeMultiMesh_" + str(vi)
+		mmi.layers = 2
 		mmi.cast_shadow = cast_shadows
 		var no_limit: bool = Engine.is_editor_hint() and _is_editor_unlimited_view()
 		mmi.visibility_range_end = 0.0 if no_limit else visibility_range_end

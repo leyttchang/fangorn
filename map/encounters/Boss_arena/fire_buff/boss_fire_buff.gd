@@ -8,7 +8,7 @@ extends Node3D
 ##   les joueurs vers le haut.
 
 const SLAM_DEBOUNCE_MSEC: int = 100
-const SPAWN_RING_OFFSET: float = 0.85
+const SPAWN_RING_OFFSET: float = 2.15
 
 @export_category("Buff Feu du Boss (Tornades)")
 
@@ -21,8 +21,8 @@ const SPAWN_RING_OFFSET: float = 0.85
 @export_range(2.0, 18.0, 0.2, "suffix:m/s") var tornado_speed: float = 6.2
 @export_range(1.5, 12.0, 0.2, "suffix:s") var tornado_duration: float = 4.8
 @export_range(1.0, 200.0, 1.0) var tornado_damage: float = 24.0
-@export_range(0.0, 50.0, 0.5) var tornado_knockback_force: float = 24.0
-@export_range(0.0, 85.0, 1.0, "suffix:°") var tornado_knockback_angle: float = 62.0
+@export_range(0.0, 50.0, 0.5) var tornado_knockback_force: float = 15.0
+@export_range(0.0, 85.0, 1.0, "suffix:°") var tornado_knockback_angle: float = 30.0
 @export_range(-2.5, 2.5, 0.05) var tornado_curve_strength: float = 0.45
 
 @export_group("Buff Direct sur l'Ogre & Scènes")

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb771.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/blazing_stride/blazing_stride.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/blazing_stride/BlazingStride_tooltip.tres" id="4_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Blazing Stride"
+description = "Surges forward with +60% Movement Speed for 4.5 seconds, leaving a wide blazing wake of roaring flames that scorches pursuing foes."
+icon = ExtResource("2_icon")
+cooldown = 9.5
+mana_cost = 22.0
+max_range = 2.4
+cast_time = 0.0
+spell_id = "blazing_stride"
+tier = 2
+element = "fire"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

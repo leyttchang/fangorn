@@ -20,14 +20,10 @@ const SLATE_DIFF_PATH := "res://map/encounters/Boss_arena/gate_assets/moria_slat
 const SLATE_NOR_PATH := "res://map/encounters/Boss_arena/gate_assets/moria_slate_nor.jpg"
 const SLATE_ROUGH_PATH := "res://map/encounters/Boss_arena/gate_assets/moria_slate_rough.jpg"
 
-const ROOT_SHADER_PATH := "res://objet/forest_interactables/fangorn_root.gdshader"
+const ROOT_SHADER_PATH := "res://assets/3D_models/VFX_spell/root_shader.tres"
 const BARK_A_DIFF := "res://assets/texture/bark_brown_text/bark_brown_02_diff_1k.jpg"
 const BARK_A_NOR := "res://assets/texture/bark_brown_text/bark_brown_02_nor_gl_1k.jpg"
 const BARK_A_ROUGH := "res://assets/texture/bark_brown_text/bark_brown_02_rough_1k.jpg"
-
-const BARK_B_DIFF := "res://assets/texture/tree_root_text/fever_tree_bark_diff_1k.jpg"
-const BARK_B_NOR := "res://assets/texture/tree_root_text/fever_tree_bark_nor_gl_1k.jpg"
-const BARK_B_ARM := "res://assets/texture/tree_root_text/fever_tree_bark_arm_1k.jpg"
 
 static var _arch_mat: ShaderMaterial = null
 static var _pillar_mat: ShaderMaterial = null
@@ -47,8 +43,14 @@ static func clear_caches() -> void:
 static func _get_shader_radius_curve() -> Curve:
 	if _root_profile_curve != null:
 		return _root_profile_curve
-	# Profil identique à Curve_radius_profile dans root_shader.tres afin que force_pincement_ referme
-	# chaque racine en pointe conique pleine parfaite (0 ouverture creuse) quel que soit debut/fin.
+	# Lit directement Curve_radius_profile depuis root_shader.tres (nœud vertex 24)
+	var vs: VisualShader = load(ROOT_SHADER_PATH) as VisualShader
+	if vs != null:
+		var c_node: VisualShaderNodeCurveTexture = vs.get_node(VisualShader.TYPE_VERTEX, 24) as VisualShaderNodeCurveTexture
+		if c_node != null and c_node.texture != null and c_node.texture.curve != null:
+			_root_profile_curve = c_node.texture.curve
+			_root_profile_curve.bake()
+			return _root_profile_curve
 	var c := Curve.new()
 	c.add_point(Vector2(0.0, 0.0), 0.0, 4.0)
 	c.add_point(Vector2(0.05, 0.28), 5.0, 6.0)
@@ -127,39 +129,32 @@ static func get_slate_masonry_material(upper_element: bool = false) -> ShaderMat
 
 
 static func create_vine_root_material(
-	use_secondary_bark: bool = false,
-	tint: Color = Color(0.50, 0.44, 0.32, 1.0),
+	_use_secondary_bark: bool = false,
+	tint: Color = Color(0.28, 0.22, 0.15, 1.0),
 	base_radius: float = 0.28,
 	length_meters: float = 7.5
 ) -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
 	mat.shader = load(ROOT_SHADER_PATH) as Shader
-	mat.set_shader_parameter("fin", 0.0)
-	mat.set_shader_parameter("debut", 1.0)
-	mat.set_shader_parameter("smoth_step", 0.008)
-	mat.set_shader_parameter("smoth_step_sommet", 0.14)
-	# Pincement calé sur le rayon réel du tube => l'extrémité qui se rétracte se pince jusqu'à rayon 0 (jamais de tube ouvert)
-	mat.set_shader_parameter("force_pincement_", base_radius * 1.06)
-	# Alignement longitudinal des fibres d'écorce + répétition métrique naturelle (au lieu de x100)
+	mat.set_shader_parameter("fin", -0.09)
+	mat.set_shader_parameter("debut", 1.08)
+	mat.set_shader_parameter("smoth_step", 0.002)
+	mat.set_shader_parameter("smoth_step_sommet", 0.08)
+	# Pincement conique exact à rayon 0 sur toute la course de debut
+	mat.set_shader_parameter("force_pincement_", base_radius * 1.00)
+	# Fibres d'écorce orientées dans le sens de la racine + répétition entière sans couture
 	mat.set_shader_parameter("align_bark_uv", 1.0)
-	var circ_repeats := float(maxi(1, roundi((TAU * base_radius) / 1.15)))
-	var len_repeats := clampf(length_meters / 2.2, 1.2, 5.0)
+	var circ_repeats: float = float(maxi(1, roundi((TAU * base_radius) / 1.35)))
+	var len_repeats: float = snappedf(clampf(length_meters / 2.0, 1.5, 6.0), 0.5)
 	mat.set_shader_parameter("uv_scale", Vector2(circ_repeats, len_repeats))
 	mat.set_shader_parameter("ColorParameter", tint)
-	mat.set_shader_parameter("normal_strength", 1.25)
-	if use_secondary_bark and ResourceLoader.exists(BARK_B_DIFF):
-		mat.set_shader_parameter("root_texture", load(BARK_B_DIFF))
-		if ResourceLoader.exists(BARK_B_ARM):
-			mat.set_shader_parameter("arm_text", load(BARK_B_ARM))
-		if ResourceLoader.exists(BARK_B_NOR):
-			mat.set_shader_parameter("normal_text", load(BARK_B_NOR))
-	else:
-		if ResourceLoader.exists(BARK_A_DIFF):
-			mat.set_shader_parameter("root_texture", load(BARK_A_DIFF))
-		if ResourceLoader.exists(BARK_A_ROUGH):
-			mat.set_shader_parameter("arm_text", load(BARK_A_ROUGH))
-		if ResourceLoader.exists(BARK_A_NOR):
-			mat.set_shader_parameter("normal_text", load(BARK_A_NOR))
+	mat.set_shader_parameter("normal_strength", 1.0)
+	if ResourceLoader.exists(BARK_A_DIFF):
+		mat.set_shader_parameter("root_texture", load(BARK_A_DIFF))
+	if ResourceLoader.exists(BARK_A_ROUGH):
+		mat.set_shader_parameter("arm_text", load(BARK_A_ROUGH))
+	if ResourceLoader.exists(BARK_A_NOR):
+		mat.set_shader_parameter("normal_text", load(BARK_A_NOR))
 	return mat
 
 
@@ -478,24 +473,32 @@ static func build_hollow_moria_arch_spandrel(
 	var st_vault := SurfaceTool.new()
 	st_vault.begin(Mesh.PRIMITIVE_TRIANGLES)
 
+	var arch_arc_accum: float = 0.0
 	for i in range(segments):
 		var pi0 := in_pts[i]
 		var pi1 := in_pts[i + 1]
 		var kb0 := key_protrude[i]
 		var kb1 := key_protrude[i + 1]
+		var seg_arc: float = pi0.distance_to(pi1)
+		var u_arc0: float = arch_arc_accum * 0.30
+		var u_arc1: float = (arch_arc_accum + seg_arc) * 0.30
+		arch_arc_accum += seg_arc
 
-		# Normale de l'intrados dirigée vers le centre (0, 0) de l'ouverture !
+		# Normale de l'intrados dirigée vers le centre (0, 0) de l'ouverture, UV curviligne continu sans cassure
 		var mid_in := (pi0 + pi1) * 0.5
 		var n_intrados := Vector3(-mid_in.x, -mid_in.y, 0.0).normalized()
 
-		_emit_quad_auto_uv(
+		_emit_quad_outward(
 			st_vault,
 			Vector3(pi0.x, pi0.y, hz + kb0),
 			Vector3(pi1.x, pi1.y, hz + kb1),
 			Vector3(pi1.x, pi1.y, -hz - kb1),
 			Vector3(pi0.x, pi0.y, -hz - kb0),
-			n_intrados,
-			0.30
+			Vector2(u_arc0, (hz + kb0) * 0.30),
+			Vector2(u_arc1, (hz + kb1) * 0.30),
+			Vector2(u_arc1, (-hz - kb1) * 0.30),
+			Vector2(u_arc0, (-hz - kb0) * 0.30),
+			n_intrados
 		)
 
 		# Chants extérieurs segmentés (suivant aussi le léger décroché de la clé de voûte)
@@ -544,133 +547,183 @@ static func smoothstep_scalar(edge0: float, edge1: float, x: float) -> float:
 
 
 # =========================================================================
-# 4. RACINES & LIANES FERMÉES ET COMPATIBLES SHADER (PINCEMENT CONIQUE 100% PLEIN)
+# 4. RACINES LISSES INDEXÉES 100% COMPATIBLES AVEC root_shader.tres
 # =========================================================================
+static func _resample_catmull_rom(src_pts: PackedVector3Array, target_count: int) -> PackedVector3Array:
+	var n: int = src_pts.size()
+	if n < 2 or target_count <= 2:
+		return src_pts
+	var out := PackedVector3Array()
+	out.resize(target_count)
+	for k in range(target_count):
+		var t_glob: float = float(k) / float(target_count - 1)
+		var seg_f: float = t_glob * float(n - 1)
+		var i1: int = clampi(int(floor(seg_f)), 0, n - 2)
+		var lt: float = seg_f - float(i1)
+		var lt2: float = lt * lt
+		var lt3: float = lt2 * lt
+		var p0: Vector3 = src_pts[maxi(0, i1 - 1)]
+		var p1: Vector3 = src_pts[i1]
+		var p2: Vector3 = src_pts[i1 + 1]
+		var p3: Vector3 = src_pts[mini(n - 1, i1 + 2)]
+		out[k] = 0.5 * (
+			(2.0 * p1)
+			+ (-p0 + p2) * lt
+			+ (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * lt2
+			+ (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * lt3
+		)
+	return out
+
+
 static func build_anchored_root_tube(
 	points: PackedVector3Array,
 	base_radius: float,
 	_tip_radius_ratio: float = 0.26,
-	radial_segments: int = 10,
+	radial_segments: int = 14,
 	gnarl_amp: float = 0.016,
-	seed_val: int = 1
+	seed_val: int = 1,
+	use_custom_pivot: bool = false,
+	custom_pivot: Vector3 = Vector3.ZERO
 ) -> ArrayMesh:
-	var n_pts := points.size()
-	if n_pts < 2:
+	var src_n: int = points.size()
+	if src_n < 2:
 		return ArrayMesh.new()
 
-	var origin := points[0]
-	var local_pts := PackedVector3Array()
-	local_pts.resize(n_pts)
-	for i in range(n_pts):
-		local_pts[i] = points[i] - origin
+	var origin: Vector3 = custom_pivot if use_custom_pivot else points[0]
+	var rel_pts := PackedVector3Array()
+	rel_pts.resize(src_n)
+	for i in range(src_n):
+		rel_pts[i] = points[i] - origin
+
+	# Densification Catmull-Rom à 72 anneaux longitudinaux : garantit que l'interpolation linéaire GPU
+	# entre deux anneaux reste < 2 mm pendant la rétraction de root_shader.tres (zéro ouverture creuse)
+	var n_rings: int = 72
+	var local_pts: PackedVector3Array = _resample_catmull_rom(rel_pts, n_rings)
+
+	# Légère ondulation organique appliquée à la ligne centrale (et NON au rayon), pour que chaque section
+	# reste un cercle parfait centré sur local_pts[i] qui se pince exactement en 1 point sous root_shader.tres
+	if gnarl_amp > 0.0005:
+		var init_prev_n := Vector3.UP
+		var warped := PackedVector3Array()
+		warped.resize(n_rings)
+		for i in range(n_rings):
+			var tf: float = float(i) / float(n_rings - 1)
+			var tan_i: Vector3
+			if i == 0:
+				tan_i = (local_pts[1] - local_pts[0]).normalized()
+			elif i == n_rings - 1:
+				tan_i = (local_pts[n_rings - 1] - local_pts[n_rings - 2]).normalized()
+			else:
+				tan_i = (local_pts[i + 1] - local_pts[i - 1]).normalized()
+			if tan_i.length_squared() < 0.0001:
+				tan_i = Vector3.RIGHT
+			var rn: Vector3 = init_prev_n - tan_i * init_prev_n.dot(tan_i)
+			if rn.length_squared() < 0.001:
+				var fb := Vector3.FORWARD if absf(tan_i.dot(Vector3.UP)) > 0.9 else Vector3.UP
+				rn = (fb - tan_i * fb.dot(tan_i)).normalized()
+			else:
+				rn = rn.normalized()
+			init_prev_n = rn
+			var bn: Vector3 = tan_i.cross(rn).normalized()
+			var env: float = sin(tf * PI)
+			var w1: float = sin(tf * 13.0 + float(seed_val) * 1.9) * gnarl_amp * 1.35 * env
+			var w2: float = cos(tf * 9.5 + float(seed_val) * 2.7) * gnarl_amp * 1.15 * env
+			warped[i] = local_pts[i] + rn * w1 + bn * w2
+		local_pts = warped
 
 	var cum_len := PackedFloat32Array()
-	cum_len.resize(n_pts)
+	cum_len.resize(n_rings)
 	cum_len[0] = 0.0
-	var total_len := 0.0
-	for i in range(1, n_pts):
+	var total_len: float = 0.0
+	for i in range(1, n_rings):
 		total_len += local_pts[i - 1].distance_to(local_pts[i])
 		cum_len[i] = total_len
 	if total_len < 0.0001:
 		total_len = 1.0
 
-	var prof_curve := _get_shader_radius_curve()
+	var rad_segs: int = maxi(12, radial_segments)
+	var stride: int = rad_segs + 1
+	var prof_curve: Curve = _get_shader_radius_curve()
+
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 
 	var prev_normal := Vector3.UP
-	var ring_verts: Array[PackedVector3Array] = []
-	var ring_norms: Array[PackedVector3Array] = []
-	var ring_uvs: Array[PackedVector2Array] = []
-	var tangents: PackedVector3Array = PackedVector3Array()
+	var ring_zero_pos := PackedVector3Array()
+	var ring_zero_nrm := PackedVector3Array()
 
-	for i in range(n_pts):
-		var raw_t := clampf(cum_len[i] / total_len, 0.0, 1.0)
-		# Plage 0.02..0.98 calée sur Curve_radius_profile du shader pour un pincement exact à 0
-		var u := lerpf(0.02, 0.98, raw_t)
+	for i in range(n_rings):
+		var raw_t: float = clampf(cum_len[i] / total_len, 0.0, 1.0)
+		var u: float = lerpf(0.004, 0.996, raw_t)
 
 		var tangent: Vector3
 		if i == 0:
 			tangent = (local_pts[1] - local_pts[0]).normalized()
-		elif i == n_pts - 1:
-			tangent = (local_pts[n_pts - 1] - local_pts[n_pts - 2]).normalized()
+		elif i == n_rings - 1:
+			tangent = (local_pts[n_rings - 1] - local_pts[n_rings - 2]).normalized()
 		else:
 			tangent = (local_pts[i + 1] - local_pts[i - 1]).normalized()
 		if tangent.length_squared() < 0.0001:
 			tangent = Vector3.RIGHT
-		tangents.append(tangent)
 
-		var ref_n := prev_normal - tangent * prev_normal.dot(tangent)
+		var ref_n: Vector3 = prev_normal - tangent * prev_normal.dot(tangent)
 		if ref_n.length_squared() < 0.001:
 			var fallback := Vector3.FORWARD if absf(tangent.dot(Vector3.UP)) > 0.9 else Vector3.UP
 			ref_n = (fallback - tangent * fallback.dot(tangent)).normalized()
 		else:
 			ref_n = ref_n.normalized()
 		prev_normal = ref_n
-		var binorm := tangent.cross(ref_n).normalized()
+		var binorm: Vector3 = tangent.cross(ref_n).normalized()
 
-		# Rayon calé sur Curve_radius_profile(u) pour que VERTEX - NORMAL * force_pincement_ * profile(u) = 0 à la pointe
-		var prof := maxf(0.04, prof_curve.sample_baked(u))
-		var r_here := base_radius * prof
+		# Rayon exact base_radius * Curve_radius_profile(u) (comme l'export BézierCurve Blender)
+		var prof: float = maxf(0.008, prof_curve.sample_baked(u))
+		var r_here: float = base_radius * prof
 
-		var r_v := PackedVector3Array()
-		var r_n := PackedVector3Array()
-		var r_uv := PackedVector2Array()
-		for j in range(radial_segments + 1):
-			var v_frac := float(j) / float(radial_segments)
-			var ang := v_frac * TAU + raw_t * 2.2
-			var ridge := 1.0 + 0.08 * sin(ang * 3.0 + float(seed_val) * 1.7 + raw_t * 7.0)
-			var knot := gnarl_amp * prof * sin(raw_t * 11.0 + float(seed_val) * 2.1 + ang)
-			var radial_dir := (ref_n * cos(ang) + binorm * sin(ang)).normalized()
-			var pos := local_pts[i] + radial_dir * maxf(0.008, r_here * ridge + knot)
-			r_v.append(pos)
-			r_n.append(radial_dir)
-			# v_frac dans [0..1] (sans x2 artificiel)
-			r_uv.append(Vector2(u, v_frac))
+		var first_dir: Vector3 = ref_n
+		var first_pos: Vector3 = local_pts[i] + first_dir * r_here
 
-		ring_verts.append(r_v)
-		ring_norms.append(r_n)
-		ring_uvs.append(r_uv)
+		for j in range(stride):
+			var v_frac: float = float(j) / float(rad_segs)
+			var radial_dir: Vector3
+			var pos: Vector3
+			if j == 0 or j == rad_segs:
+				# Couture j=0 / j=rad_segs strictement identique bit à bit (zéro fissure au pincement)
+				radial_dir = first_dir
+				pos = first_pos
+			else:
+				var ang: float = v_frac * TAU
+				radial_dir = (ref_n * cos(ang) + binorm * sin(ang)).normalized()
+				pos = local_pts[i] + radial_dir * r_here
 
-	for i in range(n_pts - 1):
-		for j in range(radial_segments):
-			var v00 := ring_verts[i][j]
-			var v01 := ring_verts[i][j + 1]
-			var v10 := ring_verts[i + 1][j]
-			var v11 := ring_verts[i + 1][j + 1]
-			var avg_n := (ring_norms[i][j] + ring_norms[i][j + 1] + ring_norms[i + 1][j] + ring_norms[i + 1][j + 1]).normalized()
-			_emit_quad_outward(
-				st,
-				v00, v01, v11, v10,
-				ring_uvs[i][j], ring_uvs[i][j + 1], ring_uvs[i + 1][j + 1], ring_uvs[i + 1][j],
-				avg_n
-			)
+			if i <= 1 and j <= 1:
+				ring_zero_pos.append(pos)
+				ring_zero_nrm.append(radial_dir)
 
-	# Capuchons coniques fermés aux deux extrémités (maillage 100% étanche / fermé)
-	var base_apex := local_pts[0] - tangents[0] * (base_radius * 0.25)
-	for j in range(radial_segments):
-		var vb0 := ring_verts[0][j]
-		var vb1 := ring_verts[0][j + 1]
-		var nb := (-tangents[0] + ring_norms[0][j] * 0.35 + ring_norms[0][j + 1] * 0.35).normalized()
-		_emit_tri_outward(
-			st,
-			base_apex, vb0, vb1,
-			Vector2(0.0, (float(j) + 0.5) / float(radial_segments)), ring_uvs[0][j], ring_uvs[0][j + 1],
-			nb
-		)
+			st.set_normal(radial_dir)
+			st.set_uv(Vector2(u, v_frac))
+			st.add_vertex(pos)
 
-	var last := n_pts - 1
-	var tip_apex := local_pts[last] + tangents[last] * (base_radius * 0.35)
-	for j in range(radial_segments):
-		var vt0 := ring_verts[last][j]
-		var vt1 := ring_verts[last][j + 1]
-		var nt := (tangents[last] + ring_norms[last][j] * 0.35 + ring_norms[last][j + 1] * 0.35).normalized()
-		_emit_tri_outward(
-			st,
-			tip_apex, vt0, vt1,
-			Vector2(1.0, (float(j) + 0.5) / float(radial_segments)), ring_uvs[last][j], ring_uvs[last][j + 1],
-			nt
-		)
+	# Vérification automatique du sens extérieur des triangles indexés pour cull_back
+	var p00: Vector3 = ring_zero_pos[0]
+	var p10: Vector3 = ring_zero_pos[2]
+	var p11: Vector3 = ring_zero_pos[3]
+	var n00: Vector3 = ring_zero_nrm[0]
+	var flip_winding: bool = ((p11 - p00).cross(p10 - p00).dot(n00) < 0.0)
+
+	for i in range(n_rings - 1):
+		var row0: int = i * stride
+		var row1: int = (i + 1) * stride
+		for j in range(rad_segs):
+			var i00: int = row0 + j
+			var i01: int = row0 + j + 1
+			var i10: int = row1 + j
+			var i11: int = row1 + j + 1
+			if not flip_winding:
+				st.add_index(i00); st.add_index(i10); st.add_index(i11)
+				st.add_index(i00); st.add_index(i11); st.add_index(i01)
+			else:
+				st.add_index(i00); st.add_index(i11); st.add_index(i10)
+				st.add_index(i00); st.add_index(i01); st.add_index(i11)
 
 	st.generate_tangents()
 	return st.commit()

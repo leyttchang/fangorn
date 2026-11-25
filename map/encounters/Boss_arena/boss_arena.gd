@@ -17,8 +17,8 @@ signal arena_boss_defeated(boss_ilvl: int, boss_enchantment: Variant, reward_che
 @export var boss_scene: PackedScene = preload("res://character/enemie/ogre_boss/ogre_boss.tscn")
 ## Scène du coffre de récompense qui apparaît à la mort du boss
 @export var reward_chest_scene: PackedScene = preload("res://objet/chest/chest.tscn")
-## Si > 0, écrase l'ilvl défini sur la scène du boss au moment du spawn (0 = garde l'ilvl du boss)
-@export var boss_ilvl_override: int = 0
+## Si > 0, écrase l'ilvl défini sur la scène du boss au moment du spawn (10 par défaut pour le Boss final)
+@export var boss_ilvl_override: int = 10
 
 @export_category("Porte & Accès")
 ## Porte en pierre style Moria rebouchée par des lianes à l'entrée de l'arène
@@ -123,8 +123,9 @@ func spawn_boss(triggering_player: Node3D = null) -> Node3D:
 		push_error("BossArena (%s): la scène boss_scene n'est pas un Node3D !" % name)
 		return null
 		
-	if boss_ilvl_override > 0 and "ilvl" in boss_inst:
-		boss_inst.set("ilvl", boss_ilvl_override)
+	var effective_boss_ilvl: int = boss_ilvl_override if boss_ilvl_override > 0 else WorldLevelScaler.BOSS_ILVL
+	if "ilvl" in boss_inst:
+		boss_inst.set("ilvl", effective_boss_ilvl)
 		
 	var marker_pos: Vector3 = boss_spawn_marker.global_position if boss_spawn_marker != null else global_position
 	var ground_y: float = _get_arena_ground_y(marker_pos.x, marker_pos.z)
@@ -133,6 +134,7 @@ func spawn_boss(triggering_player: Node3D = null) -> Node3D:
 	var net_parent: Node = _get_network_objects_parent()
 	net_parent.add_child(boss_inst, true)
 	boss_inst.global_position = final_spawn_pos
+	WorldLevelScaler.apply_level_to_monster(boss_inst, effective_boss_ilvl)
 	
 	# Orienter le boss face à l'entrée de l'arène
 	if entry_marker != null:
@@ -288,6 +290,8 @@ func spawn_reward_chest(reward_ilvl: int, reward_enchantment: Variant = null) ->
 	var net_parent: Node = _get_network_objects_parent()
 	net_parent.add_child(chest_inst, true)
 	chest_inst.global_position = final_reward_pos
+	if multiplayer.has_multiplayer_peer() and chest_inst.has_method("sync_chest_ilvl"):
+		chest_inst.rpc("sync_chest_ilvl", effective_ilvl)
 	
 	if entry_marker != null:
 		var look_target := Vector3(entry_marker.global_position.x, final_reward_pos.y, entry_marker.global_position.z)

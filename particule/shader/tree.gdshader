@@ -1,7 +1,7 @@
 // NOTE: Shader automatically converted from Godot Engine 4.7.stable's StandardMaterial3D.
 
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_disabled;
+render_mode depth_draw_opaque, cull_back, diffuse_lambert, specular_disabled;
 
 uniform vec4 albedo : source_color;
 uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
@@ -107,12 +107,15 @@ float eval_organic_wave(vec2 c, float t, float reb_amt, float storm_fac, float s
 	return mix(calm_wave, storm_wave, storm_fac);
 }
 
+varying float v_cam_dist;
+
 void vertex() {
 	UV = UV * uv1_scale.xy + uv1_offset.xy;
 	
 	vec3 node_origin = MODEL_MATRIX[3].xyz;
 	vec3 cam_pos = (INV_VIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
 	float dist = length(node_origin - cam_pos);
+	v_cam_dist = dist;
 
 	if (dist < wind_max_distance) {
 		// Le Vertex Color (R) contrôle la distance de déplacement :
@@ -190,18 +193,34 @@ void fragment() {
 	vec4 albedo_tex = texture(texture_albedo, base_uv);
 	ALBEDO = albedo.rgb * albedo_tex.rgb;
 
-	float metallic_tex = dot(texture(texture_metallic, base_uv), metallic_texture_channel);
-	METALLIC = metallic_tex * metallic;
+	if (metallic > 0.001) {
+		float metallic_tex = dot(texture(texture_metallic, base_uv), metallic_texture_channel);
+		METALLIC = metallic_tex * metallic;
+	} else {
+		METALLIC = 0.0;
+	}
 	SPECULAR = specular;
 
-	vec4 roughness_texture_channel = vec4(1.0, 0.0, 0.0, 0.0);
-	float roughness_tex = dot(texture(texture_roughness, base_uv), roughness_texture_channel);
-	ROUGHNESS = roughness_tex * roughness;
+	if (roughness < 0.999) {
+		vec4 roughness_texture_channel = vec4(1.0, 0.0, 0.0, 0.0);
+		float roughness_tex = dot(texture(texture_roughness, base_uv), roughness_texture_channel);
+		ROUGHNESS = roughness_tex * roughness;
+	} else {
+		ROUGHNESS = 1.0;
+	}
 
-	NORMAL_MAP = texture(texture_normal, base_uv).rgb;
-	NORMAL_MAP_DEPTH = normal_scale;
+	if (v_cam_dist < 85.0) {
+		float detail_fade = 1.0 - smoothstep(65.0, 85.0, v_cam_dist);
+		NORMAL_MAP = texture(texture_normal, base_uv).rgb;
+		NORMAL_MAP_DEPTH = normal_scale * detail_fade;
 
-	float ao_tex = dot(texture(texture_ambient_occlusion, base_uv), ao_texture_channel);
-	AO = mix(1.0, ao_tex, ao_strength);
-	AO_LIGHT_AFFECT = ao_light_affect;
+		float ao_tex = dot(texture(texture_ambient_occlusion, base_uv), ao_texture_channel);
+		AO = mix(1.0, ao_tex, ao_strength * detail_fade);
+		AO_LIGHT_AFFECT = ao_light_affect;
+	} else {
+		NORMAL_MAP = vec3(0.5, 0.5, 1.0);
+		NORMAL_MAP_DEPTH = 0.0;
+		AO = 1.0;
+		AO_LIGHT_AFFECT = 0.0;
+	}
 }

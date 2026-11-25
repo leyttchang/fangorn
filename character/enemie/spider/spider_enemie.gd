@@ -172,6 +172,9 @@ func _physics_process(delta: float) -> void:
 		
 	var vitesse_horizontale = Vector2(velocity.x, velocity.z)
 
+	if current_state != State.ATTACK and attack_shape != null and not attack_shape.disabled:
+		attack_shape.disabled = true
+
 	match current_state:
 		State.IDLE:
 			vitesse_horizontale = _process_idle_state(vitesse_horizontale, delta)
@@ -233,7 +236,7 @@ func _process_chase_state(vitesse_horiz: Vector2, delta: float, speed: float) ->
 func _process_attack_state(vitesse_horiz: Vector2, delta: float) -> Vector2:
 	if target != null and movement_comp and behavior:
 		var direction = (target.global_position - global_position).normalized()
-		movement_comp.rotate_towards_direction(direction, behavior, delta, 2.0)
+		movement_comp.rotate_towards_direction(direction, behavior, delta, 0.80)
 		
 	if movement_comp and behavior:
 		return movement_comp.apply_friction(vitesse_horiz, behavior, delta)

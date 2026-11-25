@@ -2,6 +2,43 @@
 
 [ext_resource type="Script" uid="uid://w3xxdepu757s" path="res://ui/SpellBook/spell_book_ui.gd" id="1_72jq0"]
 [ext_resource type="PackedScene" uid="uid://ch8b412k8kv3p" path="res://ui/SpellBook/spell_u_slot.tscn" id="2_5xpyw"]
+[ext_resource type="Theme" uid="uid://bgl8qdem0mpjl" path="res://ui/themes/moria_d2_theme.tres" id="3_moria"]
+[ext_resource type="Script" path="res://ui/SpellBook/spell_lineage_graph.gd" id="4_graph"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_subpanel"]
+bg_color = Color(0.06, 0.07, 0.09, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.36, 0.32, 0.22, 0.78)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_bg"]
+bg_color = Color(0.05, 0.06, 0.08, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.30, 0.20, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
+bg_color = Color(0.86, 0.68, 0.25, 0.95)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="SpellBook_UI" type="CanvasLayer" unique_id=1946714399]
 script = ExtResource("1_72jq0")
@@ -14,7 +51,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-metadata/_edit_use_anchors_ = true
+theme = ExtResource("3_moria")
 
 [node name="MarginContainer" type="MarginContainer" parent="MainPanel" unique_id=767060938]
 layout_mode = 1
@@ -24,120 +61,258 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 200
-theme_override_constants/margin_top = 50
-theme_override_constants/margin_right = 200
-theme_override_constants/margin_bottom = 50
+theme_override_constants/margin_left = 130
+theme_override_constants/margin_top = 38
+theme_override_constants/margin_right = 130
+theme_override_constants/margin_bottom = 138
 
-[node name="inventaire" type="Panel" parent="MainPanel/MarginContainer" unique_id=1678709805]
-custom_minimum_size = Vector2(800, 800)
+[node name="inventaire" type="PanelContainer" parent="MainPanel/MarginContainer" unique_id=1678709805]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RootVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/inventaire"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderBar" type="HBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/HeaderBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="TitleLabel" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/HeaderBar/TitleVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.82, 0.52, 1)
+theme_override_font_sizes/font_size = 24
+text = "GRIMOIRE OF ANCIENT SPELLS"
+
+[node name="SubtitleLabel" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/HeaderBar/TitleVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.70, 0.64, 0.92)
+theme_override_font_sizes/font_size = 15
+text = "Drag spells to your bottom bar • Equipped spells gain XP in combat and unlock higher-tier evolutions at Max Level"
+
+[node name="TestLevelUpButton" type="Button" parent="MainPanel/MarginContainer/inventaire/RootVBox/HeaderBar"]
+layout_mode = 2
 size_flags_vertical = 4
-metadata/_edit_use_anchors_ = true
+mouse_default_cursor_shape = 2
+text = "+1 Spell Lv (Test)"
 
-[node name="inv_grid" type="GridContainer" parent="MainPanel/MarginContainer/inventaire" unique_id=1964638]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-columns = 5
-metadata/_edit_use_anchors_ = true
-
-[node name="Spell_U_Slot" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=178112762 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
+[node name="UnlockAllButton" type="Button" parent="MainPanel/MarginContainer/inventaire/RootVBox/HeaderBar" unique_id=987654321]
 layout_mode = 2
-
-[node name="Spell_U_Slot2" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=999834282 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot3" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=973596879 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot4" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1505222051 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot5" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1392790704 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot6" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=6632815 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot7" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1099745106 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot8" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=258986615 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot9" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1078117236 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot10" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1350555323 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot11" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=595451629 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot12" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=296249305 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot13" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=2146737062 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot14" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1491145827 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot15" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1505843897 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot16" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1574910599 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot17" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1937547943 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot18" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=81463527 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot19" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1027847361 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="Spell_U_Slot20" parent="MainPanel/MarginContainer/inventaire/inv_grid" unique_id=1672116855 instance=ExtResource("2_5xpyw")]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
-[node name="UnlockAllButton" type="Button" parent="MainPanel/MarginContainer/inventaire" unique_id=987654321]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -68.0
-offset_top = 60.0
-offset_right = 64.0
-offset_bottom = 95.0
-grow_horizontal = 2
+size_flags_vertical = 4
 mouse_default_cursor_shape = 2
 text = "Unlock all spells"
+
+[node name="HeaderSep" type="HSeparator" parent="MainPanel/MarginContainer/inventaire/RootVBox"]
+layout_mode = 2
+
+[node name="SplitHBox" type="HBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="LeftPanel" type="PanelContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.92
+theme_override_styles/panel = SubResource("StyleBoxFlat_subpanel")
+
+[node name="LeftVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GridHeader" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.76, 0.48, 1)
+theme_override_font_sizes/font_size = 16
+text = "UNLOCKED SPELLS & SKILLS  (Click to Inspect • Drag to Equip)"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="inv_grid" type="GridContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer" unique_id=1964638]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 5
+
+[node name="Spell_U_Slot" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=178112762 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot2" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=999834282 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot3" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=973596879 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot4" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1505222051 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot5" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1392790704 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot6" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=6632815 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot7" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1099745106 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot8" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=258986615 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot9" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1078117236 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot10" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1350555323 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot11" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=595451629 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot12" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=296249305 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot13" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=2146737062 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot14" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1491145827 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot15" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1505843897 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot16" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1574910599 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot17" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1937547943 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot18" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=81463527 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot19" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1027847361 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Spell_U_Slot20" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/LeftPanel/LeftVBox/ScrollContainer/inv_grid" unique_id=1672116855 instance=ExtResource("2_5xpyw")]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="RightPanel" type="PanelContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.08
+theme_override_styles/panel = SubResource("StyleBoxFlat_subpanel")
+
+[node name="RightVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopHeaderHBox" type="HBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="DetailIcon" type="TextureRect" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox/TopHeaderHBox"]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MetaVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox/TopHeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="DetailNameLabel" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox/TopHeaderHBox/MetaVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.86, 0.56, 1)
+theme_override_font_sizes/font_size = 22
+text = "Select a Spell"
+
+[node name="DetailTagsLabel" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox/TopHeaderHBox/MetaVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.78, 0.88, 0.95)
+theme_override_font_sizes/font_size = 14
+text = "ELEMENT • TIER I SPELL"
+
+[node name="DetailLevelLabel" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox/TopHeaderHBox/MetaVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.90, 0.88, 0.80, 0.96)
+theme_override_font_sizes/font_size = 14
+text = "Mastery Level 1 / 5"
+
+[node name="DetailXPBar" type="ProgressBar" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_xp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xp_fill")
+value = 25.0
+show_percentage = false
+
+[node name="DetailScalingLabel" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.90, 0.68, 0.95)
+theme_override_font_sizes/font_size = 14
+text = "Level Bonus: +0% Power, -0% Cooldown"
+
+[node name="DetailStatsRich" type="RichTextLabel" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+custom_minimum_size = Vector2(0, 125)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.85
+bbcode_enabled = true
+text = "Spell description and stats..."
+
+[node name="LineageHeader" type="Label" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.76, 0.48, 1)
+theme_override_font_sizes/font_size = 15
+text = "EVOLUTION LINEAGE  (Click any node to inspect)"
+
+[node name="LineageGraph" type="Control" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+custom_minimum_size = Vector2(0, 185)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.05
+script = ExtResource("4_graph")
+
+[node name="RequirementsRich" type="RichTextLabel" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+text = ""
+
+[node name="UnlockEvolutionButton" type="Button" parent="MainPanel/MarginContainer/inventaire/RootVBox/SplitHBox/RightPanel/RightVBox"]
+visible = false
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "UNLOCK EVOLUTION"

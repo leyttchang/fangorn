@@ -101,11 +101,10 @@ func _process(delta: float) -> void:
 func _prune_dead_or_invalid_mobs() -> void:
 	if _enchanted_mobs.is_empty():
 		return
-	var valid: Array[Node3D] = []
-	for m in _enchanted_mobs:
-		if not EnchantLightningLink._is_mob_invalid_or_dead(m):
-			valid.append(m)
-	_enchanted_mobs = valid
+	for i in range(_enchanted_mobs.size() - 1, -1, -1):
+		var m := _enchanted_mobs[i]
+		if m == null or not is_instance_valid(m) or EnchantLightningLink._is_mob_invalid_or_dead(m):
+			_enchanted_mobs.remove_at(i)
 
 func _trigger_pulse_on_authority() -> void:
 	if _enchanted_mobs.size() < 2:

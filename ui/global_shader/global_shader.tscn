@@ -25,6 +25,7 @@ shader_parameter/contrast = 1.12
 script = ExtResource("1_script")
 
 [node name="quad_mesh" type="MeshInstance3D" parent="." unique_id=505763465]
+layers = 2
 material_override = SubResource("ShaderMaterial_yqkk6")
 cast_shadow = 0
 extra_cull_margin = 16384.0

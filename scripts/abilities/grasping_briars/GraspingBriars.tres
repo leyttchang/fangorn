@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/heavy-thorny-triskelion.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/grasping_briars/grasping_briars.tscn" id="3_scene"]
+[ext_resource type="PackedScene" uid="uid://xaa82q5x5mm7" path="res://scripts/abilities/casting_animation/arcane_casting_vfx.tscn" id="4_vfx"]
+[ext_resource type="Resource" path="res://scripts/abilities/grasping_briars/GraspingBriars_tooltip.tres" id="5_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Grasping Briars"
+description = "Channel colossal runic briars that burst from the earth, arch forward along your cursor's path, root ensnared foes in place, and drag them together along the furrow."
+icon = ExtResource("2_icon")
+cooldown = 3.0
+mana_cost = 10.0
+max_range = 24.0
+cast_time = 0.0
+spell_id = "grasping_briars"
+tier = 2
+element = "arcane"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
+channel_mana_per_sec = 16.5
+channel_tick_interval = 0.34
+target_mode = 6
+custom_tooltip = ExtResource("5_tt")
+cast_vfx_scene = ExtResource("4_vfx")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

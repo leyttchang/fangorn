@@ -82,7 +82,7 @@ func _setup_extra_ui() -> void:
 	_hint_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_hint_label.text = "Clic gauche : Allouer (1 pt)   •   Clic droit sur un nœud : Rembourser (1 pt)"
+	_hint_label.text = "Left Click: Allocate (1 pt)   •   Right Click on a node: Refund (1 pt)"
 
 	var hint_settings: LabelSettings = LabelSettings.new()
 	hint_settings.font_size = 14
@@ -124,7 +124,7 @@ func _setup_extra_ui() -> void:
 
 func _update_points_label(_unused_points: int = -1) -> void:
 	if points_label != null:
-		points_label.text = "Points de compétence : %d   |   Points de Regret : %d" % [
+		points_label.text = "Skill Points: %d   |   Refund Points: %d" % [
 			available_skill_points,
 			available_refund_points
 		]
@@ -219,7 +219,7 @@ func _on_tree_node_clicked(node_index: int, skill_data: SkillNodeData) -> void:
 
 		node_unlocked.emit(node_index, skill_data)
 	elif available_skill_points <= 0 and not unlocked_nodes.has(node_index):
-		_show_feedback("Aucun point de compétence disponible !", true)
+		_show_feedback("No skill points available!", true)
 		if skill_tree_ui != null and skill_tree_ui.has_method("play_reject_feedback"):
 			skill_tree_ui.call("play_reject_feedback", node_index)
 
@@ -232,7 +232,7 @@ func _on_tree_node_right_clicked(node_index: int, skill_data: SkillNodeData) -> 
 ## 3) Ne pas déconnecter d'autres nœuds alloués de la racine de départ
 func try_refund_node(node_index: int, skill_data: SkillNodeData = null) -> bool:
 	if node_index == ROOT_NODE_INDEX:
-		_show_feedback("Le point de départ central ne peut pas être remboursé.", true)
+		_show_feedback("The central starting node cannot be refunded.", true)
 		if skill_tree_ui != null and skill_tree_ui.has_method("play_reject_feedback"):
 			skill_tree_ui.call("play_reject_feedback", node_index)
 		return false
@@ -241,7 +241,7 @@ func try_refund_node(node_index: int, skill_data: SkillNodeData = null) -> bool:
 		return false
 
 	if available_refund_points <= 0:
-		_show_feedback("Aucun point de Regret disponible pour rembourser ce nœud !", true)
+		_show_feedback("No refund points available to refund this node!", true)
 		if skill_tree_ui != null and skill_tree_ui.has_method("play_reject_feedback"):
 			skill_tree_ui.call("play_reject_feedback", node_index)
 		return false
@@ -249,7 +249,7 @@ func try_refund_node(node_index: int, skill_data: SkillNodeData = null) -> bool:
 	if skill_tree_ui != null and skill_tree_ui.has_method("can_refund_node"):
 		var stays_connected: bool = bool(skill_tree_ui.call("can_refund_node", node_index, unlocked_nodes))
 		if not stays_connected:
-			_show_feedback("Impossible de rembourser : d'autres nœuds alloués dépendent de ce chemin !", true)
+			_show_feedback("Cannot refund: other allocated nodes depend on this path!", true)
 			if skill_tree_ui.has_method("play_reject_feedback"):
 				skill_tree_ui.call("play_reject_feedback", node_index)
 			return false
@@ -275,7 +275,7 @@ func try_refund_node(node_index: int, skill_data: SkillNodeData = null) -> bool:
 	if skill_tree_ui != null and skill_tree_ui.has_method("refund_node"):
 		skill_tree_ui.call("refund_node", node_index)
 
-	_show_feedback("Nœud remboursé (+1 point de compétence)", false)
+	_show_feedback("Node refunded (+1 skill point)", false)
 	node_refunded.emit(node_index, resolved_data)
 	return true
 
@@ -359,4 +359,30 @@ func _remove_keystone(node_index: int, skill_data: SkillNodeData) -> void:
 		modifiers_container.remove_child(keystone_node)
 		keystone_node.queue_free()
 		print("Keystone désactivée : ", skill_data.node_name)
+
+func get_allocated_points_with_tags(tag_mask: int) -> int:
+	if tag_mask == 0:
+		return unlocked_nodes.size()
+	var count: int = 0
+	for node_idx: int in unlocked_nodes:
+		var sdata: SkillNodeData = _unlocked_skill_data.get(node_idx) as SkillNodeData
+		if sdata == null and skill_tree_ui != null and skill_tree_ui.has_method("get_node_skill_data"):
+			sdata = skill_tree_ui.call("get_node_skill_data", node_idx) as SkillNodeData
+		if sdata != null and (sdata.tags & tag_mask) != 0:
+			count += 1
+	return count
+
+func has_keystone_allocated(keystone_id: String) -> bool:
+	var norm_id: String = keystone_id.strip_edges().to_lower()
+	if norm_id.is_empty():
+		return false
+	for node_idx: int in unlocked_nodes:
+		var sdata: SkillNodeData = _unlocked_skill_data.get(node_idx) as SkillNodeData
+		if sdata == null and skill_tree_ui != null and skill_tree_ui.has_method("get_node_skill_data"):
+			sdata = skill_tree_ui.call("get_node_skill_data", node_idx) as SkillNodeData
+		if sdata != null and sdata.node_type == SkillNodeData.NodeType.KEYSTONE:
+			if sdata.node_id.to_lower() == norm_id or sdata.gameplay_effect_id.to_lower() == norm_id or sdata.node_name.to_lower() == norm_id:
+				return true
+	return false
+
 

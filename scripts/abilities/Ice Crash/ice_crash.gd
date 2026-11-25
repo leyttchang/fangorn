@@ -41,6 +41,7 @@ func execute(caster: Node, target_data: Dictionary) -> void:
 	else:
 		global_position = caster.global_position 
 	# -----------------------------
+	SpellAudioManager.play_ice_cast(self, global_position, 0.96, 0.5)
 	
 	# 1. On lance le calcul des stats (Dégâts, Radius, Knockback...)
 	if scaling_component != null and scaling_component.has_method("on_execute"):

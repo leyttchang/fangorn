@@ -118,5 +118,5 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.physical_keycode == KEY_ESCAPE and event.pressed):
 		close_ui()
 		get_viewport().set_input_as_handled()
-	elif event is InputEventKey and event.physical_keycode == KEY_E and event.pressed:
+	elif event.is_action_pressed(&"interact") and not event.is_echo():
 		get_viewport().set_input_as_handled()

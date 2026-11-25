@@ -210,10 +210,10 @@ properties/0/spawn = true
 properties/0/replication_mode = 2
 properties/1/path = NodePath(".:position")
 properties/1/spawn = true
-properties/1/replication_mode = 1
+properties/1/replication_mode = 2
 properties/2/path = NodePath(".:rotation")
 properties/2/spawn = true
-properties/2/replication_mode = 1
+properties/2/replication_mode = 2
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_eghwk"]
 _data = {
@@ -389,6 +389,7 @@ hurt_sounds = Array[AudioStream]([ExtResource("39_4dymp"), ExtResource("40_jgxqd
 volume_db = -40.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1330057290]
+delta_interval = 0.033
 replication_config = SubResource("SceneReplicationConfig_xhm4c")
 
 [node name="status_effect_componant" parent="." unique_id=344235016 node_paths=PackedStringArray("stats_component", "health_component") instance=ExtResource("42_ae8dh")]

@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var stats_container: VBoxContainer = %StatsContainer # <-- NOUVEAU
 
 var stat_labels: Dictionary = {}
+var _stats_dirty: bool = false
 @onready var loot_panel: Panel = %LootPanel
 @onready var loot_grid: GridContainer = %LootGrid
 @onready var loot_all_btn: Button = %LootPanel.get_node_or_null("HBoxContainer/loot_all")
@@ -30,6 +31,8 @@ func _ready() -> void:
 		main_panel.theme = clean_theme
 
 	visible = false
+	if not visibility_changed.is_connected(_on_visibility_changed):
+		visibility_changed.connect(_on_visibility_changed)
 	if inventory_component != null:
 		inventory_component.inventory_changed.connect(update_ui)
 		update_ui()
@@ -140,11 +143,33 @@ func _build_stats_ui() -> void:
 			label.text = _format_stat(stat_name, stats_component.get_stat_value(stat_name))
 			if fallback_vbox: fallback_vbox.add_child(label)
 			stat_labels[stat_name] = label
+func _on_visibility_changed() -> void:
+	if visible and _stats_dirty:
+		_refresh_all_stat_labels()
+
+func _refresh_all_stat_labels() -> void:
+	_stats_dirty = false
+	if stats_component == null:
+		return
+	for stat_name in stat_labels.keys():
+		if stat_name == "current_level":
+			if level_component != null:
+				stat_labels["current_level"].text = "Level : " + str(level_component.current_level)
+			continue
+		if stats_component._stats.has(stat_name):
+			stat_labels[stat_name].text = _format_stat(stat_name, stats_component.get_stat_value(stat_name))
+
 func _on_stat_changed(stat_name: String, new_value: float) -> void:
+	if not visible:
+		_stats_dirty = true
+		return
 	if stat_labels.has(stat_name):
 		stat_labels[stat_name].text = _format_stat(stat_name, new_value)
 
 func _on_level_up(new_level: int) -> void:
+	if not visible:
+		_stats_dirty = true
+		return
 	if stat_labels.has("current_level"):
 		stat_labels["current_level"].text = "Level : " + str(new_level)
 

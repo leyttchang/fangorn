@@ -42,6 +42,23 @@ signal rain_max_reached
 ## DEBUG : force le vent au maximum dès le début de la partie (désactiver pour retrouver la progression normale)
 @export var debug_max_wind: bool = true
 
+const _WeatherAmbienceScript := preload("res://map/meteo/weather_ambience_manager.gd")
+
+@export_group("Ambiance Sonore Météo")
+## Active l'ambiance sonore dynamique (vent, pluie forêt, rafales 3D, tonnerre échelonné)
+@export var ambience_enabled: bool = true:
+	set(val):
+		ambience_enabled = val
+		if not ambience_enabled and _ambience_manager != null and is_instance_valid(_ambience_manager):
+			_ambience_manager.stop_all()
+
+## Volume général du bus WeatherAmbience (en dB)
+@export_range(-24.0, 12.0, 0.5) var ambience_volume_db: float = 0.0:
+	set(val):
+		ambience_volume_db = val
+		if _ambience_manager != null and is_instance_valid(_ambience_manager):
+			_ambience_manager.master_volume_db = val
+
 @export_group("Références")
 ## Nœud de pluie dans la scène (détecté automatiquement si non renseigné)
 @export var rain_node: Node3D
@@ -49,24 +66,55 @@ signal rain_max_reached
 var _rain_particles: GPUParticles3D = null
 var _rain_has_started: bool = false
 var _rain_has_peaked: bool = false
+var _ambience_manager: WeatherAmbienceManager = null
+var _last_applied_time: float = -1.0
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		set_process(false)
 		return
 	_resolve_references()
+	_setup_ambience()
+	_last_applied_time = elapsed_time
 	_update_wind()
 	_update_weather(true)
+	_update_ambience(0.016)
 
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
-	if not timer_enabled:
-		return
+	if timer_enabled:
+		elapsed_time += delta * time_scale
+	if not is_equal_approx(elapsed_time, _last_applied_time):
+		_last_applied_time = elapsed_time
+		_update_wind()
+		_update_weather(false)
+	_update_ambience(delta)
 
-	elapsed_time += delta * time_scale
-	_update_wind()
-	_update_weather(false)
+func _setup_ambience() -> void:
+	if _ambience_manager != null and is_instance_valid(_ambience_manager):
+		return
+	var existing := get_node_or_null("WeatherAmbienceManager") as WeatherAmbienceManager
+	if existing != null:
+		_ambience_manager = existing
+	else:
+		_ambience_manager = _WeatherAmbienceScript.new() as WeatherAmbienceManager
+		_ambience_manager.name = "WeatherAmbienceManager"
+		add_child(_ambience_manager)
+	_ambience_manager.master_volume_db = ambience_volume_db
+
+func _update_ambience(delta: float) -> void:
+	if _ambience_manager == null or not is_instance_valid(_ambience_manager):
+		return
+	if not ambience_enabled:
+		return
+	_ambience_manager.update_weather_soundscape(
+		delta,
+		elapsed_time,
+		wind_start_time,
+		rain_start_time,
+		rain_max_time
+	)
 
 ## Progression du vent : très faible jusqu'à wind_start_time, puis montée en courbe jusqu'à wind_max_time
 func _update_wind() -> void:

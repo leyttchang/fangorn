@@ -36,8 +36,9 @@ func _process(delta: float) -> void:
 			
 		# --- GESTION DU MAINTIEN (ReviveComponent) ---
 		if current_target.get_parent() is ReviveComponent:
-			if Input.is_key_pressed(current_target.interaction_key) or Input.is_physical_key_pressed(current_target.interaction_key):
-				current_target.get_parent().process_revive(delta, player)
+			var hold_act: StringName = current_target.interaction_action if not current_target.interaction_action.is_empty() else &"interact"
+			if Input.is_action_pressed(hold_act):
+				(current_target.get_parent() as ReviveComponent).process_revive(delta, player)
 	else:
 		if current_target != null:
 			current_target.hide_prompt()
@@ -48,6 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 		
 	if current_target != null:
-		if event is InputEventKey and event.physical_keycode == current_target.interaction_key and event.pressed:
+		var press_act: StringName = current_target.interaction_action if not current_target.interaction_action.is_empty() else &"interact"
+		if event.is_action_pressed(press_act) and not event.is_echo():
 			current_target.trigger_interaction(player)
 			get_viewport().set_input_as_handled()

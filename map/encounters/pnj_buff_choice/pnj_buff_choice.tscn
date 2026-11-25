@@ -18,4 +18,4 @@ shape = SubResource("CapsuleShape3D_hlie2")
 [node name="characterMedium" parent="." unique_id=1879266682 instance=ExtResource("1_smxnx")]
 
 [node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("3_o4mo6")]
-prompt_text = "Press [E] to choose your blessing"
+prompt_text = "Press [F] to choose your blessing"

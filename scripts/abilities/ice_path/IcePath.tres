@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/32x32/fb792.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/ice_path/ice_path.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://scripts/abilities/ice_path/IcePath_tooltip.tres" id="4_tt"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Ice Path"
+description = "Forges a crystalline aerial ramp of ice beneath your feet: hold Jump (or aim upward) to climb smoothly into the sky above melee combat while raining sharp icicles onto enemies below."
+icon = ExtResource("2_icon")
+cooldown = 13.0
+mana_cost = 28.0
+max_range = 18.0
+cast_time = 0.0
+spell_id = "ice_path"
+tier = 2
+element = "ice"
+max_spell_level = 5
+base_xp_to_level = 140
+is_rare_drop = true
+is_evolution_only = false
+target_mode = 0
+custom_tooltip = ExtResource("4_tt")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

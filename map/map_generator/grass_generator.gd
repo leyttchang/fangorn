@@ -148,11 +148,16 @@ func generate_grass() -> void:
 	# Récupération de la largeur de base des chemins (pour le calcul du ratio)
 	var base_path_width: float = float(path_generator.path_width)
 		
-	# Grille spatiale ultra rapide pour éviter la route (Road avoidance)
+	# Grille spatiale ultra rapide pour éviter la route + les chemins intérieurs des arènes de totems
 	var road_grid = {}
-	if path_generator != null and "segments" in path_generator and path_generator.segments.size() > 0:
+	var all_road_segments: Array = []
+	if path_generator != null and "segments" in path_generator:
+		all_road_segments.append_array(path_generator.segments)
+	if map_generator != null and map_generator.has_method("get_arena_path_segments"):
+		all_road_segments.append_array(map_generator.get_arena_path_segments())
+	if all_road_segments.size() > 0:
 		var cell_size = 128.0
-		for seg in path_generator.segments:
+		for seg in all_road_segments:
 			var seg_w = float(seg.get("width", base_path_width))
 			var ratio = seg_w / base_path_width
 			var max_seg_check = maxf(0.0, maxf(road_margin * ratio, road_fade_distance * ratio))
@@ -336,6 +341,7 @@ func generate_grass() -> void:
 		total_grass += t_arr.size()
 		
 		var mmi = MultiMeshInstance3D.new()
+		mmi.layers = 2
 		var mm = MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
 		mm.mesh = grass_mesh

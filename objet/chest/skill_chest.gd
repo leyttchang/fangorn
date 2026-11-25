@@ -1,117 +1,252 @@
+@tool
 class_name SkillChest
 extends Node3D
 
-## Liste de tous les sorts du jeu qui peuvent être débloqués dans ce coffre
+## Petite Stèle de Compétences (remplace tous les anciens coffres de sorts `Skill_chest.tscn`).
+## Au clic sur [F], ouvre l'écran de sélection de la Moria (`reward_choice_ui_d2.tscn`)
+## proposant 3 compétences distinctes non encore débloquées par le joueur.
+
+signal skill_stele_claimed(reward_dict: Dictionary, player: CharacterBody3D)
+
+@export_group("Pool de Compétences")
+## Liste des compétences éligibles (si vide, charge automatiquement toutes les compétences de GameData)
 @export var all_possible_spells: Array[AbilityData] = []
+@export_range(1, 3, 1) var choices_count: int = 3
+
+@export_group("Interface de la Moria")
+@export var d2_reward_ui_scene: PackedScene = preload("res://map/encounters/pnj_buff_choice/reward_choice_ui_d2.tscn")
+@export var stele_header_title: String = "ANCIENT SKILL STELE"
+@export var stele_header_subtitle: String = "Choose one inscribed skill to awaken"
+
+@export_group("Textes d'Interaction")
+@export var prompt_ready: String = "Press [F] to read the Skill Stele"
+@export var prompt_claimed: String = "The ancient stele rests silent"
+@export var prompt_all_mastered: String = "All ancient skills are already mastered"
+
+@export_group("Actions (Éditeur)")
+@export var rebuild_stele_now: bool = false:
+	set(val):
+		rebuild_stele_now = false
+		if is_inside_tree():
+			if Engine.is_editor_hint():
+				SkillSteleMeshes.clear_caches()
+			_rebuild_visuals()
+
+@onready var interaction_component: InteractionComponent = $InteractionComponent if has_node("InteractionComponent") else null
 
 var is_open: bool = false
+var reward_claimed_local: bool = false
 var player_in_range: CharacterBody3D = null
 
+var _visual_root: Node3D = null
+var _rune_mat: StandardMaterial3D = null
+var _stele_light: OmniLight3D = null
+var _stele_motes: GPUParticles3D = null
+var _pulse_time: float = 0.0
+
+var _player_offered_choices: Dictionary = {}
+var _claimed_players: Dictionary = {}
+var _active_ui: CanvasLayer = null
+
+
 func _ready() -> void:
-	# Auto-chargement des sorts si l'array est vide dans l'inspecteur
+	_rebuild_visuals()
+	if Engine.is_editor_hint():
+		set_process(false)
+		return
+
 	if all_possible_spells.is_empty():
 		_auto_load_default_spells()
 
+	_refresh_prompt_text(prompt_ready)
+	set_process(true)
+
+
+func _process(delta: float) -> void:
+	if Engine.is_editor_hint() or reward_claimed_local:
+		set_process(false)
+		return
+	_pulse_time += delta
+	var wave: float = 0.5 + 0.5 * sin(_pulse_time * 2.1)
+	if _rune_mat != null:
+		_rune_mat.emission_energy_multiplier = lerpf(1.10, 1.85, wave)
+	if _stele_light != null and is_instance_valid(_stele_light):
+		_stele_light.light_energy = lerpf(0.95, 1.45, wave)
+
+
+func _rebuild_visuals() -> void:
+	if _visual_root != null and is_instance_valid(_visual_root):
+		remove_child(_visual_root)
+		_visual_root.queue_free()
+	var old_vis: Node = get_node_or_null("SteleVisual")
+	if old_vis != null:
+		remove_child(old_vis)
+		old_vis.queue_free()
+
+	var built: Dictionary = SkillSteleMeshes.build_stele_visual_root("SteleVisual")
+	_visual_root = built.get("root") as Node3D
+	_rune_mat = built.get("rune_material") as StandardMaterial3D
+	_stele_light = built.get("light") as OmniLight3D
+	_stele_motes = built.get("motes") as GPUParticles3D
+	if _visual_root != null:
+		add_child(_visual_root)
+
+
 func _auto_load_default_spells() -> void:
-	var all_spells = GameData.get_all_spells()
-	for spell_res in all_spells:
+	var droppable: Array[AbilityData] = GameData.get_droppable_skills(0.14)
+	for spell_res: AbilityData in droppable:
 		if spell_res != null:
 			all_possible_spells.append(spell_res)
 
-## Méthode appelée par l'InteractionComponent quand le joueur appuie sur E
-func use(player: CharacterBody3D) -> void:
-	if is_open: return
-	player_in_range = player
-	open_chest()
 
+func _get_player_key(player: CharacterBody3D) -> int:
+	if player == null:
+		return 0
+	if multiplayer.has_multiplayer_peer():
+		return player.get_multiplayer_authority()
+	return player.get_instance_id()
+
+
+func _has_player_claimed(player: CharacterBody3D) -> bool:
+	if reward_claimed_local and (not multiplayer.has_multiplayer_peer() or (player != null and player.is_multiplayer_authority())):
+		return true
+	var p_key: int = _get_player_key(player)
+	return bool(_claimed_players.get(p_key, false))
+
+
+## Appelé par InteractionComponent quand le joueur appuie sur [E]
+func use(player: Node3D) -> void:
+	var body: CharacterBody3D = player as CharacterBody3D
+	if body == null:
+		return
+	interact(body)
+
+
+func interact(player: CharacterBody3D) -> void:
+	if player == null:
+		return
+	if multiplayer.has_multiplayer_peer() and not player.is_multiplayer_authority():
+		return
+
+	player_in_range = player
+
+	if _has_player_claimed(player):
+		_refresh_prompt_text(prompt_claimed)
+		return
+
+	_open_stele_selection_window(player)
 
 
 func open_chest() -> void:
-	if is_open or player_in_range == null:
+	if player_in_range != null:
+		interact(player_in_range)
+
+
+func _open_stele_selection_window(player: CharacterBody3D) -> void:
+	if is_instance_valid(_active_ui):
+		return
+	if d2_reward_ui_scene == null:
+		push_error("SkillChest (Stele): scène UI de la Moria introuvable !")
 		return
 
-	var spellbook_ui: SpellBookUI = _get_spellbook_ui(player_in_range)
-	var skill_bar: SkillBarComponent = _get_skill_bar(player_in_range)
+	var ui_mgr: Node = player.get_node_or_null("UI_manager")
+	if ui_mgr != null and "current_state" in ui_mgr and int(ui_mgr.get("current_state")) != 0 and ui_mgr.has_method("close_all_ui"):
+		ui_mgr.call("close_all_ui")
 
-	if spellbook_ui == null:
-		push_error("SkillChest : Impossible de trouver le SpellBookUI sur le joueur.")
+	if all_possible_spells.is_empty():
+		_auto_load_default_spells()
+
+	var p_key: int = _get_player_key(player)
+	var choices: Array[RewardData] = []
+
+	if _player_offered_choices.has(p_key) and _player_offered_choices[p_key] is Array:
+		var raw_arr: Array = _player_offered_choices[p_key] as Array
+		var cached_typed: Array[RewardData] = []
+		for entry: Variant in raw_arr:
+			var rd_entry: RewardData = entry as RewardData
+			if rd_entry != null:
+				cached_typed.append(rd_entry)
+		choices = SkillSteleRewardData.refresh_cached_choices_for_player(cached_typed, player, all_possible_spells, choices_count)
+
+	if choices.is_empty():
+		choices = SkillSteleRewardData.build_skill_choices_for_player(player, all_possible_spells, choices_count)
+
+	_player_offered_choices[p_key] = choices
+
+	if choices.is_empty():
+		print("[SkillStele] Le joueur maîtrise déjà toutes les compétences disponibles !")
+		_refresh_prompt_text(prompt_all_mastered)
 		return
 
-	# 1. Filtre des sorts : On ne garde QUE ceux que le joueur n'a PAS encore débloqués
-	var available_locked_spells: Array[AbilityData] = []
-	for spell in all_possible_spells:
-		if spell == null:
-			continue
-
-		var already_unlocked = false
-
-		# Vérification dans les sorts débloqués du SpellBookUI
-		for unlocked in spellbook_ui.unlocked_spells:
-			if unlocked != null and (unlocked == spell or unlocked.ability_name == spell.ability_name):
-				already_unlocked = true
-				break
-
-		# Vérification dans la barre de compétences (SkillBarComponent)
-		if not already_unlocked and skill_bar != null:
-			for slot_spell in skill_bar.slots.values():
-				if slot_spell != null and (slot_spell == spell or slot_spell.ability_name == spell.ability_name):
-					already_unlocked = true
-					break
-
-		if not already_unlocked:
-			available_locked_spells.append(spell)
-
-	# 2. Si le joueur a déjà TOUS les sorts du jeu
-	if available_locked_spells.is_empty():
-		print("Le joueur a déjà débloqué tous les sorts disponibles !")
+	var ui_instance: CanvasLayer = d2_reward_ui_scene.instantiate() as CanvasLayer
+	if ui_instance == null or not ui_instance.has_method("open_rewards"):
+		push_error("SkillChest (Stele): impossible d'instancier l'écran de sélection de la Moria !")
 		return
 
-	# 3. Tirage aléatoire parmi les sorts NON possédés
-	var chosen_spell = available_locked_spells.pick_random()
+	_active_ui = ui_instance
+	player.add_child(ui_instance)
+	ui_instance.call("open_rewards", choices, player, self)
+	_customize_moria_header(ui_instance)
 
-	# 4. Déblocage du sort dans le SpellBookUI du joueur
-	spellbook_ui.unlock_spell(chosen_spell)
-	print("Nouveau sort débloqué : ", chosen_spell.ability_name)
 
-	is_open = true
+func _customize_moria_header(ui_instance: CanvasLayer) -> void:
+	if ui_instance == null:
+		return
+	if "title_label" in ui_instance:
+		var t_lbl: Label = ui_instance.get("title_label") as Label
+		if t_lbl != null:
+			t_lbl.text = stele_header_title
+	if "subtitle_label" in ui_instance:
+		var s_lbl: Label = ui_instance.get("subtitle_label") as Label
+		if s_lbl != null:
+			s_lbl.text = stele_header_subtitle
 
-	# Destruction du coffre après ouverture
-	# Au lieu de queue_free() qui le d?truit pour tout le monde, on le cache juste localement
-	visible = false
-	var interact = get_node_or_null("InteractionComponent")
-	if interact:
-		interact.queue_free()
-	
-	var static_body = get_node_or_null("StaticBody3D")
-	if static_body:
-		static_body.queue_free()
 
-func _get_spellbook_ui(player: Node) -> SpellBookUI:
-	if player == null: return null
-	for child in player.get_children():
-		if child is SpellBookUI:
-			return child
-	return player.find_child("SpellBook*", true, false) as SpellBookUI
+## Appelé automatiquement par `RewardChoiceUID2` lorsque le joueur choisit l'une des 3 compétences
+func apply_reward(reward_item: Variant, player: CharacterBody3D) -> void:
+	if player == null or _has_player_claimed(player):
+		return
 
-func _get_skill_bar(player: Node) -> SkillBarComponent:
-	if player == null: return null
-	for child in player.get_children():
-		if child is SkillBarComponent:
-			return child
-	return player.find_child("SkillBar*", true, false) as SkillBarComponent
+	var rd: RewardData = reward_item as RewardData
+	if rd == null:
+		return
 
-var players_looted: Array[int] = []
+	var p_key: int = _get_player_key(player)
+	rd.apply_reward(player, self, func() -> void:
+		_claimed_players[p_key] = true
+		_player_offered_choices.erase(p_key)
 
-func _notify_looted() -> void:
-	var my_id = multiplayer.get_unique_id()
-	rpc_id(1, "_rpc_chest_looted", my_id)
+		if not multiplayer.has_multiplayer_peer() or player.is_multiplayer_authority():
+			is_open = true
+			reward_claimed_local = true
+			_refresh_prompt_text(prompt_claimed)
+			_dim_stele_after_claim()
 
-@rpc("any_peer", "call_local", "reliable")
-func _rpc_chest_looted(peer_id: int) -> void:
-	if not multiplayer.is_server(): return
-	if not players_looted.has(peer_id):
-		players_looted.append(peer_id)
-		
-	var total_players = multiplayer.get_peers().size() + 1
-	if players_looted.size() >= total_players:
-		queue_free()
+		var info: Dictionary = {
+			"id": rd.id,
+			"title": rd.title
+		}
+		skill_stele_claimed.emit(info, player)
+	)
+
+
+func _dim_stele_after_claim() -> void:
+	set_process(false)
+	if _stele_motes != null and is_instance_valid(_stele_motes):
+		_stele_motes.emitting = false
+	var tw: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	if _rune_mat != null:
+		tw.tween_property(_rune_mat, "emission_energy_multiplier", 0.08, 0.65)
+		tw.tween_property(_rune_mat, "albedo_color", Color(0.46, 0.50, 0.56, 1.0), 0.65)
+	if _stele_light != null and is_instance_valid(_stele_light):
+		tw.tween_property(_stele_light, "light_energy", 0.0, 0.65)
+
+
+func _refresh_prompt_text(new_text: String) -> void:
+	if interaction_component == null:
+		interaction_component = get_node_or_null("InteractionComponent") as InteractionComponent
+	if interaction_component == null:
+		return
+	interaction_component.prompt_text = new_text
+	if interaction_component.prompt_label != null:
+		interaction_component.prompt_label.text = new_text

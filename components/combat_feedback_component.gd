@@ -68,50 +68,64 @@ func _on_damage_taken(amount: float, is_critical: bool = false) -> void:
 				if not CombatFeedbackComponent._frame_reset_active and get_tree() != null:
 					CombatFeedbackComponent._reset_counter_next_frame(get_tree())
 
-	if not enable_flash:
-		print("[CombatFeedback] ", get_parent().name, " a pris des degats, mais 'enable_flash' est decoche.")
-	elif flash_material == null:
-		print("[CombatFeedback] ", get_parent().name, " a pris des degats, mais 'flash_material' est VIDE !")
-	else:
+	if enable_flash and flash_material != null:
 		_flash_meshes()
 
 var _current_flash_id: int = 0
+var _cached_meshes: Array[MeshInstance3D] = []
+var _meshes_cached: bool = false
+var _flash_mat_instance: Material = null
+var _cached_status_comp: Node = null
+var _status_comp_searched: bool = false
 
 func _flash_meshes() -> void:
+	if not is_inside_tree():
+		return
+	var parent = get_parent()
+	if parent == null:
+		return
+
 	_current_flash_id += 1
 	var expected_id = _current_flash_id
 	
-	var parent = get_parent()
-	var meshes = _get_all_meshes(parent)
+	if not _meshes_cached:
+		_cached_meshes = _get_all_meshes(parent)
+		_meshes_cached = true
 	
 	# On regarde SI on a un effet de statut actif (pour le fusionner avec le flash)
-	var status_comp = parent.get_node_or_null("status_effect_componant")
+	if not _status_comp_searched:
+		_status_comp_searched = true
+		_cached_status_comp = parent.get_node_or_null("status_effect_componant")
 	var target_overlay: Material = null
-	if status_comp != null and status_comp.has_method("get_current_overlay_material"):
-		target_overlay = status_comp.get_current_overlay_material()
+	if _cached_status_comp != null and is_instance_valid(_cached_status_comp) and _cached_status_comp.has_method("get_current_overlay_material"):
+		target_overlay = _cached_status_comp.get_current_overlay_material()
 		
-	var flash_mat_to_apply = flash_material.duplicate()
-	flash_mat_to_apply.resource_name = "HitFlash"
+	if _flash_mat_instance == null:
+		_flash_mat_instance = flash_material.duplicate()
+		_flash_mat_instance.resource_name = "HitFlash"
 	
-	if target_overlay != null:
-		# Magie de Godot : on dit au flash de dessiner l'effet elementaire EN DESSOUS de lui !
-		flash_mat_to_apply.next_pass = target_overlay
+	# Met à jour (ou réinitialise à null) le next_pass sur l'instance réutilisée
+	_flash_mat_instance.next_pass = target_overlay
 
 	# Appliquer le flash en OVERLAY (permet de garder la transparence et l'effet en meme temps)
-	for mesh in meshes:
-		mesh.material_overlay = flash_mat_to_apply
+	for mesh in _cached_meshes:
+		if is_instance_valid(mesh):
+			mesh.material_overlay = _flash_mat_instance
 		
 	# Attendre la duree du flash
 	await get_tree().create_timer(flash_duration).timeout
 	
+	if not is_inside_tree():
+		return
+
 	# Retirer le materiel UNIQUEMENT si aucune autre attaque n'a eu lieu entre temps
 	if _current_flash_id == expected_id:
 		# On cherche si un composant d'effet de statut a un overlay a remettre
 		var restore_overlay: Material = null
-		if status_comp != null and status_comp.has_method("get_current_overlay_material"):
-			restore_overlay = status_comp.get_current_overlay_material()
+		if _cached_status_comp != null and is_instance_valid(_cached_status_comp) and _cached_status_comp.has_method("get_current_overlay_material"):
+			restore_overlay = _cached_status_comp.get_current_overlay_material()
 			
-		for mesh in meshes:
+		for mesh in _cached_meshes:
 			if is_instance_valid(mesh):
 				mesh.material_overlay = restore_overlay
 

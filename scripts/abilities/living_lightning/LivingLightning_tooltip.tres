@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Transformation Spell | Instant | Cooldown: 8.5s | Mana Cost: 24[/color]
+
+[color=orange][b]- Living Lightning -[/b][/color]
+Impact Damage: [b]30[/b] Base per strike [color=yellow](Up to 5 consecutive hits)[/color]
+Damage Type: [color=gold]100% Lightning (AoE)[/color]
+Dash Distance: ~8.4m • [color=cyan]Intangible throughout the transformation[/color]
+Striking a monster vaults you high above it — press [b]Right-Click[/b] in mid-air to chain up to [b]4[/b] extra lightning dashes toward your crosshair (missing ends the spell)
+Applies [b]Shock[/b] (75% chance) for 3.0s
+"

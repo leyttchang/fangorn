@@ -8,6 +8,7 @@ extends Control
 @onready var liquide: TextureRect = %liquid_mana
 var current_uv_offset: Vector2 = Vector2.ZERO
 var info_label: Label
+var _bar_tween: Tween = null
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -63,11 +64,11 @@ func _process(delta: float) -> void:
 	liquide.material.set_shader_parameter("current_offset", current_uv_offset)
 
 	if info_label != null:
-		if Input.is_action_pressed("show_info"):
-			info_label.visible = true
+		var show_it: bool = Input.is_action_pressed("show_info")
+		if info_label.visible != show_it:
+			info_label.visible = show_it
+		if show_it and info_label.text != self.tooltip_text:
 			info_label.text = self.tooltip_text
-		else:
-			info_label.visible = false
 
 func _on_mana_changed(current_mana: float, max_mana: float) -> void:
 	if not is_inside_tree() or Engine.is_editor_hint():
@@ -80,12 +81,14 @@ func _on_mana_changed(current_mana: float, max_mana: float) -> void:
 	if max_mana > 0:
 		target_percent = current_mana / max_mana
 		
-	var tween = create_tween()
+	if _bar_tween != null and _bar_tween.is_valid():
+		_bar_tween.kill()
+	_bar_tween = create_tween()
 	var current_percent = liquide.material.get_shader_parameter("health_percent")
 	if current_percent == null:
 		current_percent = 1.0
 		
-	tween.tween_method(
+	_bar_tween.tween_method(
 		func(val: float): liquide.material.set_shader_parameter("health_percent", val),
 		current_percent,
 		target_percent,

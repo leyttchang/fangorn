@@ -252,6 +252,11 @@ func _physics_process(delta: float) -> void:
 			_idle_timer = randf_range(2.0, 4.0)
 		return
 		
+	# 2b. Mise en veille des patrouilles/rôdeurs distants (> 115m de tout joueur vivant hors combat)
+	if not _has_any_player_within(115.0):
+		_pack_tick_timer = -randf_range(0.25, 0.45)
+		return
+
 	# 3. Traitement des départs échelonnés (stagger delays)
 	_process_pending_dispatches(dt)
 	
@@ -507,6 +512,21 @@ func _are_all_members_arrived() -> bool:
 # PACK MIND / AGGRO PARTAGÉE
 # ==========================================================
 
+func _has_any_player_within(radius: float) -> bool:
+	if get_tree() == null:
+		return false
+	var r2: float = radius * radius
+	var ref_pos: Vector3 = global_position
+	if not members.is_empty() and is_instance_valid(members[0]):
+		ref_pos = members[0].global_position
+	for p_node: Node in get_tree().get_nodes_in_group("Player"):
+		var p3d: Node3D = p_node as Node3D
+		if p3d == null or not is_instance_valid(p3d) or p3d.get("is_dead") == true:
+			continue
+		if ref_pos.distance_squared_to(p3d.global_position) <= r2 or global_position.distance_squared_to(p3d.global_position) <= r2:
+			return true
+	return false
+
 ## Alerte toute la meute lorsqu'un joueur est repéré ou attaque
 func alert_pack(target_node: Node3D) -> void:
 	if target_node == null or not is_instance_valid(target_node): return
@@ -515,6 +535,12 @@ func alert_pack(target_node: Node3D) -> void:
 	
 	for member in members:
 		if not is_instance_valid(member): continue
+		var opt: EnemyOptimizerComponent = member.get_node_or_null("EnemyOptimizerComponent") as EnemyOptimizerComponent
+		if opt != null:
+			opt.set_ai_sleeping(false)
+		else:
+			member.set_physics_process(true)
+			member.set_process(true)
 		
 		# Annuler toute destination de patrouille/roam
 		var nav_comp = member.get_node_or_null("EnemyNavigationComponent") as EnemyNavigationComponent

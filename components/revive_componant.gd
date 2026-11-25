@@ -25,7 +25,7 @@ func enable_revive() -> void:
 	if interaction_comp:
 		interaction_comp.monitoring = true
 		interaction_comp.monitorable = true
-		interaction_comp.prompt_text = "Maintenir E pour reanimer (0%)"
+		interaction_comp.prompt_text = "Hold [F] to revive (0%)"
 		var shape = interaction_comp.get_node_or_null("CollisionShape3D")
 		if shape != null:
 			shape.disabled = false
@@ -64,10 +64,10 @@ func add_progress_rpc(amount: float) -> void:
 	current_progress += amount
 	
 	if interaction_comp:
-		interaction_comp.prompt_text = "Maintenir E pour reanimer (" + str(int(current_progress)) + "%)"
+		interaction_comp.prompt_text = "Hold [F] to revive (" + str(int(current_progress)) + "%)"
 		# Force l'actualisation visuelle si on le regarde
 		if interaction_comp.prompt_label and interaction_comp.prompt_label.visible:
-			interaction_comp.prompt_label.text = interaction_comp.prompt_text
+			interaction_comp.prompt_label.text = interaction_comp.get_formatted_prompt()
 	
 	if current_progress >= max_revive_progress:
 		_complete_revive()

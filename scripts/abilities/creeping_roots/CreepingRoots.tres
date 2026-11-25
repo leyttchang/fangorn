@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" uid="uid://3lwhmf27kto3" path="res://scripts/abilities/ability_data.gd" id="1_ad"]
+[ext_resource type="Texture2D" path="res://assets/icon/Mythril Age Icons/heavy-thorny-triskelion.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scripts/abilities/creeping_roots/creeping_roots.tscn" id="3_scene"]
+[ext_resource type="PackedScene" uid="uid://xaa82q5x5mm7" path="res://scripts/abilities/casting_animation/arcane_casting_vfx.tscn" id="4_vfx"]
+[ext_resource type="Resource" path="res://scripts/abilities/creeping_roots/CreepingRoots_tooltip.tres" id="5_tt"]
+[ext_resource type="Resource" path="res://scripts/abilities/grasping_briars/GraspingBriars.tres" id="6_evo_gb"]
+[ext_resource type="Resource" path="res://scripts/abilities/sylvan_grapple/SylvanGrapple.tres" id="7_evo_sg"]
+
+[resource]
+script = ExtResource("1_ad")
+ability_name = "Creeping Roots"
+description = "Channel runic roots that erupt from the soil and snake along the ground following your cursor in real time, lacerating and briefly entangling enemies in their path."
+icon = ExtResource("2_icon")
+cooldown = 2.2
+mana_cost = 5.0
+max_range = 24.0
+cast_time = 0.0
+spell_id = "creeping_roots"
+tier = 1
+element = "arcane"
+max_spell_level = 5
+base_xp_to_level = 80
+evolutions = Array[ExtResource("1_ad")]([ExtResource("6_evo_gb"), ExtResource("7_evo_sg")])
+channel_mana_per_sec = 11.0
+channel_tick_interval = 0.22
+target_mode = 6
+custom_tooltip = ExtResource("5_tt")
+cast_vfx_scene = ExtResource("4_vfx")
+ability_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://3lwhmf27kto3"

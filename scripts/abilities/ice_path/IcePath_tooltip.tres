@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell (Rare Drop • Mobility) | Instant | Cooldown: 13.0s | Mana Cost: 28[/color]
+
+[color=cyan][b]- Ice Path -[/b][/color]
+Bridge Forming: [b]4.5s[/b] (Slabs persist [b]3.8s[/b]) • Sprint Speed: [b]+38%[/b]
+Height Control: Hold [b]Jump[/b] to climb skyward, or steer pitch ([b]-32° to +34°[/b]) with Camera
+Icicle Rain: [b]16[/b] Base [color=cyan]100% Ice[/color] Damage every 0.28s [color=yellow](2.0m AoE)[/color]
+Applies [b]Chill[/b] (-50% Move & Attack Speed) for 2.5s
+"

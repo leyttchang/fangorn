@@ -95,10 +95,19 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 		
+	call_deferred("_sync_camp_level_from_world")
 	# En jeu : connexion automatique au signal du spawner
 	if spawner != null:
 		if not spawner.all_mobs_defeated.is_connected(open_cage):
 			spawner.all_mobs_defeated.connect(open_cage)
+
+func _sync_camp_level_from_world() -> void:
+	if not is_inside_tree():
+		return
+	if camp_ilvl <= 1 and global_position != Vector3.ZERO:
+		camp_ilvl = WorldLevelScaler.get_camp_ilvl_at(self, global_position)
+	else:
+		_resolve_references()
 
 func _resolve_references() -> void:
 	if cage_node == null:
@@ -182,13 +191,19 @@ func _get_ground_y() -> float:
 
 ## Méthode publique : déclenche l'ouverture de la cage (synchronisée via RPC en multijoueur)
 func open_cage() -> void:
+	var resolved_lvl: int = camp_ilvl
+	if resolved_lvl <= 1 and global_position != Vector3.ZERO:
+		resolved_lvl = WorldLevelScaler.get_camp_ilvl_at(self, global_position)
+		camp_ilvl = resolved_lvl
 	if multiplayer.has_multiplayer_peer() and multiplayer.is_server():
-		rpc("_rpc_open_cage")
+		rpc("_rpc_open_cage", resolved_lvl)
 	else:
 		_do_open_cage()
 
 @rpc("authority", "call_local", "reliable")
-func _rpc_open_cage() -> void:
+func _rpc_open_cage(synced_ilvl: int = 0) -> void:
+	if synced_ilvl > 0:
+		camp_ilvl = synced_ilvl
 	_do_open_cage()
 
 ## Méthode interne : fait glisser la cage jusqu'au sol puis la fait exploser après un court délai

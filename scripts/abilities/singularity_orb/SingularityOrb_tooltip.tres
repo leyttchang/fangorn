@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell | Instant | Cooldown: 7.0s | Mana Cost: 22[/color]
+
+[color=orange][b]- Singularity Orb -[/b][/color]
+Implosion Damage: [b]46[/b] Base [color=yellow](AoE)[/color]
+Gravitational Pulse: [b]15%[/b] Damage every 0.45s while travelling (2.4s)
+Damage Type: [color=#b86bff]100% Arcane[/color]
+Pull Radius: ~6.2m • [color=violet]Continuously pulls nearby foes toward its core[/color]
+Applies [b]Arcane Sunder[/b] (-35% Armor & -20% Elemental Resistances) for 4.0s
+"

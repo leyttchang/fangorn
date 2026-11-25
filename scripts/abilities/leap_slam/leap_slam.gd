@@ -17,8 +17,11 @@ extends Node3D
 @export_range(10.0, 60.0, 0.5) var max_leap_speed: float = 28.0
 
 @export_group("Air Control & Safety")
-@export_range(0.0, 1.0, 0.01) var air_steer_strength: float = 0.14
+@export_range(0.0, 40.0, 0.5) var mouse_air_turn_smoothing: float = 16.0
+@export_range(60.0, 1440.0, 10.0) var mouse_air_max_turn_deg_per_sec: float = 540.0
 @export_range(0.5, 10.0, 0.1) var max_air_timeout: float = 3.5
+
+const ENEMY_BODY_LAYER_MASK: int = 256
 
 var slam_impact: Node3D = null
 var decal: Decal = null
@@ -37,6 +40,8 @@ var _is_local_player: bool = false
 var _is_jumping: bool = false
 var _has_slammed: bool = false
 var _motion_override_active: bool = false
+var _has_saved_collision_mask: bool = false
+var _saved_collision_mask: int = 0
 var _remote_peak_reached: bool = false
 
 var _leap_dir: Vector3 = Vector3.FORWARD
@@ -185,10 +190,18 @@ func execute(caster: Node3D, target_data: Dictionary) -> void:
 		or caster.find_child("SkillBarComponent", true, false) != null
 	)
 
-	_leap_dir = _compute_initial_leap_direction(caster, _is_local_player)
+	_leap_dir = _get_caster_horizontal_forward(caster)
 	_jump_gravity = (8.0 * h_val) / (_duration * _duration)
 	_vy = (4.0 * h_val) / _duration
 	_horiz_vel = _leap_dir * _leap_speed
+
+	if _caster_body != null:
+		_saved_collision_mask = _caster_body.collision_mask
+		_has_saved_collision_mask = true
+		var airborne_mask: int = _saved_collision_mask & ~ENEMY_BODY_LAYER_MASK
+		if airborne_mask == 0:
+			airborne_mask = 1
+		_caster_body.collision_mask = airborne_mask
 
 	caster.set("external_motion_override", true)
 	_motion_override_active = true
@@ -232,19 +245,12 @@ func _physics_process(delta: float) -> void:
 			set_physics_process(false)
 			if attack_component != null:
 				attack_component.is_active_for_network = false
-			_trigger_ground_slam(_caster.global_position)
+			_trigger_ground_slam(_resolve_ground_impact_position(_caster.global_position))
 		return
 
-	# Léger contrôle aérien horizontal si le joueur local maintient une direction
-	if _is_local_player and air_steer_strength > 0.0 and _has_movement_actions():
-		var in_v: Vector2 = Input.get_vector("left", "right", "forward", "backward")
-		if in_v.length() > 0.1:
-			var steer_world: Vector3 = _caster.global_transform.basis * Vector3(in_v.x, 0.0, in_v.y)
-			steer_world.y = 0.0
-			if steer_world.length_squared() > 0.0001:
-				steer_world = steer_world.normalized()
-				_leap_dir = _leap_dir.lerp(steer_world, clampf(air_steer_strength * delta * 6.0, 0.0, 1.0)).normalized()
-				_horiz_vel = _leap_dir * _leap_speed
+	# Air control style Bounce Pad (Deadlock) : vitesse avant constante orientée selon la visée souris
+	if _is_local_player:
+		_apply_mouse_air_control(delta)
 
 	_vy = maxf(-45.0, _vy - _jump_gravity * delta)
 
@@ -258,12 +264,50 @@ func _physics_process(delta: float) -> void:
 
 	var min_air_check: float = minf(0.10, _duration * 0.25)
 	if _elapsed >= min_air_check:
-		var hit_floor: bool = _vy <= 0.0 and _caster_body != null and _caster_body.is_on_floor()
+		var hit_floor: bool = false
+		if _vy <= 0.0 and _caster_body != null and _caster_body.is_on_floor():
+			var char_blocker: CharacterBody3D = _get_character_floor_blocker(_caster_body)
+			if char_blocker != null:
+				# Évite de finir le saut sur la tête d'un monstre/mannequin : glisse sur le côté vers le vrai sol
+				var away: Vector3 = Vector3(
+					_caster_body.global_position.x - char_blocker.global_position.x,
+					0.0,
+					_caster_body.global_position.z - char_blocker.global_position.z
+				)
+				if away.length_squared() < 0.0004:
+					away = _leap_dir if _leap_dir.length_squared() > 0.0004 else Vector3.FORWARD
+				else:
+					away = away.normalized()
+				_caster_body.global_position += away * (6.5 * delta)
+				_horiz_vel = away * _leap_speed
+				_vy = minf(_vy, -5.0)
+			else:
+				hit_floor = true
+
 		var timed_out: bool = _elapsed >= max_air_timeout
-		var virtual_floor_hit: bool = _elapsed >= _duration and _caster.global_position.y <= _start_y + 0.05
+		var virtual_floor_hit: bool = (_caster_body == null) and _elapsed >= _duration and _caster.global_position.y <= _start_y + 0.05
 
 		if hit_floor or timed_out or virtual_floor_hit:
 			_finish_authoritative_landing()
+
+
+func _apply_mouse_air_control(delta: float) -> void:
+	var facing_dir: Vector3 = _get_caster_horizontal_forward(_caster)
+	if _leap_dir.length_squared() <= 0.0001:
+		_leap_dir = facing_dir
+	elif mouse_air_turn_smoothing <= 0.0:
+		_leap_dir = facing_dir
+	else:
+		var angle_diff: float = atan2(
+			_leap_dir.z * facing_dir.x - _leap_dir.x * facing_dir.z,
+			_leap_dir.x * facing_dir.x + _leap_dir.z * facing_dir.z
+		)
+		var blend: float = clampf(1.0 - exp(-mouse_air_turn_smoothing * delta), 0.0, 1.0)
+		var max_step: float = deg_to_rad(mouse_air_max_turn_deg_per_sec) * delta
+		var step: float = clampf(angle_diff * blend, -max_step, max_step)
+		_leap_dir = _leap_dir.rotated(Vector3.UP, step).normalized()
+
+	_horiz_vel = _leap_dir * _leap_speed
 
 
 func _finish_authoritative_landing() -> void:
@@ -280,7 +324,8 @@ func _finish_authoritative_landing() -> void:
 
 	if _caster != null and is_instance_valid(_caster):
 		_play_caster_animation(_caster, "leap_slam_land", clampf(_atk_spd, 0.85, 2.2))
-		_trigger_ground_slam(_caster.global_position)
+		var ground_impact_pos: Vector3 = _resolve_ground_impact_position(_caster.global_position)
+		_trigger_ground_slam(ground_impact_pos)
 	else:
 		queue_free()
 
@@ -316,13 +361,19 @@ func _trigger_ground_slam(impact_pos: Vector3) -> void:
 		if scaling_component.final_aoe_multiplier > 0.0:
 			aoe_mult = scaling_component.final_aoe_multiplier
 
-	if collision_shape != null and collision_shape.shape is CylinderShape3D:
-		var cyl: CylinderShape3D = (collision_shape.shape as CylinderShape3D).duplicate() as CylinderShape3D
-		cyl.radius = final_r
-		collision_shape.shape = cyl
+	var slam_cyl: CylinderShape3D = null
+	if collision_shape != null:
+		if collision_shape.shape is CylinderShape3D:
+			slam_cyl = (collision_shape.shape as CylinderShape3D).duplicate() as CylinderShape3D
+		else:
+			slam_cyl = CylinderShape3D.new()
+		slam_cyl.radius = final_r
+		slam_cyl.height = maxf(slam_cyl.height, 3.2)
+		collision_shape.shape = slam_cyl
+		collision_shape.position = Vector3(0.0, 0.9, 0.0)
 
 	if decal != null:
-		decal.size = Vector3(final_r * 2.0, 1.8, final_r * 2.0)
+		decal.size = Vector3(final_r * 2.0, 2.8, final_r * 2.0)
 		decal.modulate = Color(0.65, 0.46, 0.26, 1.0)
 		var decal_tween: Tween = create_tween()
 		decal_tween.tween_property(decal, "modulate", Color(0.34, 0.2244, 0.1088, 1.0), 0.28)
@@ -360,13 +411,16 @@ func _trigger_ground_slam(impact_pos: Vector3) -> void:
 				wave_impact.visible = false
 		)
 
+	if _is_authoritative and attack_component != null and slam_cyl != null:
+		_apply_immediate_slam_hits(impact_pos, slam_cyl)
+
 	if collision_shape != null and _is_authoritative:
-		collision_shape.disabled = false
+		collision_shape.set_deferred("disabled", false)
 		var hit_tween: Tween = create_tween()
-		hit_tween.tween_interval(0.15)
+		hit_tween.tween_interval(0.24)
 		hit_tween.tween_callback(func() -> void:
 			if is_instance_valid(collision_shape):
-				collision_shape.disabled = true
+				collision_shape.set_deferred("disabled", true)
 		)
 
 	var cleanup_tween: Tween = create_tween()
@@ -374,7 +428,98 @@ func _trigger_ground_slam(impact_pos: Vector3) -> void:
 	cleanup_tween.tween_callback(queue_free)
 
 
+func _apply_immediate_slam_hits(impact_pos: Vector3, cyl_shape: CylinderShape3D) -> void:
+	if attack_component == null or cyl_shape == null:
+		return
+	var world: World3D = get_world_3d()
+	if world == null or world.direct_space_state == null:
+		return
+
+	var shape_offset: Vector3 = collision_shape.position if collision_shape != null else Vector3(0.0, 0.9, 0.0)
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = cyl_shape
+	query.transform = Transform3D(Basis.IDENTITY, impact_pos + shape_offset)
+	query.collision_mask = attack_component.collision_mask
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+
+	var overlaps: Array[Dictionary] = world.direct_space_state.intersect_shape(query, 64)
+	for hit_info: Dictionary in overlaps:
+		var hit_collider: Variant = hit_info.get("collider")
+		if hit_collider is Area3D:
+			attack_component._on_area_entered(hit_collider as Area3D)
+
+
+func _resolve_ground_impact_position(origin_pos: Vector3) -> Vector3:
+	var foot_offset: float = _get_caster_foot_offset()
+	var world: World3D = get_world_3d()
+	if world != null and world.direct_space_state != null:
+		var space: PhysicsDirectSpaceState3D = world.direct_space_state
+		var ray_from: Vector3 = origin_pos + Vector3(0.0, 0.65, 0.0)
+		var ray_to: Vector3 = origin_pos - Vector3(0.0, foot_offset + 2.4, 0.0)
+		var env_mask: int = ((_saved_collision_mask if _has_saved_collision_mask else 1) & ~ENEMY_BODY_LAYER_MASK) | 1
+		var exclude_rids: Array[RID] = []
+		if _caster_body != null and is_instance_valid(_caster_body):
+			exclude_rids.append(_caster_body.get_rid())
+
+		for _attempt: int in range(6):
+			var query := PhysicsRayQueryParameters3D.create(ray_from, ray_to, env_mask, exclude_rids)
+			query.collide_with_areas = false
+			query.collide_with_bodies = true
+			var hit: Dictionary = space.intersect_ray(query)
+			if hit.is_empty():
+				break
+			var collider: Variant = hit.get("collider")
+			if collider is CharacterBody3D:
+				exclude_rids.append((collider as CollisionObject3D).get_rid())
+				continue
+			var hit_pos: Vector3 = hit.get("position", origin_pos - Vector3(0.0, foot_offset, 0.0))
+			return Vector3(origin_pos.x, hit_pos.y, origin_pos.z)
+
+	return origin_pos - Vector3(0.0, foot_offset, 0.0)
+
+
+func _get_caster_foot_offset() -> float:
+	if _caster == null or not is_instance_valid(_caster):
+		return 1.0
+	var col_node: CollisionShape3D = _caster.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if col_node != null and col_node.shape != null:
+		var s: Shape3D = col_node.shape
+		if s is CapsuleShape3D:
+			return maxf(0.1, (s as CapsuleShape3D).height * 0.5 - col_node.position.y)
+		elif s is CylinderShape3D:
+			return maxf(0.1, (s as CylinderShape3D).height * 0.5 - col_node.position.y)
+		elif s is BoxShape3D:
+			return maxf(0.1, (s as BoxShape3D).size.y * 0.5 - col_node.position.y)
+	return 1.0
+
+
+func _get_character_floor_blocker(body: CharacterBody3D) -> CharacterBody3D:
+	if body == null:
+		return null
+	var first_char: CharacterBody3D = null
+	var has_static_floor: bool = false
+	var count: int = body.get_slide_collision_count()
+	for i: int in range(count):
+		var col: KinematicCollision3D = body.get_slide_collision(i)
+		if col == null or col.get_normal().y <= 0.55:
+			continue
+		var collider: Object = col.get_collider()
+		if collider is CharacterBody3D:
+			if first_char == null:
+				first_char = collider as CharacterBody3D
+		else:
+			has_static_floor = true
+	if first_char != null and not has_static_floor:
+		return first_char
+	return null
+
+
 func _release_caster_motion_override() -> void:
+	if _has_saved_collision_mask and _caster_body != null and is_instance_valid(_caster_body):
+		_caster_body.collision_mask = _saved_collision_mask
+	_has_saved_collision_mask = false
+
 	if _motion_override_active and _caster != null and is_instance_valid(_caster):
 		_caster.set("external_motion_override", false)
 	_motion_override_active = false
@@ -388,24 +533,9 @@ func _check_caster_authority(in_caster: Node3D) -> bool:
 	return in_caster.is_multiplayer_authority()
 
 
-func _has_movement_actions() -> bool:
-	return (
-		InputMap.has_action("left")
-		and InputMap.has_action("right")
-		and InputMap.has_action("forward")
-		and InputMap.has_action("backward")
-	)
-
-
-func _compute_initial_leap_direction(in_caster: Node3D, use_local_input: bool) -> Vector3:
-	if use_local_input and _has_movement_actions():
-		var in_v: Vector2 = Input.get_vector("left", "right", "forward", "backward")
-		if in_v.length() > 0.1:
-			var input_dir: Vector3 = in_caster.global_transform.basis * Vector3(in_v.x, 0.0, in_v.y)
-			input_dir.y = 0.0
-			if input_dir.length_squared() > 0.0001:
-				return input_dir.normalized()
-
+func _get_caster_horizontal_forward(in_caster: Node3D) -> Vector3:
+	if in_caster == null or not is_instance_valid(in_caster):
+		return Vector3.FORWARD
 	var forward_horiz: Vector3 = Vector3(
 		-in_caster.global_transform.basis.z.x,
 		0.0,

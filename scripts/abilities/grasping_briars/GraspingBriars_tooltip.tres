@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Channeled Spell | Cooldown: 3.0s | Mana: 10 + 16.5/s[/color]
+
+[color=orange][b]- Grasping Briars -[/b][/color]
+Damage: [b]6.5[/b] Base every 0.34s [color=yellow](AoE)[/color]
+Damage Type: [color=#b86bff]100% Arcane[/color]
+Range: 24m (Cursor-Guided) • [color=violet]Captures & drags foes up to 5.5m along your path before releasing them[/color]
+Applies [b]Briar Root[/b] (-100% Move Speed) for 1.15s
+"

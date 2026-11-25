@@ -220,6 +220,7 @@ func generate_wall() -> void:
 			mm.set_instance_transform(i, chunk_list[i])
 			
 		mmi.multimesh = mm
+		mmi.layers = 2 # Couche 2 : visible caméra, ignorée par la HeightField de pluie
 		if tree_data["material"] != null:
 			mmi.material_override = tree_data["material"]
 			

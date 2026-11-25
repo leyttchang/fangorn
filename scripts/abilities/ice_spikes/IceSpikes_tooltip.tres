@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell | Cast: 0.30s | Cooldown: 6.5s | Mana Cost: 24[/color]
+
+[color=cyan][b]- Ice Spikes -[/b][/color]
+Target Range: [b]24.0m[/b] • Impact Radius: [b]4.2m[/b]
+Damage: [b]36[/b] Base [color=cyan]100% Ice[/color] [color=yellow](AoE)[/color]
+Knockback: [b]7.5[/b] (Impales upward)
+Applies [b]Freeze[/b] (100% chance) for [b]1.5s[/b], briefly paralyzing foes
+"

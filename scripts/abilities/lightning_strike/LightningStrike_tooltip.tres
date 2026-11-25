@@ -4,12 +4,11 @@
 
 [resource]
 script = ExtResource("1_wam2v")
-generated_text = "[color=lightblue]Spell | Cooldown: 4.0s | Mana Cost: 25.0[/color]
+generated_text = "[color=lightblue]Tier II Rare Spell | Cast: 0.45s | Cooldown: 6.5s | Mana Cost: 26[/color]
 
 [color=orange][b]- Lightning Strike -[/b][/color]
-Damage: [b]100.0[/b] Base
-Damage Type: [color=gold]100.0% Lightning[/color]
-Knockback: 15.0
-Applies [b]Shock[/b] (50.0% chance) for 6.0s
-
+Damage: [b]100[/b] Base [color=yellow](AoE)[/color]
+Damage Type: [color=gold]100% Lightning[/color]
+Radius: 1.5m • Knockback: 15.0
+Applies [b]Shock[/b] (50% chance) for 6.0s
 "

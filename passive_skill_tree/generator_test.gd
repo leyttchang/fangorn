@@ -215,6 +215,20 @@ func _gui_input(event: InputEvent) -> void:
 		canvas.offset = new_offset
 
 func _ready():
+	if not Engine.is_editor_hint():
+		var player_root: Node = owner if (owner != null and owner.is_in_group("Player")) else null
+		if player_root == null:
+			var p: Node = get_parent()
+			while p != null:
+				if p.is_in_group("Player"):
+					player_root = p
+					break
+				p = p.get_parent()
+		if multiplayer.has_multiplayer_peer() and player_root != null and not player_root.is_multiplayer_authority():
+			set_process(false)
+			set_process_input(false)
+			return
+
 	# Agrandir le panneau BEAUCOUP plus que la limite de camÃ©ra (3000 pixels) 
 	# pour crÃ©er une zone morte gÃ©ante qui captera TOUJOURS la souris.
 	offset_left = -3000

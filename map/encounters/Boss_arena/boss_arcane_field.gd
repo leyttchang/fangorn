@@ -54,7 +54,7 @@ const MIN_FLARE_SEPARATION_SQ: float = 36.0
 ## Accélération progressive des orbes au fil du temps (en m/s²)
 @export_range(0.0, 5.0, 0.05, "suffix:m/s²") var flare_acceleration: float = 0.35
 ## Vitesse maximale plafond des orbes après accélération (en m/s)
-@export_range(1.0, 25.0, 0.1, "suffix:m/s") var flare_max_speed: float = 8.6
+@export_range(1.0, 25.0, 0.01, "suffix:m/s") var flare_max_speed: float = 7.31
 ## Vitesse de braquage de base des orbes en vol (en rad/s)
 @export_range(0.2, 12.0, 0.1, "suffix:rad/s") var flare_turn_speed: float = 2.6
 ## Dégâts d'arcane infligés au contact avec un joueur

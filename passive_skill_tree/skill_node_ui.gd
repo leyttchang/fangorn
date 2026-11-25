@@ -76,7 +76,7 @@ func setup(p_data: SkillNodeData, p_index: int) -> void:
 			custom_minimum_size = Vector2(32.0, 32.0)
 			size = Vector2(32.0, 32.0)
 	elif node_index == 0:
-		_base_tooltip = "Origine de l'Arbre\nPoint de départ central (non remboursable)"
+		_base_tooltip = "Tree Origin\nCentral starting point (non-refundable)"
 
 	# Centrer l'image (pivot) après avoir changé la taille
 	pivot_offset = size / 2.0
@@ -128,9 +128,9 @@ func _refresh_tooltip() -> void:
 		return
 
 	if current_state == NodeState.AVAILABLE:
-		tooltip_text = _base_tooltip + "\n\n[Clic gauche : Allouer (1 pt)]"
+		tooltip_text = _base_tooltip + "\n\n[Left Click: Allocate (1 pt)]"
 	elif current_state == NodeState.UNLOCKED and node_index != 0:
-		tooltip_text = _base_tooltip + "\n\n[Clic droit : Rembourser (1 pt de Regret)]"
+		tooltip_text = _base_tooltip + "\n\n[Right Click: Refund (1 Refund pt)]"
 	else:
 		tooltip_text = _base_tooltip
 
@@ -224,4 +224,3 @@ func _on_button_up() -> void:
 		var target_scale: Vector2 = Vector2(1.1, 1.1) if _is_hovered else Vector2.ONE
 		_hover_tween = create_tween()
 		_hover_tween.tween_property(self, "scale", target_scale, 0.05)
-

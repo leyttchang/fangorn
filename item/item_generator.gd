@@ -1,6 +1,8 @@
 class_name ItemGenerator
 extends RefCounted
 
+const AFFIX_ROLL_CURVE: Curve = preload("res://components/stats/affix_roll_curve.tres")
+
 ## Fonction principale pour générer un équipement ou une arme
 static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.Rarity, all_possible_affixes: Array[AffixData]) -> EquipmentItem:
 	# 0. Vérification du drop Unique
@@ -92,7 +94,7 @@ static func generate_equipment(base: EquipmentItem, ilvl: int, rarity: ItemData.
 				valid_affixes.append(affix)
 	
 	# On charge la courbe de probabilité
-	var roll_curve: Curve = load("res://components/stats/affix_roll_curve.tres")
+	var roll_curve: Curve = AFFIX_ROLL_CURVE
 	
 	if num_affixes > 0 and valid_affixes.size() > 0:
 		# 5. Tirer les affixes aléatoires
@@ -329,7 +331,7 @@ static func upgrade_item_rarity(item: EquipmentItem, all_possible_affixes: Array
 	if item.specific_affix_multipliers.has(stat_name):
 		equipment_budget *= item.specific_affix_multipliers[stat_name]
 		
-	var roll_curve: Curve = load("res://components/stats/affix_roll_curve.tres")
+	var roll_curve: Curve = AFFIX_ROLL_CURVE
 	var roll_t = 0.0
 	if roll_curve != null:
 		while true:

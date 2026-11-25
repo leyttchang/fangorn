@@ -10,7 +10,11 @@ extends Node3D
 @export var line_material_3: Material
 @export var sphere_radius: float = 0.5
 @export var sphere_material: Material
-@export_flags_3d_physics var bounce_collision_mask: int = 4294967295
+# Layer 4 (8 = HitboxEnemie) | Layer 9 (256 = enemie)
+@export_flags_3d_physics var bounce_collision_mask: int = 8 | 256
+
+static var _shared_bounce_sphere: SphereShape3D = null
+static var _shared_bounce_params: PhysicsShapeQueryParameters3D = null
 
 @onready var attack_component: AttackComponent = $AttackComponent
 @onready var spell_scaling_component: SpellScalingComponent = $SpellScalingComponent
@@ -38,6 +42,9 @@ func execute(caster: Node3D, target_data: Dictionary) -> void:
 		start_node = main_gauche
 		
 	_process_bounce(initial_target, start_node, hit_targets)
+	if not hit_targets.is_empty() and is_instance_valid(caster):
+		var pitch_b: float = clampf(0.98 + float(mini(hit_targets.size(), 5)) * 0.02, 0.98, 1.08)
+		SpellAudioManager.play_lightning_cast(caster, start_node.global_position, pitch_b, 0.0)
 	# Le sort n'a plus besoin d'exister en tant que nœud, les lignes gèrent leur propre durée de vie
 	queue_free()
 
@@ -66,21 +73,25 @@ func _process_bounce(current_target: Node3D, previous_target: Node3D, hit_target
 		if hit_targets.size() >= max_bounces:
 			return
 			
-		# 5. Chercher la prochaine cible avec intersect_shape
+		# 5. Chercher la prochaine cible avec intersect_shape (forme et paramètres partagés, masque ciblé ennemis)
 		var target_pos = current_target.global_position
 		var space_state = get_world_3d().direct_space_state
-		var shape = SphereShape3D.new()
-		shape.radius = bounce_radius
-		
-		var params = PhysicsShapeQueryParameters3D.new()
-		params.shape = shape
-		params.transform = Transform3D(Basis(), target_pos)
-		params.collision_mask = bounce_collision_mask
+		if _shared_bounce_sphere == null:
+			_shared_bounce_sphere = SphereShape3D.new()
+			_shared_bounce_sphere.radius = bounce_radius
+		elif not is_equal_approx(_shared_bounce_sphere.radius, bounce_radius):
+			_shared_bounce_sphere.radius = bounce_radius
+
+		if _shared_bounce_params == null:
+			_shared_bounce_params = PhysicsShapeQueryParameters3D.new()
+		_shared_bounce_params.shape = _shared_bounce_sphere
+		_shared_bounce_params.transform = Transform3D(Basis(), target_pos)
+		# Si la scène .tscn sérialisait l'ancien masque complet 0xFFFFFFFF, restreindre aux couches ennemies (8 | 256)
+		_shared_bounce_params.collision_mask = (8 | 256) if bounce_collision_mask == 4294967295 else bounce_collision_mask
 		# On exclut le collider actuel pour éviter de se trouver soi-même
-		params.exclude = [current_target.get_rid()] 
-		
-		# TRÈS IMPORTANT : Le Terrain3D génère beaucoup de blocs. On met 256 au max_results (le 2ème paramètre)
-		var results = space_state.intersect_shape(params, 256)
+		_shared_bounce_params.exclude = [current_target.get_rid()]
+
+		var results = space_state.intersect_shape(_shared_bounce_params, 64)
 		
 		var nearest_enemy: Node3D = null
 		var min_dist = bounce_radius + 1.0

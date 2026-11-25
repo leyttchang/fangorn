@@ -21,6 +21,8 @@ class MobFireState:
 	var modified_attacks: Array[AttackComponent] = []
 
 var default_config: Resource
+var _enchanted_mobs: Array = []
+var _enchanted_mob_ids: PackedInt64Array = PackedInt64Array()
 var _mob_states: Dictionary = {} # instance_id (int) -> MobFireState
 var _global_active_patches: Array[Node3D] = []
 var _listened_containers: Array[Node] = []
@@ -74,6 +76,8 @@ func register_mob(mob: Node3D, config_res: Resource = null) -> void:
 		state.last_trail_xz = Vector2(mob.global_position.x, mob.global_position.z)
 		state.has_last_pos = true
 		_mob_states[mid] = state
+		_enchanted_mobs.append(mob)
+		_enchanted_mob_ids.append(mid)
 	else:
 		if cfg != null:
 			state.config = cfg
@@ -86,25 +90,32 @@ func register_mob(mob: Node3D, config_res: Resource = null) -> void:
 			mob.child_entered_tree.connect(cb)
 
 
-func unregister_mob(mob: Node3D) -> void:
+func unregister_mob(mob: Variant) -> void:
 	if mob == null:
 		return
-	_unregister_by_id(mob.get_instance_id())
+	var idx: int = _enchanted_mobs.find(mob)
+	if idx >= 0:
+		_unregister_by_id(_enchanted_mob_ids[idx])
+	elif is_instance_valid(mob):
+		_unregister_by_id((mob as Object).get_instance_id())
 
 
 func _unregister_by_id(mid: int) -> void:
-	if not _mob_states.has(mid):
-		return
-	var state: MobFireState = _mob_states[mid] as MobFireState
-	if state != null:
-		_clear_burn_from_modified_attacks(state)
-	_mob_states.erase(mid)
+	if _mob_states.has(mid):
+		var state: MobFireState = _mob_states[mid] as MobFireState
+		if state != null:
+			_clear_burn_from_modified_attacks(state)
+		_mob_states.erase(mid)
+	var idx: int = _enchanted_mob_ids.find(mid)
+	if idx >= 0:
+		_enchanted_mobs.remove_at(idx)
+		_enchanted_mob_ids.remove_at(idx)
 
 
 func _process(_delta: float) -> void:
 	_prune_dead_or_invalid_mobs()
 
-	if _mob_states.is_empty():
+	if _enchanted_mobs.is_empty():
 		if get_child_count() == 0:
 			if multiplayer.has_multiplayer_peer():
 				set_process(false)
@@ -119,23 +130,28 @@ func _process(_delta: float) -> void:
 
 	_ensure_spawned_projectiles_listener()
 
-	for mid in _mob_states.keys():
+	for i in range(_enchanted_mob_ids.size()):
+		var mid: int = _enchanted_mob_ids[i]
 		var state: MobFireState = _mob_states.get(mid) as MobFireState
-		if state == null or is_mob_invalid_or_dead(state.mob):
+		if state == null or is_mob_invalid_or_dead(_enchanted_mobs[i]):
 			continue
 		_update_mob_fire_trail(state)
 
 
 func _prune_dead_or_invalid_mobs() -> void:
-	if _mob_states.is_empty():
+	if _enchanted_mobs.is_empty():
+		if not _mob_states.is_empty():
+			_mob_states.clear()
 		return
-	var dead_ids: Array[int] = []
-	for mid in _mob_states.keys():
-		var state: MobFireState = _mob_states[mid] as MobFireState
-		if state == null or is_mob_invalid_or_dead(state.mob):
-			dead_ids.append(int(mid))
-	for mid in dead_ids:
-		_unregister_by_id(mid)
+	for i in range(_enchanted_mobs.size() - 1, -1, -1):
+		var mid: int = _enchanted_mob_ids[i]
+		var state: MobFireState = _mob_states.get(mid) as MobFireState
+		if state == null or is_mob_invalid_or_dead(_enchanted_mobs[i]):
+			_enchanted_mobs.remove_at(i)
+			_enchanted_mob_ids.remove_at(i)
+			if state != null:
+				_clear_burn_from_modified_attacks(state)
+			_mob_states.erase(mid)
 
 
 # =========================================================================
@@ -528,11 +544,12 @@ func _resolve_enchanted_owner_for_attack(atk: AttackComponent, attack_root: Node
 	var best_state: MobFireState = null
 	var best_dist_sq: float = INF
 
-	for mid in _mob_states.keys():
-		var st: MobFireState = _mob_states[mid] as MobFireState
-		if st == null or is_mob_invalid_or_dead(st.mob):
+	for i in range(_enchanted_mob_ids.size()):
+		var mid: int = _enchanted_mob_ids[i]
+		var st: MobFireState = _mob_states.get(mid) as MobFireState
+		if st == null or is_mob_invalid_or_dead(_enchanted_mobs[i]):
 			continue
-		var mob: Node3D = st.mob
+		var mob: Node3D = _enchanted_mobs[i] as Node3D
 		var is_attacking: bool = true
 		if "current_state" in mob and "State" in mob and "ATTACK" in mob.State:
 			is_attacking = (mob.current_state == mob.State.ATTACK)
@@ -559,8 +576,11 @@ static func _collect_attack_components(root: Node) -> Array[AttackComponent]:
 	return result
 
 
-static func is_mob_invalid_or_dead(mob: Node3D) -> bool:
-	if mob == null or not is_instance_valid(mob) or mob.is_queued_for_deletion():
+static func is_mob_invalid_or_dead(raw_mob: Variant) -> bool:
+	if raw_mob == null or not is_instance_valid(raw_mob):
+		return true
+	var mob := raw_mob as Node3D
+	if mob == null or mob.is_queued_for_deletion():
 		return true
 	var hc := mob.get_node_or_null("HealthComponent") as HealthComponent
 	if hc != null and hc.current_health <= 0.0:

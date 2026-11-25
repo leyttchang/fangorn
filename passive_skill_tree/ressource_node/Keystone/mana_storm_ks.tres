@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("1_gkhx3")
 node_id = "mana_storm"
-node_name = "Mana storm"
-description = "declanche une tempete de mana quand votre mana descend en dessous de 25%
-20 seconde de recuperation"
+node_name = "Mana Storm"
+description = "Triggers a Mana Storm when your mana drops below 25%.
+20s cooldown."
 icon = ExtResource("1_2r5pq")
 node_type = 2
 zone_barbarian_multiplier = 0.0

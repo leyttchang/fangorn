@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell | Instant | Cooldown: 9.5s | Mana Cost: 22[/color]
+
+[color=orange][b]- Blazing Stride -[/b][/color]
+Movement Speed: [color=lime][b]+60%[/b][/color] for [b]4.5s[/b]
+Wake Tick Damage: [b]14[/b] Base every 0.30s [color=yellow](AoE • 2.25m Radius)[/color]
+Patch Duration: 3.4s
+Damage Type: [color=orangered]100% Fire[/color]
+Applies [b]Burn[/b] (35% chance per tick) for 3.0s
+"

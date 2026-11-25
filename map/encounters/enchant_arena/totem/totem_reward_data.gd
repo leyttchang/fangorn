@@ -31,10 +31,10 @@ static var _ability_element_cache: Dictionary = {}
 static func is_attack_ability(ability: AbilityData) -> bool:
 	if ability == null:
 		return false
-	return (
-		ability.skill_type == AbilityData.SkillScalingType.ATTACK
-		or ability.category == AbilityData.AbilityCategory.WEAPON_ATTACK
-	)
+	if ability.skill_type == AbilityData.SkillScalingType.ATTACK or ability.category == AbilityData.AbilityCategory.WEAPON_ATTACK:
+		return true
+	var eff_id: String = ability.get_effective_id()
+	return eff_id in ["prismatic_blade", "thunder_aspect", "flaming_stab", "thunder_slash", "ice_crash", "leap_slam", "cleave"]
 
 
 ## Vrai si la compétence est un Sort (`SkillScalingType.SPELL` et non `WEAPON_ATTACK`)
@@ -66,6 +66,20 @@ static func _inspect_ability_element_uncached(ability: AbilityData) -> String:
 		var raw_elem: String = _normalize_element_token(str(ability.get("element")))
 		if not raw_elem.is_empty():
 			return raw_elem
+
+	# 1b. Table explicite pour les sorts/attaques procéduraux (dont les noeuds d'attaque sont créés au runtime)
+	var eff_id: String = ability.get_effective_id()
+	match eff_id:
+		"ember_bolt", "cinder_trail", "fireball", "dragons_breath", "burning_ground", "blazing_stride", "immolation_aura", "living_bomb", "flaming_stab":
+			return "fire"
+		"glacial_shell", "frost_pulse", "glacial_ram", "frostmirror_aegis", "ice_nova", "ice_spikes", "ice_path", "ice_crash":
+			return "ice"
+		"crackling_arc", "spark_step", "chain_lightning", "lodestone_beam", "living_lightning", "stormwire", "lightning_strike", "thunder_slash", "thunder_aspect":
+			return "lightning"
+		"creeping_roots", "kinetic_bolt", "grasping_briars", "sylvan_grapple", "singularity_orb", "magic_shot", "prismatic_blade":
+			return "arcane"
+		"dash", "warcry", "warcry_ability", "leap_slam", "cleave":
+			return ""
 
 	if ability.ability_scene == null:
 		return ""
@@ -240,9 +254,9 @@ static func get_locked_elemental_abilities(player: Node, element: String, want_a
 	if norm_elem.is_empty():
 		return result
 
-	var all_abilities: Array[AbilityData] = GameData.get_all_spells()
+	var all_abilities: Array[AbilityData] = GameData.get_all_non_evolution_skills()
 	for ab: AbilityData in all_abilities:
-		if ab == null:
+		if ab == null or ab.is_evolution_only:
 			continue
 		if want_attack and not is_attack_ability(ab):
 			continue

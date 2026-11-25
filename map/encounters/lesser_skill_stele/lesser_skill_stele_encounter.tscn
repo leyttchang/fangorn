@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://map/encounters/lesser_skill_stele/lesser_skill_stele_encounter.gd" id="1_enc_script"]
+[ext_resource type="PackedScene" path="res://objet/chest/lesser_skill_stele.tscn" id="2_lesser_stele"]
+[ext_resource type="PackedScene" uid="uid://bjpvlflywckyu" path="res://map/encounters/mob_raycast_spawner/mob_raycast_spawner.tscn" id="3_mobspawner"]
+[ext_resource type="PackedScene" uid="uid://5wrdcmpkd7se" path="res://character/enemie/dumb/dumb.tscn" id="4_dumb"]
+[ext_resource type="PackedScene" uid="uid://bh02yc666r2ee" path="res://character/enemie/dumb_archer/dumb_archer.tscn" id="5_archer"]
+[ext_resource type="PackedScene" uid="uid://bwv7mkwsym0an" path="res://character/enemie/spider/spider_enemie.tscn" id="6_spider"]
+[ext_resource type="PackedScene" uid="uid://btg4a1s8kbui" path="res://character/enemie/creep/creep.tscn" id="7_creep"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_lesser_enc"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:stele_level")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:is_starter_stele")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:is_unsealed")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[node name="LesserSkillSteleEncounter" type="Node3D"]
+script = ExtResource("1_enc_script")
+
+[node name="LesserSkillStele" parent="." instance=ExtResource("2_lesser_stele")]
+is_unsealed = false
+
+[node name="mob_raycast_spawner" parent="." instance=ExtResource("3_mobspawner")]
+monster_scenes = Array[PackedScene]([ExtResource("4_dumb"), ExtResource("5_archer"), ExtResource("6_spider"), ExtResource("7_creep")])
+monster_weights = Array[float]([1.7, 0.95, 0.55, 0.2])
+base_credits = 40
+credits_per_level = 15
+spawn_radius = 7.6
+min_spawn_radius = 3.2
+spawn_on_ready = false
+zone_aggro_enabled = true
+zone_aggro_radius = 18.5
+aggro_link = true
+combat_aggro_radius = 45.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 2.5
+replication_config = SubResource("SceneReplicationConfig_lesser_enc")

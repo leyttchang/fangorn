@@ -5,8 +5,11 @@ signal mana_changed(current_mana: float, max_mana: float)
 
 @export var stats_component: StatsComponent
 
+const REGEN_EMIT_INTERVAL: float = 0.066
+
 var current_mana: float = 0.0
 var _known_max_mana: float = 0.0
+var _emit_accum: float = 0.0
 
 func _ready() -> void:
 	if stats_component == null:
@@ -28,13 +31,20 @@ func _emit_initial() -> void:
 	mana_changed.emit(current_mana, _known_max_mana)
 
 func _process(delta: float) -> void:
+	if multiplayer.has_multiplayer_peer() and not is_multiplayer_authority():
+		return
+
 	var max_m = stats_component.get_stat_value("max_mana")
 	var regen = stats_component.get_stat_value("mana_regen")
 	
 	if current_mana < max_m and regen > 0:
-		current_mana += regen * delta
-		current_mana = min(current_mana, max_m)
-		mana_changed.emit(current_mana, max_m)
+		current_mana = minf(current_mana + regen * delta, max_m)
+		_emit_accum += delta
+		if current_mana >= max_m or _emit_accum >= REGEN_EMIT_INTERVAL:
+			_emit_accum = 0.0
+			mana_changed.emit(current_mana, max_m)
+	else:
+		_emit_accum = 0.0
 
 # Vérifie si le joueur a assez de mana pour lancer un sort
 func has_enough_mana(amount: float) -> bool:
@@ -44,6 +54,7 @@ func has_enough_mana(amount: float) -> bool:
 func use_mana(amount: float) -> bool:
 	if has_enough_mana(amount):
 		current_mana -= amount
+		_emit_accum = 0.0
 		mana_changed.emit(current_mana, stats_component.get_stat_value("max_mana"))
 		return true
 	return false
@@ -52,8 +63,8 @@ func use_mana(amount: float) -> bool:
 func add_mana(amount: float) -> void:
 	if amount > 0:
 		var max_m = stats_component.get_stat_value("max_mana")
-		current_mana += amount
-		current_mana = min(current_mana, max_m)
+		current_mana = minf(current_mana + amount, max_m)
+		_emit_accum = 0.0
 		mana_changed.emit(current_mana, max_m)
 
 # Si le joueur équipe un objet qui modifie son max_mana

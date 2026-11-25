@@ -19,6 +19,7 @@ func execute(caster: Node, target_data: Dictionary) -> void:
 	elif caster is Node3D:
 		global_position = caster.global_position
 		print("⚡ Lightning Strike spawn at caster position: ", global_position)
+	SpellAudioManager.play_lightning_strike_thunder(self, global_position)
 	
 	# 1. On lance le calcul des stats (Dégâts, Radius, Knockback...)
 	if scaling_component != null and scaling_component.has_method("on_execute"):

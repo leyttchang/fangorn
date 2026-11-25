@@ -6,7 +6,7 @@ enum Zone { ANY, BARBARIAN, MAGE, DUELIST, HYBRID_BARB_MAGE, HYBRID_MAGE_DUEL, H
 
 @export_category("Informations Principales")
 @export var node_id: String = ""
-@export var node_name: String = "Nouvelle Compétence"
+@export var node_name: String = "New Skill"
 @export_multiline var description: String = ""
 @export var icon: Texture2D
 

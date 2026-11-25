@@ -30,7 +30,7 @@ static var _active_frozen_arenas: Array = []
 ## Durée de fonte visuelle de la glace à la mort du boss (en secondes)
 @export_range(0.2, 3.0, 0.1, "suffix:s") var thaw_duration: float = 1.0
 ## Largeur du fondu progressif de la glace au pied du mur d'arbres (en mètres)
-@export_range(0.5, 14.0, 0.5, "suffix:m") var edge_fade_width: float = 4.5
+@export_range(0.5, 14.0, 0.5, "suffix:m") var edge_fade_width: float = 3.0
 ## Légère élévation du maillage de glace au-dessus du sol de l'arène (en mètres)
 @export_range(0.01, 0.15, 0.005, "suffix:m") var floor_height_offset: float = 0.035
 ## Optionnel : Path3D explicite délimitant l'arène (sinon détecté automatiquement dans BossArena)
@@ -99,25 +99,29 @@ static func get_ice_physics_at(world_pos: Vector3) -> Dictionary:
 		if arena == null or not arena._is_floor_frozen:
 			continue
 
-		# 1. Vérification verticale rapide autour de l'altitude du sol de l'arène
-		if absf(world_pos.y - arena._arena_ground_y) > 2.5:
-			continue
-
-		# 2. Vérification circulaire par rapport au front actuel de l'onde de gel
+		# 1. Vérification circulaire 2D par rapport au front actuel de l'onde de gel (+ marge de crête du shader)
 		var dx: float = world_pos.x - arena._freeze_origin_world.x
 		var dz: float = world_pos.z - arena._freeze_origin_world.z
-		var r: float = arena._current_freeze_radius
+		var r: float = arena._current_freeze_radius + 1.0
 		if (dx * dx + dz * dz) > (r * r):
 			continue
 
-		# 3. Vérification AABB 2D rapide dans le repère local de l'arène
+		# 2. Vérification AABB 2D rapide dans le repère local de l'arène
 		var local_pos: Vector3 = arena.to_local(world_pos)
 		var pt_local_2d := Vector2(local_pos.x, local_pos.z)
 		if not arena._local_aabb_2d.has_point(pt_local_2d):
 			continue
 
-		# 4. Test exact d'appartenance au polygone de l'arène
-		if arena._arena_poly_2d.size() < 3 or not Geometry2D.is_point_in_polygon(pt_local_2d, arena._arena_poly_2d):
+		# 3. Test d'appartenance au polygone de glace (avec tolérance de bord pour couvrir tout le rendu visuel jusqu'aux arbres)
+		if arena._arena_poly_2d.size() < 3:
+			continue
+		if not Geometry2D.is_point_in_polygon(pt_local_2d, arena._arena_poly_2d):
+			if arena._min_distance_to_polygon_edges(pt_local_2d, arena._arena_poly_2d) > 1.35:
+				continue
+
+		# 4. Vérification verticale par rapport à la hauteur RÉELLE du sol à (x, z) (suit les bords en pente de l'arène !)
+		var local_ground_y: float = arena._sample_arena_ground_y(world_pos.x, world_pos.z)
+		if absf(world_pos.y - (local_ground_y + 1.0)) > 5.5:
 			continue
 
 		return arena._cached_physics_dict
@@ -166,8 +170,7 @@ func _rpc_arm_ice_buff_client_state(boss_path: NodePath, totem_stacks: int) -> v
 	active_totem_stacks = totem_stacks
 	is_ice_buff_armed = true
 	_refresh_physics_dict()
-	if not _geometry_built:
-		_prepare_arena_geometry()
+	_prepare_arena_geometry()
 	_resolve_and_attach_boss_aura(boss_path, 4)
 
 
@@ -229,10 +232,7 @@ func on_boss_phase2_roar(roar_world_pos: Vector3 = Vector3.INF) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _rpc_trigger_arena_freeze(origin_pos: Vector3) -> void:
-	if not _geometry_built or not _last_built_global_xform.is_equal_approx(global_transform):
-		_prepare_arena_geometry()
-	else:
-		_arena_ground_y = _resolve_reference_ground_y()
+	_prepare_arena_geometry()
 
 	_ensure_visual_nodes()
 	_refresh_physics_dict()
@@ -474,9 +474,32 @@ func _extract_arena_polygon_local_2d() -> PackedVector2Array:
 		var fallback_packed := PackedVector2Array()
 		for v: Vector2 in cleaned:
 			fallback_packed.append(v)
-		return fallback_packed
+		simplified = fallback_packed
+
+	# Légère dilatation (+2.0m) pour épouser jusqu'aux troncs du mur d'arbres lissé (Chaikin)
+	var inflated_list: Array[PackedVector2Array] = Geometry2D.offset_polygon(simplified, 2.0, Geometry2D.JOIN_ROUND)
+	if not inflated_list.is_empty():
+		var best_poly: PackedVector2Array = inflated_list[0]
+		var best_area: float = _compute_abs_area_2d(best_poly)
+		for cand: PackedVector2Array in inflated_list:
+			var cand_area: float = _compute_abs_area_2d(cand)
+			if cand_area > best_area:
+				best_area = cand_area
+				best_poly = cand
+		if best_poly.size() >= 3 and not Geometry2D.triangulate_polygon(best_poly).is_empty():
+			return best_poly
 
 	return simplified
+
+
+func _compute_abs_area_2d(poly: PackedVector2Array) -> float:
+	var a: float = 0.0
+	var n: int = poly.size()
+	for i: int in range(n):
+		var p: Vector2 = poly[i]
+		var q: Vector2 = poly[(i + 1) % n]
+		a += p.x * q.y - q.x * p.y
+	return absf(a) * 0.5
 
 
 func _build_fallback_circle_polygon() -> PackedVector2Array:
@@ -499,7 +522,7 @@ func _compute_polygon_aabb(poly: PackedVector2Array) -> Rect2:
 	for p: Vector2 in poly:
 		min_p = min_p.min(p)
 		max_p = max_p.max(p)
-	return Rect2(min_p, max_p - min_p).grow(0.5)
+	return Rect2(min_p, max_p - min_p).grow(2.0)
 
 
 func _compute_required_freeze_radius(origin_world: Vector3) -> float:

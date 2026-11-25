@@ -191,6 +191,7 @@ func generate_props(custom_seed: int = 0) -> void:
 				roadside_trees.append(t_info)
 
 	var encounter_positions: Array = path_gen.encounter_positions
+	var lesser_stele_pts: Array = map_gen.lesser_stele_positions if "lesser_stele_positions" in map_gen else []
 	var spawn_start_2d: Vector2 = path_gen.start_pos
 	var arena_zones: Array = map_gen.get_arena_zones() if map_gen.has_method("get_arena_zones") else []
 	var segments: Array = path_gen.segments
@@ -260,8 +261,8 @@ func generate_props(custom_seed: int = 0) -> void:
 		if spawn_start_2d != Vector2.ZERO and candidate_2d.distance_squared_to(spawn_start_2d) < 484.0:
 			continue
 
-		# 4. Éviter les Encounters (villages, totems, cages PNJ) et les Arènes de Boss
-		if _is_inside_excluded_zones(candidate_2d, encounter_positions, encounter_exclusion_radius, arena_zones):
+		# 4. Éviter les Encounters (villages, totems, cages PNJ), Petites Stèles et les Arènes de Boss
+		if _is_inside_excluded_zones(candidate_2d, encounter_positions, encounter_exclusion_radius, arena_zones, lesser_stele_pts):
 			continue
 
 		# 5. Espacement minimal avec les autres instances de ce même prop
@@ -325,10 +326,13 @@ func generate_props(custom_seed: int = 0) -> void:
 
 	print("[RoadForestPropSpawner] '", name, "' : ", spawned_count, "/", target_count, " instances générées (fréquence = ", snappedf(spawn_frequency, 0.01), ").")
 
-func _is_inside_excluded_zones(pt: Vector2, encounters: Array, enc_rad: float, arenas: Array) -> bool:
+func _is_inside_excluded_zones(pt: Vector2, encounters: Array, enc_rad: float, arenas: Array, lesser_steles: Array = []) -> bool:
 	var enc_rad_sq := enc_rad * enc_rad
 	for ep in encounters:
 		if ep is Vector2 and pt.distance_squared_to(ep) < enc_rad_sq:
+			return true
+	for ls in lesser_steles:
+		if ls is Vector2 and pt.distance_squared_to(ls) < 324.0:
 			return true
 	for az in arenas:
 		if az is Dictionary and az.has("min_x"):

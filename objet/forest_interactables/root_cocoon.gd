@@ -9,8 +9,9 @@ extends Node3D
 ## - ~22% de chance (si pas de sac) de faire jaillir une orbe de Vie ou de Mana
 
 @export_category("Probabilités de Loot")
-@export_range(0.0, 100.0, 0.5, "suffix:%") var item_bag_drop_chance: float = 10.0
-@export_range(0.0, 100.0, 0.5, "suffix:%") var vital_orb_drop_chance: float = 22.0
+@export_range(0.0, 100.0, 0.5, "suffix:%") var item_bag_drop_chance: float = 0.0
+@export_range(0.0, 100.0, 0.5, "suffix:%") var vital_orb_drop_chance: float = 30.0
+@export_range(0.01, 1.0, 0.01) var health_orb_heal_percent: float = 0.15
 
 @export_group("Raretés du Sac")
 @export var weight_common: int = 52
@@ -22,7 +23,7 @@ extends Node3D
 @export var shatter_horizontal_impulse: float = 5.4
 @export var shatter_upward_impulse: float = 3.4
 @export var shatter_torque_impulse: float = 2.6
-@export var visibility_max_distance: float = 145.0
+@export var visibility_max_distance: float = 150.0
 
 const EGG_MESH_PATH := "res://assets/3D_models/VFX_spell/eggshape_mesh.tres"
 const CHUNK_MESH_PATH := "res://assets/3D_models/VFX_spell/insect_chunk_1_mesh.tres"
@@ -60,7 +61,7 @@ func _rebuild_visuals() -> void:
 	add_child(_visual_root)
 
 	var no_limit := Engine.is_editor_hint()
-	var vis_end := 0.0 if no_limit else visibility_max_distance
+	var vis_end := 0.0 if no_limit else (visibility_max_distance if visibility_max_distance > 0.0 else 150.0)
 
 	if _shared_cocoon_root_mat == null:
 		_shared_cocoon_root_mat = ProceduralForestMeshes.get_base_root_material(Color(0.72, 0.58, 0.40, 1.0), 0.105, 1.5)
@@ -136,15 +137,10 @@ func _server_handle_shatter(hit_dir: Vector3) -> void:
 	var orb_type_to_spawn: int = 0
 	var orb_angle: float = randf() * TAU
 
-	# 1. Jet de sac d'item (~10%)
-	var roll_bag := randf() * 100.0
-	if roll_bag <= item_bag_drop_chance:
-		_spawn_item_bag_server(hit_dir)
-	else:
-		# 2. Sinon, petite chance d'orbe de Vie ou de Mana (~22%)
-		var roll_orb := randf() * 100.0
-		if roll_orb <= vital_orb_drop_chance:
-			orb_type_to_spawn = VitalOrb.OrbType.HEALTH if randf() < 0.5 else VitalOrb.OrbType.MANA
+	# 30% de chance d'obtenir une petite orbe de vie (15% PV régénérés), aucun drop d'item
+	var roll_orb: float = randf() * 100.0
+	if roll_orb < vital_orb_drop_chance:
+		orb_type_to_spawn = VitalOrb.OrbType.HEALTH
 
 	if multiplayer.has_multiplayer_peer():
 		_rpc_explode_cocoon.rpc(hit_dir, orb_type_to_spawn, orb_angle)
@@ -215,6 +211,8 @@ func _shatter_roots_jolt(hit_dir: Vector3) -> void:
 		unique_mat.set_shader_parameter("fin", 0.0)
 		unique_mat.set_shader_parameter("debut", 1.0)
 		flying_mi.material_override = unique_mat
+		flying_mi.visibility_range_end = 150.0
+		flying_mi.visibility_range_end_margin = 20.0
 		rb.add_child(flying_mi)
 		add_child(rb)
 
@@ -266,6 +264,8 @@ func _spawn_shatter_particles(hit_dir: Vector3) -> void:
 		splinters.lifetime = 1.05
 		splinters.one_shot = true
 		splinters.explosiveness = 0.96
+		splinters.visibility_range_end = 90.0
+		splinters.visibility_range_end_margin = 15.0
 
 		var smat := ParticleProcessMaterial.new()
 		smat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
@@ -291,6 +291,8 @@ func _spawn_shatter_particles(hit_dir: Vector3) -> void:
 	sap_cloud.lifetime = 0.78
 	sap_cloud.one_shot = true
 	sap_cloud.explosiveness = 0.95
+	sap_cloud.visibility_range_end = 90.0
+	sap_cloud.visibility_range_end_margin = 15.0
 
 	var cmat := ParticleProcessMaterial.new()
 	cmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
@@ -350,10 +352,11 @@ func _spawn_vital_orb(orb_type: int, orb_angle: float) -> void:
 	var parent_target: Node = get_parent() if get_parent() != null else get_tree().current_scene
 	if parent_target == null:
 		return
-	var orb := VitalOrb.new()
-	var init_vel := Vector3(cos(orb_angle) * 2.2, 4.8, sin(orb_angle) * 2.2)
+	var orb: VitalOrb = VitalOrb.new()
+	orb.scale = Vector3.ONE * 0.82
+	var init_vel: Vector3 = Vector3(cos(orb_angle) * 2.2, 4.6, sin(orb_angle) * 2.2)
 	parent_target.add_child(orb)
-	orb.setup_orb(orb_type as VitalOrb.OrbType, global_position + Vector3(0.0, 0.72, 0.0), global_position.y, init_vel)
+	orb.setup_orb(orb_type as VitalOrb.OrbType, global_position + Vector3(0.0, 0.72, 0.0), global_position.y, init_vel, health_orb_heal_percent)
 
 func _spawn_item_bag_server(hit_dir: Vector3) -> void:
 	if not ResourceLoader.exists(BAG_SCENE_PATH):
@@ -393,12 +396,7 @@ func _spawn_item_bag_server(hit_dir: Vector3) -> void:
 		bag.angular_velocity = Vector3(randf_range(-4.0, 4.0), randf_range(-4.0, 4.0), randf_range(-4.0, 4.0))
 
 func _resolve_cocoon_ilvl() -> int:
-	var spawners := get_tree().get_nodes_in_group("SmartSpawner")
-	if not spawners.is_empty() and "current_wave" in spawners[0]:
-		var w: int = int(spawners[0].current_wave)
-		if w > 0:
-			return maxi(1, int(float(w) / 1.5))
-	return maxi(1, int(global_position.length() / 220.0) + 1)
+	return WorldLevelScaler.resolve_context_ilvl(self, global_position)
 
 func _roll_rarity() -> ItemData.Rarity:
 	var total := maxi(1, weight_common + weight_magic + weight_rare + weight_legendary)

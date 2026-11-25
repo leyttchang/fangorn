@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Mobility Spell | Instant | Cooldown: 4.5s | Mana Cost: 14[/color]
+
+[color=orange][b]- Spark Step -[/b][/color]
+Damage: [b]22[/b] Base [color=yellow](AoE Pass-Through)[/color]
+Damage Type: [color=gold]100% Lightning[/color]
+Dash Distance: ~7.0m (Zig-Zag Arc) • [color=cyan]Intangible + leaves crackling arc behind you[/color]
+Applies [b]Shock[/b] (50% chance) for 3.0s
+"

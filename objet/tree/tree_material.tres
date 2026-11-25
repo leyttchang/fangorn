@@ -44,4 +44,4 @@ shader_parameter/rebound_amount = 0.45
 shader_parameter/storm_base_lean = 0.42
 shader_parameter/lateral_amount = 0.06
 shader_parameter/vertical_dip = 0.15
-shader_parameter/wind_max_distance = 300.0
+shader_parameter/wind_max_distance = 160.0

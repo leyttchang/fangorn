@@ -167,7 +167,7 @@ libraries/ = SubResource("AnimationLibrary_mvp0p")
 
 [node name="InteractionComponent" parent="." unique_id=987654321 instance=ExtResource("5_wnu14")]
 collision_mask = 512
-prompt_text = "Appuyez sur E pour lancer la vague suivante"
+prompt_text = "Press [F] to start the next wave"
 
 [node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)

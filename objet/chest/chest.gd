@@ -52,7 +52,7 @@ func open_chest() -> void:
 	# On ne génère le loot qu'une seule fois
 	if not has_generated_loot:
 		has_generated_loot = true
-		var ilvl = chest_ilvl if chest_ilvl > 0 else _get_ilvl_from_wave()
+		var ilvl: int = _resolve_chest_ilvl()
 		
 		var num_items = 1
 		if randf() * 100.0 <= chance_2nd_item:
@@ -115,6 +115,27 @@ func _on_inventory_closed() -> void:
 			static_body.queue_free()
 			
 		_notify_looted()
+
+@rpc("authority", "call_local", "reliable")
+func sync_chest_ilvl(new_ilvl: int) -> void:
+	chest_ilvl = maxi(1, new_ilvl)
+
+func _resolve_chest_ilvl() -> int:
+	if chest_ilvl > 0:
+		return chest_ilvl
+	var p: Node = get_parent()
+	if p != null and "camp_ilvl" in p and int(p.get("camp_ilvl")) > 0:
+		return maxi(1, int(p.get("camp_ilvl")))
+	var spawners: Array[Node] = get_tree().get_nodes_in_group("SmartSpawner")
+	if not spawners.is_empty() and "current_wave" in spawners[0] and int(spawners[0].get("current_wave")) > 0:
+		return maxi(1, int(float(int(spawners[0].get("current_wave"))) / 1.5))
+	var mg: Node = WorldLevelScaler.find_map_generator(self)
+	if mg != null and "region_size" in mg and "map_width_chunks" in mg and "map_height_chunks" in mg:
+		var mw: float = float(mg.get("region_size")) * float(mg.get("map_width_chunks"))
+		var mh: float = float(mg.get("region_size")) * float(mg.get("map_height_chunks"))
+		if global_position.x < 0.0 or global_position.x > mw or global_position.z < 0.0 or global_position.z > mh:
+			return WorldLevelScaler.BOSS_ILVL
+	return WorldLevelScaler.resolve_context_ilvl(self, global_position)
 
 func _get_ilvl_from_wave() -> int:
 	var wave_num = 1

@@ -53,7 +53,7 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 23.0
 grow_horizontal = 2
-text = "Coffre"
+text = "Chest"
 horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/MarginContainer/HBoxContainer/grp_gauche/LootPanel" unique_id=530185518]

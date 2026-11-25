@@ -77,7 +77,7 @@ properties/1/spawn = true
 properties/1/replication_mode = 1
 properties/2/path = NodePath("HealthComponent:current_health")
 properties/2/spawn = true
-properties/2/replication_mode = 1
+properties/2/replication_mode = 2
 properties/3/path = NodePath("Camera3D/MainDroite:rotation")
 properties/3/spawn = true
 properties/3/replication_mode = 1
@@ -95,7 +95,7 @@ properties/7/spawn = true
 properties/7/replication_mode = 1
 properties/8/path = NodePath(".:nominal_speed")
 properties/8/spawn = true
-properties/8/replication_mode = 1
+properties/8/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hlie2"]
 
@@ -1238,7 +1238,7 @@ tracks/3/keys = {
 
 [sub_resource type="Animation" id="Animation_cleave_slash"]
 resource_name = "cleave_slash"
-length = 0.55
+length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1246,10 +1246,10 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.14, 0.27, 0.41, 0.55),
-"transitions": PackedFloat32Array(0.65, 1.4, 1, 0.75, 1),
+"times": PackedFloat32Array(0, 0.12, 0.21, 0.32, 0.42, 0.5),
+"transitions": PackedFloat32Array(0.58, 1.85, 0.72, 0.55, 0.65, 1),
 "update": 0,
-"values": [Vector3(0.5, -0.78, -1), Vector3(0.76, -0.38, -0.64), Vector3(0.04, -0.35, -1.26), Vector3(-0.54, -0.36, -1.02), Vector3(-0.78, -0.4, -0.66)]
+"values": [Vector3(0.5, -0.78, -1), Vector3(0.94, -0.33, -0.56), Vector3(0.02, -0.36, -1.38), Vector3(-0.82, -0.4, -0.98), Vector3(-0.98, -0.44, -0.62), Vector3(-0.92, -0.43, -0.66)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1258,10 +1258,10 @@ tracks/1/path = NodePath(".:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.14, 0.27, 0.41, 0.55),
-"transitions": PackedFloat32Array(0.65, 1.4, 1, 0.75, 1),
+"times": PackedFloat32Array(0, 0.12, 0.21, 0.32, 0.42, 0.5),
+"transitions": PackedFloat32Array(0.58, 1.85, 0.72, 0.55, 0.65, 1),
 "update": 0,
-"values": [Vector3(0, 0, 0), Vector3(-1.51, -1.22, 0.05), Vector3(-1.53, 0, 0), Vector3(-1.51, 0.82, -0.04), Vector3(-1.48, 1.28, -0.06)]
+"values": [Vector3(0, 0, 0), Vector3(-1.46, -1.46, 0.1), Vector3(-1.53, 0.06, 0), Vector3(-1.5, 1.18, -0.06), Vector3(-1.46, 1.54, -0.09), Vector3(-1.47, 1.46, -0.08)]
 }
 tracks/2/type = "method"
 tracks/2/imported = false
@@ -1270,7 +1270,7 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.14, 0.16, 0.46),
+"times": PackedFloat32Array(0.12, 0.13, 0.41),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
 "args": [],
@@ -1290,7 +1290,7 @@ tracks/3/path = NodePath("%Camera3D/../SkillBarComponent")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.13, 0.47),
+"times": PackedFloat32Array(0.11, 0.42),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": ["cleave_start"],
@@ -1307,15 +1307,15 @@ tracks/4/path = NodePath("%wrist:rotation")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.55),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.12, 0.21, 0.32, 0.42, 0.5),
+"transitions": PackedFloat32Array(0.58, 1.85, 0.72, 0.55, 0.65, 1),
 "update": 0,
-"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+"values": [Vector3(0, 0, 0), Vector3(0, 0.95, 0), Vector3(0, 1.32, 0), Vector3(0, 1.46, 0), Vector3(0, 1.52, 0), Vector3(0, 1.38, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_cleave_recovery"]
 resource_name = "cleave_slash_recovery"
-length = 0.24
+length = 0.21
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1323,10 +1323,10 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.24),
-"transitions": PackedFloat32Array(0.65, 1),
+"times": PackedFloat32Array(0, 0.21),
+"transitions": PackedFloat32Array(0.6, 1),
 "update": 0,
-"values": [Vector3(-0.78, -0.4, -0.66), Vector3(0.5, -0.9, -1)]
+"values": [Vector3(-0.92, -0.43, -0.66), Vector3(0.5, -0.9, -1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1335,10 +1335,10 @@ tracks/1/path = NodePath(".:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.24),
-"transitions": PackedFloat32Array(0.65, 1),
+"times": PackedFloat32Array(0, 0.21),
+"transitions": PackedFloat32Array(0.6, 1),
 "update": 0,
-"values": [Vector3(-1.48, 1.28, -0.06), Vector3(0, 0, 0)]
+"values": [Vector3(-1.47, 1.46, -0.08), Vector3(0, 0, 0)]
 }
 tracks/2/type = "method"
 tracks/2/imported = false
@@ -1347,12 +1347,24 @@ tracks/2/path = NodePath(".")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.21),
+"times": PackedFloat32Array(0.18),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],
 "method": &"end_combat_state"
 }]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%wrist:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.21),
+"transitions": PackedFloat32Array(0.6, 1),
+"update": 0,
+"values": [Vector3(0, 1.38, 0), Vector3(0, 0, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_aw5rd"]
@@ -1617,8 +1629,9 @@ metadata/_edit_group_ = true
 
 [node name="loot_cast" type="RayCast3D" parent="Camera3D" unique_id=1984343279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0022087097, 0.075296044, 0.2528488)
-target_position = Vector3(0, 0, -4)
+target_position = Vector3(0, 0, -4.6)
 collision_mask = 32
+hit_from_inside = true
 collide_with_areas = true
 collide_with_bodies = false
 script = ExtResource("15_2o2rg")

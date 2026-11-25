@@ -32,9 +32,9 @@ enum UIStyleMode {
 
 @export_group("Textes d'Interaction")
 ## Texte affiché avant l'activation du combat
-@export var prompt_activate: String = "Press [E] to challenge the Totem"
+@export var prompt_activate: String = "Press [F] to challenge the Totem"
 ## Texte affiché une fois tous les monstres du totem vaincus
-@export var prompt_reward_ready: String = "Press [E] to claim the Totem's blessing"
+@export var prompt_reward_ready: String = "Press [F] to claim the Totem's blessing"
 ## Texte affiché après que le joueur a réclamé sa récompense
 @export var prompt_reward_claimed: String = "The purified Totem slumbers"
 
@@ -57,10 +57,12 @@ var _player_offered_choices: Dictionary = {}
 var _claimed_players: Dictionary = {}
 var _active_ui: CanvasLayer = null
 var _blessing_light_tween: Tween = null
+var _combat_watchdog_timer: float = 0.0
 
 
 func _ready() -> void:
 	add_to_group("EnchantTotem")
+	set_physics_process(false)
 	totem_element = _resolve_totem_element()
 	totem_ilvl = get_effective_ilvl()
 
@@ -68,6 +70,42 @@ func _ready() -> void:
 		if interaction_component.collision_layer != 0:
 			_initial_interaction_layer = interaction_component.collision_layer
 		_set_interaction_enabled(true, _get_formatted_activate_prompt())
+
+
+func _physics_process(delta: float) -> void:
+	if not is_activated or is_completed:
+		set_physics_process(false)
+		return
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		set_physics_process(false)
+		return
+	_combat_watchdog_timer += delta
+	if _combat_watchdog_timer < 1.0:
+		return
+	_combat_watchdog_timer = 0.0
+
+	if mob_spawner == null or not is_instance_valid(mob_spawner):
+		_on_spawner_all_mobs_defeated()
+		return
+
+	if mob_spawner.get_alive_mobs_count() == 0:
+		_on_spawner_all_mobs_defeated()
+		return
+
+	# Maintenir l'aggro sur le joueur vivant le plus proche tant que le combat du totem est actif
+	var best_player: Node3D = null
+	var best_d2: float = INF
+	var my_pos: Vector3 = global_position
+	for p_node: Node in get_tree().get_nodes_in_group("Player"):
+		var p3d: Node3D = p_node as Node3D
+		if p3d == null or not is_instance_valid(p3d) or p3d.get("is_dead") == true:
+			continue
+		var d2: float = my_pos.distance_squared_to(p3d.global_position)
+		if d2 < best_d2:
+			best_d2 = d2
+			best_player = p3d
+	if best_player != null:
+		mob_spawner.alert_all_mobs(best_player)
 
 
 func _exit_tree() -> void:
@@ -180,9 +218,11 @@ func _on_common_totem_activated(player: Node3D) -> void:
 	if mob_spawner != null:
 		if mob_spawner.encounter_level < totem_ilvl:
 			mob_spawner.encounter_level = totem_ilvl
+		mob_spawner.combat_aggro_radius = maxf(mob_spawner.combat_aggro_radius, mob_spawner.spawn_radius * 2.5 + 60.0)
 
 		# Sur le serveur (ou en solo), on écoute la défaite de tous les monstres pour valider le totem
 		if not multiplayer.has_multiplayer_peer() or multiplayer.is_server():
+			set_physics_process(true)
 			if not mob_spawner.all_mobs_defeated.is_connected(_on_spawner_all_mobs_defeated):
 				mob_spawner.all_mobs_defeated.connect(_on_spawner_all_mobs_defeated, CONNECT_ONE_SHOT)
 
@@ -278,6 +318,7 @@ func _open_reward_window(player: CharacterBody3D) -> void:
 	if player == null or _has_player_claimed(player):
 		return
 	if is_instance_valid(_active_ui):
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		return
 
 	var scene_to_open: PackedScene = _get_selected_ui_scene()
@@ -370,14 +411,14 @@ func apply_reward(reward_item: Variant, player: CharacterBody3D) -> void:
 # =========================================================================
 
 func _get_formatted_activate_prompt() -> String:
-	if prompt_activate == "Press [E] to challenge the Totem":
-		return "Press [E] to challenge the %s Totem" % totem_element.capitalize()
+	if prompt_activate == "Press [F] to challenge the Totem" or prompt_activate == "Press [E] to challenge the Totem":
+		return "Press [F] to challenge the %s Totem" % totem_element.capitalize()
 	return prompt_activate
 
 
 func _get_formatted_reward_prompt() -> String:
-	if prompt_reward_ready == "Press [E] to claim the Totem's blessing":
-		return "Press [E] to claim the %s Totem's blessing" % totem_element.capitalize()
+	if prompt_reward_ready == "Press [F] to claim the Totem's blessing" or prompt_reward_ready == "Press [E] to claim the Totem's blessing":
+		return "Press [F] to claim the %s Totem's blessing" % totem_element.capitalize()
 	return prompt_reward_ready
 
 
@@ -395,10 +436,17 @@ func _set_interaction_enabled(enabled: bool, text: String) -> void:
 			interaction_component.prompt_label.text = text
 		interaction_component.collision_layer = _initial_interaction_layer if _initial_interaction_layer != 0 else 32
 		interaction_component.monitoring = true
-		interaction_component.monitorable = true
+		interaction_component.monitorable = false
+		interaction_component.set_deferred("monitorable", true)
 		interaction_component.visible = true
 		if col_shape != null:
 			col_shape.set_deferred("disabled", false)
+		# Rafraîchir immédiatement le loot_cast local si le joueur vise déjà le totem à la fin du combat
+		if get_tree() != null:
+			for p_node: Node in get_tree().get_nodes_in_group("Player"):
+				var lc: RayCast3D = p_node.find_child("loot_cast", true, false) as RayCast3D
+				if lc != null:
+					lc.call_deferred("force_raycast_update")
 	else:
 		interaction_component.hide_prompt()
 		interaction_component.collision_layer = 0

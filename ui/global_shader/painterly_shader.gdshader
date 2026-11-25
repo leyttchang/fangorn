@@ -33,8 +33,27 @@ group_uniforms;
 const vec3 LUMA_WEIGHTS = vec3(0.2126, 0.7152, 0.0722);
 const float SQRT2_2 = 0.70710678;
 
+varying flat vec3 v_s_tint;
+varying flat vec3 v_l_tint;
+
+vec4 eval_kuwahara_sector(vec4 mk, vec3 sk) {
+	float inv_w = 1.0 / max(mk.w, 0.00001);
+	vec3 mean_k = mk.rgb * inv_w;
+	vec3 var_k = abs(sk * inv_w - mean_k * mean_k);
+	float sigma2 = dot(var_k, LUMA_WEIGHTS);
+
+	// Poids fort sur les secteurs à faible variance (aplat net sans bavure)
+	float s_scaled = 300.0 * sigma2;
+	float s2 = s_scaled * s_scaled;
+	float wt = 1.0 / (1.0 + s2 * s2);
+
+	return vec4(mean_k * wt, wt);
+}
+
 void vertex() {
 	POSITION = vec4(VERTEX.xy * 2.0, 1.0, 1.0);
+	v_s_tint = pow(max(shadow_tint.rgb, vec3(0.001)), vec3(1.0 / 2.2));
+	v_l_tint = pow(max(light_tint.rgb, vec3(0.001)), vec3(1.0 / 2.2));
 }
 
 void fragment() {
@@ -58,15 +77,28 @@ void fragment() {
 		const float zeta = 0.33;
 		const float eta = 0.85;
 
-		vec4 m[8];
-		vec3 s[8];
-
-		// Initialisation avec le pixel central dans les 8 secteurs (préserve la netteté des fins détails)
+		// Initialisation explicite sans tableaux dynamiques (zéro VGPR spilling vers la mémoire scratch)
 		vec3 center_c = texture(screen_texture, uv).rgb;
-		for (int k = 0; k < 8; ++k) {
-			m[k] = vec4(center_c * 0.125, 0.125);
-			s[k] = center_c * center_c * 0.125;
-		}
+		vec4 init_m = vec4(center_c * 0.125, 0.125);
+		vec3 init_s = center_c * center_c * 0.125;
+
+		vec4 m0 = init_m;
+		vec4 m1 = init_m;
+		vec4 m2 = init_m;
+		vec4 m3 = init_m;
+		vec4 m4 = init_m;
+		vec4 m5 = init_m;
+		vec4 m6 = init_m;
+		vec4 m7 = init_m;
+
+		vec3 s0 = init_s;
+		vec3 s1 = init_s;
+		vec3 s2 = init_s;
+		vec3 s3 = init_s;
+		vec3 s4 = init_s;
+		vec3 s5 = init_s;
+		vec3 s6 = init_s;
+		vec3 s7 = init_s;
 
 		for (int y = -radius; y <= radius; ++y) {
 			for (int x = -radius; x <= radius; ++x) {
@@ -86,52 +118,48 @@ void fragment() {
 				float g = exp(-dot(v, v) * 1.35);
 
 				// Calcul polynomial des 8 secteurs (4 cardinaux + 4 diagonaux tournés à 45°)
-				float w[8];
 				float z;
 				float vxx = zeta - eta * v.x * v.x;
 				float vyy = zeta - eta * v.y * v.y;
 
-				z = max(0.0, v.y + vxx);  w[0] = z * z;
-				z = max(0.0, -v.x + vyy); w[2] = z * z;
-				z = max(0.0, -v.y + vxx); w[4] = z * z;
-				z = max(0.0, v.x + vyy);  w[6] = z * z;
+				z = max(0.0, v.y + vxx);  float w0 = z * z;
+				z = max(0.0, -v.x + vyy); float w2 = z * z;
+				z = max(0.0, -v.y + vxx); float w4 = z * z;
+				z = max(0.0, v.x + vyy);  float w6 = z * z;
 
 				vec2 vd = SQRT2_2 * vec2(v.x - v.y, v.x + v.y);
 				vxx = zeta - eta * vd.x * vd.x;
 				vyy = zeta - eta * vd.y * vd.y;
 
-				z = max(0.0, vd.y + vxx);  w[1] = z * z;
-				z = max(0.0, -vd.x + vyy); w[3] = z * z;
-				z = max(0.0, -vd.y + vxx); w[5] = z * z;
-				z = max(0.0, vd.x + vyy);  w[7] = z * z;
+				z = max(0.0, vd.y + vxx);  float w1 = z * z;
+				z = max(0.0, -vd.x + vyy); float w3 = z * z;
+				z = max(0.0, -vd.y + vxx); float w5 = z * z;
+				z = max(0.0, vd.x + vyy);  float w7 = z * z;
 
-				float sum_w = w[0] + w[1] + w[2] + w[3] + w[4] + w[5] + w[6] + w[7];
+				float sum_w = w0 + w1 + w2 + w3 + w4 + w5 + w6 + w7;
 				float norm_factor = g / max(sum_w, 0.00001);
 
 				vec3 c2 = c * c;
-				for (int k = 0; k < 8; ++k) {
-					float wk = w[k] * norm_factor;
-					m[k] += vec4(c * wk, wk);
-					s[k] += c2 * wk;
-				}
+				w0 *= norm_factor; m0 += vec4(c * w0, w0); s0 += c2 * w0;
+				w1 *= norm_factor; m1 += vec4(c * w1, w1); s1 += c2 * w1;
+				w2 *= norm_factor; m2 += vec4(c * w2, w2); s2 += c2 * w2;
+				w3 *= norm_factor; m3 += vec4(c * w3, w3); s3 += c2 * w3;
+				w4 *= norm_factor; m4 += vec4(c * w4, w4); s4 += c2 * w4;
+				w5 *= norm_factor; m5 += vec4(c * w5, w5); s5 += c2 * w5;
+				w6 *= norm_factor; m6 += vec4(c * w6, w6); s6 += c2 * w6;
+				w7 *= norm_factor; m7 += vec4(c * w7, w7); s7 += c2 * w7;
 			}
 		}
 
 		// Pondération finale par l'inverse de la variance de chaque secteur
-		vec4 final_acc = vec4(0.0);
-		for (int k = 0; k < 8; ++k) {
-			float inv_w = 1.0 / max(m[k].w, 0.00001);
-			vec3 mean_k = m[k].rgb * inv_w;
-			vec3 var_k = abs(s[k] * inv_w - mean_k * mean_k);
-			float sigma2 = dot(var_k, LUMA_WEIGHTS);
-
-			// Poids fort sur les secteurs à faible variance (aplat net sans bavure)
-			float s_scaled = 300.0 * sigma2;
-			float s2 = s_scaled * s_scaled;
-			float wt = 1.0 / (1.0 + s2 * s2);
-
-			final_acc += vec4(mean_k * wt, wt);
-		}
+		vec4 final_acc = eval_kuwahara_sector(m0, s0);
+		final_acc += eval_kuwahara_sector(m1, s1);
+		final_acc += eval_kuwahara_sector(m2, s2);
+		final_acc += eval_kuwahara_sector(m3, s3);
+		final_acc += eval_kuwahara_sector(m4, s4);
+		final_acc += eval_kuwahara_sector(m5, s5);
+		final_acc += eval_kuwahara_sector(m6, s6);
+		final_acc += eval_kuwahara_sector(m7, s7);
 
 		color = final_acc.rgb / max(final_acc.w, 0.00001);
 	}
@@ -186,12 +214,9 @@ void fragment() {
 		float orig_luma = dot(gamma_col, LUMA_WEIGHTS);
 
 		// 3A. Split-Toning à LUMINANCE CONSTANTE (réchauffe sans jamais assombrir !)
-		vec3 s_tint = pow(max(shadow_tint.rgb, vec3(0.001)), vec3(1.0 / 2.2));
-		vec3 l_tint = pow(max(light_tint.rgb, vec3(0.001)), vec3(1.0 / 2.2));
-
 		// Dès les tons moyens-sombres (0.18+), on bascule vers la teinte chaude dorée
 		float warm_mask = smoothstep(0.10, 0.65, orig_luma);
-		vec3 target_tint = mix(s_tint, l_tint, warm_mask);
+		vec3 target_tint = mix(v_s_tint, v_l_tint, warm_mask);
 		vec3 neutral_tint = vec3(1.0);
 		vec3 active_tint = mix(neutral_tint, target_tint, clamp(warmth * 0.75, 0.0, 1.5));
 

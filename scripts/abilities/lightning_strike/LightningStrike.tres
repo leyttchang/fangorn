@@ -9,12 +9,18 @@
 [resource]
 script = ExtResource("1_script")
 ability_name = "Lightning Strike"
-description = "Calls down a devastating thunderbolt from the sky to smite the targeted area. Strikes with pinpoint accuracy and pure electrical wrath."
+description = "Calls down a devastating thunderbolt from the sky to smite the targeted area with pinpoint electrical wrath."
 icon = ExtResource("2_docdq")
-cooldown = 4.0
-mana_cost = 25.0
+cooldown = 6.5
+mana_cost = 26.0
 max_range = 25.0
-cast_time = 1.5
+cast_time = 0.45
+spell_id = "lightning_strike"
+tier = 2
+element = "lightning"
+max_spell_level = 5
+base_xp_to_level = 140
+is_rare_drop = true
 target_mode = 3
 cast_vfx_scene = ExtResource("2_0cfru")
 indicator_scene = ExtResource("3_indicator")

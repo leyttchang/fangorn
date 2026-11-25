@@ -1,45 +1,39 @@
 [gd_scene format=3 uid="uid://cekr3wmhu571c"]
 
-[ext_resource type="PackedScene" uid="uid://cjlkis05t14ni" path="res://objet/chest/low poly chest 1/Low_Poly_Chest GLTF/Simple_Chest GLTF.glb" id="1_rxqf2"]
-[ext_resource type="PackedScene" uid="uid://c1ebdtvibf4p4" path="res://objet/chest/particule_chest.tscn" id="2_isn6a"]
 [ext_resource type="Script" uid="uid://boupjl212x11c" path="res://objet/chest/skill_chest.gd" id="2_skillchest"]
 [ext_resource type="PackedScene" uid="uid://c5k807u123abc" path="res://components/interaction_component.tscn" id="3_interact"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_solid"]
-size = Vector3(1.2149, 0.9249, 0.7678)
+[sub_resource type="BoxShape3D" id="BoxShape3D_stele_solid"]
+size = Vector3(0.84, 1.62, 0.50)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_j0hct"]
-size = Vector3(2.3206787, 1.7149658, 1.7115479)
+[sub_resource type="BoxShape3D" id="BoxShape3D_stele_interact"]
+size = Vector3(2.35, 2.05, 2.25)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_j0hct"]
 properties/0/path = NodePath(".:rotation")
 properties/0/spawn = true
-properties/0/replication_mode = 1
+properties/0/replication_mode = 2
 properties/1/path = NodePath(".:position")
 properties/1/spawn = true
-properties/1/replication_mode = 1
+properties/1/replication_mode = 2
 
 [node name="SkillChest" type="Node3D" unique_id=1680074550]
 script = ExtResource("2_skillchest")
 
-[node name="Simple_Chest GLTF" parent="." unique_id=1602409973 instance=ExtResource("1_rxqf2")]
-
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=951093061]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=705017762]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
-shape = SubResource("BoxShape3D_solid")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.81, 0)
+shape = SubResource("BoxShape3D_stele_solid")
 
 [node name="InteractionComponent" parent="." unique_id=123456790 instance=ExtResource("3_interact")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36, 0)
 collision_mask = 512
-prompt_text = "Press E to open Skill Chest"
+prompt_text = "Press [F] to read the Skill Stele"
 
 [node name="CollisionShape3D" parent="InteractionComponent" index="0" unique_id=987654322]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.054382324, 0.8574829, -0.059265137)
-shape = SubResource("BoxShape3D_j0hct")
-
-[node name="chest_particule" parent="." unique_id=288196329 instance=ExtResource("2_isn6a")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0)
+shape = SubResource("BoxShape3D_stele_interact")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=870459558]
 replication_interval = 5.0

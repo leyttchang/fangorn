@@ -109,9 +109,11 @@ func _get_locked_spells(player: Node) -> Array[AbilityData]:
 	if spellbook_ui == null:
 		return locked
 	var skill_bar = _get_skill_bar(player)
-	var all_spells = GameData.get_all_spells()
+	var all_spells: Array[AbilityData] = GameData.get_droppable_skills(0.14)
+	if all_spells.is_empty():
+		all_spells = GameData.get_all_non_evolution_skills()
 	for sp in all_spells:
-		if sp == null:
+		if sp == null or sp.is_evolution_only:
 			continue
 		var already_unlocked = false
 		for unlocked in spellbook_ui.unlocked_spells:

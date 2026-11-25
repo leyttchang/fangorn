@@ -7,13 +7,19 @@
 
 [resource]
 script = ExtResource("1_a8h7x")
-ability_name = "Chaing lightning"
-description = "Unleashes a fierce bolt of raw lightning that violently arcs between multiple targets. The electricity seeks out nearby enemies, shocking them into submission."
+ability_name = "Chain Lightning"
+description = "Unleashes a fierce bolt of raw lightning that instantly arcs between multiple nearby enemies, shocking every target in the chain."
 icon = ExtResource("2_fpq6r")
-cooldown = 8.0
-mana_cost = 40.0
-max_range = 10.0
-cast_time = 2.0
+cooldown = 5.5
+mana_cost = 24.0
+max_range = 18.0
+cast_time = 0.35
+spell_id = "chain_lightning"
+tier = 2
+element = "lightning"
+max_spell_level = 5
+base_xp_to_level = 140
+is_evolution_only = true
 target_mode = 2
 cast_vfx_scene = ExtResource("2_maggd")
 ability_scene = ExtResource("1_tdoh0")

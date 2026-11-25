@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" uid="uid://d26m8dfptrfhi" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier II Spell | Instant | Cooldown: 12.0s | Mana Cost: 26[/color]
+
+[color=cyan][b]- Frostmirror Aegis (Barrier) -[/b][/color]
+Shield Amount: [b]42% of Max Health[/b] (scales with Spell Level)
+Duration: [b]6.5s[/b] • Poise: [b]+50 Knockback Resistance[/b] while active
+Shatter / Expiry Nova: [b]38[/b] Base [color=cyan]100% Ice[/color] Damage [color=yellow](6.0m AoE)[/color]
+Applies [b]Freeze[/b] (100% chance) for [b]2.2s[/b], immobilizing nearby foes
+"

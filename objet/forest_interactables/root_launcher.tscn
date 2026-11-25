@@ -25,7 +25,7 @@ shape = SubResource("CylinderShape3D_prox")
 collision_layer = 544
 collision_mask = 0
 script = ExtResource("2_intcmp")
-prompt_text = "[E] Propulser"
+prompt_text = "[F] Launch"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionComponent" unique_id=457389596]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)

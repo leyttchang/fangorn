@@ -15,6 +15,7 @@ func execute(caster: Node, target_data: Dictionary) -> void:
 	# Ice Nova est centré sur le lanceur
 	if caster is Node3D:
 		global_position = caster.global_position 
+	SpellAudioManager.play_ice_windup(self, global_position)
 	
 	# 1. On lance le calcul des stats (Dégâts, Radius, Knockback...)
 	if scaling_component != null and scaling_component.has_method("on_execute"):
@@ -37,6 +38,7 @@ func execute(caster: Node, target_data: Dictionary) -> void:
 
 # NOUVEAU : Méthode à appeler depuis ton AnimationPlayer pour activer les dégâts au bon moment
 func enable_damage() -> void:
+	SpellAudioManager.play_ice_cast(self, global_position, 1.03, 0.0)
 	if collision != null:
 		# On utilise set_deferred pour éviter les erreurs de physique
 		collision.set_deferred("disabled", false)

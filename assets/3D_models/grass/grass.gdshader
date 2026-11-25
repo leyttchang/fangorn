@@ -79,6 +79,7 @@ varying vec3 noiseLevel;
 // x = hauteur sur le brin (0 base, 1 pointe), y = vague de vent, z = secheresse, w = force de la vague
 varying vec4 g_data;
 varying vec2 g_rnd;
+varying vec3 v_up_view;
 
 float hash12(vec2 p) {
 	vec3 p3 = fract(vec3(p.xyx) * 0.1031);
@@ -104,80 +105,92 @@ void vertex() {
 	float dist = length(instance_pos - cam_pos);
 	vec2 p = instance_pos.xz;
 
-	// Aleatoire stable par touffe
-	vec2 rnd = vec2(hash12(p), hash12(p.yx + 19.19));
-
-	// 1. Amincissement par distance
+	// 1. Amincissement par distance + fondu final (early-exit avant bruit/textures si touffe cullee)
 	float keep = mix(1.0, far_keep, smoothstep(thin_start, thin_end, dist));
-	float alive = smoothstep(rnd.x - 0.08, rnd.x, keep);
-	float comp = inversesqrt(max(keep, 0.01));
-	VERTEX.xz *= comp;
-	VERTEX.y *= mix(1.0, comp, 0.4);
-	VERTEX *= alive;
+	float rnd_x = hash12(p);
+	float alive = smoothstep(rnd_x - 0.08, rnd_x, keep);
+	float fade = clamp(1.0 - smoothstep(fade_distance_min, fade_distance_max, dist), 0.0, 1.0);
 
-	// 2. Fondu final de disparition
-	VERTEX *= clamp(1.0 - smoothstep(fade_distance_min, fade_distance_max, dist), 0.0, 1.0);
-
-	// Hauteur sur le brin : UV.y = 1 a la racine, 0 a la pointe
-	float hr = clamp(1.0 - UV.y, 0.0, 1.0);
-	VERTEX.xz *= 1.0 - tip_pinch * hr * hr;
-
-	// 3. VENT ET MOUVEMENT ------------------------------------------------------
-	float gust = 0.5;
-	if (enable_wind_distance_cutoff && dist >= wind_max_distance) {
-		// Au-dela de wind_max_distance : AUCUN calcul de mouvement, sommet projete directement
-		VERTEX = (VIEW_MATRIX * MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-		NORMAL = MODELVIEW_NORMAL_MATRIX * NORMAL;
-		BINORMAL = MODELVIEW_NORMAL_MATRIX * BINORMAL;
-		TANGENT = MODELVIEW_NORMAL_MATRIX * TANGENT;
+	if (alive * fade <= 0.0005) {
+		VERTEX = (VIEW_MATRIX * vec4(instance_pos, 1.0)).xyz;
+		noiseLevel = vec3(0.0);
+		g_data = vec4(0.0);
+		g_rnd = vec2(0.0);
+		v_up_view = vec3(0.0, 1.0, 0.0);
 	} else {
-		// Rafales procedurales et turbulence (calculees seulement pres de la camera)
-		vec2 wdir = normalize(wind_direction + vec2(0.0001));
-		vec2 perp = vec2(-wdir.y, wdir.x);
-		float s = clamp(wind_strength * strength_mult, 0.0, 1.0);
+		// Aleatoire stable par touffe
+		vec2 rnd = vec2(rnd_x, hash12(p.yx + 19.19));
 
-		vec2 q = (p + rnd * gust_dithering) * gust_frequency - wind_scroll * gust_frequency * gust_travel;
-		float travel = vnoise(q) * 0.65 + vnoise(q * 2.3 + vec2(17.0, 31.0)) * 0.35;
-		float timing = vnoise(vec2(wind_time * gust_rate + rnd.x * 0.6, 0.0) + p * 0.025);
-		float g = smoothstep(gust_contrast.x, gust_contrast.y, mix(travel, timing, gust_randomness));
+		float comp = inversesqrt(max(keep, 0.01));
+		VERTEX.xz *= comp;
+		VERTEX.y *= mix(1.0, comp, 0.4);
+		VERTEX *= alive;
 
-		float f = s * mix(calm_lean, 1.0, g);
-		float lean_base = max_lean * pow(f, 0.707);
+		// 2. Fondu final de disparition
+		VERTEX *= fade;
 
-		vec2 tq = p * turb_frequency - wind_scroll * turb_frequency * gust_travel * 1.6;
-		float eddy = vnoise(tq + rnd * 3.0) * 2.0 - 1.0;
-		float tuft = vnoise(vec2(wind_time * turb_rate + rnd.y * 37.0, rnd.x * 53.0)) * 2.0 - 1.0;
-		float side = vnoise(vec2(wind_time * turb_rate * 0.8 + rnd.x * 41.0, rnd.y * 29.0 + 7.0)) * 2.0 - 1.0;
-		float t_amp = turbulence * max_lean * s * (0.45 + 0.55 * g);
-		float lean_full = clamp(lean_base + (eddy * 0.55 + tuft * 0.45) * t_amp, -back_swing * max_lean, max_lean * 1.1);
+		// Hauteur sur le brin : UV.y = 1 a la racine, 0 a la pointe
+		float hr = clamp(1.0 - UV.y, 0.0, 1.0);
+		VERTEX.xz *= 1.0 - tip_pinch * hr * hr;
 
-		float wf = 1.0;
-		if (enable_wind_distance_cutoff) {
-			wf = 1.0 - smoothstep(wind_max_distance * 0.75, wind_max_distance, dist);
+		// 3. VENT ET MOUVEMENT ------------------------------------------------------
+		float gust = 0.5;
+		if (enable_wind_distance_cutoff && dist >= wind_max_distance) {
+			// Au-dela de wind_max_distance : AUCUN calcul de mouvement, sommet projete directement
+			VERTEX = (VIEW_MATRIX * MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+			NORMAL = MODELVIEW_NORMAL_MATRIX * NORMAL;
+			BINORMAL = MODELVIEW_NORMAL_MATRIX * BINORMAL;
+			TANGENT = MODELVIEW_NORMAL_MATRIX * TANGENT;
+		} else {
+			// Rafales procedurales et turbulence (calculees seulement pres de la camera)
+			vec2 wdir = normalize(wind_direction + vec2(0.0001));
+			vec2 perp = vec2(-wdir.y, wdir.x);
+			float s = clamp(wind_strength * strength_mult, 0.0, 1.0);
+
+			vec2 q = (p + rnd * gust_dithering) * gust_frequency - wind_scroll * gust_frequency * gust_travel;
+			float travel = vnoise(q) * 0.65 + vnoise(q * 2.3 + vec2(17.0, 31.0)) * 0.35;
+			float timing = vnoise(vec2(wind_time * gust_rate + rnd.x * 0.6, 0.0) + p * 0.025);
+			float g = smoothstep(gust_contrast.x, gust_contrast.y, mix(travel, timing, gust_randomness));
+
+			float f = s * mix(calm_lean, 1.0, g);
+			float lean_base = max_lean * pow(f, 0.707);
+
+			vec2 tq = p * turb_frequency - wind_scroll * turb_frequency * gust_travel * 1.6;
+			float eddy = vnoise(tq + rnd * 3.0) * 2.0 - 1.0;
+			float tuft = vnoise(vec2(wind_time * turb_rate + rnd.y * 37.0, rnd.x * 53.0)) * 2.0 - 1.0;
+			float side = vnoise(vec2(wind_time * turb_rate * 0.8 + rnd.x * 41.0, rnd.y * 29.0 + 7.0)) * 2.0 - 1.0;
+			float t_amp = turbulence * max_lean * s * (0.45 + 0.55 * g);
+			float lean_full = clamp(lean_base + (eddy * 0.55 + tuft * 0.45) * t_amp, -back_swing * max_lean, max_lean * 1.1);
+
+			float wf = 1.0;
+			if (enable_wind_distance_cutoff) {
+				wf = 1.0 - smoothstep(wind_max_distance * 0.75, wind_max_distance, dist);
+			}
+			float lean_t = lean_full * wf;
+			gust = mix(0.5, g, wf);
+			float wobble = sin(wind_time * 1.3 * (1.0 + rnd.x + rnd.y)) * lateral_amount * (1.0 - g) * wf;
+			float side_n = side * wf;
+
+			float lean = lean_t * hr;
+			float side_off = side_n * t_amp * 0.5 * hr;
+
+			vec3 w = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+			float vh = max(w.y - instance_pos.y, 0.0);
+			w.xz += (wdir + perp * wobble) * (lean * vh) + perp * (side_off * vh);
+			w.y -= vh * (lean * lean + side_off * side_off) * 0.5;
+			VERTEX = (VIEW_MATRIX * vec4(w, 1.0)).xyz;
+			NORMAL = MODELVIEW_NORMAL_MATRIX * NORMAL;
+			BINORMAL = MODELVIEW_NORMAL_MATRIX * BINORMAL;
+			TANGENT = MODELVIEW_NORMAL_MATRIX * TANGENT;
 		}
-		float lean_t = lean_full * wf;
-		gust = mix(0.5, g, wf);
-		float wobble = sin(wind_time * 1.3 * (1.0 + rnd.x + rnd.y)) * lateral_amount * (1.0 - g) * wf;
-		float side_n = side * wf;
 
-		float lean = lean_t * hr;
-		float side_off = side_n * t_amp * 0.5 * hr;
-
-		vec3 w = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-		float vh = max(w.y - instance_pos.y, 0.0);
-		w.xz += (wdir + perp * wobble) * (lean * vh) + perp * (side_off * vh);
-		w.y -= vh * (lean * lean + side_off * side_off) * 0.5;
-		VERTEX = (VIEW_MATRIX * vec4(w, 1.0)).xyz;
-		NORMAL = MODELVIEW_NORMAL_MATRIX * NORMAL;
-		BINORMAL = MODELVIEW_NORMAL_MATRIX * BINORMAL;
-		TANGENT = MODELVIEW_NORMAL_MATRIX * TANGENT;
+		// 4. Donnees pour le fragment (1 lecture de texture par touffe, pas par pixel)
+		noiseLevel = textureLod(noise, p / noiseScale, 0.0).rgb;
+		float dry_n = textureLod(noise, p / (noiseScale * 3.0) + vec2(0.37, 0.11), 0.0).r;
+		g_data = vec4(hr, gust, smoothstep(0.55, 0.8, dry_n), wind_strength * gust);
+		g_rnd = rnd;
+		v_up_view = (VIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz;
 	}
-
-	// 4. Donnees pour le fragment (1 lecture de texture par touffe, pas par pixel)
-	noiseLevel = textureLod(noise, p / noiseScale, 0.0).rgb;
-	float dry_n = textureLod(noise, p / (noiseScale * 3.0) + vec2(0.37, 0.11), 0.0).r;
-	g_data = vec4(hr, gust, smoothstep(0.55, 0.8, dry_n), wind_strength * gust);
-	g_rnd = rnd;
 }
 
 void fragment() {
@@ -209,6 +222,5 @@ void fragment() {
 	if (!FRONT_FACING) {
 		n = -n;
 	}
-	vec3 up_view = (VIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz;
-	NORMAL = normalize(mix(n, up_view, normal_up_blend));
+	NORMAL = normalize(mix(n, v_up_view, normal_up_blend));
 }

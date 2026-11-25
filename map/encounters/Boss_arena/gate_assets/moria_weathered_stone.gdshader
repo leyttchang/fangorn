@@ -8,7 +8,7 @@ render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_sc
 // - Mousse forestière sombre au pied des maçonneries
 
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
-uniform sampler2D normal_tex : filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D normal_tex : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D roughness_tex : filter_linear_mipmap_anisotropic, repeat_enable;
 
 uniform vec4 stone_tint : source_color = vec4(1.22, 1.26, 1.32, 1.0);

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SpellTooltipData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/spell_tooltip_data.gd" id="1_tt"]
+
+[resource]
+script = ExtResource("1_tt")
+generated_text = "[color=lightblue]Tier I Spell | Instant | Cooldown: 4.0s | Mana Cost: 12[/color]
+
+[color=orange][b]- Frost Pulse -[/b][/color]
+Damage: [b]19[/b] Base [color=yellow](Frontal Cone)[/color]
+Damage Type: [color=cyan]100% Ice[/color]
+Cone Range: 5.5m • Knockback: 9.5
+Applies [b]Chill[/b] (-50% Move & Attack Speed) for 3.8s
+"

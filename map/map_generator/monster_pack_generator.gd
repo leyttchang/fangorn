@@ -148,11 +148,12 @@ func get_player_count_multiplier() -> float:
 	var player_count = _get_player_count()
 	return 1.0 + float(player_count - 1) * difficulty_scale_per_extra_player
 
-func _calculate_pack_credits(rng: RandomNumberGenerator) -> int:
-	var base_credits = rng.randi_range(min_pack_credits, max_pack_credits)
-	var level_bonus = (maxi(pack_level, 1) - 1) * credits_per_level
-	var player_count = _get_player_count()
-	var player_mult = 1.0
+func _calculate_pack_credits(rng: RandomNumberGenerator, zone_lvl: int = -1) -> int:
+	var base_credits: int = rng.randi_range(min_pack_credits, max_pack_credits)
+	var eff_lvl: int = zone_lvl if zone_lvl > 0 else maxi(pack_level, 1)
+	var level_bonus: int = (eff_lvl - 1) * 10
+	var player_count: int = _get_player_count()
+	var player_mult: float = 1.0
 	if scale_pack_size_with_players and player_count > 1:
 		player_mult += float(player_count - 1) * player_credit_multiplier
 	return maxi(int(float(base_credits + level_bonus) * player_mult), 1)
@@ -338,6 +339,9 @@ func _spawn_ambush_packs(count: int, rng: RandomNumberGenerator, path_gen: PathG
 			var ground_y = _get_terrain_height_at(ambush_center_2d.x, ambush_center_2d.y)
 			spawn_pos = Vector3(ambush_center_2d.x, ground_y, ambush_center_2d.y)
 		
+		if _is_near_lesser_stele(Vector2(spawn_pos.x, spawn_pos.z), 28.0):
+			continue
+
 		# Instanciation du contrôleur de pack
 		var pack: MonsterPack = pack_scene.instantiate() as MonsterPack
 		pack.name = "AmbushPack_%d" % (spawned_count + 1)
@@ -352,9 +356,10 @@ func _spawn_ambush_packs(count: int, rng: RandomNumberGenerator, path_gen: PathG
 		pack.setup_ambush(road_pos_3d, road_radius, ambush_detection_range, look_dir_3d)
 		_spawned_packs.append(pack)
 		
-		# Instanciation des monstres cachés derrière l'arbre avec le système de crédits
+		# Instanciation des monstres cachés derrière l'arbre avec le système de crédits et l'iLvl de zone (1..5)
+		var zone_lvl: int = WorldLevelScaler.get_zone_ilvl_at(self, spawn_pos)
 		var parent_for_monsters = _get_parent_for_monsters(pack)
-		var pack_credits = _calculate_pack_credits(rng)
+		var pack_credits = _calculate_pack_credits(rng, zone_lvl)
 		var chosen_monsters = _roll_monsters_for_pack(pack_credits, rng)
 		var lateral_dir_2d = Vector2(-behind_dir_2d.y, behind_dir_2d.x)
 		
@@ -375,6 +380,7 @@ func _spawn_ambush_packs(count: int, rng: RandomNumberGenerator, path_gen: PathG
 			var mz = mob_pos_2d.y
 			var my = _get_terrain_height_at(mx, mz) + spawn_height_offset
 			mob.global_position = Vector3(mx, my, mz)
+			WorldLevelScaler.apply_level_to_monster(mob, zone_lvl)
 			
 			# Orienter le monstre vers la route surveillée pour qu'il guette l'arrivée des joueurs
 			var look_target = Vector3(road_pos_3d.x, my, road_pos_3d.z)
@@ -416,8 +422,9 @@ func _spawn_patrol_packs(count: int, rng: RandomNumberGenerator, path_gen: PathG
 		pack.setup_patrol(route_3d, false, patrol_wait_time + rng.randf_range(-0.5, 0.5))
 		_spawned_packs.append(pack)
 		
+		var zone_lvl: int = WorldLevelScaler.get_zone_ilvl_at(self, route_3d[0])
 		var parent_for_monsters = _get_parent_for_monsters(pack)
-		var pack_credits = _calculate_pack_credits(rng)
+		var pack_credits = _calculate_pack_credits(rng, zone_lvl)
 		var chosen_monsters = _roll_monsters_for_pack(pack_credits, rng)
 		for scn in chosen_monsters:
 			var mob = scn.instantiate() as CharacterBody3D
@@ -431,6 +438,7 @@ func _spawn_patrol_packs(count: int, rng: RandomNumberGenerator, path_gen: PathG
 			var mz = route_3d[0].z + rng.randf_range(-2.0, 2.0)
 			var my = _get_terrain_height_at(mx, mz) + spawn_height_offset
 			mob.global_position = Vector3(mx, my, mz)
+			WorldLevelScaler.apply_level_to_monster(mob, zone_lvl)
 			_spawned_monsters.append(mob)
 			pack.add_member(mob)
 			
@@ -508,6 +516,9 @@ func _spawn_roam_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGen
 		# 1. Éviter les routes principales (rester dans la forêt)
 		if path_gen != null and path_gen.is_point_on_path(c, 35.0):
 			continue
+
+		if _is_near_lesser_stele(c, 30.0):
+			continue
 			
 		# 2. Éviter de se coller aux autres meutes rôdeurs
 		var too_close = false
@@ -534,8 +545,9 @@ func _spawn_roam_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGen
 		pack.setup_roam(rng.randf_range(roam_radius_min, roam_radius_max), roam_detection_range)
 		_spawned_packs.append(pack)
 		
+		var zone_lvl: int = WorldLevelScaler.get_zone_ilvl_at(self, spawn_pos)
 		var parent_for_monsters = _get_parent_for_monsters(pack)
-		var pack_credits = _calculate_pack_credits(rng)
+		var pack_credits = _calculate_pack_credits(rng, zone_lvl)
 		var chosen_monsters = _roll_monsters_for_pack(pack_credits, rng)
 		for scn in chosen_monsters:
 			var mob = scn.instantiate() as CharacterBody3D
@@ -549,6 +561,7 @@ func _spawn_roam_packs(count: int, rng: RandomNumberGenerator, path_gen: PathGen
 			var mz = spawn_pos.z + rng.randf_range(-2.5, 2.5)
 			var my = _get_terrain_height_at(mx, mz) + spawn_height_offset
 			mob.global_position = Vector3(mx, my, mz)
+			WorldLevelScaler.apply_level_to_monster(mob, zone_lvl)
 			_spawned_monsters.append(mob)
 			pack.add_member(mob)
 			
@@ -605,6 +618,9 @@ func _spawn_tree_men(count: int, rng: RandomNumberGenerator, path_gen: PathGener
 		# 3. Éviter le point de spawn immédiat des joueurs
 		if path_gen.start_pos != Vector2.ZERO and pos_2d.distance_squared_to(path_gen.start_pos) < (25.0 * 25.0):
 			continue
+
+		if _is_near_lesser_stele(pos_2d, 26.0):
+			continue
 			
 		# 4. Espacement minimum entre deux Tree Man
 		var too_close: bool = false
@@ -631,6 +647,8 @@ func _spawn_tree_men(count: int, rng: RandomNumberGenerator, path_gen: PathGener
 		var ground_y: float = _get_terrain_height_at(pos_2d.x, pos_2d.y)
 		mob.global_position = Vector3(pos_2d.x, ground_y + spawn_height_offset, pos_2d.y)
 		mob.rotation.y = rng.randf_range(0.0, TAU)
+		var tm_lvl: int = WorldLevelScaler.get_zone_ilvl_at(self, mob.global_position)
+		WorldLevelScaler.apply_level_to_monster(mob, tm_lvl)
 		
 		spawned_positions.append(pos_2d)
 		_spawned_monsters.append(mob)
@@ -731,3 +749,14 @@ func _get_map_bounds() -> Rect2:
 		w = reg_size * chunks_w
 		h = reg_size * chunks_h
 	return Rect2(0, 0, w, h)
+
+
+func _is_near_lesser_stele(pos_2d: Vector2, radius: float = 28.0) -> bool:
+	var map_gen: Node = get_parent()
+	if map_gen == null or not ("lesser_stele_positions" in map_gen):
+		return false
+	var r_sq: float = radius * radius
+	for ls_pt in map_gen.lesser_stele_positions:
+		if ls_pt is Vector2 and pos_2d.distance_squared_to(ls_pt as Vector2) < r_sq:
+			return true
+	return false
